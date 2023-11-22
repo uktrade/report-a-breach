@@ -3,18 +3,47 @@
 # verbose regular expressions by Black. Use [ ] to denote a significant space
 # character.
 
-[build-system]
-requires = ["setuptools==69.0.1"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "report-a-trade-sanctions-breach-prototype"
-version = "0"
+version = "0.0.1"
+requires-python = "3.11"
 
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+omit = [
+    '*/migrations/*',
+    '*/site-packages/*',
+    'manage.py',
+    '*/.pycharm_helpers/*',
+    '*/pycharm/*',
+]
+
+exclude_lines = [
+    # Don't complain about missing debug-only code:
+    'def __repr__',
+    'if self\.debug',
+
+    # Don't complain if tests don't hit defensive assertion code:
+    'raise AssertionError',
+    'raise NotImplementedError',
+
+    # Don't complain if non-runnable code isn't run:
+    'if 0:',
+    'if __name__ == .__main__.:',
+]
 
 [tool.black]
 line-length = 100
-target-version = ['py312']
+target-version = ['py311']
 exclude = '''
 /(
     \.eggs
@@ -31,40 +60,23 @@ exclude = '''
 [tool.isort]
 profile = "black"
 
-#
-# Global mypy config
-#
-[tool.mypy]
-python_version = "3.12"
-exclude = [
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "settings.test"
+norecursedirs = [
+    "allure-results",
+    "csv",
+    "dist",
+    "docs",
+    "*.egg-info",
+    ".git",
+    "htmlcov",
+    ".local",
+    ".ipynb_checkpoints",
+    "node_modules",
+    "prof",
+    "__pycache__",
+    "static",
+    "run",
+    "venv",
 ]
-show_error_codes = true
-check_untyped_defs = true
-warn_unused_configs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-
-#
-# Modules to ignore missing imports
-#
-[[tool.mypy.overrides]]
-module = [
-]
-ignore_missing_imports = true
-
-
-#
-# Modules to have extra typing checks (equivalent to --strict).
-# Extend as needed - modules added below as an example.
-# https://mypy.readthedocs.io/en/stable/existing_code.html#introduce-stricter-options
-#
-[[tool.mypy.overrides]]
-module = [
-]
-disallow_subclassing_any = true
-disallow_untyped_decorators = true
-disallow_any_generics = true
-disallow_untyped_calls = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-no_implicit_reexport = true
+addopts = "-n=auto"

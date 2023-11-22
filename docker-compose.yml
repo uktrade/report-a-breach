@@ -1,0 +1,100 @@
+# This docker-compose configuration is for ICMS development and CI environment.
+# Production deployment does not use this configuration.
+#
+# see https://hub.docker.com/ for the images used here
+version: "3.8"
+services:
+    db:
+        image: postgres:11.11
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=password
+        ports:
+            - "6000:5432"
+        networks:
+            - backend
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+            interval: 2s
+            timeout: 2s
+            retries: 5
+
+    web:
+        build:
+            context: .
+        command: scripts/entry.sh
+        environment:
+            - DJANGO_SETTINGS_MODULE
+            - PYTHONUNBUFFERED=1
+            - TSB_WEB_PORT
+            - TSB_DEBUG=True # Used in entry.sh
+        env_file:
+            - .env
+        ports:
+            - "8080:8080"
+        depends_on:
+            db:
+                condition: service_healthy
+        volumes:
+            - ./test-reports:/code/test-reports
+            - .:/code
+
+    celery-worker:
+        build:
+            context: .
+        command: celery --app=config.celery:app worker --loglevel=INFO -Q celery,mail
+        environment:
+            - DJANGO_SETTINGS_MODULE
+        env_file:
+            - .env
+        volumes:
+            - .:/code
+        networks:
+            - backend
+            - public
+
+    celery-beat:
+        build:
+            context: .
+        environment:
+            - DJANGO_SETTINGS_MODULE
+        env_file:
+            - .env
+        command: celery --app=config.celery:app beat --loglevel=INFO
+        volumes:
+            - .:/code
+        networks:
+            - backend
+
+    localstack:
+        container_name: localstack_main
+        image: localstack/localstack:0.14.2
+        ports:
+            - "4510-4559:4510-4559"  # external service port range
+            - "4566:4566"            # LocalStack Edge Proxy
+        environment:
+            - DEBUG=0
+            - DATA_DIR=/tmp/localstack/data
+            - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
+            - DOCKER_HOST=unix:///var/run/docker.sock
+            - HOSTNAME_EXTERNAL="localstack"
+            - SERVICES=s3
+        volumes:
+            - ls_data:/tmp/localstack
+            - "/var/run/docker.sock:/var/run/docker.sock"
+        networks:
+            - backend
+
+
+networks:
+    public:
+        driver: bridge
+        name: "tsb_public"
+    backend:
+        name: "tsb_backend"
+
+volumes:
+    pgdata:
+    ls_data:
