@@ -8,7 +8,7 @@ env.bak/
 venv.bak/
 
 # https://github.com/uktrade/pii-secret-check-hooks
-.pii-secret-hook/
+.pii-secret-hook
 ner_output_file.txt
 
 # Added by pyenv after setting a local python version on mac
@@ -68,7 +68,6 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-Pipfile.lock
 
 # Unit test / coverage reports
 htmlcov/
@@ -87,4 +86,3 @@ coverage.xml
 __pycache__/
 *.py[cod]
 *$py.class
-/Pipfile.lock
