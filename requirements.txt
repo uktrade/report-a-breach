@@ -29,7 +29,6 @@ pydantic==2.5.1
 pydantic_core==2.14.3
 pylint==3.0.2
 PyYAML==6.0.1
--e git+https://github.com/uktrade/report-a-breach-prototype.git@d90584e96dd97ea7bf01d92f092b11b1722932b4#egg=report_a_trade_sanctions_breach_prototype
 sqlparse==0.4.4
 srsly==2.4.8
 thinc==8.2.1
