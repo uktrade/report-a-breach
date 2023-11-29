@@ -38,7 +38,7 @@ dmypy.json
 *.log
 local_settings.py
 db.sqlite3
-tsb_service/migrations/
+*migrations/
 
 # Distribution / packaging
 .Python
