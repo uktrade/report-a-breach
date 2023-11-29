@@ -76,12 +76,12 @@ WSGI_APPLICATION = "report_tsb.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "breach_prototype",
         "USER": os.environ["DB_USER"],
         "PASSWORD": os.environ["DB_PASSWORD"],
         "HOST": "localhost",
-        "PORT": "5432",
+        "PORT": "",
     }
 }
 
