@@ -1,6 +1,6 @@
 from invoke import task
 
-# TBD if this will be used in conjunction with or as an alternative to docker-compose for local dev.
+# This needs to be a separate utility repo
 
 
 @task
