@@ -87,3 +87,6 @@ coverage.xml
 __pycache__/
 *.py[cod]
 *$py.class
+
+# node package files
+*node_modules/
