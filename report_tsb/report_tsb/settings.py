@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "crispy_forms_gds",
     "tsb_service",
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_form", "gds")
+CRISPY_TEMPLATE_PACK = "gds"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
