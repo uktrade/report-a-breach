@@ -41,51 +41,51 @@ services:
             - ./test-reports:/code/test-reports
             - .:/code
 
-    celery-worker:
-        build:
-            context: .
-        command: celery --app=config.celery:app worker --loglevel=INFO -Q celery,mail
-        environment:
-            - DJANGO_SETTINGS_MODULE
-        env_file:
-            - .env
-        volumes:
-            - .:/code
-        networks:
-            - backend
-            - public
-
-    celery-beat:
-        build:
-            context: .
-        environment:
-            - DJANGO_SETTINGS_MODULE
-        env_file:
-            - .env
-        command: celery --app=config.celery:app beat --loglevel=INFO
-        volumes:
-            - .:/code
-        networks:
-            - backend
-
-    localstack:
-        container_name: localstack_main
-        image: localstack/localstack:0.14.2
-        ports:
-            - "4510-4559:4510-4559"  # external service port range
-            - "4566:4566"            # LocalStack Edge Proxy
-        environment:
-            - DEBUG=0
-            - DATA_DIR=/tmp/localstack/data
-            - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
-            - DOCKER_HOST=unix:///var/run/docker.sock
-            - HOSTNAME_EXTERNAL="localstack"
-            - SERVICES=s3
-        volumes:
-            - ls_data:/tmp/localstack
-            - "/var/run/docker.sock:/var/run/docker.sock"
-        networks:
-            - backend
+#    celery-worker:
+#        build:
+#            context: .
+#        command: celery --app=config.celery:app worker --loglevel=INFO -Q celery,mail
+#        environment:
+#            - DJANGO_SETTINGS_MODULE
+#        env_file:
+#            - .env
+#        volumes:
+#            - .:/code
+#        networks:
+#            - backend
+#            - public
+#
+#    celery-beat:
+#        build:
+#            context: .
+#        environment:
+#            - DJANGO_SETTINGS_MODULE
+#        env_file:
+#            - .env
+#        command: celery --app=config.celery:app beat --loglevel=INFO
+#        volumes:
+#            - .:/code
+#        networks:
+#            - backend
+#
+#    localstack:
+#        container_name: localstack_main
+#        image: localstack/localstack:0.14.2
+#        ports:
+#            - "4510-4559:4510-4559"  # external service port range
+#            - "4566:4566"            # LocalStack Edge Proxy
+#        environment:
+#            - DEBUG=0
+#            - DATA_DIR=/tmp/localstack/data
+#            - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
+#            - DOCKER_HOST=unix:///var/run/docker.sock
+#            - HOSTNAME_EXTERNAL="localstack"
+#            - SERVICES=s3
+#        volumes:
+#            - ls_data:/tmp/localstack
+#            - "/var/run/docker.sock:/var/run/docker.sock"
+#        networks:
+#            - backend
 
 
 networks:
@@ -97,4 +97,4 @@ networks:
 
 volumes:
     pgdata:
-    ls_data:
+#    ls_data:
