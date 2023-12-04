@@ -31,7 +31,7 @@ services:
             - TSB_WEB_PORT
             - TSB_DEBUG=True # Used in entry.sh
         env_file:
-            - .env
+            - report_tsb/.env
         ports:
             - "8080:8080"
         depends_on:
@@ -41,32 +41,32 @@ services:
             - ./test-reports:/code/test-reports
             - .:/code
 
-    celery-worker:
-        build:
-            context: .
-        command: celery --app=config.celery:app worker --loglevel=INFO -Q celery,mail
-        environment:
-            - DJANGO_SETTINGS_MODULE
-        env_file:
-            - .env
-        volumes:
-            - .:/code
-        networks:
-            - backend
-            - public
-
-    celery-beat:
-        build:
-            context: .
-        environment:
-            - DJANGO_SETTINGS_MODULE
-        env_file:
-            - .env
-        command: celery --app=config.celery:app beat --loglevel=INFO
-        volumes:
-            - .:/code
-        networks:
-            - backend
+#    celery-worker:
+#        build:
+#            context: .
+#        command: celery --app=config.celery:app worker --loglevel=INFO -Q celery,mail
+#        environment:
+#            - DJANGO_SETTINGS_MODULE
+#        env_file:
+#            - .env
+#        volumes:
+#            - .:/code
+#        networks:
+#            - backend
+#            - public
+#
+#    celery-beat:
+#        build:
+#            context: .
+#        environment:
+#            - DJANGO_SETTINGS_MODULE
+#        env_file:
+#            - .env
+#        command: celery --app=config.celery:app beat --loglevel=INFO
+#        volumes:
+#            - .:/code
+#        networks:
+#            - backend
 
 #    localstack:
 #        container_name: localstack_main

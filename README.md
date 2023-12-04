@@ -26,3 +26,7 @@ Initialize npm
 
 Install Postgresql (MacOs)
 https://www.postgresql.org/download/macosx/
+
+Create your .env in the report_tsb directory
+and add the following
+`SECRET_KEY`
