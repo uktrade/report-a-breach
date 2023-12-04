@@ -68,24 +68,24 @@ services:
         networks:
             - backend
 
-    localstack:
-        container_name: localstack_main
-        image: localstack/localstack:0.14.2
-        ports:
-            - "4510-4559:4510-4559"  # external service port range
-            - "4566:4566"            # LocalStack Edge Proxy
-        environment:
-            - DEBUG=0
-            - DATA_DIR=/tmp/localstack/data
-            - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
-            - DOCKER_HOST=unix:///var/run/docker.sock
-            - HOSTNAME_EXTERNAL="localstack"
-            - SERVICES=s3
-        volumes:
-            - ls_data:/tmp/localstack
-            - "/var/run/docker.sock:/var/run/docker.sock"
-        networks:
-            - backend
+#    localstack:
+#        container_name: localstack_main
+#        image: localstack/localstack:0.14.2
+#        ports:
+#            - "4510-4559:4510-4559"  # external service port range
+#            - "4566:4566"            # LocalStack Edge Proxy
+#        environment:
+#            - DEBUG=0
+#            - DATA_DIR=/tmp/localstack/data
+#            - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
+#            - DOCKER_HOST=unix:///var/run/docker.sock
+#            - HOSTNAME_EXTERNAL="localstack"
+#            - SERVICES=s3
+#        volumes:
+#            - ls_data:/tmp/localstack
+#            - "/var/run/docker.sock:/var/run/docker.sock"
+#        networks:
+#            - backend
 
 
 networks:
@@ -97,4 +97,4 @@ networks:
 
 volumes:
     pgdata:
-    ls_data:
+#    ls_data:
