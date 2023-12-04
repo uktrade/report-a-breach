@@ -17,11 +17,11 @@ pip install -r requirements.txt
 pip freeze > requirements.txt
 ```
 
-Ensure pre-commit is installed properly:
-`pre-commit --version`
-Install the repos pre commit hooks:
-`pre-commit install`
-Set pre-commit to autoupdate:
+Ensure pre-commit is installed properly:\
+`pre-commit --version`\
+Install the repos pre commit hooks:\
+`pre-commit install`\
+Set pre-commit to autoupdate:\
 `pre-commit autoupdate`
 
 Install Postgresql (MacOs)
