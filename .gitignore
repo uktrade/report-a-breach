@@ -1,0 +1,89 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# https://github.com/uktrade/pii-secret-check-hooks
+.pii-secret-hook
+ner_output_file.txt
+
+# Added by pyenv after setting a local python version on mac
+.python-version
+
+# local docker-compose changes
+/docker-compose.override.yml
+
+# visual studio code project data
+/.vscode
+
+# localstack persistency data folder
+/.ls_data
+
+# postgress data
+/pgdata
+
+# intellij project data
+/.idea
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+*migrations/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
