@@ -87,3 +87,9 @@ coverage.xml
 __pycache__/
 *.py[cod]
 *$py.class
+
+# mac specific
+**/.DS_Store
+
+# node local files
+*node_modules
