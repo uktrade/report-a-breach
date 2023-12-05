@@ -40,3 +40,6 @@ ABC
 bootstrap3
 https://github.com/uktrade/report-a-breach-prototype/issues
 MIT
+report_trade_sanctions_breach.settings
+" Django settings for
+View.as_view

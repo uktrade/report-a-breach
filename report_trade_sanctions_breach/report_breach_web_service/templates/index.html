@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+
+{% block content %}
+
+  {% error_summary form %}
+
+  <span class="govuk-caption-xl">
+  </span>
+  <h2 class="govuk-heading-l">
+    Form
+  </h2>
+
+  <div class="govuk-body">
+    {% crispy form %}
+  </div>
+
+{% endblock %}
