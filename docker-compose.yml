@@ -31,7 +31,7 @@ services:
             - TSB_WEB_PORT
             - TSB_DEBUG=True # Used in entry.sh
         env_file:
-            - report_tsb/.env
+            - .env
         ports:
             - "8080:8080"
         depends_on:
@@ -67,7 +67,7 @@ services:
 #            - .:/code
 #        networks:
 #            - backend
-
+#
 #    localstack:
 #        container_name: localstack_main
 #        image: localstack/localstack:0.14.2
