@@ -39,6 +39,8 @@ dmypy.json
 local_settings.py
 db.sqlite3
 *migrations/
+# collectstatic output for local dev
+report_trade_sanctions_breach/static
 
 # Distribution / packaging
 .Python

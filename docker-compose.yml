@@ -28,8 +28,8 @@ services:
         environment:
             - DJANGO_SETTINGS_MODULE
             - PYTHONUNBUFFERED=1
-            - TSB_WEB_PORT
-            - TSB_DEBUG=True # Used in entry.sh
+            - WEB_PORT
+            - DEBUG=True # Used in entry.sh
         env_file:
             - .env
         ports:
@@ -91,9 +91,9 @@ services:
 networks:
     public:
         driver: bridge
-        name: "tsb_public"
+        name: "public"
     backend:
-        name: "tsb_backend"
+        name: "backend"
 
 volumes:
     pgdata:
