@@ -40,7 +40,7 @@ local_settings.py
 db.sqlite3
 *migrations/
 # collectstatic output for local dev
-report_trade_sanctions_breach/static
+report_trade_sanctions_breach/staticfiles
 
 # Distribution / packaging
 .Python

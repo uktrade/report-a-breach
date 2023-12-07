@@ -16,9 +16,7 @@
   <link rel="apple-touch-icon" sizes="152x152" href="{% static "govuk/images/govuk-apple-touch-icon-152x152.png" %}">
   <link rel="apple-touch-icon" href="{% static "govuk/images/govuk-apple-touch-icon.png" %}">
 
-  {% if not WEBPACK_DEV_URL %}
   <link rel="stylesheet" href="{% static "stylesheets/govuk-frontend-4.7.0.min.css" %}">
-  {% endif %}
 
   <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
 </head>
@@ -57,7 +55,6 @@
           <div class="govuk-header__content">
             <a href="{% block header__service__url %}{% endblock %}" class="govuk-header__link govuk-header__link--service-name">
               {% block header__service__name %}
-              Report a trade sanctions breach
               {% endblock %}
             </a>
             {% block header__service__navigaton %}
@@ -71,18 +68,18 @@
   {% endblock %}
 
   {% block phase_banner %}
-    <div class="govuk-phase-banner govuk-width-container">
-      <p class="govuk-phase-banner__content">
-        <strong class="govuk-tag govuk-phase-banner__content__tag">
-          {% block phase_banner__tag %}
-          {% endblock %}
-        </strong>
-        <span class="govuk-phase-banner__text">
-          {% block phase_banner__text %}
-          {% endblock %}
-        </span>
-      </p>
-    </div>
+<!--    <div class="govuk-phase-banner govuk-width-container">-->
+<!--&lt;!&ndash;      <p class="govuk-phase-banner__content">&ndash;&gt;-->
+<!--&lt;!&ndash;        <strong class="govuk-tag govuk-phase-banner__content__tag">&ndash;&gt;-->
+<!--&lt;!&ndash;          {% block phase_banner__tag %}&ndash;&gt;-->
+<!--&lt;!&ndash;          {% endblock %}&ndash;&gt;-->
+<!--&lt;!&ndash;        </strong>&ndash;&gt;-->
+<!--&lt;!&ndash;        <span class="govuk-phase-banner__text">&ndash;&gt;-->
+<!--&lt;!&ndash;          {% block phase_banner__text %}&ndash;&gt;-->
+<!--&lt;!&ndash;          {% endblock %}&ndash;&gt;-->
+<!--&lt;!&ndash;        </span>&ndash;&gt;-->
+<!--&lt;!&ndash;      </p>&ndash;&gt;-->
+<!--    </div>-->
   {% endblock %}
 
   {% block extra_header %}
