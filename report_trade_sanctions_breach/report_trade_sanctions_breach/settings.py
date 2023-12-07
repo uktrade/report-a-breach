@@ -125,10 +125,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-WEB_SERVICE_DIR = os.path.abspath(
+WEB_SERVICE_STATIC_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "../report_breach_web_service", "static")
 )
-STATICFILES_DIRS = (WEB_SERVICE_DIR,)  # /PS-IGNORE
+# used by djangos manage.py collectstatic command which copies the static files into the
+# top level project directory
+# more info: https://docs.djangoproject.com/en/4.2/ref/contrib/staticfiles/
+# The copied folder has been added to .gitignore
+# This may need to be revisited when we are deploying to a cloud env
+STATICFILES_DIRS = (WEB_SERVICE_STATIC_DIR,)  # /PS-IGNORE
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
