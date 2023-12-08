@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#0b0c0c">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>{% block title %}{{ form_title }}{% endblock %}</title>
+  {% block page_title %}{% endblock %}
 
   <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "govuk/images/favicon.ico" %}" type="image/x-icon">
   <link rel="mask-icon" href="{% static "govuk/images/govuk-mask-icon.svg" %}" color="#0b0c0c">
@@ -66,8 +66,14 @@
     </header>
 
   {% endblock %}
+{% block navigation %}{% endblock %}
+  {% block header_title %}{% endblock %}
 
+{% block service_name %}{% endblock %}
+
+{% block cookie_message %}{% endblock %}
   {% block phase_banner %}
+  {% block back_link %}{% endblock %}
 <!--    <div class="govuk-phase-banner govuk-width-container">-->
 <!--&lt;!&ndash;      <p class="govuk-phase-banner__content">&ndash;&gt;-->
 <!--&lt;!&ndash;        <strong class="govuk-tag govuk-phase-banner__content__tag">&ndash;&gt;-->
@@ -89,6 +95,7 @@
     <div class="govuk-width-container">
       <main class="govuk-main-wrapper" id="main-content" role="main">
         {% block content %}
+        {% block two_thirds %}{% endblock %}
         {% endblock %}
       </main>
     </div>
