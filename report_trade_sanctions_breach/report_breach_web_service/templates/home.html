@@ -7,26 +7,30 @@
 {% block service_name %}{% endblock %}
 
 {% block cookie_message %}
+<div class="govuk-width-container">
     <p>
         {% trans 'GOV.UK uses cookies to make the site simpler.' %}
         <a href="https://www.gov.uk/help/cookies">
             {% trans 'Find out more about cookies' %}
         </a>
     </p>
+</div>
 {% endblock %}
 
 {% block back_link %}
-	<div class="govuk-breadcrumbs">
-		<ol class="govuk-breadcrumbs__list">
-			{% for breadcrumb in breadcrumbs %}
+	<div class="govuk-width-container">
+		<div class="govuk-breadcrumbs">
+			<ol class="govuk-breadcrumbs__list">
+				{% for breadcrumb in breadcrumbs %}
+					<li class="govuk-breadcrumbs__list-item">
+						<a class="govuk-breadcrumbs__link" href="{{ breadcrumb }}">{{ breadcrumb }}</a>
+					</li>
+				{% endfor %}
 				<li class="govuk-breadcrumbs__list-item">
-					<a class="govuk-breadcrumbs__link" href="{{ breadcrumb }}">{{ breadcrumb }}</a>
+
 				</li>
-			{% endfor %}
-			<li class="govuk-breadcrumbs__list-item">
-				{{ service_name }}
-			</li>
-		</ol>
+			</ol>
+		</div>
 	</div>
 {% endblock %}
 
