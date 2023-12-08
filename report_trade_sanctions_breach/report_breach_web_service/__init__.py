@@ -1,1 +1,1 @@
-default_app_config = "report_breach_web_servuce.apps.ReportBreachWebServiceConfig"
+default_app_config = "report_breach_web_service.apps.ReportBreachWebServiceConfig"
