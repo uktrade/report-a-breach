@@ -3,16 +3,31 @@ from crispy_forms_gds.layout import Button
 from crispy_forms_gds.layout import Layout
 from django import forms
 
+from .constants import PROFESSIONAL_RELATIONSHIP_CHOICES
 
-# example taken from crispy-forms-gds tutorial
-class StartForm(forms.Form):
+
+class NameForm(forms.Form):
     name = forms.CharField(
         label="Name",
-        help_text="Your full name.",
+        help_text="What is your full name.",
         error_messages={"required": "Enter your name as it appears on your passport"},
     )
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
-        self.helper.layout = Layout("name", Button("submit", "Submit"))
+        self.helper.layout = Layout("name", Button("continue", "Continue"))
+        super().__init__(*args, **kwargs)
+
+
+class ProfessionalRelationshipForm(forms.Form):
+    name = forms.ChoiceField(
+        choices=((choice, choice) for choice in PROFESSIONAL_RELATIONSHIP_CHOICES),
+        widget=forms.RadioSelect,
+        label="What is the professional relationship with the company or person suspected of breaching sanctions?",
+        error_messages={"required": "Please select one of the choices to continue"},
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+        self.helper.layout = Layout("name", Button("continue", "Continue"))
         super().__init__(*args, **kwargs)
