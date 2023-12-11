@@ -1,8 +1,3 @@
-import abc
-from abc import ABC
-from abc import abstractmethod
-
-from crispy_forms_gds.layout import HTML
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 from django.views.generic import TemplateView
@@ -11,6 +6,7 @@ from .constants import BREADCRUMBS_START_PAGE
 from .constants import SERVICE_HEADER
 from .forms import NameForm
 from .forms import ProfessionalRelationshipForm
+from .models import BreachDetails
 
 
 class StartView(TemplateView):
@@ -22,11 +18,8 @@ class StartView(TemplateView):
         return context
 
 
-class BaseFormView(FormView, ABC):
-    @abstractmethod
-    def __init__(self, **kwargs):
-        self.template_name = "form.html"
-        super().__init__(**kwargs)
+class BaseFormView(FormView):
+    template_name = "form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -35,17 +28,19 @@ class BaseFormView(FormView, ABC):
 
 
 class NameView(BaseFormView):
-    def __init__(self, **kwargs):
-        self.form_class = NameForm
-        self.success_url = reverse_lazy("page_2")
-        super().__init__(**kwargs)
+    form_class = NameForm
+    success_url = reverse_lazy("page_2")
+
+    def __init__(self):
+        super().__init__()
 
 
 class ProfessionalRelationshipView(BaseFormView):
-    def __init__(self, **kwargs):
-        self.form_class = ProfessionalRelationshipForm
-        self.success_url = reverse_lazy("confirmation")
-        super().__init__(**kwargs)
+    form_class = ProfessionalRelationshipForm
+    success_url = reverse_lazy("confirmation")
+
+    def __init__(self):
+        super().__init__()
 
 
 class ReportSubmissionCompleteView(TemplateView):

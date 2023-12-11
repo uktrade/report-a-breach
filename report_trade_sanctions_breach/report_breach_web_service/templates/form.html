@@ -15,6 +15,10 @@
   </div>
 {% endblock %}
 
+{% block back_link %}
+<a href="{{request.META.HTTP_REFERER|escape}}" class="govuk-back-link govuk-width-container">Back</a>
+{% endblock %}
+
 {% block content %}
 {% error_summary form %}
 
