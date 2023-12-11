@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/uktrade/report-a-breach-prototype/issues"
   },
-  "homepage": "https://github.com/uktrade/report-a-breach-prototype#readme"
+  "homepage": "https://github.com/uktrade/report-a-breach-prototype#readme",
+  "dependencies": {
+    "govuk-frontend": "^4.7.0"
+  }
 }

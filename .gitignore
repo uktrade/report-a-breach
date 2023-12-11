@@ -39,6 +39,8 @@ dmypy.json
 local_settings.py
 db.sqlite3
 *migrations/
+# collectstatic output for local dev
+report_trade_sanctions_breach/staticfiles
 
 # Distribution / packaging
 .Python
@@ -87,3 +89,9 @@ coverage.xml
 __pycache__/
 *.py[cod]
 *$py.class
+
+# mac specific
+**/.DS_Store
+
+# node local files
+*node_modules

@@ -1,5 +1,5 @@
 """
-WSGI config for report_tsb project.
+WSGI config for report_trade_sanctions_breach project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "report_tsb.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "report_trade_sanctions_breach.settings")
 
 application = get_wsgi_application()

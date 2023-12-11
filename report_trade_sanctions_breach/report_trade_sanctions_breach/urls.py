@@ -1,5 +1,5 @@
 """
-URL configuration for report_tsb project.
+URL configuration for report_trade_sanctions_breach project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -19,6 +19,6 @@ from django.urls import include
 from django.urls import path
 
 urlpatterns = [
-    path("tsb_service/", include("tsb_service.urls")),
+    path("report_breach_web_service/", include("report_breach_web_service.urls")),
     path("admin/", admin.site.urls),
 ]

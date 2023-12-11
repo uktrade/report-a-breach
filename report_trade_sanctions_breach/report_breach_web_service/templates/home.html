@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block navigation %}{% endblock %}
+
+{% block header_title %}{% endblock %}
+
+{% block service_name %}{% endblock %}
+
+{% block cookie_message %}
+<!--<div class="govuk-width-container">-->
+<!--    <p>-->
+<!--        {% trans 'GOV.UK uses cookies to make the site simpler.' %}-->
+<!--        <a href="https://www.gov.uk/help/cookies">-->
+<!--            {% trans 'Find out more about cookies' %}-->
+<!--        </a>-->
+<!--    </p>-->
+<!--</div>-->
+{% endblock %}
+
+{% block back_link %}
+	<div class="govuk-width-container">
+		<div class="govuk-breadcrumbs">
+			<ol class="govuk-breadcrumbs__list">
+				{% for breadcrumb in breadcrumbs %}
+					<li class="govuk-breadcrumbs__list-item">
+						<a class="govuk-breadcrumbs__link" href="{{ breadcrumb.1 }}">{{ breadcrumb.0 }}</a>
+					</li>
+				{% endfor %}
+			</ol>
+		</div>
+	</div>
+{% endblock %}
+
+{% block two_thirds %}
+	<div>
+		<h2 class="govuk-heading-l">
+			{% block title %}
+				Report a suspected breach of trade sanctions
+			{% endblock %}
+		</h2>
+
+		<p class="govuk-body">Tell us if you, or someone else, has breached trade sanctions.
+		You can also tell us if you're not sure, but you suspect it might be a breach.
+		<br><br><b>When to report a breach</b>
+		<br>Description text here
+			<br>
+		<br>
+			<b>Which breaches are implemented and enforced by the Office of Trade Sanctions Implementation (OTSI)</b>
+		<br>Description text here with breakpoints
+			<br><br><b>Reporting other types of trade sanctions breaches</b>
+			<br>Description text here with breakpoints
+		<br><br><b>Who can report a suspected breach</b>
+			<br>Description text here
+		</p>
+		<a class="govuk-button govuk-button--start" id="button-sign-in" href="/report_breach_web_service/page_1">
+			Start now
+		</a>
+	</div>
+{% endblock %}

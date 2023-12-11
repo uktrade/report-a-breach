@@ -1,0 +1,21 @@
+{% extends "components/base.html" %}
+{% load i18n crispy_forms_tags crispy_forms_gds %}
+
+{% block right %}
+
+  {% breadcrumbs breadcrumbs %}
+
+  {% error_summary form %}
+
+  <span class="govuk-caption-xl">
+    {% trans 'Components' %}
+  </span>
+  <h1 class="govuk-heading-xl">
+    {{ title }}
+  </h1>
+
+  <div class="govuk-body">
+    {% crispy form %}
+  </div>
+
+{% endblock %}

@@ -29,7 +29,7 @@ https://www.postgresql.org/download/macosx/
 
 Setup your local environment variables
 ```
-cd report_tsb
+cd report_trade_sanctions_breach
 touch .env
 ```
 The project currently requires 3 env variables. SECRET_KEY, DB_USER, DB_PASSWORD.

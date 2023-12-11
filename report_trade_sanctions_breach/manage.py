@@ -6,7 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "report_tsb.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "report_trade_sanctions_breach.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

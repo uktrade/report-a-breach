@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class TsBreachAppConfig(AppConfig):
+class ReportBreachWebServiceConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "tsb_service"
+    name = "report_breach_web_service"
