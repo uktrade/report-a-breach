@@ -13,7 +13,6 @@ class StartView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # breadcrumbs currently only displaying the text without the real link
         context["breadcrumbs"] = BREADCRUMBS_START_PAGE
         return context
 
