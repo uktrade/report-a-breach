@@ -26,11 +26,15 @@ class ProfessionalRelationshipForm(forms.Form):
     name = forms.ChoiceField(
         choices=((choice, choice) for choice in PROFESSIONAL_RELATIONSHIP_CHOICES),
         widget=forms.RadioSelect,
-        label="What is the professional relationship with the company or person suspected of breaching sanctions?",
+        # TODO: The label on this form won't display as large, even when setting the helper.
+        label=mark_safe(
+            "<strong>What is the professional relationship with the company or person suspected of breaching sanctions?</strong>"
+        ),
         error_messages={"required": "Please select one of the choices to continue"},
     )
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
+        self.helper.label_size = Size.MEDIUM
         self.helper.layout = Layout("name", Button("continue", "Continue"))
         super().__init__(*args, **kwargs)
