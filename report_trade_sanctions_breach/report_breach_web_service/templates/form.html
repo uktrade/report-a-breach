@@ -23,6 +23,7 @@
 {% error_summary form %}
 
   <div class="govuk-body">
+    {% csrf_token %}
     {% crispy form %}
   </div>
 

@@ -1,19 +1,20 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from django.urls import re_path
 
 from .views import NameView
 from .views import ProfessionalRelationshipView
 from .views import ReportSubmissionCompleteView
 from .views import StartView
+from .views import SummaryView
 
 urlpatterns = [
     path("", StartView.as_view(), name="home"),
     path(r"page_1", NameView.as_view(), name="page_1"),
     path(r"page_2", ProfessionalRelationshipView.as_view(), name="page_2"),
+    # Not currently working
+    path("summary/<uuid:pk>/", SummaryView.as_view(), name="summary"),
     path(r"confirmation", ReportSubmissionCompleteView.as_view(), name="confirmation"),
-    # path(r"assets/images", View.as_view()),
-    # path(r"javascript/", View.as_view()),
-    # path(r"stylesheets/", View.as_view())
     # TODO: the static urls can likely be removed
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
