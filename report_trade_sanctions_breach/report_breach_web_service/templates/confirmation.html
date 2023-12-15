@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block navigation %}{% endblock %}
+
+{% block header_title %}{% endblock %}
+
+{% block service_name %}{% endblock %}
+
+{% block cookie_message %}
+
+{% endblock %}
+
+{% block back_link %}
+	<div class="govuk-width-container">
+		<div class="govuk-breadcrumbs">
+			<ol class="govuk-breadcrumbs__list">
+				{% for breadcrumb in breadcrumbs %}
+					<li class="govuk-breadcrumbs__list-item">
+						<a class="govuk-breadcrumbs__link" href="{{ breadcrumb.1 }}">{{ breadcrumb.0 }}</a>
+					</li>
+				{% endfor %}
+			</ol>
+		</div>
+	</div>
+{% endblock %}
+
+{% block two_thirds %}
+
+    <div class="govuk-form-group">
+
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--xl" for="search-reg-org">
+                Check your answers before sending
+            </label>
+        </h1>
+
+        <br>
+        <h2 class="govuk-heading-m">Organisation details</h2>
+
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered company number
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    Placeholder
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> company</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered name
+                </dt>
+                <dd class="govuk-summary-list__value">
+
+                    Some Organisation Name
+
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> organisation</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Trading name (optional)
+                </dt>
+                <dd class="govuk-summary-list__value">
+
+                    Some Organisation Name
+
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> trade</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Company registered address
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <ul class="govuk-list">
+
+                        <!-- {  % for contact in selected_contacts %  }
+
+                            <li>
+
+                                {  { contact.name }  } - {  { contact.email }  }
+
+                            </li>
+
+                        {  % endfor %  } -->
+
+                        <li> 1 Address Street </li>
+                        <li> City </li>
+                        <li> Post Code </li>
+
+
+                    </ul>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <a href="invite-party-contacts-choice" class="govuk-link--no-visited-state">
+                    {% endif %}
+
+                    Change
+                    <span class="govuk-visually-hidden"> contact</span>
+                    </a>
+
+                </dd>
+
+            </div>
+
+        </dl>
+
+        <br>
+        <h2 class="govuk-heading-m">Your details</h2>
+
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Full name
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    Placeholder
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> name</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Email address
+                </dt>
+                <dd class="govuk-summary-list__value">
+
+                    Some Organisation Name
+
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> email</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Phone number
+                </dt>
+                <dd class="govuk-summary-list__value">
+
+                    Some Organisation Name
+
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> phone</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+
+        <br><br>
+        <h2 class="govuk-heading-m">Recipient of services</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Who has been receiving the services?
+                </dt>
+                <dd class="govuk-summary-list__value">
+
+                    A company name?
+
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> organisation</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+
+        <br><br>
+        <h2 class="govuk-heading-m">Sanctions breach details</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-2">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Supporting documents (optional)
+                </dt>
+                <dd class="govuk-summary-list__value">
+
+                    Some Document Name
+
+                </dd>
+                <dd class="govuk-summary-list__actions">
+
+                    {% if new_contact %}
+                        <a href="{% url 'organisations:invite-party-contact-new' case_id=case_id %}" class="govuk-link--no-visited-state">
+                    {% else %}
+                        <!-- <a href="{  % url 'organisations:invite-party' case_id=case_id %  }" class="govuk-link--no-visited-state"> -->
+                            <a href="www.bbc.com" class="govuk-link--no-visited-state">
+                    {% endif %}
+                    Change
+                    <span class="govuk-visually-hidden"> trade</span>
+                    </a>
+
+                </dd>
+            </div>
+        </dl>
+
+        <br><br><br>
+        
+        <div class="govuk-button-group">
+            <form method="post">
+                {% csrf_token %}
+                <button role="button" draggable="false"
+                    class="govuk-button" data-module="govuk-button">
+                    Submit
+                </button>
+            </form>
+        </div>
+
+    </div>
+{% endblock %}

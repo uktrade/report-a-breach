@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+
+{% block header__service %}
+  <div class="govuk-header__content">
+    <a href="{% block header__service__url %}{% endblock %}" class="govuk-header__link govuk-header__service-name">
+      {% block header__service__name %}
+      {{ service_header }}
+      {% endblock %}
+    </a>
+    {% block header__service__navigaton %}
+    {% endblock %}
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-width-container">
+  <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--confirmation">
+          <h1 class="govuk-panel__title">
+            Submission complete
+          </h1>
+          <div class="govuk-panel__body">
+            Your reference number<br>
+            <strong>PLACEHOLDER</strong>
+          </div>
+        </div>
+        <p class="govuk-body">We've sent you a confirmation email.</p>
+        <h2 class="govuk-heading-m">What happens next</h2>
+        <p class="govuk-body">
+          We’ve sent your report to the Department for Business and Trade.
+        </p>
+        <p class="govuk-body">
+          They may contact you either to ask for more information.
+        </p>
+        <p class="govuk-body">
+          <a href="#" class="govuk-link">What did you think of this service?</a> (takes 30 seconds)
+        </p>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

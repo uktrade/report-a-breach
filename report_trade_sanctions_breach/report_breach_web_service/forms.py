@@ -16,3 +16,16 @@ class StartForm(forms.Form):
         self.helper = FormHelper()
         self.helper.layout = Layout("name", Button("submit", "Submit"))
         super().__init__(*args, **kwargs)
+
+
+class ConfirmationForm(forms.Form):
+    name = forms.CharField(
+        label="Name",
+        help_text="Your full name.",
+        error_messages={"required": "Enter your name as it appears on your passport"},
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+        self.helper.layout = Layout("name", Button("submit", "Submit"))
+        super().__init__(*args, **kwargs)
