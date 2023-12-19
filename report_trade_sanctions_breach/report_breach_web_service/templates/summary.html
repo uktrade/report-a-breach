@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load crispy_forms_tags crispy_forms_gds %}
     {% block navigation %}{% endblock %}
 
     {% block header_title %}{% endblock %}
@@ -15,6 +16,7 @@
     {% endblock %}
 
     {% block two_thirds %}
+{% block content %}
 
         <div class="govuk-summary-card">
   <div class="govuk-summary-card__title-wrapper">
@@ -48,13 +50,19 @@
   </div>
 </div>
 
-            </dl>
-            <button type="submit" data-prevent-double-click="true" class="govuk-button" data-module="govuk-button">
-            Confirm and send
-            </button>
-<!--            <a class="m_govuk-button m_govuk-button&#45;&#45;start" id="m_button-sign-in" rel="noreferrer" ahref="/report_breach_web_service/confirmation">-->
-<!--                Submit-->
-<!--            </a>-->
 
-        </div>
+{% error_summary form %}
+<a class="govuk-button govuk-button--start" id="button-sign-in" href="{{ success_url }}">
+			Start now
+		</a>
+<!--            <button type="submit" data-prevent-double-click="true" class="govuk-button" data-module="govuk-button">-->
+<!--            <a href="{{ success_url }}">-->
+<!--			Confirm and send-->
+<!--		    </a>-->
+<!--            </button>-->
+</dl>
+</div>
+
+
+{% endblock %}
 {% endblock %}

@@ -10,5 +10,3 @@ class BreachDetails(models.Model):
     reporter_full_name = models.CharField(blank=True, null=True)
     reporter_professional_relationship = models.TextField(blank=True, null=True)
     reporter_confirmation_id = models.CharField(blank=True, null=True)
-
-    # TODO: test to see if it can be removed

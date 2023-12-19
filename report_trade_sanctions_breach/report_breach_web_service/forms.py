@@ -42,13 +42,13 @@ class ProfessionalRelationshipForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         # TODO: check why this helper isn't working
         self.helper.label_size = Size.MEDIUM
         self.helper.layout = Layout(
             "reporter_professional_relationship", Button("continue", "Continue")
         )
-        super().__init__(*args, **kwargs)
 
     class Meta:
         model = BreachDetails

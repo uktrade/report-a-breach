@@ -64,7 +64,6 @@ class ProfessionalRelationshipView(BaseFormView):
 
     def form_valid(self, form):
         breach_details_instance = form.save(commit=False)
-        print(breach_details_instance.report_id)
         reporter_data = self.request.session.get("breach_details_instance", {})
         reporter_data[
             "reporter_professional_relationship"
@@ -90,48 +89,42 @@ class SummaryView(TemplateView):
 
     template_name = "summary.html"
     model = BreachDetails
-    success_url = reverse_lazy("confirmation")
+
+    def __init__(self):
+        super().__init__()
 
     def get(self, request, *args, **kwargs):
-        print(f"Session data: {self.request.session['breach_details_instance']}")
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        reference_id = str(uuid.uuid4()).split("-")[0]
-        breach_details_instance = form.save(commit=False)
-        breach_details_instance.reporter_confirmation_id = reference_id
-        breach_details_instance = form.save(commit=True)
-        self.object = self.request.session.pop("breach_details_instance")
-        self.object.save()
-        return super().form_valid(form)
-
-    # TODO: continue debug here, try to print the session data and pass that into the get method
-    def get_form_kwargs(self, **kwargs):
         kwargs = self.kwargs
-        print(kwargs)
-        kwargs["reporter_confirmation_id"] = self.object.reporter_confirmation_id
-        kwargs["reporter_full_name"] = self.object.reporter_full_name
-        kwargs[
+        self.object = self.request.session["breach_details_instance"]
+        kwargs["reporter_full_name"] = self.object["reporter_full_name"]
+        kwargs["reporter_professional_relationship"] = self.object[
             "reporter_professional_relationship"
-        ] = self.object.reporter_professional_relationship
-        return kwargs
+        ]
+        kwargs["pk"] = kwargs.get("pk", None)
+        kwargs.pop("pk")
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        kwargs = self.get_form_kwargs()
         context["full_name"] = kwargs["reporter_full_name"]
-        context["company_relationship"] = self.object.reporter_professional_relationship
-        print(f"object: {self.object.reporter_full_name}")
-        print(type(self.object))
-        print(f"kwargs: {kwargs['object'].reporter_full_name}")
+        context["company_relationship"] = kwargs["reporter_professional_relationship"]
+        context["success_url"] = self.get_success_url()
         return context
 
-    # def get_queryset(self):
-    #     return BreachDetails.objects.filter(report_id=self.kwargs["pk"])
+    def get_success_url(self):
+        return reverse(
+            "confirmation",
+            kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]},
+        )
 
-    # def get_object(self, queryset=None):
-    #     report_param = self.kwargs.get("pk")
-    #     return get_object_or_404(BreachDetails, report_id=report_param)
+    def post(self, request, *args, **kwargs):
+        reference_id = str(uuid.uuid4()).split("-")[0]
+        kwargs["reporter_confirmation_id"] = reference_id
+        print(f"kwargs: {kwargs}")
+        self.instance = BreachDetails(report_id=self.object.report_id)
+        self.instance.reporter_confirmation_id = reference_id
+        self.instance.save()
+        return super().post(request, *args, **kwargs)
 
 
 class ReportSubmissionCompleteView(TemplateView):
@@ -144,8 +137,8 @@ class ReportSubmissionCompleteView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        session_data = self.request.session.get("breach_details_instance")
+        print(f"Session data - confirmation: {session_data}")
         context["service_header"] = SERVICE_HEADER
-        context["application_reference_number"] = self.request.session.get(
-            "breach_details_instance"
-        ).reporter_confirmation_id
+        context["application_reference_number"] = kwargs["reporter_confirmation_id"]
         return context
