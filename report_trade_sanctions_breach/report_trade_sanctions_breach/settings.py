@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import environ
+
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -19,6 +21,10 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env()
+env.read_env()
+
+# TODO: replace os.environ with env?
 SECRET_KEY = os.environ["SECRET_KEY"]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -40,10 +46,15 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_forms_gds",
     "report_breach_web_service",
+    "django_chunk_upload_handlers",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_form", "gds")
 CRISPY_TEMPLATE_PACK = "gds"
+
+CLAM_AV_USERNAME = env("CLAM_AV_USERNAME", default=None)
+CLAM_AV_PASSWORD = env("CLAM_AV_PASSWORD", default=None)
+CLAM_AV_DOMAIN = env("CLAM_AV_DOMAIN", default=None)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -108,6 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+FILE_UPLOAD_HANDLERS = (
+    "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
+    "django_chunk_upload_handlers.s3.S3FileUploadHandler",
+)  # Order is important
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
