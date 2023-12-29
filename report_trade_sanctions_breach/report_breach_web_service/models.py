@@ -11,3 +11,8 @@ class BreachDetails(models.Model):
     report_date = models.DateField(auto_now=True)
     # TODO: add auto json validation - separate ticket, on hold for data model
     data = models.JSONField(default=dict)
+
+
+# TODO: add FileUpload model - to keep track of files that have been uploaded.
+class FileUpload(BaseModel):
+    pass
