@@ -24,13 +24,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 env.read_env()
 
-# TODO: replace os.environ with env?
-SECRET_KEY = os.environ["SECRET_KEY"]
+# TODO: replace os.environ[""] with env("") throughout?
+# SECURITY WARNING: keep the secret key used in production secret!
+# SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = env("SECRET_KEY")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
 
 ALLOWED_HOSTS = []
 
@@ -51,6 +55,9 @@ INSTALLED_APPS = [
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_form", "gds")
 CRISPY_TEMPLATE_PACK = "gds"
+
+# File storage
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 CLAM_AV_USERNAME = env("CLAM_AV_USERNAME", default=None)
 CLAM_AV_PASSWORD = env("CLAM_AV_PASSWORD", default=None)
