@@ -53,3 +53,14 @@ class ProfessionalRelationshipForm(forms.ModelForm):
     class Meta:
         model = BreachDetails
         fields = ["reporter_professional_relationship"]
+
+
+class SummaryForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(Button("submit", "Submit"))
+
+    class Meta:
+        model = BreachDetails
+        fields = ["reporter_full_name", "reporter_professional_relationship"]

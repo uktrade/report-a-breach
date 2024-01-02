@@ -1,9 +1,8 @@
 import uuid
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from django.urls import reverse
 from django.urls import reverse_lazy
-from django.views.generic import DetailView
 from django.views.generic import FormView
 from django.views.generic import TemplateView
 
@@ -11,6 +10,7 @@ from .constants import BREADCRUMBS_START_PAGE
 from .constants import SERVICE_HEADER
 from .forms import NameForm
 from .forms import ProfessionalRelationshipForm
+from .forms import SummaryForm
 from .models import BreachDetails
 
 
@@ -78,9 +78,7 @@ class ProfessionalRelationshipView(BaseFormView):
         )
 
 
-# The app makes it as far as this view then can't find breach details.
-# TODO: need to debug to find out why this view won't render
-class SummaryView(TemplateView):
+class SummaryView(FormView):
     """
     The summary page will display the information the reporter has provided,
     and give them a chance to change any of it.
@@ -88,26 +86,17 @@ class SummaryView(TemplateView):
     """
 
     template_name = "summary.html"
+    form_class = SummaryForm
     model = BreachDetails
 
-    def __init__(self):
-        super().__init__()
-
     def get(self, request, *args, **kwargs):
-        kwargs = self.kwargs
-        self.object = self.request.session["breach_details_instance"]
-        kwargs["reporter_full_name"] = self.object["reporter_full_name"]
-        kwargs["reporter_professional_relationship"] = self.object[
-            "reporter_professional_relationship"
-        ]
-        kwargs["pk"] = kwargs.get("pk", None)
-        kwargs.pop("pk")
-        return super().get(request, *args, **kwargs)
+        return render(request, self.template_name, self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["full_name"] = kwargs["reporter_full_name"]
-        context["company_relationship"] = kwargs["reporter_professional_relationship"]
+        data = self.request.session.get("breach_details_instance")
+        context["full_name"] = data["reporter_full_name"]
+        context["company_relationship"] = data["reporter_professional_relationship"]
         context["success_url"] = self.get_success_url()
         return context
 
@@ -117,14 +106,19 @@ class SummaryView(TemplateView):
             kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]},
         )
 
-    def post(self, request, *args, **kwargs):
+    def form_valid(self, form):
+        reporter_data = self.request.session.get("breach_details_instance")
         reference_id = str(uuid.uuid4()).split("-")[0]
-        kwargs["reporter_confirmation_id"] = reference_id
-        print(f"kwargs: {kwargs}")
-        self.instance = BreachDetails(report_id=self.object.report_id)
+        reporter_data["reporter_confirmation_id"] = reference_id
+        self.instance = BreachDetails(report_id=reporter_data["report_id"])
+        self.instance.reporter_full_name = reporter_data["reporter_full_name"]
+        self.instance.reporter_professional_relationship = reporter_data[
+            "reporter_professional_relationship"
+        ]
         self.instance.reporter_confirmation_id = reference_id
         self.instance.save()
-        return super().post(request, *args, **kwargs)
+        self.request.session["breach_details_instance"] = reporter_data
+        return super().form_valid(form)
 
 
 class ReportSubmissionCompleteView(TemplateView):
@@ -140,5 +134,5 @@ class ReportSubmissionCompleteView(TemplateView):
         session_data = self.request.session.get("breach_details_instance")
         print(f"Session data - confirmation: {session_data}")
         context["service_header"] = SERVICE_HEADER
-        context["application_reference_number"] = kwargs["reporter_confirmation_id"]
+        context["application_reference_number"] = session_data["reporter_confirmation_id"]
         return context
