@@ -1,24 +1,29 @@
 {% extends "base.html" %}
+{% load i18n %}
+{% block navigation %}{% endblock %}
 {% load crispy_forms_tags crispy_forms_gds %}
 
 {% block header__service %}
-  {% block header__service__name %}
-    <h3>{{ service_header }}</h3>
-  {% endblock %}
+  <div class="govuk-header__content">
+    <a href="{% block header__service__url %}{% endblock %}" class="govuk-header__link govuk-header__service-name">
+      {% block header__service__name %}
+      {{ service_header }}
+      {% endblock %}
+    </a>
+    {% block header__service__navigaton %}
+    {% endblock %}
+  </div>
 {% endblock %}
 
+{% block back_link %}
+<a href="{{request.META.HTTP_REFERER|escape}}" class="govuk-back-link govuk-width-container">Back</a>
+{% endblock %}
 
 {% block content %}
-
-  {% error_summary form %}
-
-  <span class="govuk-caption-xl">
-  </span>
-  <h2 class="govuk-heading-l">
-    Form
-  </h2>
+{% error_summary form %}
 
   <div class="govuk-body">
+    {% csrf_token %}
     {% crispy form %}
   </div>
 
