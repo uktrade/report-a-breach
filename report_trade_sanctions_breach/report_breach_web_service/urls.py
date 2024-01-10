@@ -13,8 +13,6 @@ urlpatterns = [
     path("", StartView.as_view(), name="home"),
     path(r"page_1", NameView.as_view(), name="page_1"),
     path(r"page_2", ProfessionalRelationshipView.as_view(), name="page_2"),
-    # Not currently working
     path("summary/<uuid:pk>/", SummaryView.as_view(), name="summary"),
     path("confirmation/<uuid:pk>", ReportSubmissionCompleteView.as_view(), name="confirmation"),
-    # TODO: the static urls can likely be removed
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]

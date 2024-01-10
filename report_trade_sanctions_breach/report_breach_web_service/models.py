@@ -9,4 +9,3 @@ class BreachDetails(models.Model):
     report_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reporter_full_name = models.CharField(blank=True, null=True)
     reporter_professional_relationship = models.TextField(blank=True, null=True)
-    reporter_confirmation_id = models.CharField(blank=True, null=True)

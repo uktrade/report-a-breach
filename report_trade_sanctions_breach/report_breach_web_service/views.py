@@ -29,7 +29,7 @@ class StartView(TemplateView):
 
 class BaseFormView(FormView):
     """
-    The parent class for all forms in the report a breach application.
+    The parent class for most forms in the report a breach application.
     Reference the associated forms.py and form.html for formatting and content.
     """
 
@@ -108,14 +108,15 @@ class SummaryView(FormView):
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_details_instance")
-        reference_id = str(uuid.uuid4()).split("-")[0]
+        reference_id = reporter_data["report_id"].split("-")[0].upper()
+        # reference_id = str(uuid.uuid4()).split("-")[0]
         reporter_data["reporter_confirmation_id"] = reference_id
         self.instance = BreachDetails(report_id=reporter_data["report_id"])
         self.instance.reporter_full_name = reporter_data["reporter_full_name"]
         self.instance.reporter_professional_relationship = reporter_data[
             "reporter_professional_relationship"
         ]
-        self.instance.reporter_confirmation_id = reference_id
+        # self.instance.reporter_confirmation_id = reference_id
         self.instance.save()
         self.request.session["breach_details_instance"] = reporter_data
         return super().form_valid(form)
@@ -132,7 +133,6 @@ class ReportSubmissionCompleteView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session_data = self.request.session.get("breach_details_instance")
-        print(f"Session data - confirmation: {session_data}")
         context["service_header"] = SERVICE_HEADER
         context["application_reference_number"] = session_data["reporter_confirmation_id"]
         return context
