@@ -33,7 +33,6 @@ class ProfessionalRelationshipForm(forms.ModelForm):
     reporter_professional_relationship = forms.ChoiceField(
         choices=((choice, choice) for choice in PROFESSIONAL_RELATIONSHIP_CHOICES),
         widget=forms.RadioSelect,
-        # TODO: The label on this form won't display as large, even when setting the helper.
         label=mark_safe(
             "<strong>What is the professional relationship with the company or person suspected of breaching "
             "sanctions?</strong>"
