@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_forms_gds",
     "report_breach_web_service",
+    "django_chunk_upload_handlers",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_form", "gds")

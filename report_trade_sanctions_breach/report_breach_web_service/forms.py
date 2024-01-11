@@ -1,7 +1,5 @@
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import Button
-from crispy_forms_gds.layout import Field
-from crispy_forms_gds.layout import Fieldset
 from crispy_forms_gds.layout import Layout
 from crispy_forms_gds.layout import Size
 from django import forms
@@ -27,6 +25,38 @@ class NameForm(forms.ModelForm):
     class Meta:
         model = BreachDetails
         fields = ["reporter_full_name"]
+
+
+class EmailForm(forms.ModelForm):
+    reporter_email_address = forms.EmailField(
+        label=mark_safe("<strong>What is your email address</strong>"),
+        error_messages={"required": "We need to send you an email to verify your email address"},
+        widget=forms.TextInput(attrs={"id": "reporter_email_address"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.label_size = Size.MEDIUM
+        self.helper.layout = Layout("reporter_email_address", Button("continue", "Continue"))
+
+    class Meta:
+        model = BreachDetails
+        fields = ["reporter_email_address"]
+
+
+class EmailVerifyForm(forms.Form):
+    reporter_verify_email = forms.CharField(
+        label=mark_safe("<strong>We've sent you an email</strong>"),
+        error_messages={"required": "Enter the 6 digit security code"},
+        widget=forms.TextInput(attrs={"id": "reporter_verify_email"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.label_size = Size.MEDIUM
+        self.helper.layout = Layout("reporter_verify_email", Button("continue", "Continue"))
 
 
 class ProfessionalRelationshipForm(forms.ModelForm):
@@ -62,4 +92,8 @@ class SummaryForm(forms.ModelForm):
 
     class Meta:
         model = BreachDetails
-        fields = ["reporter_full_name", "reporter_professional_relationship"]
+        fields = [
+            "reporter_full_name",
+            "reporter_email_address",
+            "reporter_professional_relationship",
+        ]

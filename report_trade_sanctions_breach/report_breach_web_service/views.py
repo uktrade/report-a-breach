@@ -1,17 +1,17 @@
-import uuid
-
 from django.shortcuts import render
 from django.urls import reverse
-from django.urls import reverse_lazy
 from django.views.generic import FormView
 from django.views.generic import TemplateView
 
 from .constants import BREADCRUMBS_START_PAGE
 from .constants import SERVICE_HEADER
+from .forms import EmailForm
+from .forms import EmailVerifyForm
 from .forms import NameForm
 from .forms import ProfessionalRelationshipForm
 from .forms import SummaryForm
 from .models import BreachDetails
+from .notifier import send_mail
 
 
 class StartView(TemplateView):
@@ -43,7 +43,7 @@ class BaseFormView(FormView):
 
 class NameView(BaseFormView):
     form_class = NameForm
-    success_url = reverse_lazy("page_2")
+    # success_url = reverse_lazy("page_2")
 
     def __init__(self):
         super().__init__()
@@ -52,8 +52,53 @@ class NameView(BaseFormView):
         breach_details_instance = form.save(commit=False)
         reporter_data = self.request.session.get("breach_details_instance", {})
         reporter_data["reporter_full_name"] = breach_details_instance.reporter_full_name
+        reporter_data["report_id"] = str(breach_details_instance.report_id)
         self.request.session["breach_details_instance"] = reporter_data
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "email", kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]}
+        )
+
+
+class EmailView(BaseFormView):
+    form_class = EmailForm
+
+    def __init__(self):
+        super().__init__()
+
+    def form_valid(self, form):
+        breach_details_instance = form.save(commit=False)
+        reporter_data = self.request.session.get("breach_details_instance", {})
+        reporter_data["reporter_email_address"] = breach_details_instance.reporter_email_address
+        self.request.session["breach_details_instance"] = reporter_data
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "verify", kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]}
+        )
+
+
+class VerifyView(BaseFormView):
+    form_class = EmailVerifyForm
+
+    def __init__(self):
+        super().__init__()
+
+    def form_valid(self, form):
+        breach_details_instance = form.save(commit=False)
+        reporter_data = self.request.session.get("breach_details_instance", {})
+        reporter_data["reporter_email_address"] = breach_details_instance.reporter_email_address
+        self.request.session["breach_details_instance"] = reporter_data
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "professional_relationship",
+            kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]},
+        )
 
 
 class ProfessionalRelationshipView(BaseFormView):
@@ -87,7 +132,7 @@ class SummaryView(FormView):
 
     template_name = "summary.html"
     form_class = SummaryForm
-    model = BreachDetails
+    # model = BreachDetails
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, self.get_context_data(**kwargs))
@@ -109,14 +154,12 @@ class SummaryView(FormView):
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_details_instance")
         reference_id = reporter_data["report_id"].split("-")[0].upper()
-        # reference_id = str(uuid.uuid4()).split("-")[0]
         reporter_data["reporter_confirmation_id"] = reference_id
         self.instance = BreachDetails(report_id=reporter_data["report_id"])
         self.instance.reporter_full_name = reporter_data["reporter_full_name"]
         self.instance.reporter_professional_relationship = reporter_data[
             "reporter_professional_relationship"
         ]
-        # self.instance.reporter_confirmation_id = reference_id
         self.instance.save()
         self.request.session["breach_details_instance"] = reporter_data
         return super().form_valid(form)
