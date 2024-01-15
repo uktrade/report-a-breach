@@ -175,7 +175,6 @@ class SummaryView(FormView):
         context["email"] = data["reporter_email_address"]
         context["full_name"] = data["reporter_full_name"]
         context["company_relationship"] = data["reporter_professional_relationship"]
-        context["success_url"] = self.get_success_url()
         return context
 
     def get_success_url(self):
@@ -196,6 +195,7 @@ class SummaryView(FormView):
         ]
         self.instance.save()
         self.request.session["breach_details_instance"] = reporter_data
+        print(self.request.session["breach_details_instance"])
         return super().form_valid(form)
 
 

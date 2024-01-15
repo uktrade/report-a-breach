@@ -116,4 +116,8 @@ class SummaryForm(forms.ModelForm):
 
     class Meta:
         model = BreachDetails
-        exclude = ["report_id"]
+        fields = [
+            "reporter_email_address",
+            "reporter_full_name",
+            "reporter_professional_relationship",
+        ]
