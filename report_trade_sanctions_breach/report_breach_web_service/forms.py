@@ -9,6 +9,21 @@ from .constants import PROFESSIONAL_RELATIONSHIP_CHOICES
 from .models import BreachDetails
 
 
+class StartForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(Button("start now", "Start now"))
+
+    class Meta:
+        model = BreachDetails
+        exclude = [
+            "reporter_full_name",
+            "reporter_email_address",
+            "reporter_professional_relationship",
+        ]
+
+
 class NameForm(forms.ModelForm):
     reporter_full_name = forms.CharField(
         label=mark_safe("<strong>What is your full name</strong>"),
@@ -45,8 +60,9 @@ class EmailForm(forms.ModelForm):
         fields = ["reporter_email_address"]
 
 
-class EmailVerifyForm(forms.Form):
+class EmailVerifyForm(forms.ModelForm):
     reporter_verify_email = forms.CharField(
+        # TODO: need to fix the label to specify in smaller print, req: 6 digit...
         label=mark_safe("<strong>We've sent you an email</strong>"),
         error_messages={"required": "Enter the 6 digit security code"},
         widget=forms.TextInput(attrs={"id": "reporter_verify_email"}),
@@ -57,6 +73,14 @@ class EmailVerifyForm(forms.Form):
         self.helper = FormHelper()
         self.helper.label_size = Size.MEDIUM
         self.helper.layout = Layout("reporter_verify_email", Button("continue", "Continue"))
+
+    class Meta:
+        model = BreachDetails
+        exclude = [
+            "reporter_full_name",
+            "reporter_email_address",
+            "reporter_professional_relationship",
+        ]
 
 
 class ProfessionalRelationshipForm(forms.ModelForm):
@@ -92,8 +116,4 @@ class SummaryForm(forms.ModelForm):
 
     class Meta:
         model = BreachDetails
-        fields = [
-            "reporter_full_name",
-            "reporter_email_address",
-            "reporter_professional_relationship",
-        ]
+        exclude = ["report_id"]

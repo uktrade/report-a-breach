@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block navigation %}{% endblock %}
+{% load crispy_forms_tags crispy_forms_gds %}
 
 {% block header_title %}{% endblock %}
 
@@ -30,7 +31,7 @@
 		</div>
 	</div>
 {% endblock %}
-
+{% block content %}
 {% block two_thirds %}
 	<div>
 		<h2 class="govuk-heading-l">
@@ -52,8 +53,13 @@
 		<br><br><b>Who can report a suspected breach</b>
 			<br>Description text here
 		</p>
-		<a class="govuk-button govuk-button--start" id="button-sign-in" href="/report_breach_web_service/page_1">
-			Start now
-		</a>
+		{% error_summary form %}
+
+		<div class="govuk-body">
+		{% csrf_token %}
+		{% crispy form %}
+		</div>
+
+{% endblock %}
 	</div>
 {% endblock %}

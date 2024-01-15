@@ -28,13 +28,24 @@
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
+          Email
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {{ email }}
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="/report_breach_web_service/email/{{ pk }}">Change<span class="govuk-visually-hidden"> email (Your details)</span></a>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
           Full name
         </dt>
         <dd class="govuk-summary-list__value">
           {{ full_name }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/report_breach_web_service/page_1">Change<span class="govuk-visually-hidden"> full name (Your details)</span></a>
+          <a class="govuk-link" href="/report_breach_web_service/name/{{ pk }}">Change<span class="govuk-visually-hidden"> full name (Your details)</span></a>
         </dd>
       </div>
       <div class="govuk-summary-list__row">
@@ -45,7 +56,7 @@
           {{ company_relationship }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/report_breach_web_service/page_2">Change<span class="govuk-visually-hidden"> professional relationship with the organisation (Your details)</span></a>
+          <a class="govuk-link" href="/report_breach_web_service/professional_relationship/{{ pk }}">Change<span class="govuk-visually-hidden"> professional relationship with the organisation (Your details)</span></a>
         </dd>
       </div>
     </dl>

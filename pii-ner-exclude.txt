@@ -54,3 +54,4 @@ GOV_NOTIFY_API_KEY
 def send_sms(number
 template_id
 BreachDetails
+6 digit
