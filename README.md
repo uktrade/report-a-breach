@@ -43,3 +43,16 @@ Install node via the web or homebrew (optional - not needed for current prototyp
 Initialize npm (optional)
 
 `npm init`
+
+### Run the prototype
+After following the setup (except for the optional node install), use the following to run the web app \
+`python manage.py runserver`\
+Django will provide the local url which should be http://127.0.0.1:8000/ \
+Navigate to http://127.0.0.1:8000/report_breach_web_service in your browser to run through the prototype. \
+Important to note that at this stage in the prototype, gov notify will not work unless you provide a DBT email address.
+
+### Useful django commands
+Along with the above runserver command, while developing on the project, \
+the following will be handy when making changes to the db model:\
+`python manage.py makemigrations`\
+`python manage.py migrate`
