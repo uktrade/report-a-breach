@@ -13,7 +13,7 @@ crispy-forms-gds==0.2.4
 cymem==2.0.8
 dill==0.3.7
 distlib==0.3.7
-Django==4.2.7
+Django==4.2.9
 django-chunk-upload-handlers==0.0.13
 django-crispy-forms==1.13.0
 django-jsonfield==1.4.1
