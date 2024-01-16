@@ -64,7 +64,8 @@ class EmailVerifyForm(forms.ModelForm):
     reporter_verify_email = forms.CharField(
         # TODO: need to fix the label to specify in smaller print, req: 6 digit...
         label=mark_safe("<strong>We've sent you an email</strong>"),
-        error_messages={"required": "Enter the 6 digit security code"},
+        help_text="Enter the 6 digit security code",
+        error_messages={"required": "Please enter the 6 digit security code provided in the email"},
         widget=forms.TextInput(attrs={"id": "reporter_verify_email"}),
     )
 
