@@ -73,7 +73,6 @@ class NameView(BaseFormView):
         breach_details_instance = form.save(commit=False)
         reporter_data = self.request.session.get("breach_details_instance", {})
         reporter_data["reporter_full_name"] = breach_details_instance.reporter_full_name
-        # reporter_data["report_id"] = str(breach_details_instance.report_id)
         self.request.session["breach_details_instance"] = reporter_data
         return super().form_valid(form)
 
@@ -201,7 +200,6 @@ class SummaryView(FormView):
         ]
         self.instance.save()
         self.request.session["breach_details_instance"] = reporter_data
-        print(self.request.session["breach_details_instance"])
         return super().form_valid(form)
 
 
