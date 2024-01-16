@@ -27,7 +27,7 @@ class StartForm(forms.ModelForm):
 class NameForm(forms.ModelForm):
     reporter_full_name = forms.CharField(
         label=mark_safe("<strong>What is your full name</strong>"),
-        error_messages={"required": "Enter your name as it appears on your passport"},
+        error_messages={"required": "Please enter your name as it appears on your passport"},
         widget=forms.TextInput(attrs={"id": "full_user_name"}),
     )
 
@@ -62,7 +62,6 @@ class EmailForm(forms.ModelForm):
 
 class EmailVerifyForm(forms.ModelForm):
     reporter_verify_email = forms.CharField(
-        # TODO: need to fix the label to specify in smaller print, req: 6 digit...
         label=mark_safe("<strong>We've sent you an email</strong>"),
         help_text="Enter the 6 digit security code",
         error_messages={"required": "Please enter the 6 digit security code provided in the email"},
