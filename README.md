@@ -13,7 +13,7 @@ pip install --user pipenv
 # OR with homebrew
 brew install pipenv
 ```
-Once installed, we [local.env.example](local.env.example)need to install the requirements for the project:
+Once installed, we need to install the requirements for the project:
 ```
 pipenv install
 ```
