@@ -2,7 +2,7 @@
 A prototype for the report a breach service
 
 ## Setup
-The project requires Python 3.11. Backing services are provided by Docker and Docker Compose whilst the web app itself is ran as a normal process.
+The project requires Python 3.11. Backing services are provided by Docker whilst the web app itself is ran as a normal process with Pipenv.
 
 ### 1. Setting up your virtual environment
 We use Pipenv to manage our virtual environment, dependencies, and environment variables. You can install it with either of the following commands:
@@ -13,16 +13,24 @@ pip install --user pipenv
 # OR with homebrew
 brew install pipenv
 ```
-Then we need to install the requirements for the project:
+Once installed, we need to install the requirements for the project:
 ```
 pipenv install
 ```
+Now we need to activate the virtual environment:
+```
+pipenv shell
+```
 
 ### 2. Installing pre-commit
-Install the repos pre commit hooks:\
-`pre-commit install`\
-Set pre-commit to autoupdate:\
-`pre-commit autoupdate`
+Install the repos pre commit hooks:
+```
+pre-commit install
+```
+Set pre-commit to autoupdate:
+```
+pre-commit autoupdate
+```
 
 
 ### 3. Setup your local environment variables
@@ -54,5 +62,3 @@ the following will be handy when making changes to the db model:\
 ### Dependencies
 To add a new dependency to the project, use the following command:\
 `pipenv install <package-name>`
-
-
