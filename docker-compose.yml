@@ -5,7 +5,7 @@ services:
         volumes:
             - ./pgdata/:/var/lib/postgresql/data
         env_file:
-            -   local.env
+            - .env
         ports:
             - "15432:5432"
         healthcheck:
@@ -14,24 +14,6 @@ services:
             timeout: 6s
             retries: 5
 
-    web:
-        build: .
-        command:
-            - /bin/bash
-            - -c
-            - |
-                python manage.py migrate --noinput
-                python manage.py collectstatic --noinput
-                python manage.py runserver 0.0.0.0:8000
-        env_file:
-            -   local.env
-        ports:
-            - "18000:8000"
-        depends_on:
-            db:
-                condition: service_healthy
-        volumes:
-            - .:/code
 
     redis:
         image: redis:7.2.4
