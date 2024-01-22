@@ -5,7 +5,7 @@ from crispy_forms_gds.layout import Size
 from django import forms
 from django.utils.safestring import mark_safe
 
-from .constants import PROFESSIONAL_RELATIONSHIP_CHOICES
+from report_a_breach.constants import PROFESSIONAL_RELATIONSHIP_CHOICES
 from .models import BreachDetails
 
 

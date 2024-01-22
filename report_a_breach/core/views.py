@@ -6,10 +6,9 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.generic import FormView
 from django.views.generic import TemplateView
-from dotenv import load_dotenv
 
-from .constants import BREADCRUMBS_START_PAGE
-from .constants import SERVICE_HEADER
+from report_a_breach.constants import BREADCRUMBS_START_PAGE
+from report_a_breach.constants import SERVICE_HEADER
 from .forms import EmailForm
 from .forms import EmailVerifyForm
 from .forms import NameForm
@@ -17,9 +16,8 @@ from .forms import ProfessionalRelationshipForm
 from .forms import StartForm
 from .forms import SummaryForm
 from .models import BreachDetails
-from .notifier import send_mail
+from report_a_breach.utils.notifier import send_mail
 
-load_dotenv()
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 

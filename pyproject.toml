@@ -1,18 +1,30 @@
-# NOTE: you have to use single-quoted strings in TOML for regular expressions.
-# It's the equivalent of r-strings in Python. Multiline strings are treated as
-# verbose regular expressions by Black. Use [ ] to denote a significant space
-# character.
-
-[project]
-name = "report-a-trade-sanctions-breach-prototype"
+[tool.poetry]
+name = "Report a Trade Sanctions Breach Prototype"
+description = "Report a Trade Sanctions Breach Prototype"
 version = "0.0.1"
+authors = [
+    "Chris Pettinga <chris.pettinga@digital.trade.gov.uk>",
+    "Jennifer Riordan <jennifer.riordan@digital.trade.gov.uk>",
+    "Nawaz Ahmed <nawaz.ahmed@digital.trade.gov.uk>",
+]
+readme = "README.md"
+repository = "https://github.com/uktrade/report-a-breach-prototype"
 
 [build-system]
-requires = [
-    "setuptools>=62",
-    "wheel",
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "~=4.2"
+django-environ = "~=0.11"
+psycopg = "~=3.1"
+django-crispy-forms = "~=2.1"
+crispy-forms-gds = "^0.2.4"
+django-chunk-upload-handlers = "^0.0.13"
+notifications-python-client = "^9.0.0"
+django-audit-log-middleware = "^0.0.4"
+black = "^23.12.1"
 
 [tool.coverage.run]
 branch = true
@@ -60,22 +72,11 @@ exclude = '''
 profile = "black"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "settings.test"
-norecursedirs = [
-    "allure-results",
-    "csv",
-    "dist",
-    "docs",
-    "*.egg-info",
-    ".git",
-    "htmlcov",
-    ".local",
-    ".ipynb_checkpoints",
-    "node_modules",
-    "prof",
-    "__pycache__",
-    "static",
-    "run",
-    "venv",
-]
-addopts = "-n=auto"
+DJANGO_SETTINGS_MODULE = "report_trade_sanctions_breach.config.test"
+testpaths = "tests"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+addopts = """
+    --reuse-db
+    --ds=config.settings.test
+"""

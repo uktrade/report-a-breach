@@ -1,5 +1,5 @@
 """
-URL configuration for report_trade_sanctions_breach project.
+URL configuration for core project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -19,6 +19,6 @@ from django.urls import include
 from django.urls import path
 
 urlpatterns = [
-    path("report_breach_web_service/", include("report_breach_web_service.urls")),
+    path("", include("report_a_breach.urls")),
     path("admin/", admin.site.urls),
 ]

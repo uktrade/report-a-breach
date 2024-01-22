@@ -12,3 +12,9 @@ def pylint(context, directory):
 @task
 def pytest_cov(context, directory):
     print(f"Running tests with coverage in {directory}")
+
+
+@task
+def migrate(context):
+    print(f"Running migrate")
+    context.run(f"python manage.py migrate")

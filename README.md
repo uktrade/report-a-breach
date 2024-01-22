@@ -7,6 +7,7 @@ The project requires Python 3.11
 ```
 # create your virtual env
 virtualenv venv
+
 # activate it
 source venv/bin/activate
 
@@ -29,7 +30,7 @@ https://www.postgresql.org/download/macosx/
 
 Setup your local environment variables
 ```
-cd report_trade_sanctions_breach
+cd core
 touch .env
 ```
 The project currently requires 3 env variables. SECRET_KEY, DB_USER, DB_PASSWORD.
@@ -48,7 +49,7 @@ Initialize npm (optional)
 After following the setup (except for the optional node install), use the following to run the web app \
 `python manage.py runserver`\
 Django will provide the local url which should be http://127.0.0.1:8000/ \
-Navigate to http://127.0.0.1:8000/report_breach_web_service in your browser to run through the prototype. \
+Navigate to http://127.0.0.1:8000/report_a_breach in your browser to run through the prototype. \
 Important to note that at this stage in the prototype, gov notify will not work unless you provide a DBT email address.
 
 ### Useful django commands
