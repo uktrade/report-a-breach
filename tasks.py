@@ -1,7 +1,5 @@
 from invoke import task
 
-# This needs to be a separate utility repo
-
 
 @task
 def pylint(context, directory):
@@ -17,4 +15,10 @@ def pytest_cov(context, directory):
 @task
 def migrate(context):
     print(f"Running migrate")
-    context.run(f"python manage.py migrate")
+    context.run(f"pipenv run python manage.py migrate")
+
+
+@task
+def black(context, directory="."):
+    print(f"Running black formatting")
+    context.run(f"pipenv run black {directory}")
