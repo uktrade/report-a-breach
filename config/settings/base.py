@@ -93,8 +93,8 @@ DATABASES = {
         "NAME": env.str("POSTGRES_NAME", default="postgres"),
         "USER": env.str("POSTGRES_USER", default="postgres"),
         "PASSWORD": env.str("POSTGRES_PASSWORD", default="password"),
-        "HOST": env.str("POSTGRES_HOST", default="host.docker.internal"),
-        "PORT": env.str("POSTGRES_PORT", default="5432"),
+        "HOST": env.str("POSTGRES_HOST", default="localhost"),
+        "PORT": env.str("POSTGRES_PORT", default="15432"),
     }
 }
 
