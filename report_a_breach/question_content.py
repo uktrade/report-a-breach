@@ -1,3 +1,5 @@
+# TODO: should this be a single json object which holds all question data? If so, should we specify a schema?
+
 FULL_NAME = {
     "text": "What is your full name?",
     "helper": "Please enter your name as it appears on your passport",

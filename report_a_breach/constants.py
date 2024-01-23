@@ -1,4 +1,4 @@
-SERVICE_HEADER = "Report a trade sanctions breach"
+SERVICE_HEADER = "Report a suspected breach of trade sanctions"
 
 BREADCRUMBS_START_PAGE = [
     ("Home", "https://www.gov.uk"),
@@ -8,10 +8,4 @@ BREADCRUMBS_START_PAGE = [
     ("Embargoes and sanctions", "https://www.gov.uk/business-and-industry/embargoes-and-sanctions"),
 ]
 
-PROFESSIONAL_RELATIONSHIP_CHOICES = (
-    "I'm an owner, officer or employee of the company, or I am the person",
-    "I do not work for the company, but I'm acting on their behalf to make a voluntary declaration",
-    "I work for a third party with a legal responsibility to make a mandatory declaration",
-    "I do not have a professional relationship with the company or person or I no longer have a professional "
-    "relationship with them",
-)
+DEFAULT_REPORT_TYPE = "self report"
