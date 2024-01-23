@@ -14,7 +14,11 @@ from .models import BreachDetails
 class StartForm(forms.ModelForm):
     class Meta:
         model = BreachDetails
-        fields = ["report_type"]
+        exclude = [
+            "reporter_full_name",
+            "reporter_email_address",
+            "reporter_professional_relationship",
+        ]
 
 
 class NameForm(forms.ModelForm):

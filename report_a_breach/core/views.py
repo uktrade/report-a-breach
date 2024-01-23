@@ -38,10 +38,8 @@ class StartView(FormView):
 
     def form_valid(self, form):
         breach_details_instance = form.save(commit=False)
-        breach_details_instance.report_type = DEFAULT_REPORT_TYPE
         reporter_data = self.request.session.get("breach_details_instance", {})
         reporter_data["id"] = str(breach_details_instance.id)
-        reporter_data["report_type"] = breach_details_instance.report_type
         self.request.session["breach_details_instance"] = reporter_data
         return super().form_valid(form)
 
@@ -96,8 +94,11 @@ class EmailView(BaseFormView):
     def __init__(self):
         super().__init__()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["success_url"] = self.get_success_url()
+
     def form_valid(self, form):
-        # breach_details_instance = form.save(commit=False)
         reporter_data = self.request.session.get("breach_details_instance", {})
         reporter_data["reporter_email_address"] = form.cleaned_data.get("reporter_email_address")
         reporter_data["verify_code"] = get_random_string(6, allowed_chars="0123456789")

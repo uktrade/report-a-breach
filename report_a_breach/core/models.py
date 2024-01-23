@@ -21,9 +21,7 @@ class BreachDetails(BaseModel):
             "I do not have a professional relationship with the company or person or I no longer have a professional relationship with them",
         ),
     )
-    report_type = models.TextField(
-        null=False,
-    )
+
     reporter_professional_relationship = models.TextField(
         null=False,
         choices=REPORTER_PROFESSIONAL_RELATIONSHIP_CHOICES,
