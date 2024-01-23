@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block navigation %}{% endblock %}
-{% load crispy_forms_tags crispy_forms_gds %}
 
 {% block header_title %}{% endblock %}
 
@@ -53,12 +52,12 @@
 		<br><br><b>Who can report a suspected breach</b>
 			<br>Description text here
 		</p>
-		{% error_summary form %}
-
-		<div class="govuk-body">
-		{% csrf_token %}
-		{% crispy form %}
-		</div>
+		<form method="POST">
+			{% csrf_token %}
+			<div class="govuk-body">
+				<input type="submit" class="govuk-button" data-module="govuk-button">
+			</div>
+		</form>
 
 {% endblock %}
 	</div>

@@ -9,6 +9,8 @@ from django.views.generic import TemplateView
 
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.constants import SERVICE_HEADER
+from report_a_breach.utils.notifier import send_mail
+
 from .forms import EmailForm
 from .forms import EmailVerifyForm
 from .forms import NameForm
@@ -16,7 +18,6 @@ from .forms import ProfessionalRelationshipForm
 from .forms import StartForm
 from .forms import SummaryForm
 from .models import BreachDetails
-from report_a_breach.utils.notifier import send_mail
 
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
@@ -37,13 +38,13 @@ class StartView(FormView):
     def form_valid(self, form):
         breach_details_instance = form.save(commit=False)
         reporter_data = self.request.session.get("breach_details_instance", {})
-        reporter_data["report_id"] = str(breach_details_instance.report_id)
+        reporter_data["id"] = str(breach_details_instance.id)
         self.request.session["breach_details_instance"] = reporter_data
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
-            "email", kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]}
+            "email", kwargs={"pk": self.request.session["breach_details_instance"]["id"]}
         )
 
 
