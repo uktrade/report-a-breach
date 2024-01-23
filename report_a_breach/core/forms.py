@@ -6,22 +6,14 @@ from django import forms
 from django.utils.safestring import mark_safe
 
 from report_a_breach.constants import PROFESSIONAL_RELATIONSHIP_CHOICES
+
 from .models import BreachDetails
 
 
 class StartForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(Button("start now", "Start now"))
-
     class Meta:
         model = BreachDetails
-        exclude = [
-            "reporter_full_name",
-            "reporter_email_address",
-            "reporter_professional_relationship",
-        ]
+        fields = ["reporter_professional_relationship"]
 
 
 class NameForm(forms.ModelForm):
