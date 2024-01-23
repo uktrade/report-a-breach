@@ -40,7 +40,7 @@ local_settings.py
 db.sqlite3
 *migrations/
 # collectstatic output for local dev
-report_trade_sanctions_breach/staticfiles
+core/staticfiles
 
 # Distribution / packaging
 .Python
@@ -95,3 +95,7 @@ __pycache__/
 
 # node local files
 *node_modules
+
+*.env
+/redis_data/
+/static/
