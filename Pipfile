@@ -14,6 +14,8 @@ notifications-python-client = "~=9.0"
 django-audit-log-middleware = "~=0.0.4"
 black = "~=23.12"
 pre-commit = "~=3.6"
+django-countries = "~=7.5"
+django-storages = "~=1.14"
 
 [dev-packages]
 
