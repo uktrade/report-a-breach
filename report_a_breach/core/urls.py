@@ -1,13 +1,13 @@
 from django.urls import path
-from .views import (
-    EmailView,
-    VerifyView,
-    NameView,
-    ProfessionalRelationshipView,
-    ReportSubmissionCompleteView,
-    StartView,
-    SummaryView,
-)
+
+from .views import EmailView
+from .views import FileUploadView
+from .views import NameView
+from .views import ProfessionalRelationshipView
+from .views import ReportSubmissionCompleteView
+from .views import StartView
+from .views import SummaryView
+from .views import VerifyView
 
 urlpatterns = [
     path(r"email/<uuid:pk>", EmailView.as_view(), name="email"),
@@ -20,4 +20,5 @@ urlpatterns = [
     ),
     path("summary/<uuid:pk>/", SummaryView.as_view(), name="summary"),
     path("confirmation/<uuid:pk>", ReportSubmissionCompleteView.as_view(), name="confirmation"),
+    path("file_upload/", FileUploadView.as_view(), name="file_upload"),
 ]

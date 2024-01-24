@@ -113,3 +113,10 @@ class SummaryForm(forms.ModelForm):
             "reporter_full_name",
             "reporter_professional_relationship",
         ]
+
+
+class FileUploadForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(Button("continue", "Continue"))

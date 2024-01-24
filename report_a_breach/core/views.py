@@ -9,14 +9,17 @@ from django.views.generic import TemplateView
 
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.constants import SERVICE_HEADER
+from report_a_breach.utils.notifier import send_mail
+
 from .forms import EmailForm
 from .forms import EmailVerifyForm
+from .forms import FileUploadForm
 from .forms import NameForm
 from .forms import ProfessionalRelationshipForm
 from .forms import StartForm
 from .forms import SummaryForm
 from .models import BreachDetails
-from report_a_breach.utils.notifier import send_mail
+from .models import FileUpload
 
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
@@ -216,3 +219,38 @@ class ReportSubmissionCompleteView(TemplateView):
         context["service_header"] = SERVICE_HEADER
         context["application_reference_number"] = session_data["reporter_confirmation_id"]
         return context
+
+
+class FileUploadView(FormView):
+    # form_class = UploadFileForm
+    form_class = FileUploadForm
+    context = "Upload Files"
+    template_name = "file_upload.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["section_name"] = self.context
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+
+        if form.is_valid():
+            data = form.cleaned_data
+
+            # When using a model form, you must use the
+            # name attribute of the file rather than
+            # passing the request file var directly as this is the
+            # required when using the chunk uploader project
+            s3_file_name = request.FILES["document"].name
+
+            file_upload = FileUpload(
+                s3_document_file=s3_file_name,
+                uploading_user=request.user,
+            )
+            file_upload.save()
+
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)

@@ -1,6 +1,8 @@
 import uuid
 
+from django.contrib.auth import get_user_model
 from django.db import models
+from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 
 from report_a_breach.base_classes.models import BaseModel
 
@@ -26,7 +28,58 @@ class BreachDetails(BaseModel):
     reporter_professional_relationship = models.TextField(
         null=False,
         choices=REPORTER_PROFESSIONAL_RELATIONSHIP_CHOICES,
-        label="What is your professional relationship with the company or person suspected of breaching sanctions?",
+        verbose_name="What is your professional relationship with the company or person suspected of breaching sanctions?",
     )
     reporter_email_address = models.EmailField(verbose_name="What is your email address?")
     reporter_full_name = models.TextField(verbose_name="What is your full name?")
+
+
+class FileUpload(models.Model):
+    # TODO: Full requirements are not yet fully defined, therefore
+    # some of the code below might be changed/removed.
+
+    # TODO: Deteremine if we need FILE_LOCATION_CHOICE.
+    LOCALFILE = "local"
+    S3FILE = "S3"
+    FILE_LOCATION_CHOICE = [
+        (LOCALFILE, "File system"),
+        (S3FILE, "S3 Bucket"),
+    ]
+    file_location = models.CharField(
+        max_length=100,
+        choices=FILE_LOCATION_CHOICE,
+        default=S3FILE,
+    )
+
+    s3_document_file = models.FileField(
+        max_length=1000,
+        null=True,
+        blank=True,
+        upload_to="",  # TODO: Add S3 bucket details of where file is to be stored
+        validators=[
+            validate_virus_check_result,
+        ],
+    )
+
+    document_file_name = models.CharField(
+        max_length=1000,
+        null=True,
+        blank=True,
+    )
+
+    uploading_user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+    @property
+    def file_name(self):
+        return self.s3_document_file.name
+
+    def __str__(self):
+        return "{} {} {}".format(
+            self.s3_document_file.name,
+        )
