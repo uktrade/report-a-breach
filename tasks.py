@@ -8,8 +8,10 @@ def pylint(context, directory):
 
 
 @task
-def pytest_cov(context, directory):
-    print(f"Running tests with coverage in {directory}")
+def pytest_cov(context, project):
+    print(f"Running tests with coverage against {project}")
+    # TODO: test with and without config
+    context.run(f"pytest --cov={project} tests/")
 
 
 @task
