@@ -6,9 +6,9 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.generic import FormView
 from django.views.generic import TemplateView
+from django.views.generic.edit import BaseFormView
 
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
-from report_a_breach.constants import DEFAULT_REPORT_TYPE
 from report_a_breach.constants import SERVICE_HEADER
 from report_a_breach.utils.notifier import send_mail
 
@@ -18,35 +18,27 @@ from .forms import EmailVerifyForm
 from .forms import NameForm
 from .forms import StartForm
 from .forms import SummaryForm
-from .models import BreachDetails
+from .models import Breach
 
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 
-class StartView(FormView):
+class LandingView(TemplateView):
     """
     This view displays the landing page for the report a trade sanctions breach application.
     """
 
-    form_class = StartForm
-    template_name = "home.html"
+    template_name = "landing.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = BREADCRUMBS_START_PAGE
         return context
 
-    def form_valid(self, form):
-        breach_details_instance = form.save(commit=False)
-        reporter_data = self.request.session.get("breach_details_instance", {})
-        reporter_data["id"] = str(breach_details_instance.id)
-        self.request.session["breach_details_instance"] = reporter_data
-        return super().form_valid(form)
 
-    def get_success_url(self):
-        return reverse(
-            "email", kwargs={"pk": self.request.session["breach_details_instance"]["id"]}
-        )
+class ReportABreachStartView(BaseFormView):
+    form_class = StartForm
+    template_name = "start.html"
 
 
 class BaseFormView(FormView):
@@ -194,7 +186,7 @@ class SummaryView(FormView):
         reporter_data = self.request.session.get("breach_details_instance")
         reference_id = reporter_data["report_id"].split("-")[0].upper()
         reporter_data["reporter_confirmation_id"] = reference_id
-        self.instance = BreachDetails(report_id=reporter_data["report_id"])
+        self.instance = Breach(report_id=reporter_data["report_id"])
         self.instance.reporter_email_address = reporter_data["reporter_email_address"]
         self.instance.reporter_full_name = reporter_data["reporter_full_name"]
         self.instance.reporter_professional_relationship = reporter_data[

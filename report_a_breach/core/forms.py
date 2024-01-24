@@ -8,15 +8,13 @@ from django.utils.safestring import mark_safe
 # from report_a_breach.constants import PROFESSIONAL_RELATIONSHIP_CHOICES
 import report_a_breach.question_content as content
 
-from .models import BreachDetails
+from .models import Breach
 
 
 class StartForm(forms.ModelForm):
     class Meta:
-        model = BreachDetails
-        exclude = [
-            "reporter_full_name",
-            "reporter_email_address",
+        model = Breach
+        fields = [
             "reporter_professional_relationship",
         ]
 
@@ -35,7 +33,7 @@ class NameForm(forms.ModelForm):
         self.helper.layout = Layout("reporter_full_name", Button("continue", "Continue"))
 
     class Meta:
-        model = BreachDetails
+        model = Breach
         fields = ["reporter_full_name"]
 
 
@@ -78,7 +76,7 @@ class EmailVerifyForm(forms.Form):
 #         )
 #
 #     class Meta:
-#         model = BreachDetails
+#         model = Breach
 #         fields = ["reporter_professional_relationship"]
 
 
@@ -89,7 +87,7 @@ class SummaryForm(forms.ModelForm):
         self.helper.layout = Layout(Button("submit", "Submit"))
 
     class Meta:
-        model = BreachDetails
+        model = Breach
         exclude = [
             "reporter_email_address",
             "reporter_full_name",

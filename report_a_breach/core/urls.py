@@ -1,15 +1,15 @@
 from django.urls import path
 
-# from .views import ProfessionalRelationshipView
-from .views import EmailView
-from .views import NameView
-from .views import ReportSubmissionCompleteView
-from .views import StartView
-from .views import SummaryView
-from .views import VerifyView
+from report_a_breach.core.views import EmailView
+from report_a_breach.core.views import LandingView
+from report_a_breach.core.views import NameView
+from report_a_breach.core.views import ReportABreachStartView
+from report_a_breach.core.views import ReportSubmissionCompleteView
+from report_a_breach.core.views import SummaryView
+from report_a_breach.core.views import VerifyView
 
 urlpatterns = [
-    path("home", StartView.as_view(), name="home"),
+    path("home", LandingView.as_view(), name="home"),
     path(r"email/<uuid:pk>", EmailView.as_view(), name="email"),
     path(r"verify/<uuid:pk>", VerifyView.as_view(), name="verify"),
     path(r"name/<uuid:pk>", NameView.as_view(), name="name"),
