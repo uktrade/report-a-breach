@@ -20,4 +20,5 @@ urlpatterns = [
     # ),
     path("summary/<uuid:pk>/", SummaryView.as_view(), name="summary"),
     path("confirmation/<uuid:pk>", ReportSubmissionCompleteView.as_view(), name="confirmation"),
+    path("report_a_breach", ReportABreachStartView.as_view(), name="report_a_breach"),
 ]

@@ -8,10 +8,11 @@ from django.utils.safestring import mark_safe
 # from report_a_breach.constants import PROFESSIONAL_RELATIONSHIP_CHOICES
 import report_a_breach.question_content as content
 
+from ..base_classes.forms import BaseModelForm
 from .models import Breach
 
 
-class StartForm(forms.ModelForm):
+class StartForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = [

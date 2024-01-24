@@ -6,11 +6,12 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.generic import FormView
 from django.views.generic import TemplateView
-from django.views.generic.edit import BaseFormView
 
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.constants import SERVICE_HEADER
 from report_a_breach.utils.notifier import send_mail
+
+from ..base_classes.views import BaseFormView
 
 # from .forms import ProfessionalRelationshipForm
 from .forms import EmailForm
