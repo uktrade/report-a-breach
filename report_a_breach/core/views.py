@@ -94,12 +94,20 @@ class EmailView(BaseFormView):
     def __init__(self):
         super().__init__()
 
+    def form_invalid(self, form):
+        print(form.errors)
+        # print(form.cleaned_data)
+        return super().form_invalid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["success_url"] = self.get_success_url()
+        # print(f"Context: {context}")
+        return context
 
     def form_valid(self, form):
-        reporter_data = self.request.session.get("breach_details_instance", {})
+        reporter_data = self.request.session.get("breach_details_instance")
+        print(f"{reporter_data} reporter_data")
         reporter_data["reporter_email_address"] = form.cleaned_data.get("reporter_email_address")
         reporter_data["verify_code"] = get_random_string(6, allowed_chars="0123456789")
         self.request.session["breach_details_instance"] = reporter_data
@@ -128,7 +136,7 @@ class VerifyView(BaseFormView):
         super().__init__()
 
     def form_valid(self, form):
-        reporter_data = self.request.session.get("breach_details_instance", {})
+        reporter_data = self.request.session.get("breach_details_instance")
         user_submitted_code = form.cleaned_data.get("reporter_verify_email")
         if user_submitted_code == reporter_data["verify_code"]:
             return super().form_valid(form)
