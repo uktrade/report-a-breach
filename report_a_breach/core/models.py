@@ -36,6 +36,7 @@ class Breach(BaseModel):
     sanctions_regimes = models.ManyToManyField(
         "SanctionsRegime", through="SanctionsRegimeBreachThrough"
     )
+    additional_information = models.TextField(verbose_name="Tell us about the suspected breach")
 
 
 class PersonOrCompany(BaseModel):
@@ -79,3 +80,4 @@ class SanctionsRegime(BaseModel):
 
 class UploadedDocument(BaseModel):
     file = models.FileField()
+    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
