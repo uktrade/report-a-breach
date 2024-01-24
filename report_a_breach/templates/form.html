@@ -20,25 +20,27 @@
 
 {% block content %}
 
-    <form method="POST">
-      <div class="govuk-body">
-          <div class="govuk-form-group">
-              {% csrf_token %}
-              <h1 class="govuk-label-wrapper">
-                <label class="govuk-label govuk-label--l">
-                  {{ form.field.label }}
-                </label>
-              </h1>
-              <div class="govuk-hint">
-                {{ form.field.help_text }}
-              </div>
-              <input class="govuk-input govuk-input--width-20">
-            </div>
 
-          <button type="submit" class="govuk-button" data-module="govuk-button">
-          Continue
-          </button>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="govuk-body">
+        <div class="govuk-form-group">
+<!-- form.as_p renders the form correctly, and we are able to submit to the next page
+However this does not use the gov.uk styling -->
+<!--      {{ form.as_p }}-->
+        <h1 class="govuk-label-wrapper">
+          <label class="govuk-label govuk-label--l">
+            {{ form.field.label }}
+          </label>
+        </h1>
+      <div class="govuk-hint">
+        {{ form.field.help_text }}
       </div>
-    </form>
+            <input class="govuk-input" type="text">
+    </div>
+
+    <input type="submit" class="govuk-button" data-module="govuk-button" value="Continue">
+  </div>
+      </form>
 
 {% endblock %}

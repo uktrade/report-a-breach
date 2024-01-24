@@ -39,11 +39,21 @@ class NameForm(forms.ModelForm):
 
 class EmailForm(forms.Form):
     field = forms.EmailField(
-        label=mark_safe(f"<strong>{content.EMAIL['text']}</strong>"),
+        label=mark_safe(f"{content.EMAIL['text']}"),
         error_messages={"required": "We need to send you an email to verify your email address"},
-        widget=forms.TextInput(attrs={"id": "reporter_email_address"}),
         help_text=content.EMAIL["helper"],
+        widget=forms.TextInput(attrs={"class": "govuk-input"}),
+        max_length=55,
+        required=True,
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        print(cleaned_data)
+        return cleaned_data
 
 
 class EmailVerifyForm(forms.Form):
