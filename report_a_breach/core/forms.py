@@ -1,7 +1,3 @@
-from crispy_forms_gds.helper import FormHelper
-from crispy_forms_gds.layout import Button
-from crispy_forms_gds.layout import Layout
-from crispy_forms_gds.layout import Size
 from django import forms
 from django.utils.safestring import mark_safe
 
@@ -12,7 +8,7 @@ from .models import BreachDetails
 # TODO: check the wording of any error messages to match what the UCD team expect
 
 
-class StartForm(forms.ModelForm):
+class HomeForm(forms.ModelForm):
     class Meta:
         model = BreachDetails
         exclude = [
@@ -51,6 +47,7 @@ class NameForm(forms.Form):
 
 
 class ProfessionalRelationshipForm(forms.Form):
+    # TODO: radio size is showing as small. CSS appears ok. Might be possible to access the radio size in the form
     field = forms.ChoiceField(
         choices=((choice, choice) for choice in content.RELATIONSHIP["choices"]),
         widget=forms.RadioSelect(attrs={"name": "company professional relationship"}),
@@ -58,21 +55,12 @@ class ProfessionalRelationshipForm(forms.Form):
         error_messages={"required": "Please select one of the choices to continue"},
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        print(self.fields["field"])
-
 
 class SummaryForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(Button("submit", "Submit"))
-
     class Meta:
         model = BreachDetails
         exclude = [
-            "reporter_email_address",
             "reporter_full_name",
+            "reporter_email_address",
             "reporter_professional_relationship",
         ]

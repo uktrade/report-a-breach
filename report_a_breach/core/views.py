@@ -13,21 +13,21 @@ from report_a_breach.utils.notifier import send_mail
 
 from .forms import EmailForm
 from .forms import EmailVerifyForm
+from .forms import HomeForm
 from .forms import NameForm
 from .forms import ProfessionalRelationshipForm
-from .forms import StartForm
 from .forms import SummaryForm
 from .models import BreachDetails
 
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 
-class StartView(FormView):
+class HomeView(FormView):
     """
     This view displays the landing page for the report a trade sanctions breach application.
     """
 
-    form_class = StartForm
+    form_class = HomeForm
     template_name = "home.html"
 
     def get_context_data(self, **kwargs):
@@ -171,6 +171,10 @@ class SummaryView(FormView):
     template_name = "summary.html"
     form_class = SummaryForm
 
+    def form_invalid(self, form):
+        print(form.errors)
+        return super().form_invalid(form)
+
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, self.get_context_data(**kwargs))
 
@@ -180,20 +184,20 @@ class SummaryView(FormView):
         context["email"] = data["reporter_email_address"]
         context["full_name"] = data["reporter_full_name"]
         context["company_relationship"] = data["reporter_professional_relationship"]
-        context["pk"] = data["report_id"]
+        context["pk"] = data["id"]
         return context
 
     def get_success_url(self):
         return reverse(
             "confirmation",
-            kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]},
+            kwargs={"pk": self.request.session["breach_details_instance"]["id"]},
         )
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_details_instance")
-        reference_id = reporter_data["report_id"].split("-")[0].upper()
+        reference_id = reporter_data["id"].split("-")[0].upper()
         reporter_data["reporter_confirmation_id"] = reference_id
-        self.instance = BreachDetails(report_id=reporter_data["report_id"])
+        self.instance = BreachDetails(id=reporter_data["id"])
         self.instance.reporter_email_address = reporter_data["reporter_email_address"]
         self.instance.reporter_full_name = reporter_data["reporter_full_name"]
         self.instance.reporter_professional_relationship = reporter_data[

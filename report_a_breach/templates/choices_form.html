@@ -32,25 +32,12 @@
       </h1>
     </legend>
     <div class="govuk-radios" data-module="govuk-radios">
-      <div class="govuk-radios__item">
-        {% for choice in form.field %}
-        <input class="govuk-radios__input" id="choice" name="{{ form.field.name }}" type="radio">
-        {{ choice }}<br>
-        {% endfor %}
-      </div>
-
-<!--      <div class="govuk-radios__item">-->
-<!--        <input class="govuk-radios__input" id="choice1" name="{{ form.field.name }}1" type="radio">-->
-<!--        {{ choice.choice_label.0 }}-->
-<!--      </div>-->
-<!--      <div class="govuk-radios__item">-->
-<!--        <input class="govuk-radios__input" id="choice2" name="{{ form.field.name }}2" type="radio">-->
-<!--        {{ choice.choice_label.0 }}-->
-<!--      </div>-->
-<!--      <div class="govuk-radios__item">-->
-<!--        <input class="govuk-radios__input" id="choice3" name="{{ form.field.name }}3" type="radio">-->
-<!--        {{ choice.choice_label.0 }}-->
-<!--      </div>-->
+    <div class="govuk-radios__item">
+      {% for choice in form.field %}
+      <input class="govuk-radios__input" id="choice" name="{{ form.field.name }}" data-module="govuk-radios "type="radio">
+      {{ choice }}<br>
+      {% endfor %}
+    </div>
     </div>
   </fieldset>
 </div>

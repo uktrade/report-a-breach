@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load crispy_forms_tags crispy_forms_gds %}
 
     {% block navigation %}{% endblock %}
 
@@ -63,11 +62,14 @@
 </div>
 
 
-{% error_summary form %}
-		<div class="govuk-body">
-		{% csrf_token %}
-		{% crispy form %}
-		</div>
+<form method="POST">
+  {% csrf_token %}
+  <div class="govuk-body">
+      <button type="submit" class="govuk-button" data-module="govuk-button">
+      Submit
+      </button>
+  </div>
+</form>
 
 {% endblock %}
 {% endblock %}
