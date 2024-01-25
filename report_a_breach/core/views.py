@@ -171,10 +171,6 @@ class SummaryView(FormView):
     template_name = "summary.html"
     form_class = SummaryForm
 
-    def form_invalid(self, form):
-        print(form.errors)
-        return super().form_invalid(form)
-
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, self.get_context_data(**kwargs))
 
