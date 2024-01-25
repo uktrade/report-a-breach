@@ -7,5 +7,3 @@ BREADCRUMBS_START_PAGE = [
     ("Exporting", "https://www.gov.uk/business-and-industry/exporting"),
     ("Embargoes and sanctions", "https://www.gov.uk/business-and-industry/embargoes-and-sanctions"),
 ]
-
-DEFAULT_REPORT_TYPE = "self report"

@@ -21,49 +21,30 @@ class StartForm(forms.ModelForm):
         ]
 
 
-class NameForm(forms.ModelForm):
-    reporter_full_name = forms.CharField(
-        label=mark_safe("<strong>What is your full name</strong>"),
-        error_messages={"required": "Please enter your name as it appears on your passport"},
-        widget=forms.TextInput(attrs={"id": "full_user_name"}),
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_full_name", Button("continue", "Continue"))
-
-    class Meta:
-        model = BreachDetails
-        fields = ["reporter_full_name"]
-
-
 class EmailForm(forms.Form):
     field = forms.EmailField(
         label=mark_safe(f"{content.EMAIL['text']}"),
         error_messages={"required": "We need to send you an email to verify your email address"},
         help_text=content.EMAIL["helper"],
-        widget=forms.TextInput(attrs={"class": "govuk-input"}),
-        max_length=55,
+        widget=forms.TextInput(attrs={"name": "email address"}),
         required=True,
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        print(cleaned_data)
-        return cleaned_data
 
 
 class EmailVerifyForm(forms.Form):
     field = forms.CharField(
-        label=mark_safe(f"<strong>{content.VERIFY['text']}</strong>"),
+        label=mark_safe(f"{content.VERIFY['text']}"),
         help_text=content.VERIFY["helper"],
         error_messages={"required": "Please enter the 6 digit security code provided in the email"},
-        widget=forms.TextInput(attrs={"id": "reporter_verify_email"}),
+        widget=forms.TextInput(attrs={"name": "verify code"}),
+    )
+
+
+class NameForm(forms.Form):
+    reporter_full_name = forms.CharField(
+        label=mark_safe("<strong>What is your full name</strong>"),
+        error_messages={"required": "Please enter your name as it appears on your passport"},
+        widget=forms.TextInput(attrs={"name": "full name"}),
     )
 
 

@@ -8,7 +8,6 @@ from django.views.generic import FormView
 from django.views.generic import TemplateView
 
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
-from report_a_breach.constants import DEFAULT_REPORT_TYPE
 from report_a_breach.constants import SERVICE_HEADER
 from report_a_breach.utils.notifier import send_mail
 
@@ -63,26 +62,6 @@ class BaseFormView(FormView):
         return context
 
 
-class NameView(BaseFormView):
-    form_class = NameForm
-
-    def __init__(self):
-        super().__init__()
-
-    def form_valid(self, form):
-        breach_details_instance = form.save(commit=False)
-        reporter_data = self.request.session.get("breach_details_instance", {})
-        reporter_data["reporter_full_name"] = breach_details_instance.reporter_full_name
-        self.request.session["breach_details_instance"] = reporter_data
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse(
-            "professional_relationship",
-            kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]},
-        )
-
-
 class EmailView(BaseFormView):
     """
     This view allows the reporter to submit their email address.
@@ -94,21 +73,15 @@ class EmailView(BaseFormView):
     def __init__(self):
         super().__init__()
 
-    def form_invalid(self, form):
-        print(form.errors)
-        # print(form.cleaned_data)
-        return super().form_invalid(form)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["success_url"] = self.get_success_url()
-        # print(f"Context: {context}")
         return context
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_details_instance")
-        print(f"{reporter_data} reporter_data")
-        reporter_data["reporter_email_address"] = form.cleaned_data.get("reporter_email_address")
+        reporter_data["reporter_email_address"] = form.cleaned_data.get("field")
+        # TODO: check if this needs an explicit ttl
         reporter_data["verify_code"] = get_random_string(6, allowed_chars="0123456789")
         self.request.session["breach_details_instance"] = reporter_data
         send_mail(
@@ -137,7 +110,7 @@ class VerifyView(BaseFormView):
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_details_instance")
-        user_submitted_code = form.cleaned_data.get("reporter_verify_email")
+        user_submitted_code = form.cleaned_data.get("field")
         if user_submitted_code == reporter_data["verify_code"]:
             return super().form_valid(form)
         raise ValidationError("Please enter the 6 digit code sent to the provided email address")
@@ -145,6 +118,26 @@ class VerifyView(BaseFormView):
     def get_success_url(self):
         return reverse(
             "name",
+            kwargs={"pk": self.request.session["breach_details_instance"]["id"]},
+        )
+
+
+class NameView(BaseFormView):
+    form_class = NameForm
+
+    def __init__(self):
+        super().__init__()
+
+    def form_valid(self, form):
+        reporter_data = self.request.session.get("breach_details_instance")
+        reporter_data["reporter_full_name"] = form.cleaned_data.get("field")
+        self.request.session["breach_details_instance"] = reporter_data
+        print(reporter_data)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "professional_relationship",
             kwargs={"pk": self.request.session["breach_details_instance"]["id"]},
         )
 
