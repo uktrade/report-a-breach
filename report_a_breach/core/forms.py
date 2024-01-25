@@ -116,7 +116,6 @@ class SummaryForm(forms.ModelForm):
 
 
 class FileUploadForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(Button("continue", "Continue"))
+    # TODO: Add relevant form attributes - removed previous ones
+    # that relied on crispy-forms.
+    pass
