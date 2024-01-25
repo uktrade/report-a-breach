@@ -5,10 +5,11 @@ from crispy_forms_gds.layout import Size
 from django import forms
 from django.utils.safestring import mark_safe
 
-# from report_a_breach.constants import PROFESSIONAL_RELATIONSHIP_CHOICES
 import report_a_breach.question_content as content
 
 from .models import BreachDetails
+
+# TODO: check the wording of any error messages to match what the UCD team expect
 
 
 class StartForm(forms.ModelForm):
@@ -41,36 +42,25 @@ class EmailVerifyForm(forms.Form):
 
 
 class NameForm(forms.Form):
-    reporter_full_name = forms.CharField(
-        label=mark_safe("<strong>What is your full name</strong>"),
+    field = forms.CharField(
+        label=content.FULL_NAME["text"],
+        help_text=content.FULL_NAME["helper"],
         error_messages={"required": "Please enter your name as it appears on your passport"},
         widget=forms.TextInput(attrs={"name": "full name"}),
     )
 
 
-# class ProfessionalRelationshipForm(forms.ModelForm):
-#     reporter_professional_relationship = forms.ChoiceField(
-#         choices=((choice, choice) for choice in PROFESSIONAL_RELATIONSHIP_CHOICES),
-#         widget=forms.RadioSelect,
-#         label=mark_safe(
-#             "<strong>What is the professional relationship with the company or person suspected of breaching "
-#             "sanctions?</strong>"
-#         ),
-#         error_messages={"required": "Please select one of the choices to continue"},
-#     )
-#
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.helper = FormHelper()
-#         # TODO: check why this helper isn't working
-#         self.helper.label_size = Size.MEDIUM
-#         self.helper.layout = Layout(
-#             "reporter_professional_relationship", Button("continue", "Continue")
-#         )
-#
-#     class Meta:
-#         model = BreachDetails
-#         fields = ["reporter_professional_relationship"]
+class ProfessionalRelationshipForm(forms.Form):
+    field = forms.ChoiceField(
+        choices=((choice, choice) for choice in content.RELATIONSHIP["choices"]),
+        widget=forms.RadioSelect(attrs={"name": "company professional relationship"}),
+        label=content.RELATIONSHIP["text"],
+        error_messages={"required": "Please select one of the choices to continue"},
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        print(self.fields["field"])
 
 
 class SummaryForm(forms.ModelForm):

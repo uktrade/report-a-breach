@@ -2,7 +2,7 @@
 
 FULL_NAME = {
     "text": "What is your full name?",
-    "helper": "Please enter your name as it appears on your passport",
+    "helper": "",
 }
 
 EMAIL = {

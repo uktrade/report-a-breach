@@ -11,10 +11,10 @@ from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.constants import SERVICE_HEADER
 from report_a_breach.utils.notifier import send_mail
 
-# from .forms import ProfessionalRelationshipForm
 from .forms import EmailForm
 from .forms import EmailVerifyForm
 from .forms import NameForm
+from .forms import ProfessionalRelationshipForm
 from .forms import StartForm
 from .forms import SummaryForm
 from .models import BreachDetails
@@ -142,25 +142,23 @@ class NameView(BaseFormView):
         )
 
 
-# class ProfessionalRelationshipView(BaseFormView):
-#     form_class = ProfessionalRelationshipForm
-#
-#     def __init__(self):
-#         super().__init__()
-#
-#     def form_valid(self, form):
-#         breach_details_instance = form.save(commit=False)
-#         reporter_data = self.request.session.get("breach_details_instance", {})
-#         reporter_data[
-#             "reporter_professional_relationship"
-#         ] = breach_details_instance.reporter_professional_relationship
-#         self.request.session["breach_details_instance"] = reporter_data
-#         return super().form_valid(form)
-#
-#     def get_success_url(self):
-#         return reverse(
-#             "summary", kwargs={"pk": self.request.session["breach_details_instance"]["report_id"]}
-#         )
+class ProfessionalRelationshipView(BaseFormView):
+    form_class = ProfessionalRelationshipForm
+    template_name = "choices_form.html"
+
+    def __init__(self):
+        super().__init__()
+
+    def form_valid(self, form):
+        reporter_data = self.request.session.get("breach_details_instance")
+        reporter_data["reporter_professional_relationship"] = form.cleaned_data.get("field")
+        self.request.session["breach_details_instance"] = reporter_data
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "summary", kwargs={"pk": self.request.session["breach_details_instance"]["id"]}
+        )
 
 
 class SummaryView(FormView):

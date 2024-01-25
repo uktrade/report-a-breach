@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block navigation %}{% endblock %}
+
+{% block header__service %}
+  <div class="govuk-header__content">
+    <a href="{% block header__service__url %}{% endblock %}" class="govuk-header__link govuk-header__service-name">
+      {% block header__service__name %}
+      {{ service_header }}
+      {% endblock %}
+    </a>
+    {% block header__service__navigaton %}
+    {% endblock %}
+  </div>
+{% endblock %}
+
+{% block back_link %}
+<a href="{{request.META.HTTP_REFERER|escape}}" class="govuk-back-link govuk-width-container">Back</a>
+{% endblock %}
+
+{% block content %}
+
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="govuk-body">
+        <div class="govuk-form-group">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      <h1 class="govuk-fieldset__heading">
+        {{ form.field.label }}
+      </h1>
+    </legend>
+    <div class="govuk-radios" data-module="govuk-radios">
+      <div class="govuk-radios__item">
+        {% for choice in form.field %}
+        <input class="govuk-radios__input" id="choice" name="{{ form.field.name }}" type="radio">
+        {{ choice }}<br>
+        {% endfor %}
+      </div>
+
+<!--      <div class="govuk-radios__item">-->
+<!--        <input class="govuk-radios__input" id="choice1" name="{{ form.field.name }}1" type="radio">-->
+<!--        {{ choice.choice_label.0 }}-->
+<!--      </div>-->
+<!--      <div class="govuk-radios__item">-->
+<!--        <input class="govuk-radios__input" id="choice2" name="{{ form.field.name }}2" type="radio">-->
+<!--        {{ choice.choice_label.0 }}-->
+<!--      </div>-->
+<!--      <div class="govuk-radios__item">-->
+<!--        <input class="govuk-radios__input" id="choice3" name="{{ form.field.name }}3" type="radio">-->
+<!--        {{ choice.choice_label.0 }}-->
+<!--      </div>-->
+    </div>
+  </fieldset>
+</div>
+          <input type="submit" class="govuk-button" data-module="govuk-button" value="Continue">
+  </div>
+      </form>
+
+{% endblock %}
