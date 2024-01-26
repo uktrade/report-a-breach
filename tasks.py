@@ -8,10 +8,16 @@ def pylint(context, directory):
 
 
 @task
-def pytest_cov(context, project):
+def pytest(context, project):
     print(f"Running tests with coverage against {project}")
-    # TODO: test with and without config
+    # TODO: this requires testing config
     context.run(f"pytest --cov={project} tests/")
+
+
+@task
+def makemigrations(context):
+    print(f"Running makemigrations")
+    context.run(f"pipenv run python manage.py makemigrations")
 
 
 @task
