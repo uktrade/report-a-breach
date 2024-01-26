@@ -73,11 +73,6 @@ class EmailView(BaseFormView):
     def __init__(self):
         super().__init__()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["success_url"] = self.get_success_url()
-        return context
-
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_details_instance")
         reporter_data["reporter_email_address"] = form.cleaned_data.get("field")
