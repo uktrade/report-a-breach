@@ -20,7 +20,7 @@ class HomeForm(forms.ModelForm):
 
 class EmailForm(forms.Form):
     field = forms.EmailField(
-        label=mark_safe(f"{content.EMAIL['text']}"),
+        label=content.EMAIL["text"],
         error_messages={"required": "We need to send you an email to verify your email address"},
         help_text=content.EMAIL["helper"],
         widget=forms.TextInput(attrs={"name": "email address"}),
@@ -30,7 +30,7 @@ class EmailForm(forms.Form):
 
 class EmailVerifyForm(forms.Form):
     field = forms.CharField(
-        label=mark_safe(f"{content.VERIFY['text']}"),
+        label=content.VERIFY["text"],
         help_text=content.VERIFY["helper"],
         error_messages={"required": "Please enter the 6 digit security code provided in the email"},
         widget=forms.TextInput(attrs={"name": "verify code"}),
