@@ -15,15 +15,15 @@ def pytest(context, project):
 
 
 @task
-def makemigrations(context):
+def makemigrations(context, app="report_a_breach"):
     print(f"Running makemigrations")
-    context.run(f"pipenv run python manage.py makemigrations")
+    context.run(f"pipenv run python manage.py makemigrations {app}")
 
 
 @task
-def migrate(context):
+def migrate(context, app="report_a_breach"):
     print(f"Running migrate")
-    context.run(f"pipenv run python manage.py migrate")
+    context.run(f"pipenv run python manage.py migrate {app}")
 
 
 @task
