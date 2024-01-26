@@ -132,7 +132,6 @@ class NameView(BaseFormView):
         reporter_data = self.request.session.get("breach_details_instance")
         reporter_data["reporter_full_name"] = form.cleaned_data.get("field")
         self.request.session["breach_details_instance"] = reporter_data
-        print(reporter_data)
         return super().form_valid(form)
 
     def get_success_url(self):
