@@ -7,37 +7,34 @@ from django.utils.crypto import get_random_string
 from django.views.generic import FormView
 from django.views.generic import TemplateView
 
+from report_a_breach.base_classes.views import BaseFormView
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.constants import SERVICE_HEADER
 from report_a_breach.utils.notifier import send_mail
 
 from .forms import EmailForm
 from .forms import EmailVerifyForm
-from .forms import HomeForm
+from .forms import LandingForm
 from .forms import NameForm
-from .forms import ProfessionalRelationshipForm
+from .forms import StartForm
 from .forms import SummaryForm
 from .models import Breach
 
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 
-class HomeView(FormView):
+class LandingView(FormView):
     """
     This view displays the landing page for the report a trade sanctions breach application.
     """
 
-    form_class = HomeForm
-    template_name = "home.html"
+    form_class = LandingForm
+    template_name = "landing.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = BREADCRUMBS_START_PAGE
         return context
-
-    def form_invalid(self, form):
-        print(form.errors)
-        return super().form_invalid(form)
 
     def form_valid(self, form):
         breach_instance = form.save(commit=False)
@@ -47,21 +44,22 @@ class HomeView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
+        return reverse("start", kwargs={"pk": self.request.session["breach_instance"]["id"]})
+
+
+class ReportABreachStartView(BaseFormView):
+    form_class = StartForm
+
+    def form_valid(self, form):
+        reporter_data = self.request.session.get("breach_instance")
+        reporter_data["reporter_professional_relationship"] = form.cleaned_data.get(
+            "reporter_professional_relationship"
+        )
+        self.request.session["breach_instance"] = reporter_data
+        return super().form_valid(form)
+
+    def get_success_url(self):
         return reverse("email", kwargs={"pk": self.request.session["breach_instance"]["id"]})
-
-
-class BaseFormView(FormView):
-    """
-    The parent class for most forms in the report a breach application.
-    Reference the associated forms.py and form.html for formatting and content.
-    """
-
-    template_name = "form.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["service_header"] = SERVICE_HEADER
-        return context
 
 
 class EmailView(BaseFormView):
@@ -77,12 +75,13 @@ class EmailView(BaseFormView):
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_instance")
-        reporter_data["reporter_email_address"] = form.cleaned_data.get("field")
+        reporter_email_address = form.cleaned_data.get("reporter_email_address")
         # TODO: check if this needs an explicit ttl
         reporter_data["verify_code"] = get_random_string(6, allowed_chars="0123456789")
+        reporter_data["reporter_email_address"] = reporter_email_address
         self.request.session["breach_instance"] = reporter_data
         send_mail(
-            email=reporter_data["reporter_email_address"],
+            email=reporter_email_address,
             context={"verification_code": reporter_data["verify_code"]},
             template_id=EMAIL_TEMPLATE_ID,
         )
@@ -92,20 +91,26 @@ class EmailView(BaseFormView):
         return reverse("verify", kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
-class VerifyView(BaseFormView):
+class VerifyView(FormView):
     """
     A verification page. The reporter must submit the 6 digit verification code
     provided via email in order to continue.
     """
 
     form_class = EmailVerifyForm
+    template_name = "form.html"
 
     def __init__(self):
         super().__init__()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["service_header"] = SERVICE_HEADER
+        return context
+
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_instance")
-        user_submitted_code = form.cleaned_data.get("field")
+        user_submitted_code = form.cleaned_data.get("reporter_verify_email")
         if user_submitted_code == reporter_data["verify_code"]:
             return super().form_valid(form)
         raise ValidationError("Please enter the 6 digit code sent to the provided email address")
@@ -125,32 +130,15 @@ class NameView(BaseFormView):
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_instance")
-        reporter_data["reporter_full_name"] = form.cleaned_data.get("field")
+        reporter_data["reporter_full_name"] = form.cleaned_data.get("reporter_full_name")
         self.request.session["breach_instance"] = reporter_data
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
-            "professional_relationship",
+            "summary",
             kwargs={"pk": self.request.session["breach_instance"]["id"]},
         )
-
-
-class ProfessionalRelationshipView(BaseFormView):
-    form_class = ProfessionalRelationshipForm
-    template_name = "choices_form.html"
-
-    def __init__(self):
-        super().__init__()
-
-    def form_valid(self, form):
-        reporter_data = self.request.session.get("breach_instance")
-        reporter_data["reporter_professional_relationship"] = form.cleaned_data.get("field")
-        self.request.session["breach_instance"] = reporter_data
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse("summary", kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
 class SummaryView(FormView):

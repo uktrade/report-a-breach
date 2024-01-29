@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b3cd26da142c29789892659ada4fdf3c055090c943b294714f86be269f672bbd"
+            "sha256": "218e345b55ae73e72c52b80e60674f8d9e3b81878248c6efd8a95255ae6f6f6b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -257,6 +257,15 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==7.4.1"
+        },
+        "crispy-forms-gds": {
+            "hashes": [
+                "sha256:6963b7ec7d2dcc652e5741f62dc1b5de30cb31c58751b0657198856a17b6b1ae",
+                "sha256:7a3d1bc94098bafea6e0b8d404747c12b5a45fa2f7e1afd1ac529cc2816bedcb"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.6'",
+            "version": "==0.2.4"
         },
         "dill": {
             "hashes": [
