@@ -5,11 +5,7 @@ from requests import Response
 from report_a_breach.constants import SERVICE_HEADER
 
 
-class BaseView(View):
-    ...
-
-
-class BaseFormView(BaseView, FormView):
+class BaseView(FormView):
     template_name = "form.html"
 
     def get_context_data(self, **kwargs):
@@ -17,6 +13,8 @@ class BaseFormView(BaseView, FormView):
         context["service_header"] = SERVICE_HEADER
         return context
 
+
+class BaseModelFormView(BaseView):
     def form_valid(self, form):
         form.save(commit=False)
         return super().form_valid(form)

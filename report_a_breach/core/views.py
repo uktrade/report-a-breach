@@ -7,9 +7,11 @@ from django.utils.crypto import get_random_string
 from django.views.generic import FormView
 from django.views.generic import TemplateView
 
-from report_a_breach.base_classes.views import BaseFormView
+from report_a_breach.base_classes.views import BaseModelFormView
+from report_a_breach.base_classes.views import BaseView
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.constants import SERVICE_HEADER
+from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_mail
 
 from .forms import EmailForm
@@ -47,7 +49,7 @@ class LandingView(FormView):
         return reverse("start", kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
-class ReportABreachStartView(BaseFormView):
+class ReportABreachStartView(BaseModelFormView):
     form_class = StartForm
 
     def form_valid(self, form):
@@ -62,7 +64,7 @@ class ReportABreachStartView(BaseFormView):
         return reverse("email", kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
-class EmailView(BaseFormView):
+class EmailView(BaseModelFormView):
     """
     This view allows the reporter to submit their email address.
     An email is sent to the reporter with a 6 digit verification code tied to their session data.
@@ -91,7 +93,7 @@ class EmailView(BaseFormView):
         return reverse("verify", kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
-class VerifyView(FormView):
+class VerifyView(BaseView):
     """
     A verification page. The reporter must submit the 6 digit verification code
     provided via email in order to continue.
@@ -122,7 +124,7 @@ class VerifyView(FormView):
         )
 
 
-class NameView(BaseFormView):
+class NameView(BaseModelFormView):
     form_class = NameForm
 
     def __init__(self):
@@ -141,7 +143,7 @@ class NameView(BaseFormView):
         )
 
 
-class SummaryView(FormView):
+class SummaryView(BaseView):
     """
     The summary page will display the information the reporter has provided,
     and give them a chance to change any of it.
@@ -159,7 +161,10 @@ class SummaryView(FormView):
         data = self.request.session.get("breach_instance")
         context["email"] = data["reporter_email_address"]
         context["full_name"] = data["reporter_full_name"]
-        context["company_relationship"] = data["reporter_professional_relationship"]
+        # map the DB label to the question text
+        for label in RELATIONSHIP["choices"]:
+            if label[0] in data["reporter_professional_relationship"]:
+                context["company_relationship"] = label[1]
         context["pk"] = data["id"]
         return context
 
