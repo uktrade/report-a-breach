@@ -1,6 +1,7 @@
 import os
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -40,6 +41,17 @@ class LandingView(TemplateView):
 class ReportABreachStartView(BaseFormView):
     form_class = StartForm
     template_name = "start.html"
+
+    def get_success_url(self):
+        return reverse(
+            "name",
+            kwargs={"pk": self.request.session["breach_details_instance"]["id"]},
+        )
+
+
+class SummaryView(BaseFormView):
+    def form_valid(self, form):
+        transaction.commit()
 
 
 class BaseFormView(FormView):

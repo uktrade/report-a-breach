@@ -25,7 +25,6 @@ class Breach(BaseModel):
         ("person", "Person"),
         ("company", "Company"),
     )
-
     reporter_professional_relationship = models.TextField(
         null=False,
         choices=REPORTER_PROFESSIONAL_RELATIONSHIP_CHOICES,

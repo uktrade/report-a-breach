@@ -18,21 +18,16 @@ class StartForm(BaseModelForm):
         fields = [
             "reporter_professional_relationship",
         ]
-
-
-class NameForm(forms.ModelForm):
-    reporter_full_name = forms.CharField(
-        label=mark_safe("<strong>What is your full name</strong>"),
-        error_messages={"required": "Please enter your name as it appears on your passport"},
-        widget=forms.TextInput(attrs={"id": "full_user_name"}),
-    )
+        widgets = {
+            "reporter_professional_relationship": forms.RadioSelect,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_full_name", Button("continue", "Continue"))
+        self.fields["reporter_professional_relationship"].choices.pop(0)
 
+
+class NameForm(forms.ModelForm):
     class Meta:
         model = Breach
         fields = ["reporter_full_name"]
