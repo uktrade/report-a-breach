@@ -1,6 +1,6 @@
-import os
 import re
 
+from django.conf import settings
 from notifications_python_client.notifications import NotificationsAPIClient
 
 
@@ -8,7 +8,7 @@ def get_client():
     """
     Return a Notification client
     """
-    return NotificationsAPIClient(os.environ["GOV_NOTIFY_API_KEY"])
+    return NotificationsAPIClient(settings.GOV_NOTIFY_API_KEY)
 
 
 def send_mail(email, context, template_id, reference=None):
@@ -50,16 +50,6 @@ def get_preview(template_id, values):
     return client.post_template_preview(
         template_id=template_id, personalisation=get_context(values)
     )
-
-
-# def send_sms(number, context, template_id, country=None, reference=None):
-#     client = get_client()
-#     return client.send_sms_notification(
-#         phone_number=convert_to_e164(number, country=country),
-#         template_id=template_id,
-#         personalisation=context,
-#         reference=reference,
-#     )
 
 
 def is_whitelisted(email):
