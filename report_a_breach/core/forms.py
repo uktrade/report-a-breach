@@ -5,6 +5,7 @@ from crispy_forms_gds.layout import Submit
 from django import forms
 
 import report_a_breach.question_content as content
+from report_a_breach.base_classes.forms import BaseForm
 from report_a_breach.base_classes.forms import BaseModelForm
 
 from .models import Breach
@@ -34,11 +35,8 @@ class StartForm(BaseModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["reporter_professional_relationship"].choices.pop(0)
-        self.helper = FormHelper()
         self.helper.legend_size = Size.MEDIUM
-        self.helper.layout = Layout(
-            "reporter_professional_relationship", Submit("continue", "Continue")
-        )
+        self.helper.layout = Layout("reporter_professional_relationship")
 
 
 class EmailForm(BaseModelForm):
@@ -48,12 +46,11 @@ class EmailForm(BaseModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
         self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_email_address", Submit("continue", "Continue"))
+        self.helper.layout = Layout("reporter_email_address")
 
 
-class EmailVerifyForm(forms.Form):
+class EmailVerifyForm(BaseForm):
     reporter_verify_email = forms.CharField(
         label=f"{content.VERIFY['text']}",
         help_text=f"{content.VERIFY['helper']}",
@@ -62,9 +59,8 @@ class EmailVerifyForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
         self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_verify_email", Submit("continue", "Continue"))
+        self.helper.layout = Layout("reporter_verify_email")
 
 
 class NameForm(BaseModelForm):
@@ -75,9 +71,8 @@ class NameForm(BaseModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
         self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_full_name", Submit("continue", "Continue"))
+        self.helper.layout = Layout("reporter_full_name")
 
 
 class SummaryForm(BaseModelForm):
