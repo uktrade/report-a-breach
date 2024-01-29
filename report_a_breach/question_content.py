@@ -16,10 +16,20 @@ RELATIONSHIP = {
     "text": "What is the professional relationship with the company or person suspected of breaching "
     "sanctions?",
     "choices": (
-        "I'm an owner, officer or employee of the company, or I am the person",
-        "I do not work for the company, but I'm acting on their behalf to make a voluntary declaration",
-        "I work for a third party with a legal responsibility to make a mandatory declaration",
-        "I do not have a professional relationship with the company or person or I no longer have a professional "
-        "relationship with them",
+        ("owner", "I'm an owner, officer or employee of the company, or I am the person"),
+        (
+            "acting",
+            "I do not work for the company, but I'm acting on their behalf to make a voluntary declaration",
+        ),
+        (
+            "third_party",
+            "I work for a third party with a legal responsibility to make a mandatory declaration",
+        ),
+        (
+            "no_professional_relationship",
+            "I do not have a professional relationship with the company or person or I no longer have a professional relationship with them",
+        ),
     ),
 }
+
+ADDITIONAL_INFORMATION = {"text": "Tell us about the suspected breach", "helper": ""}

@@ -1,20 +1,22 @@
 from django import forms
-from django.utils.safestring import mark_safe
 
 import report_a_breach.question_content as content
 
-from .models import BreachDetails
+from .models import Breach
 
 # TODO: check the wording of any error messages to match what the UCD team expect
 
 
 class HomeForm(forms.ModelForm):
     class Meta:
-        model = BreachDetails
+        model = Breach
+        # TODO: should this log a "self report" to initialize the DB and generate the pk?
         exclude = [
             "reporter_full_name",
             "reporter_email_address",
             "reporter_professional_relationship",
+            # "sanctions_regimes",
+            "additional_information",
         ]
 
 
@@ -49,7 +51,7 @@ class NameForm(forms.Form):
 class ProfessionalRelationshipForm(forms.Form):
     # TODO: radio size is showing as small. CSS appears ok. Might be possible to access the radio size in the form
     field = forms.ChoiceField(
-        choices=((choice, choice) for choice in content.RELATIONSHIP["choices"]),
+        choices=((choice[1], choice[1]) for choice in content.RELATIONSHIP["choices"]),
         widget=forms.RadioSelect(attrs={"name": "company professional relationship"}),
         label=content.RELATIONSHIP["text"],
         error_messages={"required": "Please select one of the choices to continue"},
@@ -58,9 +60,10 @@ class ProfessionalRelationshipForm(forms.Form):
 
 class SummaryForm(forms.ModelForm):
     class Meta:
-        model = BreachDetails
+        model = Breach
         exclude = [
             "reporter_full_name",
             "reporter_email_address",
             "reporter_professional_relationship",
+            "additional_information",
         ]
