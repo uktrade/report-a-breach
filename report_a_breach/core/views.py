@@ -4,19 +4,16 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import FormView
 from django.views.generic import TemplateView
 
 from report_a_breach.base_classes.views import BaseModelFormView
 from report_a_breach.base_classes.views import BaseView
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
-from report_a_breach.constants import SERVICE_HEADER
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_mail
 
 from .forms import EmailForm
 from .forms import EmailVerifyForm
-from .forms import LandingForm
 from .forms import NameForm
 from .forms import StartForm
 from .forms import SummaryForm
@@ -25,12 +22,11 @@ from .models import Breach
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 
-class LandingView(FormView):
+class LandingView(TemplateView):
     """
     This view displays the landing page for the report a trade sanctions breach application.
     """
 
-    form_class = LandingForm
     template_name = "landing.html"
 
     def get_context_data(self, **kwargs):
@@ -38,22 +34,14 @@ class LandingView(FormView):
         context["breadcrumbs"] = BREADCRUMBS_START_PAGE
         return context
 
-    def form_valid(self, form):
-        breach_instance = form.save(commit=False)
-        reporter_data = self.request.session.get("breach_instance", {})
-        reporter_data["id"] = str(breach_instance.id)
-        self.request.session["breach_instance"] = reporter_data
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse("start", kwargs={"pk": self.request.session["breach_instance"]["id"]})
-
 
 class ReportABreachStartView(BaseModelFormView):
     form_class = StartForm
 
     def form_valid(self, form):
-        reporter_data = self.request.session.get("breach_instance")
+        breach_instance = form.save(commit=False)
+        reporter_data = self.request.session.get("breach_instance", {})
+        reporter_data["id"] = str(breach_instance.id)
         reporter_data["reporter_professional_relationship"] = form.cleaned_data.get(
             "reporter_professional_relationship"
         )
@@ -107,7 +95,6 @@ class VerifyView(BaseView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["service_header"] = SERVICE_HEADER
         return context
 
     def form_valid(self, form):
@@ -162,9 +149,10 @@ class SummaryView(BaseView):
         context["email"] = data["reporter_email_address"]
         context["full_name"] = data["reporter_full_name"]
         # map the DB label to the question text
-        for label in RELATIONSHIP["choices"]:
-            if label[0] in data["reporter_professional_relationship"]:
-                context["company_relationship"] = label[1]
+        choice_dict = dict(RELATIONSHIP["choices"])
+        context["company_relationship"] = choice_dict.get(
+            data["reporter_professional_relationship"]
+        )
         context["pk"] = data["id"]
         return context
 
@@ -203,6 +191,5 @@ class ReportSubmissionCompleteView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session_data = self.request.session.get("breach_instance")
-        context["service_header"] = SERVICE_HEADER
         context["application_reference_number"] = session_data["reporter_confirmation_id"]
         return context

@@ -13,17 +13,17 @@ from .models import Breach
 # TODO: check the wording of any error messages to match what the UCD team expect
 
 
-class LandingForm(forms.ModelForm):
-    class Meta:
-        model = Breach
-        # TODO: should this log a "self report" to initialize the DB and generate the pk?
-        exclude = [
-            "reporter_full_name",
-            "reporter_email_address",
-            "reporter_professional_relationship",
-            # "sanctions_regimes",
-            "additional_information",
-        ]
+# class LandingForm(forms.ModelForm):
+#     class Meta:
+#         model = Breach
+#         # TODO: should this log a "self report" to initialize the DB and generate the pk?
+#         exclude = [
+#             "reporter_full_name",
+#             "reporter_email_address",
+#             "reporter_professional_relationship",
+#             # "sanctions_regimes",
+#             "additional_information",
+#         ]
 
 
 class StartForm(BaseModelForm):

@@ -10,7 +10,7 @@ from .views import VerifyView
 
 urlpatterns = [
     path("landing", LandingView.as_view(), name="landing"),
-    path(r"start/<uuid:pk>", ReportABreachStartView.as_view(), name="start"),
+    path("start", ReportABreachStartView.as_view(), name="start"),
     path(r"email/<uuid:pk>", EmailView.as_view(), name="email"),
     path(r"verify/<uuid:pk>", VerifyView.as_view(), name="verify"),
     path(r"name/<uuid:pk>", NameView.as_view(), name="name"),

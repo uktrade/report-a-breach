@@ -16,17 +16,17 @@ def pytest(context, project):
 
 @task
 def makemigrations(context, app="report_a_breach"):
-    print(f"Running makemigrations")
+    print("Running manage.py makemigrations")
     context.run(f"pipenv run python manage.py makemigrations {app}")
 
 
 @task
 def migrate(context, app="report_a_breach"):
-    print(f"Running migrate")
+    print("Running manage.py migrate")
     context.run(f"pipenv run python manage.py migrate {app}")
 
 
 @task
 def black(context, directory="."):
-    print(f"Running black formatting")
+    print("Running black formatting")
     context.run(f"pipenv run black {directory}")

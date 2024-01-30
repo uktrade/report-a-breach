@@ -1,5 +1,3 @@
-SERVICE_HEADER = "Report a suspected breach of trade sanctions"
-
 BREADCRUMBS_START_PAGE = [
     ("Home", "https://www.gov.uk"),
     ("Business and Industry", "https://www.gov.uk/business-and-industry"),

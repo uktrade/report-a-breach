@@ -1,8 +1,5 @@
-from django.views import View
 from django.views.generic import FormView
 from requests import Response
-
-from report_a_breach.constants import SERVICE_HEADER
 
 
 class BaseView(FormView):
@@ -10,7 +7,6 @@ class BaseView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["service_header"] = SERVICE_HEADER
         return context
 
 
