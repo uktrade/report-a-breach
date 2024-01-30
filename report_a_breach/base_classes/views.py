@@ -1,5 +1,5 @@
+from django.urls import reverse
 from django.views.generic import FormView
-from requests import Response
 
 
 class BaseView(FormView):
@@ -11,7 +11,21 @@ class BaseView(FormView):
 
 
 class BaseModelFormView(BaseView):
+    def __init__(self, success_path):
+        super().__init__()
+        self.success_path = success_path
+
     def form_valid(self, form):
-        form.save(commit=False)
+        breach_instance = form.save(commit=False)
+        session_data = self.request.session.get("breach_instance", {})
+        if "id" not in session_data.keys():
+            session_data["id"] = str(breach_instance.id)
+        form_data = form.cleaned_data
+        session_data.update({key: value for key, value in form_data.items()})
+        self.request.session["breach_instance"] = session_data
         return super().form_valid(form)
-        # return Response(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse(
+            self.success_path, kwargs={"pk": self.request.session["breach_instance"]["id"]}
+        )

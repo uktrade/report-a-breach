@@ -1,7 +1,7 @@
-from crispy_forms_gds.helper import FormHelper
+from crispy_forms_gds.layout import Field
+from crispy_forms_gds.layout import Fieldset
 from crispy_forms_gds.layout import Layout
 from crispy_forms_gds.layout import Size
-from crispy_forms_gds.layout import Submit
 from django import forms
 
 import report_a_breach.question_content as content
@@ -11,19 +11,6 @@ from report_a_breach.base_classes.forms import BaseModelForm
 from .models import Breach
 
 # TODO: check the wording of any error messages to match what the UCD team expect
-
-
-# class LandingForm(forms.ModelForm):
-#     class Meta:
-#         model = Breach
-#         # TODO: should this log a "self report" to initialize the DB and generate the pk?
-#         exclude = [
-#             "reporter_full_name",
-#             "reporter_email_address",
-#             "reporter_professional_relationship",
-#             # "sanctions_regimes",
-#             "additional_information",
-#         ]
 
 
 class StartForm(BaseModelForm):
@@ -43,6 +30,7 @@ class EmailForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["reporter_email_address"]
+        widget = forms.TextInput(attrs={"id": "email_address"})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

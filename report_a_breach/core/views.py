@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.views.generic import FormView
 from django.views.generic import TemplateView
 
 from report_a_breach.base_classes.views import BaseModelFormView
@@ -38,18 +39,8 @@ class LandingView(TemplateView):
 class ReportABreachStartView(BaseModelFormView):
     form_class = StartForm
 
-    def form_valid(self, form):
-        breach_instance = form.save(commit=False)
-        reporter_data = self.request.session.get("breach_instance", {})
-        reporter_data["id"] = str(breach_instance.id)
-        reporter_data["reporter_professional_relationship"] = form.cleaned_data.get(
-            "reporter_professional_relationship"
-        )
-        self.request.session["breach_instance"] = reporter_data
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse("email", kwargs={"pk": self.request.session["breach_instance"]["id"]})
+    def __init__(self):
+        super().__init__(success_path="email")
 
 
 class EmailView(BaseModelFormView):
@@ -61,14 +52,13 @@ class EmailView(BaseModelFormView):
     form_class = EmailForm
 
     def __init__(self):
-        super().__init__()
+        super().__init__(success_path="verify")
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_instance")
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         # TODO: check if this needs an explicit ttl
         reporter_data["verify_code"] = get_random_string(6, allowed_chars="0123456789")
-        reporter_data["reporter_email_address"] = reporter_email_address
         self.request.session["breach_instance"] = reporter_data
         send_mail(
             email=reporter_email_address,
@@ -77,6 +67,7 @@ class EmailView(BaseModelFormView):
         )
         return super().form_valid(form)
 
+    # users will need to continue to the verify page even if summary is the referrer as the new email must be verified
     def get_success_url(self):
         return reverse("verify", kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
@@ -115,22 +106,10 @@ class NameView(BaseModelFormView):
     form_class = NameForm
 
     def __init__(self):
-        super().__init__()
-
-    def form_valid(self, form):
-        reporter_data = self.request.session.get("breach_instance")
-        reporter_data["reporter_full_name"] = form.cleaned_data.get("reporter_full_name")
-        self.request.session["breach_instance"] = reporter_data
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse(
-            "summary",
-            kwargs={"pk": self.request.session["breach_instance"]["id"]},
-        )
+        super().__init__(success_path="summary")
 
 
-class SummaryView(BaseView):
+class SummaryView(FormView):
     """
     The summary page will display the information the reporter has provided,
     and give them a chance to change any of it.
