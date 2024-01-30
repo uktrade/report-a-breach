@@ -1,5 +1,3 @@
-from crispy_forms_gds.layout import Field
-from crispy_forms_gds.layout import Fieldset
 from crispy_forms_gds.layout import Layout
 from crispy_forms_gds.layout import Size
 from django import forms
@@ -42,7 +40,7 @@ class EmailVerifyForm(BaseForm):
     reporter_verify_email = forms.CharField(
         label=f"{content.VERIFY['text']}",
         help_text=f"{content.VERIFY['helper']}",
-        widget=forms.TextInput(attrs={"id": "reporter_verify_email"}),
+        widget=forms.TextInput(attrs={"id": "verify_email"}),
     )
 
     def __init__(self, *args, **kwargs):
@@ -52,10 +50,15 @@ class EmailVerifyForm(BaseForm):
 
 
 class NameForm(BaseModelForm):
+    reporter_full_name = forms.CharField(
+        label=content.FULL_NAME["text"],
+        widget=forms.TextInput(attrs={"id": "full_user_name"}),
+    )
+
     class Meta:
         model = Breach
         fields = ["reporter_full_name"]
-        widgets = {"reporter_full_name": forms.TextInput}
+        widget = forms.TextInput(attrs={"id": "reporter_full_name"})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
