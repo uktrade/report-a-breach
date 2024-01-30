@@ -5,10 +5,6 @@ from django.views.generic import FormView
 class BaseView(FormView):
     template_name = "form.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
 
 class BaseModelFormView(BaseView):
     def __init__(self):
