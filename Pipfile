@@ -20,6 +20,7 @@ invoke = "*"
 pytest-cov = "*"
 pylint = "*"
 django-formtools = "*"
+djhtml = "*"
 
 [dev-packages]
 

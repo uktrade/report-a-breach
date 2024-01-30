@@ -5,8 +5,9 @@ repos:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
+    -   id: mixed-line-ending
 -   repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 24.1.1
     hooks:
     -   id: black
 -   repo: https://github.com/pycqa/isort
@@ -14,3 +15,11 @@ repos:
     hooks:
       - id: isort
         args: [--force-single-line-imports]
+-   repo: https://github.com/pycqa/flake8
+    rev: '7.0.0'
+    hooks:
+    -   id: flake8
+-   repo: https://github.com/pre-commit/mirrors-csslint
+    rev: 'v1.0.5'
+    hooks:
+    -   id: csslint
