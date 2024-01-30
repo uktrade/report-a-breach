@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load crispy_forms_tags crispy_forms_gds %}
 
     {% block navigation %}{% endblock %}
 
@@ -18,7 +17,13 @@
 
 {% block content %}
 {% block two_thirds %}
-
+<div>
+<h2 class="govuk-heading-l">
+			{% block title %}
+				Check your answers before submitting
+			{% endblock %}
+		</h2>
+</div>
         <div class="govuk-summary-card">
   <div class="govuk-summary-card__title-wrapper">
     <h2 class="govuk-summary-card__title">Your details</h2>
@@ -33,7 +38,7 @@
           {{ email }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/report_a_breach/email/{{ pk }}">Change<span class="govuk-visually-hidden"> email (Your details)</span></a>
+          <a class="govuk-link" href="/email/{{ pk }}">Change<span class="govuk-visually-hidden"> email (Your details)</span></a>
         </dd>
       </div>
       <div class="govuk-summary-list__row">
@@ -44,7 +49,7 @@
           {{ full_name }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/report_a_breach/name/{{ pk }}">Change<span class="govuk-visually-hidden"> full name (Your details)</span></a>
+          <a class="govuk-link" href="/name/{{ pk }}">Change<span class="govuk-visually-hidden"> full name (Your details)</span></a>
         </dd>
       </div>
       <div class="govuk-summary-list__row">
@@ -55,7 +60,7 @@
           {{ company_relationship }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/report_a_breach/professional_relationship/{{ pk }}">Change<span class="govuk-visually-hidden"> professional relationship with the organisation (Your details)</span></a>
+          <a class="govuk-link" href="/start">Change<span class="govuk-visually-hidden"> professional relationship with the organisation (Your details)</span></a>
         </dd>
       </div>
     </dl>
@@ -63,11 +68,14 @@
 </div>
 
 
-{% error_summary form %}
-		<div class="govuk-body">
-		{% csrf_token %}
-		{% crispy form %}
-		</div>
+<form method="POST">
+  {% csrf_token %}
+  <div class="govuk-body">
+      <button type="submit" class="govuk-button" data-module="govuk-button">
+      Submit
+      </button>
+  </div>
+</form>
 
 {% endblock %}
 {% endblock %}

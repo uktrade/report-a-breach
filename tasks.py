@@ -8,17 +8,25 @@ def pylint(context, directory):
 
 
 @task
-def pytest_cov(context, directory):
-    print(f"Running tests with coverage in {directory}")
+def pytest(context, project):
+    print(f"Running tests with coverage against {project}")
+    # TODO: this requires testing config
+    context.run(f"pytest --cov={project} tests/")
 
 
 @task
-def migrate(context):
-    print(f"Running migrate")
-    context.run(f"pipenv run python manage.py migrate")
+def makemigrations(context, app="report_a_breach"):
+    print("Running manage.py makemigrations")
+    context.run(f"pipenv run python manage.py makemigrations {app}")
+
+
+@task
+def migrate(context, app="report_a_breach"):
+    print("Running manage.py migrate")
+    context.run(f"pipenv run python manage.py migrate {app}")
 
 
 @task
 def black(context, directory="."):
-    print(f"Running black formatting")
+    print("Running black formatting")
     context.run(f"pipenv run black {directory}")

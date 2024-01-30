@@ -7,7 +7,7 @@
   <div class="govuk-header__content">
     <a href="{% block header__service__url %}{% endblock %}" class="govuk-header__link govuk-header__service-name">
       {% block header__service__name %}
-      {{ service_header }}
+      Report a suspected breach of trade sanctions
       {% endblock %}
     </a>
     {% block header__service__navigaton %}
@@ -22,7 +22,7 @@
 {% block content %}
 {% error_summary form %}
 
-  <div class="govuk-body">
+  <div class="govuk-body govuk-!-width-two-thirds">
     {% csrf_token %}
     {% crispy form %}
   </div>

@@ -1,21 +1,12 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block navigation %}{% endblock %}
-{% load crispy_forms_tags crispy_forms_gds %}
 
 {% block header_title %}{% endblock %}
 
 {% block service_name %}{% endblock %}
 
 {% block cookie_message %}
-<!--<div class="govuk-width-container">-->
-<!--    <p>-->
-<!--        {% trans 'GOV.UK uses cookies to make the site simpler.' %}-->
-<!--        <a href="https://www.gov.uk/help/cookies">-->
-<!--            {% trans 'Find out more about cookies' %}-->
-<!--        </a>-->
-<!--    </p>-->
-<!--</div>-->
 {% endblock %}
 
 {% block back_link %}
@@ -53,12 +44,14 @@
 		<br><br><b>Who can report a suspected breach</b>
 			<br>Description text here
 		</p>
-		{% error_summary form %}
-
-		<div class="govuk-body">
-		{% csrf_token %}
-		{% crispy form %}
-		</div>
+<!--		<form method="POST">-->
+<!--			{% csrf_token %}-->
+			<div class="govuk-body">
+				<a href="/start">
+				<button type="submit" class="govuk-button" data-module="govuk-button">
+					Start now</button></a>
+			</div>
+<!--		</form>-->
 
 {% endblock %}
 	</div>

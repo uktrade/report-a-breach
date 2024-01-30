@@ -48,6 +48,8 @@ exclude = '''
   | _build
   | .venv
   | tests-reports
+  | venv
+  | .env
 )/
 '''
 
