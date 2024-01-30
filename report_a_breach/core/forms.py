@@ -1,5 +1,3 @@
-from crispy_forms_gds.layout import Layout
-from crispy_forms_gds.layout import Size
 from django import forms
 
 import report_a_breach.question_content as content
@@ -20,8 +18,6 @@ class StartForm(BaseModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["reporter_professional_relationship"].choices.pop(0)
-        self.helper.legend_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_professional_relationship")
 
 
 class EmailForm(BaseModelForm):
@@ -30,23 +26,22 @@ class EmailForm(BaseModelForm):
         fields = ["reporter_email_address"]
         widget = forms.TextInput(attrs={"id": "email_address"})
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_email_address")
-
 
 class EmailVerifyForm(BaseForm):
     reporter_verify_email = forms.CharField(
         label=f"{content.VERIFY['text']}",
         help_text=f"{content.VERIFY['helper']}",
-        widget=forms.TextInput(attrs={"id": "verify_email"}),
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_verify_email")
+    def clean_reporter_verify_email(self):
+        value = self.cleaned_data["reporter_verify_email"]
+        if session_verify_code := self.request.session.get("verify_code"):
+            if value != session_verify_code:
+                raise forms.ValidationError("The code you entered is incorrect")
+        else:
+            raise Exception("No verify code in session")
+
+        return value
 
 
 class NameForm(BaseModelForm):
@@ -60,18 +55,6 @@ class NameForm(BaseModelForm):
         fields = ["reporter_full_name"]
         widget = forms.TextInput(attrs={"id": "reporter_full_name"})
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.label_size = Size.MEDIUM
-        self.helper.layout = Layout("reporter_full_name")
 
-
-class SummaryForm(BaseModelForm):
-    class Meta:
-        model = Breach
-        exclude = [
-            "reporter_full_name",
-            "reporter_email_address",
-            "reporter_professional_relationship",
-            "additional_information",
-        ]
+class SummaryForm(BaseForm):
+    ...

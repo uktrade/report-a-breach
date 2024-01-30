@@ -19,6 +19,7 @@ django-storages = "~=1.14"
 invoke = "*"
 pytest-cov = "*"
 pylint = "*"
+django-formtools = "*"
 
 [dev-packages]
 
