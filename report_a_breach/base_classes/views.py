@@ -11,9 +11,8 @@ class BaseView(FormView):
 
 
 class BaseModelFormView(BaseView):
-    def __init__(self, success_path):
+    def __init__(self):
         super().__init__()
-        self.success_path = success_path
 
     def form_valid(self, form):
         breach_instance = form.save(commit=False)

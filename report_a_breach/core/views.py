@@ -38,9 +38,7 @@ class LandingView(TemplateView):
 
 class ReportABreachStartView(BaseModelFormView):
     form_class = StartForm
-
-    def __init__(self):
-        super().__init__(success_path="email")
+    success_path = "email"
 
 
 class EmailView(BaseModelFormView):
@@ -50,9 +48,7 @@ class EmailView(BaseModelFormView):
     """
 
     form_class = EmailForm
-
-    def __init__(self):
-        super().__init__(success_path="verify")
+    success_path = "verify"
 
     def form_valid(self, form):
         reporter_data = self.request.session.get("breach_instance")
@@ -66,10 +62,6 @@ class EmailView(BaseModelFormView):
             template_id=EMAIL_TEMPLATE_ID,
         )
         return super().form_valid(form)
-
-    # users will need to continue to the verify page even if summary is the referrer as the new email must be verified
-    def get_success_url(self):
-        return reverse("verify", kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
 class VerifyView(BaseView):
@@ -104,9 +96,7 @@ class VerifyView(BaseView):
 
 class NameView(BaseModelFormView):
     form_class = NameForm
-
-    def __init__(self):
-        super().__init__(success_path="summary")
+    success_path = "summary"
 
 
 class SummaryView(FormView):
