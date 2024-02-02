@@ -62,3 +62,25 @@ the following will be handy when making changes to the db model:\
 ### Dependencies
 To add a new dependency to the project, use the following command:\
 `pipenv install <package-name>`
+
+
+## Standards
+### Linting and Formatting
+We use:
+- [black](https://github.com/psf/black) to ensure consistent formatting across the project.\
+- [flake8](https://flake8.pycqa.org/en/latest/) to lint the project and flag any common code smells.\
+- [isort](https://pycqa.github.io/isort/) to ensure imports are ordered correctly.\
+- [djhtml](https://pypi.org/project/djhtml/) to format and indent our HTML, CSS, and JS files\
+
+We use [pre-commit](https://pre-commit.com/) to run all of the above before every commit.
+
+### Branches
+All branches should be created from the `main` branch and be named after the JIRA ticket they are related to. e.g. DST-1234
+
+### Commits
+All commits should be made to a branch and not directly to `main`.\
+The commit message should contain a clear and concise description of the changes made.
+
+### Pull Requests
+All pull requests should be made to `main` and should be named after the JIRA ticket they are related to and a short
+description of the functionality implemented. e.g. DST-1234 - Implementing S3 buckets

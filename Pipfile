@@ -22,6 +22,9 @@ pre-commit = "~=3.6"
 invoke = "*"
 pytest-cov = "*"
 pylint = "*"
+django-formtools = "*"
+djhtml = "*"
+pyproject-flake8 = "*"
 
 [requires]
 python_version = "3.11"

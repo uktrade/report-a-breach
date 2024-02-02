@@ -1,81 +1,57 @@
 {% extends "base.html" %}
-{% load i18n %}
-
-    {% block navigation %}{% endblock %}
-
-    {% block header_title %}{% endblock %}
-
-    {% block service_name %}{% endblock %}
-
-    {% block cookie_message %}
-
-    {% endblock %}
-
-    {% block back_link %}
-        <a href="{{request.META.HTTP_REFERER|escape}}" class="govuk-back-link govuk-width-container">Back</a>
-    {% endblock %}
-
-{% block content %}
-{% block two_thirds %}
-<div>
-<h2 class="govuk-heading-l">
-			{% block title %}
+{% load get_wizard_step_url %}
+{% block column_content %}
+	<form method="post">
+		{{ wizard.management_form }}
+		{% csrf_token %}
+		<div>
+			<h2 class="govuk-heading-l">
 				Check your answers before submitting
-			{% endblock %}
-		</h2>
-</div>
-        <div class="govuk-summary-card">
-  <div class="govuk-summary-card__title-wrapper">
-    <h2 class="govuk-summary-card__title">Your details</h2>
-  </div>
-  <div class="govuk-summary-card__content">
-    <dl class="govuk-summary-list">
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          Email
-        </dt>
-        <dd class="govuk-summary-list__value">
-          {{ email }}
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/email/{{ pk }}">Change<span class="govuk-visually-hidden"> email (Your details)</span></a>
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          Full name
-        </dt>
-        <dd class="govuk-summary-list__value">
-          {{ full_name }}
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/name/{{ pk }}">Change<span class="govuk-visually-hidden"> full name (Your details)</span></a>
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          What is the professional relationship with the company or person suspected of breaching trade sanctions?
-        </dt>
-        <dd class="govuk-summary-list__value">
-          {{ company_relationship }}
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="/start">Change<span class="govuk-visually-hidden"> professional relationship with the organisation (Your details)</span></a>
-        </dd>
-      </div>
-    </dl>
-  </div>
-</div>
-
-
-<form method="POST">
-  {% csrf_token %}
-  <div class="govuk-body">
-      <button type="submit" class="govuk-button" data-module="govuk-button">
-      Submit
-      </button>
-  </div>
-</form>
-
-{% endblock %}
-{% endblock %}
+			</h2>
+		</div>
+		<div class="govuk-summary-card">
+			<div class="govuk-summary-card__title-wrapper">
+				<h2 class="govuk-summary-card__title">Your details</h2>
+			</div>
+			<div class="govuk-summary-card__content">
+				<dl class="govuk-summary-list">
+					<div class="govuk-summary-list__row">
+						<dt class="govuk-summary-list__key">
+							Email
+						</dt>
+						<dd class="govuk-summary-list__value">
+							{{ reporter_email_address }}
+						</dd>
+						<dd class="govuk-summary-list__actions">
+							<a class="govuk-link" href="">Change<span class="govuk-visually-hidden"> email (Your details)</span></a>
+						</dd>
+					</div>
+					<div class="govuk-summary-list__row">
+						<dt class="govuk-summary-list__key">
+							Full name
+						</dt>
+						<dd class="govuk-summary-list__value">
+							{{ reporter_full_name }}
+						</dd>
+						<dd class="govuk-summary-list__actions">
+							<a class="govuk-link" href="/name/{{ pk }}">Change<span class="govuk-visually-hidden"> full name (Your details)</span></a>
+						</dd>
+					</div>
+					<div class="govuk-summary-list__row">
+						<dt class="govuk-summary-list__key">
+							What is the professional relationship with the company or person suspected of breaching
+							trade sanctions?
+						</dt>
+						<dd class="govuk-summary-list__value">
+							{{ reporter_professional_relationship }}
+						</dd>
+						<dd class="govuk-summary-list__actions">
+							<a class="govuk-link" href="/start">Change<span class="govuk-visually-hidden"> professional relationship with the organisation (Your details)</span></a>
+						</dd>
+					</div>
+				</dl>
+			</div>
+		</div>
+	<input type="submit" name="continue" value="Submit" class="govuk-button btn-primary" id="save-button">
+	</form>
+{% endblock column_content %}
