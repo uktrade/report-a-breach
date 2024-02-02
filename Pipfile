@@ -12,18 +12,19 @@ crispy-forms-gds = "*"
 django-chunk-upload-handlers = "*"
 notifications-python-client = "~=9.0"
 django-audit-log-middleware = "~=0.0.4"
-black = "~=23.12"
-pre-commit = "~=3.6"
 django-countries = "~=7.5"
 django-storages = "~=1.14"
+gunicorn = "~=21.2"
+
+[dev-packages]
+black = "~=23.12"
+pre-commit = "~=3.6"
 invoke = "*"
 pytest-cov = "*"
 pylint = "*"
 django-formtools = "*"
 djhtml = "*"
 pyproject-flake8 = "*"
-
-[dev-packages]
 
 [requires]
 python_version = "3.11"
