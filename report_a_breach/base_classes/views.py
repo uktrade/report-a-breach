@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.views.generic import FormView
+from formtools.wizard.views import NamedUrlSessionWizardView
 
 
 class BaseView(FormView):
@@ -24,3 +25,21 @@ class BaseModelFormView(BaseView):
         return reverse(
             self.success_path, kwargs={"pk": self.request.session["breach_instance"]["id"]}
         )
+
+
+class BaseWizardView(NamedUrlSessionWizardView):
+    def get_template_names(self):
+        if custom_getter := getattr(self, f"get_{self.steps.current}_template_name", None):
+            return custom_getter()
+        return super().get_template_names()
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form=form, **kwargs)
+        if custom_getter := getattr(self, f"get_{self.steps.current}_context_data", None):
+            context.update(custom_getter(form))
+        return super().get_context_data(form=form, **kwargs)
+
+    def process_step(self, form):
+        if custom_getter := getattr(self, f"process_{self.steps.current}_step", None):
+            return custom_getter(form)
+        return super().process_step(form)

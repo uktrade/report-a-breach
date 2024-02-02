@@ -1,16 +1,12 @@
 import os
 
-from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.generic import FormView
 from django.views.generic import TemplateView
-from formtools.wizard.views import NamedUrlSessionWizardView
-from formtools.wizard.views import SessionWizardView
 
-from report_a_breach.base_classes.views import BaseModelFormView
-from report_a_breach.base_classes.views import BaseView
+from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_mail
@@ -25,7 +21,7 @@ from .models import Breach
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 
-class ReportABreachWizardView(NamedUrlSessionWizardView):
+class ReportABreachWizardView(BaseWizardView):
     form_list = [
         ("start", StartForm),
         ("email", EmailForm),
@@ -35,32 +31,22 @@ class ReportABreachWizardView(NamedUrlSessionWizardView):
     ]
     template_name = "form_wizard_step.html"
 
-    def get_template_names(self):
-        if self.steps.current == "summary":
-            return [
-                "summary.html",
-            ]
-        return super().get_template_names()
+    def get_summary_template(self):
+        return "summary.html"
 
-    def get_context_data(self, form, **kwargs):
-        context = super().get_context_data(form=form, **kwargs)
-        if self.steps.current == "summary":
-            context.update(self.get_all_cleaned_data())
-        return context
+    def get_summary_context_data(self, form):
+        return self.get_all_cleaned_data()
 
-    def process_step(self, form):
-        form_step_data = super().process_step(form)
-        if self.steps.current == "email":
-            reporter_email_address = form.cleaned_data.get("reporter_email_address")
-            verify_code = get_random_string(6, allowed_chars="0123456789")
-            self.request.session["verify_code"] = verify_code
-            send_mail(
-                email=reporter_email_address,
-                context={"verification_code": verify_code},
-                template_id=EMAIL_TEMPLATE_ID,
-            )
-            self.request.session.modified = True
-        return form_step_data
+    def process_summary_step(self, form):
+        reporter_email_address = form.cleaned_data.get("reporter_email_address")
+        verify_code = get_random_string(6, allowed_chars="0123456789")
+        self.request.session["verify_code"] = verify_code
+        send_mail(
+            email=reporter_email_address,
+            context={"verification_code": verify_code},
+            template_id=EMAIL_TEMPLATE_ID,
+        )
+        self.request.session.modified = True
 
     def get_form_kwargs(self, step=None):
         kwargs = super().get_form_kwargs(step)
@@ -68,8 +54,8 @@ class ReportABreachWizardView(NamedUrlSessionWizardView):
         return kwargs
 
     def done(self, form_list, **kwargs):
-        all_cleaned_data = self.get_all_cleaned_data()
-        """new_breach = Breach.objects.create(
+        """all_cleaned_data = self.get_all_cleaned_data()
+        new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],
             reporter_email_address=all_cleaned_data["reporter_email_address"],
             reporter_full_name=all_cleaned_data["reporter_full_name"],
@@ -145,7 +131,8 @@ class SummaryView(FormView):
 class ReportSubmissionCompleteView(TemplateView):
     """
     The final step in the reporting a breach application.
-    This view will display the reporters reference number and information on the next steps in the process.
+    This view will display the reporters reference number and information on the
+    next steps in the process.
     """
 
     # Note: we are not currently sending the confirmation email specified in the template.

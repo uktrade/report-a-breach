@@ -21,6 +21,7 @@ pytest-cov = "*"
 pylint = "*"
 django-formtools = "*"
 djhtml = "*"
+pyproject-flake8 = "*"
 
 [dev-packages]
 
