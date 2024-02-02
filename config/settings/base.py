@@ -9,9 +9,11 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 import os
 from pathlib import Path
 
+import dj_database_url
 import environ
 
 env = environ.Env(
@@ -86,17 +88,25 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+_VCAP_SERVICES = env.json("VCAP_SERVICES", default={})
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": env.str("POSTGRES_NAME", default="postgres"),
-        "USER": env.str("POSTGRES_USER", default="postgres"),
-        "PASSWORD": env.str("POSTGRES_PASSWORD", default="password"),
-        "HOST": env.str("POSTGRES_HOST", default="localhost"),
-        "PORT": env.str("POSTGRES_PORT", default="15432"),
+if "postgres" in _VCAP_SERVICES:
+    DATABASES = {
+        "default": {
+            **dj_database_url.parse(
+                _VCAP_SERVICES["postgres"][0]["credentials"]["uri"],
+                engine="postgresql",
+                conn_max_age=0,
+            ),
+            "ENGINE": "django_db_geventpool.backends.postgresql_psycopg2",
+            "OPTIONS": {
+                "MAX_CONNS": env("DB_MAX_CONNS", default=10),
+            },
+        }
     }
-}
+else:
+    default_database = env.db()
+    DATABASES = {"default": default_database}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

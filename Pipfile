@@ -15,6 +15,7 @@ django-audit-log-middleware = "~=0.0.4"
 django-countries = "~=7.5"
 django-storages = "~=1.14"
 gunicorn = "~=21.2"
+dj-database-url = "*"
 
 [dev-packages]
 black = "~=23.12"
