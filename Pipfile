@@ -15,7 +15,7 @@ django-audit-log-middleware = "~=0.0.4"
 django-countries = "~=7.5"
 django-storages = "~=1.14"
 gunicorn = "~=21.2"
-django-simple-history = "*"
+django-simple-history = "~=3.4.0"
 django-formtools = "*"
 
 [dev-packages]
