@@ -218,6 +218,7 @@
                 "sha256:bce9b64eda52cc1eef6961cc649cf75aacd1a707c2fff08d6c3efcbc8e7e761a"
             ],
             "index": "pypi",
+            "markers": "python_version >= '3.8'",
             "version": "==2.5.1"
         },
         "django-ipware": {
@@ -296,6 +297,7 @@
                 "sha256:fde6402c5432b835fbb7698f1c7f2809c8d6b2bd9d047ac1f5a7c1d5aa569303"
             ],
             "index": "pypi",
+            "markers": "python_version >= '3.8'",
             "version": "==23.9.1"
         },
         "greenlet": {
