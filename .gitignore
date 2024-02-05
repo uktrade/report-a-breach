@@ -38,9 +38,6 @@ dmypy.json
 *.log
 local_settings.py
 db.sqlite3
-*migrations/
-# collectstatic output for local dev
-core/staticfiles
 
 # Distribution / packaging
 .Python

@@ -38,6 +38,11 @@ exclude_lines = [
 
 [tool.flake8]
 max-line-length = 100
+exclude = """
+/(
+    */migrations/*
+)/
+"""
 
 [tool.black]
 line-length = 100
