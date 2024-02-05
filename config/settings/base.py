@@ -15,6 +15,8 @@ from pathlib import Path
 
 import dj_database_url
 import environ
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -28,9 +30,9 @@ SECRET_KEY = env.str("DJANGO_SECRET_KEY")
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DJANGO_DEBUG", default=False)
+DEBUG = True
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -98,10 +100,7 @@ if "postgres" in _VCAP_SERVICES:
                 engine="postgresql",
                 conn_max_age=0,
             ),
-            "ENGINE": "django_db_geventpool.backends.postgresql_psycopg2",
-            "OPTIONS": {
-                "MAX_CONNS": env("DB_MAX_CONNS", default=10),
-            },
+            "ENGINE": "django.db.backends.postgresql",
         }
     }
 else:
@@ -154,3 +153,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # GOV NOTIFY
 GOV_NOTIFY_API_KEY = env.str("GOV_NOTIFY_API_KEY")
+
+# SENTRY
+SENTRY_DSN = env.str("SENTRY_DSN", default="")
+SENTRY_ENVIRONMENT = env.str("SENTRY_ENVIRONMENT", default="")
+if SENTRY_DSN and SENTRY_ENVIRONMENT:
+    sentry_sdk.init(
+        dsn=env.str("SENTRY_DSN", default=""),
+        environment=env.str("SENTRY_ENVIRONMENT", default=""),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0,
+    )

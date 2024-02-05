@@ -16,6 +16,9 @@ django-countries = "~=7.5"
 django-storages = "~=1.14"
 gunicorn = "~=21.2"
 dj-database-url = "*"
+django-formtools = "*"
+gevent = "*"
+sentry-sdk = "*"
 
 [dev-packages]
 black = "~=23.12"

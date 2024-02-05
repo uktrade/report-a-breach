@@ -4,4 +4,4 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 
 # Start webserver
-gunicorn core.wsgi --bind 0.0.0.0:8080 --capture-output --config config/gunicorn.py
+gunicorn config.wsgi --bind 0.0.0.0:8080 --capture-output --config config/gunicorn.py
