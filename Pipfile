@@ -19,6 +19,7 @@ dj-database-url = "*"
 django-formtools = "*"
 gevent = "*"
 sentry-sdk = "*"
+whitenoise = "*"
 
 [dev-packages]
 black = "~=23.12"

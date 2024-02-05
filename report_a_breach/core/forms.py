@@ -24,7 +24,6 @@ class EmailForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["reporter_email_address"]
-        widget = forms.TextInput(attrs={"id": "email_address"})
 
 
 class EmailVerifyForm(BaseForm):
@@ -57,4 +56,4 @@ class NameForm(BaseModelForm):
 
 
 class SummaryForm(BaseForm):
-    ...
+    pass
