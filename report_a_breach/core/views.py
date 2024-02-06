@@ -44,21 +44,18 @@ class ReportABreachWizardView(BaseWizardView):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
         self.request.session["verify_code"] = verify_code
+        print(verify_code)
         send_mail(
             email=reporter_email_address,
             context={"verification_code": verify_code},
             template_id=EMAIL_TEMPLATE_ID,
         )
         self.request.session.modified = True
+        return self.get_form_step_data(form)
 
-    def get_form_kwargs(self, step=None):
-        kwargs = super().get_form_kwargs(step)
-        kwargs["request"] = self.request
-        return kwargs
-
-    def done(self, form_list, **kwargs):
-        # the done method is not triggering at all
-        print(form_list, "form_list")
+    def process_summary_step(self, form):
+        print("I'm here")
+        print(form.errors)
         all_cleaned_data = self.get_all_cleaned_data()
         sanctions_regime = SanctionsRegime.objects.all(short_name="The Russia")
         new_breach = Breach.objects.create(
@@ -67,22 +64,53 @@ class ReportABreachWizardView(BaseWizardView):
             ],
             reporter_email_address=all_cleaned_data["reporter_email_address"],
             reporter_full_name=all_cleaned_data["reporter_full_name"],
-            additional_information="N/A",  # Placeholder
         )
         new_breach.sanctions_regimes = SanctionsRegimeBreachThrough.objects.create(
-            breach=new_breach, sanctions_regime=sanctions_regime
+            breach=new_breach.id, sanctions_regime=sanctions_regime.id
         )
+        new_breach.additional_information = "N/A"
         new_breach.save()
-        print(new_breach.objects.all())
+        return self.get_form_step_data(form)
+
+    def get_form_kwargs(self, step=None):
+        kwargs = super().get_form_kwargs(step)
+        kwargs["request"] = self.request
+        return kwargs
+
+    def done(self, form_list, **kwargs):
+        # print(form_list)
+        # all_cleaned_data = self.get_all_cleaned_data()
+        # sanctions_regime = SanctionsRegime.objects.all(short_name="The Russia")
+        # new_breach = Breach.objects.create(
+        #     reporter_professional_relationship=all_cleaned_data[
+        #         "reporter_professional_relationship"
+        #     ],
+        #     reporter_email_address=all_cleaned_data["reporter_email_address"],
+        #     reporter_full_name=all_cleaned_data["reporter_full_name"],
+        # )
+        # new_breach.sanctions_regimes = SanctionsRegimeBreachThrough.objects.create(
+        #     breach=new_breach.id, sanctions_regime=sanctions_regime.id
+        # )
+        # new_breach.additional_information = "N/A"
+        # new_breach.save()
         return render(
             self.request,
             "done.html",
         )
 
-    # This doesn't seem to be accessible from the form wizard
-    def form_invalid(self, form):
-        print(form.errors)
-        return super().form_invalid(form)
+    # def done(self, form_list, **kwargs):
+    #     all_cleaned_data = self.get_all_cleaned_data()
+    #     Breach.objects.create(
+    #         reporter_professional_relationship=all_cleaned_data[
+    #             "reporter_professional_relationship"
+    #         ],
+    #         reporter_email_address=all_cleaned_data["reporter_email_address"],
+    #         reporter_full_name=all_cleaned_data["reporter_full_name"],
+    #     )
+    #     return render(
+    #         self.request,
+    #         "done.html",
+    #     )
 
 
 class LandingView(TemplateView):
