@@ -1,0 +1,32 @@
+version: 2.1
+
+jobs:
+    build:
+        docker:
+            - image: cimg/python:3.11.7
+        environment:
+            DJANGO_SETTINGS_MODULE: config.settings.test
+            DJANGO_DEBUG: "True"
+            DJANGO_SECRET_KEY: "CircleCI"
+        steps:
+            - checkout
+            - run :
+                name: Install dependencies
+                command: pip install pipenv && pipenv install --dev
+
+            - run:
+                name: run black (code formatting check)
+                command: pipenv run black --check .
+
+            - run:
+                name: run isort (import formatter check)
+                command: pipenv run isort . --check
+
+            - run:
+                  name: Check missing migrations (changes to models that haven't been added to migrations)
+                  command: pipenv run python manage.py makemigrations --check --dry-run --settings=config.settings.local
+
+workflows:
+  build_and_test:
+    jobs:
+      - build
