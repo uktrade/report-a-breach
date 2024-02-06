@@ -55,5 +55,7 @@ class NameForm(BaseModelForm):
         widget = forms.TextInput(attrs={"id": "reporter_full_name"})
 
 
-class SummaryForm(BaseForm):
-    pass
+class SummaryForm(BaseModelForm):
+    class Meta:
+        model = Breach
+        fields = ["sanctions_regimes", "additional_information"]
