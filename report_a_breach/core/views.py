@@ -31,11 +31,12 @@ class ReportABreachWizardView(BaseWizardView):
     ]
     template_name = "form_wizard_step.html"
 
-    def get_summary_template(self):
+    def get_summary_template_name(self):
         return "summary.html"
 
     def get_summary_context_data(self, form):
-        return self.get_all_cleaned_data()
+        context_dict = self.get_all_cleaned_data()
+        return context_dict
 
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
