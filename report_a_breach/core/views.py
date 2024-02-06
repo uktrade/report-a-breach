@@ -54,7 +54,6 @@ class ReportABreachWizardView(BaseWizardView):
         return self.get_form_step_data(form)
 
     def process_summary_step(self, form):
-        print("I'm here")
         print(form.errors)
         all_cleaned_data = self.get_all_cleaned_data()
         sanctions_regime = SanctionsRegime.objects.all(short_name="The Russia")
