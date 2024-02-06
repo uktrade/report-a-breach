@@ -42,12 +42,14 @@ class ReportABreachWizardView(BaseWizardView):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
         self.request.session["verify_code"] = verify_code
+        print(verify_code)
         send_mail(
             email=reporter_email_address,
             context={"verification_code": verify_code},
             template_id=EMAIL_TEMPLATE_ID,
         )
         self.request.session.modified = True
+        return self.get_form_step_data(form)
 
     def get_form_kwargs(self, step=None):
         kwargs = super().get_form_kwargs(step)
@@ -55,12 +57,14 @@ class ReportABreachWizardView(BaseWizardView):
         return kwargs
 
     def done(self, form_list, **kwargs):
-        """all_cleaned_data = self.get_all_cleaned_data()
-        new_breach = Breach.objects.create(
-            reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],
+        all_cleaned_data = self.get_all_cleaned_data()
+        Breach.objects.create(
+            reporter_professional_relationship=all_cleaned_data[
+                "reporter_professional_relationship"
+            ],
             reporter_email_address=all_cleaned_data["reporter_email_address"],
             reporter_full_name=all_cleaned_data["reporter_full_name"],
-        )"""
+        )
         return render(
             self.request,
             "done.html",
