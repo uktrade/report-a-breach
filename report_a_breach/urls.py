@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import include, path
 
 urlpatterns = [
     path("", include("report_a_breach.core.urls")),

@@ -61,7 +61,6 @@ exclude = '''
 )/
 '''
 
-# see https://pycqa.github.io/isort/docs/configuration/black_compatibility.html
 [tool.isort]
 profile = "black"
 
