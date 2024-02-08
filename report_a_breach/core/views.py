@@ -31,6 +31,10 @@ class ReportABreachWizardView(BaseWizardView):
 
     def get_summary_context_data(self, form, **kwargs):
         context = self.get_all_cleaned_data()
+        choice_dict = dict(RELATIONSHIP["choices"])
+        context["company_relationship"] = choice_dict.get(
+            context["reporter_professional_relationship"]
+        )
         return context
 
     def process_email_step(self, form):
