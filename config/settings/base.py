@@ -52,12 +52,43 @@ THIRD_PARTY_APPS = [
     "crispy_forms_gds",
     "django_chunk_upload_handlers",
     "simple_history",
+    "storages",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_form", "gds")
 CRISPY_TEMPLATE_PACK = "gds"
+
+# AWS
+AWS_ACCESS_KEY_ID = env("S3_STORAGE_KEY", default=None)
+AWS_SECRET_ACCESS_KEY = env("S3_STORAGE_SECRET", default=None)
+AWS_STORAGE_BUCKET_NAME = env("S3_BUCKET_NAME", default=None)
+AWS_REGION = env("AWS_REGION", default="eu-west-1")
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_ENCRYPTION = True
+# S3 client library to use
+S3_CLIENT = "boto3"
+# S3 Root directory name
+S3_DOCUMENT_ROOT_DIRECTORY = "documents"
+# Time before S3 download links expire
+S3_DOWNLOAD_LINK_EXPIRY_SECONDS = env.int("S3_DOWNLOAD_LINK_EXPIRY_SECONDS", default=3600)
+# Max upload size - 2GB
+MAX_UPLOAD_SIZE = 2 * (1024 * 1024 * 1024)
+# FILE DOWNLOAD CHUNK SIZE
+STREAMING_CHUNK_SIZE = 8192
+
+FILE_UPLOAD_HANDLERS = (
+    "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
+    "django_chunk_upload_handlers.s3.S3FileUploadHandler",
+)  # Order is important
+
+# File storage
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+CLAM_AV_USERNAME = env("CLAM_AV_USERNAME", default=None)
+CLAM_AV_PASSWORD = env("CLAM_AV_PASSWORD", default=None)
+CLAM_AV_DOMAIN = env("CLAM_AV_DOMAIN", default=None)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -142,12 +173,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
-WEB_SERVICE_STATIC_DIR = BASE_DIR / "report_a_breach" / "static"
-STATICFILES_DIRS = (WEB_SERVICE_STATIC_DIR,)
-
-# where static files are collected after running collectstatic
+STATIC_URL = "/static/"
+# where static files are collected after running collectstatic:
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
+]
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
