@@ -56,8 +56,8 @@ Django will provide the local url which should be http://127.0.0.1:8000/, naviga
 ### Django
 Along with the above runserver command, while developing on the project, \
 the following will be handy when making changes to the db model:\
-`pipenv run python manage.py makemigrations`\
-`pipenv run python manage.py migrate`
+`invoke makemigrations`\
+`invoke migrate`
 
 ### Dependencies
 To add a new dependency to the project, use the following command:\
