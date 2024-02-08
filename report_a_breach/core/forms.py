@@ -1,8 +1,9 @@
+from crispy_forms_gds.helper import FormHelper
+from crispy_forms_gds.layout import Submit
 from django import forms
 
 import report_a_breach.question_content as content
-from report_a_breach.base_classes.forms import BaseForm
-from report_a_breach.base_classes.forms import BaseModelForm
+from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
 
 from .models import Breach
 
@@ -56,4 +57,7 @@ class NameForm(BaseModelForm):
 
 
 class SummaryForm(BaseForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("submit", "Submit and Save", css_class="btn-primary"))
