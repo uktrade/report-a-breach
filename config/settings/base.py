@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     "crispy_forms",
     "crispy_forms_gds",
     "django_chunk_upload_handlers",
+    "rest_framework",
     "simple_history",
     "storages",
 ]
@@ -187,6 +188,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Companies House API
+COMPANIES_HOUSE_API_KEY = env("COMPANIES_HOUSE_API_KEY", default=None)
 
 # GOV NOTIFY
 GOV_NOTIFY_API_KEY = env.str("GOV_NOTIFY_API_KEY")
