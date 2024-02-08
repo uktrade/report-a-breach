@@ -1,9 +1,8 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
 {% load get_wizard_step_url %}
 {% block column_content %}
-    <form method="POST" enctype="multipart/form-data">
-        {{ wizard.management_form }}
-        {% csrf_token %}
+    <form method="post">
         <div>
             <h2 class="govuk-heading-l">
                 Check your answers before submitting
@@ -52,6 +51,15 @@
                 </dl>
             </div>
         </div>
+        {{ wizard.management_form }}
+        {% if wizard.form.forms %}
+            {{ wizard.form.management_form }}
+            {% for form in wizard.form.forms %}
+                {% crispy form %}
+            {% endfor %}
+        {% else %}
+            {% crispy wizard.form %}
+        {% endif %}
 <!--	<input type="submit" name="continue" value="Submit" class="govuk-button btn-primary" id="save-button">-->
     </form>
 {% endblock column_content %}

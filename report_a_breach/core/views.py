@@ -3,22 +3,15 @@ import os
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import FormView
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_mail
 
-from .forms import EmailForm
-from .forms import EmailVerifyForm
-from .forms import NameForm
-from .forms import StartForm
-from .forms import SummaryForm
-from .models import Breach
-from .models import SanctionsRegime
-from .models import SanctionsRegimeBreachThrough
+from .forms import EmailForm, EmailVerifyForm, NameForm, StartForm, SummaryForm
+from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
 
 EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
@@ -36,9 +29,9 @@ class ReportABreachWizardView(BaseWizardView):
     def get_summary_template_name(self):
         return "summary.html"
 
-    def get_summary_context_data(self, form):
-        context_dict = self.get_all_cleaned_data()
-        return context_dict
+    def get_summary_context_data(self, form, **kwargs):
+        context = self.get_all_cleaned_data()
+        return context
 
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
@@ -53,10 +46,14 @@ class ReportABreachWizardView(BaseWizardView):
         self.request.session.modified = True
         return self.get_form_step_data(form)
 
-    def process_summary_step(self, form):
-        print(form.errors)
+    def get_form_kwargs(self, step=None):
+        kwargs = super().get_form_kwargs(step)
+        kwargs["request"] = self.request
+        return kwargs
+
+    def done(self, form_list, **kwargs):
         all_cleaned_data = self.get_all_cleaned_data()
-        sanctions_regime = SanctionsRegime.objects.all(short_name="The Russia")
+        sanctions_regime = SanctionsRegime.objects.get(short_name="The Russia")
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data[
                 "reporter_professional_relationship"
@@ -64,52 +61,16 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_email_address=all_cleaned_data["reporter_email_address"],
             reporter_full_name=all_cleaned_data["reporter_full_name"],
         )
-        new_breach.sanctions_regimes = SanctionsRegimeBreachThrough.objects.create(
-            breach=new_breach.id, sanctions_regime=sanctions_regime.id
-        )
         new_breach.additional_information = "N/A"
-        new_breach.save()
-        return self.get_form_step_data(form)
-
-    def get_form_kwargs(self, step=None):
-        kwargs = super().get_form_kwargs(step)
-        kwargs["request"] = self.request
-        return kwargs
-
-    def done(self, form_list, **kwargs):
-        # print(form_list)
-        # all_cleaned_data = self.get_all_cleaned_data()
-        # sanctions_regime = SanctionsRegime.objects.all(short_name="The Russia")
-        # new_breach = Breach.objects.create(
-        #     reporter_professional_relationship=all_cleaned_data[
-        #         "reporter_professional_relationship"
-        #     ],
-        #     reporter_email_address=all_cleaned_data["reporter_email_address"],
-        #     reporter_full_name=all_cleaned_data["reporter_full_name"],
-        # )
-        # new_breach.sanctions_regimes = SanctionsRegimeBreachThrough.objects.create(
-        #     breach=new_breach.id, sanctions_regime=sanctions_regime.id
-        # )
-        # new_breach.additional_information = "N/A"
-        # new_breach.save()
-        return render(
-            self.request,
-            "done.html",
+        sanctions_breach = SanctionsRegimeBreachThrough.objects.create(
+            breach=new_breach, sanctions_regime=sanctions_regime
         )
-
-    # def done(self, form_list, **kwargs):
-    #     all_cleaned_data = self.get_all_cleaned_data()
-    #     Breach.objects.create(
-    #         reporter_professional_relationship=all_cleaned_data[
-    #             "reporter_professional_relationship"
-    #         ],
-    #         reporter_email_address=all_cleaned_data["reporter_email_address"],
-    #         reporter_full_name=all_cleaned_data["reporter_full_name"],
-    #     )
-    #     return render(
-    #         self.request,
-    #         "done.html",
-    #     )
+        sanctions_breach.save()
+        new_breach.sanctions_regimes.add(sanctions_regime)
+        new_breach.save()
+        reference_id = str(new_breach.id).split("-")[0].upper()
+        kwargs["reference_id"] = reference_id
+        return render(self.request, "confirmation.html")
 
 
 class LandingView(TemplateView):
@@ -186,6 +147,5 @@ class ReportSubmissionCompleteView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        session_data = self.request.session.get("breach_instance")
-        context["application_reference_number"] = session_data["reporter_confirmation_id"]
+        context["application_reference_number"] = kwargs["reference_id"]
         return context

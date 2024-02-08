@@ -37,7 +37,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
         context = super().get_context_data(form=form, **kwargs)
         if custom_getter := getattr(self, f"get_{self.steps.current}_context_data", None):
             context.update(custom_getter(form))
-        return super().get_context_data(form=form, **kwargs)
+        return context
 
     def process_step(self, form):
         if custom_getter := getattr(self, f"process_{self.steps.current}_step", None):
