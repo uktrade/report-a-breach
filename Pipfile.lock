@@ -228,6 +228,15 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
             "version": "==3.0.7"
         },
+        "django-ratelimit": {
+            "hashes": [
+                "sha256:555943b283045b917ad59f196829530d63be2a39adb72788d985b90c81ba808b",
+                "sha256:d047a31cf94d83ef1465d7543ca66c6fc16695559b5f8d814d1b51df15110b92"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==4.1.0"
+        },
         "django-simple-history": {
             "hashes": [
                 "sha256:19bd1a87e1e2eba34dfd43eab1fcf2da5752221f343232f2372b2121c7e3b97d",

@@ -1,21 +1,58 @@
 from time import time
 
-from core.feature_flags import FeatureFlags
 from django.conf import settings
+
+# TODO: Confirm that secturity check are not required, and then remove the related code.
+# from django.contrib.auth.models import Group
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
-from organisations.models import get_organisation
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+
+# TODO: Confirm that secturity check are not required, and then remove the related code.
+# from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from security.constants import SECURITY_GROUP_SUPER_USER
-from security.utils import validate_user_case, validate_user_organisation
 
 from config.ratelimit import get_rate
 from config.version import __version__
 
-from .exceptions import AccessDenied
+# TODO: Confirm that secturity check are not required, and then remove the related code.
+# from .exceptions import AccessDenied
+# from security.utils import validate_user_organisation, validate_user_case
+# from security.constants import SECURITY_GROUP_SUPER_USER
+
+
+# TODO: Confirm that secturity check are not required, and then remove the related code.
+# class GroupPermission(BasePermission):
+#     @staticmethod
+#     def _user_in_group(user, group):
+#         """Check is a user is in a group.
+
+#         :param (User) user: User to check.
+#         :param (Group) group: Group to check membership of.
+#         :returns (bool): True if the user is in a given group, False otherwise.
+#         """
+#         try:
+#             return Group.objects.get(name=group).user_set.filter(id=user.id).exists()
+#         except Group.DoesNotExist:
+#             return False
+
+#     def has_permission(self, request, view):
+#         """Check user's permission override.
+
+#         Check if the user in this request is in an allowed group for the request
+#         method invoked on the view (or is a superuser, or the view doesn't specify
+#         allowed groups).
+#         :param (HTTPRequest) request: API request.
+#         :param (ReportABreachApiView) view: View to check permission for.
+
+#         :returns (bool): True
+#         """
+#         allowed_groups_mapping = getattr(view, "allowed_groups", {})
+#         allowed_groups = allowed_groups_mapping.get(request.method, [])
+#         if request.user.is_superuser or not allowed_groups:
+#             return True
+#         return any([self._user_in_group(request.user, group) for group in allowed_groups])
 
 
 @method_decorator(ratelimit(key="user_or_ip", rate=get_rate, method=ratelimit.ALL), name="dispatch")
@@ -44,8 +81,9 @@ class ReportABreachApiView(APIView):
         performing multiple queries to the database or cache.
     """
 
-    permission_classes = IsAuthenticated
-    allowed_groups = {}
+    # TODO: Confirm that secturity check are not required, and then remove the related code.
+    # permission_classes = (IsAuthenticated, GroupPermission)
+    # allowed_groups = {}
 
     def __init__(self, *args, **kwargs):
         self.case_id = None
@@ -67,40 +105,38 @@ class ReportABreachApiView(APIView):
         :param (HttpRequest) request: Request object.
         """
         super().initial(request, *args, **kwargs)
-        organisation_id = kwargs.get("organisation_id")
-        self.case_id = kwargs.get("case_id")
-        self.user = request.user
-        self.organisation = get_organisation(organisation_id)
-        if self.organisation:
-            self.organisation.set_user_context(request.user)
-        if self.allowed_groups:
-            self.raise_on_invalid_access()
+        # TODO: Confirm that secturity check are not required, and then remove the related code.
+        # self.user = request.user
+        # if self.allowed_groups:
+        #     self.raise_on_invalid_access()
         self._start = int(request.query_params.get("start", 0))
         self._limit = int(request.query_params.get("limit", settings.DEFAULT_QUERYSET_PAGE_SIZE))
-        self._search = request.query_params.get("q")
+        # self._search = request.query_params.get("q")
+        self._search = 1234561
         self._order_by = request.query_params.get("order_by")
         self._order_dir = request.query_params.get("order_dir", "asc")
 
-    def raise_on_invalid_access(self):
-        """Check user organisation authorisation.
+    # TODO: Confirm that secturity check are not required, and then remove the related code.
+    # def raise_on_invalid_access(self):
+    #     """Check user organisation authorisation.
 
-        Raise an AccessDenied API exception if the user is not allowed to
-        access the organisation.
-        """
-        is_valid = False
-        org_id = self.organisation.id if self.organisation else None
-        if self.user.has_group(SECURITY_GROUP_SUPER_USER):
-            is_valid = True
-        elif self.allowed_groups.get(self.request.method) and self.user.has_groups(
-            self.allowed_groups[self.request.method]
-        ):
-            is_valid = True
-        elif self.case_id and org_id:
-            is_valid = validate_user_case(self.user, self.case_id, org_id)
-        elif org_id:
-            is_valid = validate_user_organisation(self.user, org_id)
-        if not is_valid:
-            raise AccessDenied("User does not have access to organisation")
+    #     Raise an AccessDenied API exception if the user is not allowed to
+    #     access the organisation.
+    #     """
+    #     is_valid = False
+    #     org_id = self.organisation.id if self.organisation else None
+    #     if self.user.has_group(SECURITY_GROUP_SUPER_USER):
+    #         is_valid = True
+    #     elif self.allowed_groups.get(self.request.method) and self.user.has_groups(
+    #         self.allowed_groups[self.request.method]
+    #     ):
+    #         is_valid = True
+    #     elif self.case_id and org_id:
+    #         is_valid = validate_user_case(self.user, self.case_id, org_id)
+    #     elif org_id:
+    #         is_valid = validate_user_organisation(self.user, org_id)
+    #     if not is_valid:
+    #         raise AccessDenied("User does not have access to organisation")
 
     def dispatch(self, request, *args, **kwargs):
         """Dispatch override.
@@ -108,13 +144,12 @@ class ReportABreachApiView(APIView):
         :param (HttpRequest) request: Request object.
         """
         time_recv = time()
-        self.feature_flags = FeatureFlags()
         response = super().dispatch(request, *args, **kwargs)
         if hasattr(response, "data"):
             if response.exception is True:
                 response["error"] = True
                 if settings.DEBUG:
-                    # logger.error(f"Error: {response.data}") TODO: require messge?
+                    # logger.error(f"Error: {response.data}")   TODO: require a messge here?
                     pass
             else:
                 response.data["version"] = __version__
