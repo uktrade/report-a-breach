@@ -3,34 +3,25 @@ import base64
 import requests
 from django.conf import settings
 
-from .base import ReportABreachApiView, ResponseSuccess
-from .exceptions import InvalidRequestParams
-
 COMPANIES_HOUSE_BASIC_AUTH = base64.b64encode(  # /PS-IGNORE
     bytes(f"{settings.COMPANIES_HOUSE_API_KEY}:", "utf-8")
 ).decode("utf-8")
 COMPANIES_HOUSE_BASE_DOMAIN = "https://api.companieshouse.gov.uk"
 
 
-class CompaniesHouseApiSearch(ReportABreachApiView):
-    def get(self, request, *args, **kwargs):
-        query = request.query_params.get("q")
-        if not query:
-            raise InvalidRequestParams("Missing q param")
-        headers = {"Authorization": f"Basic {COMPANIES_HOUSE_BASIC_AUTH}"}
-        response = requests.get(
-            f"{COMPANIES_HOUSE_BASE_DOMAIN}/search/companies",
-            headers=headers,
-            params={
-                "q": query,
-                "items_per_page": 10,
-            },
-        ).json()
-        return ResponseSuccess(
-            {
-                "results": response.get("items"),
-                "total": response.get("total_results"),
-                "limit": response.get("items_per_page"),
-                "page_number": response.get("page_number"),
-            }
-        )
+class CompaniesHouseApi:
+    def get_details_from_companies_house(self, registration_number):
+        """
+        Retrieves and returns details of a company from Companies House
+        using registration number that is passed in.
+        """
+
+        if registration_number:
+            headers_get_company = {"Authorization": f"Basic {COMPANIES_HOUSE_BASIC_AUTH}"}
+            response = requests.get(
+                f"{COMPANIES_HOUSE_BASE_DOMAIN}/company/{registration_number}",
+                headers=headers_get_company,
+            )
+            if response.status_code == 200:
+                return response.json()
+        return {}

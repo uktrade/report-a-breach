@@ -22,8 +22,6 @@ sentry-sdk = "*"
 whitenoise = "*"
 django-simple-history = "~=3.4.0"
 pyproject-flake8 = "*"
-djangorestframework = "*"
-django-ratelimit = "*"
 
 [dev-packages]
 black = "~=23.12"

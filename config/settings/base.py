@@ -51,7 +51,6 @@ THIRD_PARTY_APPS = [
     "crispy_forms",
     "crispy_forms_gds",
     "django_chunk_upload_handlers",
-    "rest_framework",
     "simple_history",
     "storages",
 ]
@@ -191,17 +190,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Companies House API
 COMPANIES_HOUSE_API_KEY = env("COMPANIES_HOUSE_API_KEY", default=None)
-
-# ------------------- API RATE LIMITING -------------------
-API_RATELIMIT_ENABLED = env.bool("API_RATELIMIT_ENABLED", default=True)
-if API_RATELIMIT_ENABLED:
-    MIDDLEWARE = MIDDLEWARE + [
-        "django_ratelimit.middleware.RatelimitMiddleware",
-    ]
-    API_RATELIMIT_RATE = env.str("API_RATELIMIT_RATE", default="200/m")
-    RATELIMIT_VIEW = "config.ratelimit.ratelimited_error"
-
-DEFAULT_QUERYSET_PAGE_SIZE = 20
 
 # GOV NOTIFY
 GOV_NOTIFY_API_KEY = env.str("GOV_NOTIFY_API_KEY")

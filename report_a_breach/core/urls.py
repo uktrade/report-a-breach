@@ -10,5 +10,4 @@ urlpatterns = [
     path("confirmation", ReportSubmissionCompleteView.as_view(), name="confirmation"),
     path("", report_a_breach_wizard, name="report_a_breach"),
     re_path(r"report_a_breach/(?P<step>.+)/$", report_a_breach_wizard, name="report_a_breach_step"),
-    path("search/", CompaniesHouseApiSearch.as_view()),
 ]
