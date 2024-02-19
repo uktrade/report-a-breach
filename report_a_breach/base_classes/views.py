@@ -43,3 +43,20 @@ class BaseWizardView(NamedUrlSessionWizardView):
         if custom_getter := getattr(self, f"process_{self.steps.current}_step", None):
             return custom_getter(form)
         return super().process_step(form)
+
+    def post(self, request, **kwargs):
+        # TODO: this code isn't reachable if the user selects change on the summary page.
+        # TODO: need further debug - possible to add to a process step
+        # TODO: investigate wizard forms redirect methods?
+        for key, value in request.POST.items():
+            print(key, value)
+            if value == "summary":
+                kwargs["redirect_to"] = "summary"
+                print(kwargs)
+                return super().post(request, **kwargs)
+        for key, value in kwargs.items():
+            print(f"kwargs {key, value}")
+            if key == "redirect_to":
+                print("attempting redirect to summary page")
+                return reverse("summary")
+        return super().post(request, **kwargs)
