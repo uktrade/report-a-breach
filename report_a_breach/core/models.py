@@ -3,10 +3,13 @@ from django.db import models
 from django_countries.fields import CountryField
 
 from report_a_breach.base_classes.models import BaseModel
-from report_a_breach.question_content import ADDITIONAL_INFORMATION
-from report_a_breach.question_content import EMAIL
-from report_a_breach.question_content import FULL_NAME
-from report_a_breach.question_content import RELATIONSHIP
+from report_a_breach.question_content import (
+    ADDITIONAL_INFORMATION,
+    EMAIL,
+    FULL_NAME,
+    RELATIONSHIP,
+    WHAT_WERE_THE_GOODS,
+)
 
 
 class Breach(BaseModel):
@@ -26,6 +29,7 @@ class Breach(BaseModel):
         "SanctionsRegime", through="SanctionsRegimeBreachThrough"
     )
     additional_information = models.TextField(verbose_name=ADDITIONAL_INFORMATION["text"])
+    what_were_the_goods = models.TextField(verbose_name=WHAT_WERE_THE_GOODS["text"])
 
 
 class PersonOrCompany(BaseModel):

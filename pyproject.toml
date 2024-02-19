@@ -41,6 +41,7 @@ max-line-length = 100
 exclude = """
 /(
     */migrations/*
+    */question_content.py
 )/
 """
 

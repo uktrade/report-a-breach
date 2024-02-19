@@ -56,6 +56,12 @@ class NameForm(BaseModelForm):
         widget = forms.TextInput(attrs={"id": "reporter_full_name"})
 
 
+class WhatWereTheGoodsForm(BaseModelForm):
+    class Meta:
+        model = Breach
+        fields = ["what_were_the_goods"]
+
+
 class SummaryForm(BaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

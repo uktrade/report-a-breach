@@ -6,7 +6,7 @@ from django.views.generic import FormView, TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
-from report_a_breach.utils.notifier import send_mail
+from report_a_breach.utils.notifier import send_email
 
 from .forms import EmailForm, EmailVerifyForm, NameForm, StartForm, SummaryForm
 from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
@@ -38,7 +38,7 @@ class ReportABreachWizardView(BaseWizardView):
         verify_code = get_random_string(6, allowed_chars="0123456789")
         self.request.session["verify_code"] = verify_code
         print(verify_code)
-        send_mail(
+        send_email(
             email=reporter_email_address,
             context={"verification_code": verify_code},
             template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
