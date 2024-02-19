@@ -6,7 +6,6 @@ from django.utils.crypto import get_random_string
 from django.views.generic import FormView, TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
-from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_mail
 
@@ -75,19 +74,6 @@ class ReportABreachWizardView(BaseWizardView):
         reference_id = str(new_breach.id).split("-")[0].upper()
         kwargs["reference_id"] = reference_id
         return render(self.request, "confirmation.html")
-
-
-class LandingView(TemplateView):
-    """
-    This view displays the landing page for the report a trade sanctions breach application.
-    """
-
-    template_name = "landing.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = BREADCRUMBS_START_PAGE
-        return context
 
 
 class SummaryView(FormView):
