@@ -63,6 +63,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
+skip = [".gitignore", ".dockerignore", "migrations", "static", "templates", "manage.py"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "report_trade_sanctions_breach.config.test"
