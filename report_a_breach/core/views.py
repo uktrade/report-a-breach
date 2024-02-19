@@ -1,5 +1,4 @@
-import os
-
+from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -11,8 +10,6 @@ from report_a_breach.utils.notifier import send_mail
 
 from .forms import EmailForm, EmailVerifyForm, NameForm, StartForm, SummaryForm
 from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
-
-EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -44,7 +41,7 @@ class ReportABreachWizardView(BaseWizardView):
         send_mail(
             email=reporter_email_address,
             context={"verification_code": verify_code},
-            template_id=EMAIL_TEMPLATE_ID,
+            template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
         )
         self.request.session.modified = True
         return self.get_form_step_data(form)
