@@ -30,4 +30,3 @@ def get_details_from_companies_house(self, registration_number):
             )
     else:
         raise CompaniesHouseException("No registration number provided for Companies House API")
-    return {}
