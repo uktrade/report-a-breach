@@ -33,3 +33,7 @@ RELATIONSHIP = {
 }
 
 ADDITIONAL_INFORMATION = {"text": "Tell us about the suspected breach", "helper": ""}
+WHAT_WERE_THE_GOODS = {
+    "text": "What were the goods or services, or what was the technological assistance or technology?",
+    "helper": "",
+}

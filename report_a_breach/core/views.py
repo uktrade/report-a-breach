@@ -1,19 +1,15 @@
-import os
-
+from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.generic import FormView, TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
-from report_a_breach.constants import BREADCRUMBS_START_PAGE
 from report_a_breach.question_content import RELATIONSHIP
-from report_a_breach.utils.notifier import send_mail
+from report_a_breach.utils.notifier import send_email
 
 from .forms import EmailForm, EmailVerifyForm, NameForm, StartForm, SummaryForm
 from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
-
-EMAIL_TEMPLATE_ID = os.getenv("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -42,10 +38,10 @@ class ReportABreachWizardView(BaseWizardView):
         verify_code = get_random_string(6, allowed_chars="0123456789")
         self.request.session["verify_code"] = verify_code
         print(verify_code)
-        send_mail(
+        send_email(
             email=reporter_email_address,
             context={"verification_code": verify_code},
-            template_id=EMAIL_TEMPLATE_ID,
+            template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
         )
         self.request.session.modified = True
         return self.get_form_step_data(form)
@@ -75,19 +71,6 @@ class ReportABreachWizardView(BaseWizardView):
         reference_id = str(new_breach.id).split("-")[0].upper()
         kwargs["reference_id"] = reference_id
         return render(self.request, "confirmation.html")
-
-
-class LandingView(TemplateView):
-    """
-    This view displays the landing page for the report a trade sanctions breach application.
-    """
-
-    template_name = "landing.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = BREADCRUMBS_START_PAGE
-        return context
 
 
 class SummaryView(FormView):

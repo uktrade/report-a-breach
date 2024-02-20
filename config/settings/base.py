@@ -190,6 +190,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # GOV NOTIFY
 GOV_NOTIFY_API_KEY = env.str("GOV_NOTIFY_API_KEY")
+EMAIL_VERIFY_CODE_TEMPLATE_ID = env.str("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
+RESTRICT_SENDING = env.bool(
+    "RESTRICT_SENDING", default=True
+)  # if True, only send to whitelisted domains
 
 # SENTRY
 SENTRY_DSN = env.str("SENTRY_DSN", default="")
