@@ -5,7 +5,7 @@
     "fields": {
       "short_name": "The Afghanistan",
       "full_name": "The Afghanistan (Sanctions) (EU Exit) Regulations 2020",
-      "date_range": "some_date_here"
+      "date_range": ""
     }
   },
   {
@@ -14,7 +14,7 @@
     "fields": {
       "short_name": "The Republic of Belarus",
       "full_name": "The Republic of Belarus (Sanctions) (EU Exit) Regulations 2019",
-      "date_range": "some_date_here"
+      "date_range": ""
     }
   },
   {
@@ -23,7 +23,7 @@
     "fields": {
       "short_name": "The Burma",
       "full_name": "The Burma (Sanctions) (EU Exit) Regulations 2019",
-      "date_range": "some_date_here"
+      "date_range": ""
     }
   },
   {
@@ -32,7 +32,7 @@
     "fields": {
       "short_name": "The Democratic People’s Republic of Korea",
       "full_name": "The Democratic People’s Republic of Korea (Sanctions) (EU Exit) Regulations 2019",
-      "date_range": "some_date_here"
+      "date_range": ""
     }
   },
   {
@@ -41,7 +41,7 @@
     "fields": {
       "short_name": "The Iran",
       "full_name": "The Iran Human Rights (Sanctions) (EU Exit) Regulations 2019",
-      "date_range": "some_date_here"
+      "date_range": ""
     }
   },
   {
@@ -50,7 +50,7 @@
     "fields": {
       "short_name": "The Russia",
       "full_name": "The Russia (Sanctions) (EU Exit) Regulations 2019",
-      "date_range": "some_date_here"
+      "date_range": ""
     }
   }
 ]
