@@ -189,7 +189,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Companies House API
-COMPANIES_HOUSE_API_KEY = env("COMPANIES_HOUSE_API_KEY", default=None)
+COMPANIES_HOUSE_API_KEY = env.str("COMPANIES_HOUSE_API_KEY", default="")
 
 # GOV NOTIFY
 GOV_NOTIFY_API_KEY = env.str("GOV_NOTIFY_API_KEY")
