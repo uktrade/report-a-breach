@@ -44,12 +44,22 @@ class BaseWizardView(NamedUrlSessionWizardView):
             return custom_getter(form)
         return super().process_step(form)
 
+    def render(self, form=None, **kwargs):
+        if self.steps.current == "verify":
+            return super().render(form, **kwargs)
+        elif redirect_to := self.request.session.get("redirect"):
+            self.request.session["redirect"] = None
+            return self.render_goto_step(redirect_to)
+        # elif redirect_to := self.request.GET.get("redirect"):
+        #     return self.render_goto_step(redirect_to)
+        return super().render(form, **kwargs)
+
     def post(self, *args, **kwargs):
         session = self.request.session
         summary_step = "summary"
 
         # the user is directed here if they selected the change link on the summary page
-        if self.request.GET.get("redirect", None) == "true":
+        if self.request.GET.get("redirect", None) == summary_step:
             if self.steps.current == "email":
                 session["redirect"] = summary_step
             return super().post(*args, **kwargs)
