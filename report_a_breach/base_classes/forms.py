@@ -1,8 +1,10 @@
 from crispy_forms_gds.helper import FormHelper
-from crispy_forms_gds.layout import Layout
-from crispy_forms_gds.layout import Size
-from crispy_forms_gds.layout import Submit
+from crispy_forms_gds.layout import Layout, Size, Submit
 from django import forms
+
+
+class EmptyForm(forms.Form):
+    pass
 
 
 class BaseForm(forms.Form):
@@ -12,6 +14,7 @@ class BaseForm(forms.Form):
         self.helper = FormHelper()
         self.helper.add_input(Submit("continue", "Continue", css_class="btn-primary"))
         self.helper.label_size = Size.MEDIUM
+        self.helper.legend_size = Size.MEDIUM
         self.helper.layout = Layout(*self.fields)
 
 

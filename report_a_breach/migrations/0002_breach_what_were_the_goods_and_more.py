@@ -18,4 +18,13 @@ class Migration(migrations.Migration):
             ),
             preserve_default=False,
         ),
+        migrations.AddField(
+            model_name="historicalbreach",
+            name="what_were_the_goods",
+            field=models.TextField(
+                default="",
+                verbose_name="What were the goods or services, or what was the technological assistance or technology?",
+            ),
+            preserve_default=False,
+        ),
     ]

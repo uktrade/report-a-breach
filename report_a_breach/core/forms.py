@@ -1,9 +1,20 @@
 from crispy_forms_gds.helper import FormHelper
-from crispy_forms_gds.layout import Submit
+from crispy_forms_gds.layout import (
+    ConditionalQuestion,
+    ConditionalRadios,
+    Field,
+    Layout,
+    Submit,
+)
 from django import forms
 
 import report_a_breach.question_content as content
 from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
+from report_a_breach.exceptions import CompaniesHouseException
+from report_a_breach.utils.companies_house import (
+    get_details_from_companies_house,
+    get_formatted_address,
+)
 
 from .models import Breach
 
@@ -54,6 +65,78 @@ class NameForm(BaseModelForm):
         model = Breach
         fields = ["reporter_full_name"]
         widget = forms.TextInput(attrs={"id": "reporter_full_name"})
+
+
+class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
+    class Meta:
+        model = Breach
+        fields = ["business_registered_on_companies_house"]
+        widgets = {"business_registered_on_companies_house": forms.RadioSelect}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["business_registered_on_companies_house"].choices.pop(0)
+
+
+class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
+    registered_company_name = forms.CharField(required=False)
+    registered_office_address = forms.CharField(required=False)
+
+    class Meta:
+        model = Breach
+        fields = ["do_you_know_the_registered_company_number", "registered_company_number"]
+        widgets = {"do_you_know_the_registered_company_number": forms.RadioSelect}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["do_you_know_the_registered_company_number"].choices.pop(0)
+        self.helper.layout = Layout(
+            ConditionalRadios(
+                "do_you_know_the_registered_company_number",
+                ConditionalQuestion(
+                    "Yes",
+                    Field.text("registered_company_number"),
+                ),
+                "No",
+            )
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        do_you_know_the_registered_company_number = cleaned_data.get(
+            "do_you_know_the_registered_company_number"
+        )
+        registered_company_number = cleaned_data.get("registered_company_number")
+        if do_you_know_the_registered_company_number == "yes" and not registered_company_number:
+            self.add_error("registered_company_number", "Enter the company number")
+
+        # now we need to get the company details from Companies House
+        # and store them in the form. First we check the request session to see if
+        # they're already been obtained
+        if session_company_details := self.request.session.get("company_details"):
+            if (
+                cleaned_data["registered_company_number"]
+                == session_company_details["registered_company_number"]
+            ):
+                cleaned_data["registered_company_name"] = session_company_details[
+                    "registered_company_name"
+                ]
+                cleaned_data["registered_office_address"] = session_company_details[
+                    "registered_office_address"
+                ]
+                return cleaned_data
+
+        try:
+            company_details = get_details_from_companies_house(registered_company_number)
+            cleaned_data["registered_company_number"] = company_details["company_number"]
+            cleaned_data["registered_company_name"] = company_details["company_name"]
+            cleaned_data["registered_office_address"] = get_formatted_address(
+                company_details["registered_office_address"]
+            )
+        except CompaniesHouseException:
+            self.add_error(None, "The company number you entered is not valid")
+
+        return cleaned_data
 
 
 class WhatWereTheGoodsForm(BaseModelForm):

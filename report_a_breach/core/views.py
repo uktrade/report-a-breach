@@ -8,7 +8,15 @@ from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_email
 
-from .forms import EmailForm, EmailVerifyForm, NameForm, StartForm, SummaryForm
+from .forms import (
+    AreYouReportingABusinessOnCompaniesHouseForm,
+    DoYouKnowTheRegisteredCompanyNumberForm,
+    EmailForm,
+    EmailVerifyForm,
+    NameForm,
+    StartForm,
+    SummaryForm,
+)
 from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
 
 
@@ -18,12 +26,23 @@ class ReportABreachWizardView(BaseWizardView):
         ("email", EmailForm),
         ("verify", EmailVerifyForm),
         ("name", NameForm),
+        (
+            "are_you_reporting_a_business_on_companies_house",
+            AreYouReportingABusinessOnCompaniesHouseForm,
+        ),
+        ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
+        ("check_company_details", SummaryForm),
         ("summary", SummaryForm),
     ]
-    template_name = "form_wizard_step.html"
+    template_names_lookup = {
+        "summary": "summary.html",
+        "check_company_details": "form_steps/check_company_details.html",
+    }
+    template_name = "form_steps/generic_form_step.html"
 
-    def get_summary_template_name(self):
-        return "summary.html"
+    def render(self, form=None, **kwargs):
+        rendered_response = super().render(form, **kwargs)
+        return rendered_response
 
     def get_summary_context_data(self, form, **kwargs):
         context = self.get_all_cleaned_data()
@@ -32,6 +51,13 @@ class ReportABreachWizardView(BaseWizardView):
             context["reporter_professional_relationship"]
         )
         return context
+
+    def process_do_you_know_the_registered_company_number_step(self, form):
+        self.request.session.pop("company_details", None)
+        self.request.session.modified = True
+
+        if form.cleaned_data.get("do_you_know_the_registered_company_number") == "yes":
+            self.request.session["company_details"] = form.cleaned_data
 
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")

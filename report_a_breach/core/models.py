@@ -1,3 +1,4 @@
+from crispy_forms_gds.choices import Choice
 from django.contrib.postgres.fields import DateRangeField
 from django.db import models
 from django_countries.fields import CountryField
@@ -17,9 +18,20 @@ class Breach(BaseModel):
         ("person", "Person"),
         ("company", "Company"),
     )
+    Choice
+    YES_NO_DO_NOT_KNOW_CHOICES = (
+        ("yes", "Yes"),
+        ("no", "No"),
+        ("do_not_know", "I do not know"),
+    )
+    YES_NO_CHOICES = (
+        ("yes", "Yes"),
+        ("no", "No"),
+    )
 
     reporter_professional_relationship = models.TextField(
         null=False,
+        blank=False,
         choices=RELATIONSHIP["choices"],
         verbose_name=RELATIONSHIP["text"],
     )
@@ -30,6 +42,19 @@ class Breach(BaseModel):
     )
     additional_information = models.TextField(verbose_name=ADDITIONAL_INFORMATION["text"])
     what_were_the_goods = models.TextField(verbose_name=WHAT_WERE_THE_GOODS["text"])
+    business_registered_on_companies_house = models.CharField(
+        choices=YES_NO_DO_NOT_KNOW_CHOICES,
+        max_length=11,
+        verbose_name="Are you reporting a business which is registered with Companies House?",
+        blank=False,
+    )
+    do_you_know_the_registered_company_number = models.CharField(
+        choices=YES_NO_CHOICES,
+        max_length=3,
+        verbose_name="Do you know the registered company number?",
+        blank=False,
+    )
+    registered_company_number = models.CharField(max_length=20, null=True, blank=True)
 
 
 class PersonOrCompany(BaseModel):
