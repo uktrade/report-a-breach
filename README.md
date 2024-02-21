@@ -67,10 +67,10 @@ To add a new dependency to the project, use the following command:\
 ## Standards
 ### Linting and Formatting
 We use:
-- [black](https://github.com/psf/black) to ensure consistent formatting across the project.\
-- [flake8](https://flake8.pycqa.org/en/latest/) to lint the project and flag any common code smells.\
-- [isort](https://pycqa.github.io/isort/) to ensure imports are ordered correctly.\
-- [djhtml](https://pypi.org/project/djhtml/) to format and indent our HTML, CSS, and JS files\
+- [black](https://github.com/psf/black) to ensure consistent formatting across the project.
+- [flake8](https://flake8.pycqa.org/en/latest/) to lint the project and flag any common code smells.
+- [isort](https://pycqa.github.io/isort/) to ensure imports are ordered correctly.
+- [djhtml](https://pypi.org/project/djhtml/) to format and indent our HTML, CSS, and JS files
 
 We use [pre-commit](https://pre-commit.com/) to run all of the above before every commit.
 

@@ -36,7 +36,7 @@ class Breach(BaseModel):
         verbose_name=RELATIONSHIP["text"],
     )
     reporter_email_address = models.EmailField(verbose_name=EMAIL["text"])
-    reporter_full_name = models.TextField(verbose_name=FULL_NAME["text"])
+    reporter_full_name = models.CharField(verbose_name=FULL_NAME["text"], max_length=255)
     sanctions_regimes = models.ManyToManyField(
         "SanctionsRegime", through="SanctionsRegimeBreachThrough"
     )
@@ -93,7 +93,7 @@ class SanctionsRegimeBreachThrough(BaseModel):
 class SanctionsRegime(BaseModel):
     short_name = models.TextField()
     full_name = models.TextField()
-    date_range = DateRangeField
+    date_range = DateRangeField(blank=True, null=True)
 
 
 class UploadedDocument(BaseModel):
