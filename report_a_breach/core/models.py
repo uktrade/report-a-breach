@@ -68,7 +68,7 @@ class SanctionsRegimeBreachThrough(BaseModel):
 class SanctionsRegime(BaseModel):
     short_name = models.TextField()
     full_name = models.TextField()
-    date_range = DateRangeField
+    date_range = DateRangeField(blank=True, null=True)
 
 
 class UploadedDocument(BaseModel):
