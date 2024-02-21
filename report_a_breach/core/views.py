@@ -16,6 +16,7 @@ from .forms import (
     NameForm,
     StartForm,
     SummaryForm,
+    WhatWereTheGoodsForm,
 )
 from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
 
@@ -26,6 +27,7 @@ class ReportABreachWizardView(BaseWizardView):
         ("email", EmailForm),
         ("verify", EmailVerifyForm),
         ("name", NameForm),
+        ("what_were_the_goods", WhatWereTheGoodsForm),
         (
             "are_you_reporting_a_business_on_companies_house",
             AreYouReportingABusinessOnCompaniesHouseForm,
