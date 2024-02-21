@@ -74,8 +74,7 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()
 
-        # TODO: the confirmation page is not currently rendering
-        # TODO: to be fixed in DST-259
+        # TODO: the confirmation page is not currently rendering, to be fixed in DST-259
         kwargs["reference_id"] = reference_id
         return render(self.request, "confirmation.html")
 
