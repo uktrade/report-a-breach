@@ -6,6 +6,8 @@ services:
             - ./pgdata/:/var/lib/postgresql/data
         env_file:
             - .env
+        environment:
+            POSTGRES_PASSWORD: password
         ports:
             - "15432:5432"
         healthcheck:

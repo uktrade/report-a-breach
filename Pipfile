@@ -36,3 +36,6 @@ boto3 = "*"
 
 [requires]
 python_version = "3.11"
+
+[scripts]
+wipe_database = "chmod +x wipe_database.sh && ./wipe_database.sh"
