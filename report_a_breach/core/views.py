@@ -61,7 +61,11 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_email_address=all_cleaned_data["reporter_email_address"],
             reporter_full_name=all_cleaned_data["reporter_full_name"],
         )
+
+        # temporary, to be removed when the forms are integrated into the user journey
         new_breach.additional_information = "N/A"
+        new_breach.what_were_the_goods = "N/A"
+
         sanctions_breach = SanctionsRegimeBreachThrough.objects.create(
             breach=new_breach, sanctions_regime=sanctions_regime
         )
@@ -69,6 +73,9 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach.sanctions_regimes.add(sanctions_regime)
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()
+
+        # TODO: the confirmation page is not currently rendering
+        # TODO: to be fixed in DST-259
         kwargs["reference_id"] = reference_id
         return render(self.request, "confirmation.html")
 

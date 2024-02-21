@@ -44,21 +44,33 @@ class BaseWizardView(NamedUrlSessionWizardView):
             return custom_getter(form)
         return super().process_step(form)
 
+    def process_edited_form_field(self, form):
+        # this ensures the changed data from a form resubmission is saved to the cleaned dictionary
+        if form.is_valid():
+            self.storage.set_step_data(self.steps.current, self.process_step(form))
+            self.storage.set_step_files(self.steps.current, self.process_step_files(form))
+
     def post(self, *args, **kwargs):
         full_path = self.request.get_full_path()
         session = self.request.session
-        step = "summary"
+        summary_step = "summary"
+        form = self.get_form(data=self.request.POST, files=self.request.FILES)
 
-        # the user is directed here if they selected the change link on the summary page
+        # allows a user to change a form then return to the summary page
+        # after successful resubmission
         if "redirect=true" in full_path:
             if "email" in full_path:
-                session["redirect"] = step
+                session["redirect"] = True
+                self.get_cleaned_data_for_step(self.steps.current)
                 return super().post(*args, **kwargs)
-            return self.render_goto_step(step, **kwargs)
+            self.process_edited_form_field(form)
+            return self.render_goto_step(summary_step, **kwargs)
 
+        # we need to check if the user redirected to the email page and if so, send them back to
+        # summary after the verify page
         elif "verify" in full_path:
             return (
-                self.render_goto_step(step, **kwargs)
+                self.render_goto_step(summary_step, **kwargs)
                 if session.get("redirect")
                 else super().post(*args, **kwargs)
             )
