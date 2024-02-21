@@ -23,10 +23,12 @@ class ReportABreachWizardView(BaseWizardView):
     template_name = "form_wizard_step.html"
 
     def render(self, form=None, **kwargs):
-        if self.steps.prev == "verify":
-            if redirect_to := self.request.session.get("redirect"):
-                self.request.session["redirect"] = None
-                return self.render_goto_step(redirect_to)
+        if self.steps.current == "verify":
+            return super().render(form, **kwargs)
+        elif redirect_to := self.request.session.get("redirect"):
+            self.request.session["redirect"] = None
+            return self.render_goto_step(redirect_to)
+
         return super().render(form, **kwargs)
 
     def get_summary_template_name(self):
