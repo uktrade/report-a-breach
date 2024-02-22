@@ -8,7 +8,14 @@ from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_email
 
-from .forms import EmailForm, EmailVerifyForm, NameForm, StartForm, SummaryForm
+from .forms import (
+    EmailForm,
+    EmailVerifyForm,
+    NameForm,
+    StartForm,
+    SummaryForm,
+    WhatWereTheGoodsForm,
+)
 from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
 
 
@@ -18,6 +25,7 @@ class ReportABreachWizardView(BaseWizardView):
         ("email", EmailForm),
         ("verify", EmailVerifyForm),
         ("name", NameForm),
+        ("what_were_the_goods", WhatWereTheGoodsForm),
         ("summary", SummaryForm),
     ]
     template_name = "form_wizard_step.html"

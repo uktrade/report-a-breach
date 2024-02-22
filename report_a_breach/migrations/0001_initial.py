@@ -56,7 +56,10 @@ class Migration(migrations.Migration):
                     "reporter_email_address",
                     models.EmailField(max_length=254, verbose_name="What is your email address?"),
                 ),
-                ("reporter_full_name", models.TextField(verbose_name="What is your full name?")),
+                (
+                    "reporter_full_name",
+                    models.CharField(max_length=255, verbose_name="What is your full name?"),
+                ),
                 (
                     "additional_information",
                     models.TextField(verbose_name="Tell us about the suspected breach"),
@@ -437,7 +440,10 @@ class Migration(migrations.Migration):
                     "reporter_email_address",
                     models.EmailField(max_length=254, verbose_name="What is your email address?"),
                 ),
-                ("reporter_full_name", models.TextField(verbose_name="What is your full name?")),
+                (
+                    "reporter_full_name",
+                    models.CharField(max_length=255, verbose_name="What is your full name?"),
+                ),
                 (
                     "additional_information",
                     models.TextField(verbose_name="Tell us about the suspected breach"),
