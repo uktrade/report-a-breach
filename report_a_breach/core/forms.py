@@ -45,11 +45,6 @@ class EmailVerifyForm(BaseForm):
 
 
 class NameForm(BaseModelForm):
-    reporter_full_name = forms.CharField(
-        label=content.FULL_NAME["text"],
-        widget=forms.TextInput(attrs={"id": "full_user_name"}),
-    )
-
     class Meta:
         model = Breach
         fields = ["reporter_full_name"]
@@ -60,6 +55,10 @@ class WhatWereTheGoodsForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["what_were_the_goods"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["what_were_the_goods"].widget.attrs = {"rows": 5}
 
 
 class SummaryForm(BaseForm):

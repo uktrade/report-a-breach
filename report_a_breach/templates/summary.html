@@ -48,6 +48,17 @@
                             <a class="govuk-link" href="/report_a_breach/start?redirect=summary">Change<span class="govuk-visually-hidden"> professional relationship with the organisation (Your details)</span></a>
                         </dd>
                     </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            What were the goods
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ what_were_the_goods }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" href="/name/{{ pk }}">Change<span class="govuk-visually-hidden"> what were the goods</span></a>
+                        </dd>
+                    </div>
                 </dl>
             </div>
         </div>
@@ -60,6 +71,5 @@
         {% else %}
             {% crispy wizard.form %}
         {% endif %}
-<!--	<input type="submit" name="continue" value="Submit" class="govuk-button btn-primary" id="save-button">-->
     </form>
 {% endblock column_content %}
