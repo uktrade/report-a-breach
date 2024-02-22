@@ -58,7 +58,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
 
         # allow the user to change previously entered data and be redirected
         # back to the summary page once complete
-        if self.request.GET.get("redirect", None) == summary_step:
+        if  redirect_to := self.request.GET.get("redirect", None):
             session["redirect"] = summary_step
             return super().post(*args, **kwargs)
 
