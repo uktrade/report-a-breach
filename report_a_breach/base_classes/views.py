@@ -50,18 +50,16 @@ class BaseWizardView(NamedUrlSessionWizardView):
         elif redirect_to := self.request.session.get("redirect"):
             self.request.session["redirect"] = None
             return self.render_goto_step(redirect_to)
-        # elif redirect_to := self.request.GET.get("redirect"):
-        #     return self.render_goto_step(redirect_to)
         return super().render(form, **kwargs)
 
     def post(self, *args, **kwargs):
         session = self.request.session
         summary_step = "summary"
 
-        # the user is directed here if they selected the change link on the summary page
+        # if the user wants to change previously entered data, add a redirect
+        # to the session, so they can be redirected back to the summary page
         if self.request.GET.get("redirect", None) == summary_step:
-            if self.steps.current == "email":
-                session["redirect"] = summary_step
+            session["redirect"] = summary_step
             return super().post(*args, **kwargs)
 
         return super().post(*args, **kwargs)
