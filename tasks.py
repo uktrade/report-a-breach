@@ -23,7 +23,10 @@ def makemigrations(context, app="report_a_breach"):
 @task
 def migrate(context, app="report_a_breach"):
     print("Running manage.py migrate")
-    context.run(f"pipenv run python manage.py migrate {app}")
+    base_command = "pipenv run python manage.py migrate"
+    if app:
+        base_command += f" {app}"
+    context.run(base_command)
 
 
 @task
