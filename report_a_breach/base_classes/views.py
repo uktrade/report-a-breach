@@ -4,7 +4,9 @@ from formtools.wizard.views import NamedUrlSessionWizardView
 
 
 class BaseView(FormView):
-    template_name = "form.html"
+    # TODO: decide if we need to recreate form.html or other template to use here
+    # template_name = "form.html"
+    pass
 
 
 class BaseModelFormView(BaseView):
