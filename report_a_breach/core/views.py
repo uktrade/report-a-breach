@@ -17,12 +17,15 @@ from .forms import (
     StartForm,
     SummaryForm,
     WhatWereTheGoodsForm,
+    WhichSanctionsRegimeForm,
 )
 from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
 
 
 class ReportABreachWizardView(BaseWizardView):
     form_list = [
+        # TODO: remove before PR, at the top for debugging
+        ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("start", StartForm),
         ("email", EmailForm),
         ("verify", EmailVerifyForm),

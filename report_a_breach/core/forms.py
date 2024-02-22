@@ -1,5 +1,7 @@
+from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
+    HTML,
     ConditionalQuestion,
     ConditionalRadios,
     Field,
@@ -7,6 +9,7 @@ from crispy_forms_gds.layout import (
     Submit,
 )
 from django import forms
+from django.utils.html import mark_safe
 
 import report_a_breach.question_content as content
 from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
@@ -16,7 +19,7 @@ from report_a_breach.utils.companies_house import (
     get_formatted_address,
 )
 
-from .models import Breach
+from .models import Breach, SanctionsRegime
 
 # TODO: check the wording of any error messages to match what the UCD team expect
 
@@ -142,6 +145,27 @@ class WhatWereTheGoodsForm(BaseModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["what_were_the_goods"].widget.attrs = {"rows": 5}
+
+
+class WhichSanctionsRegimeForm(BaseForm):
+    checkbox_choices = (
+        Choice(item["full_name"], item["full_name"])
+        for item in SanctionsRegime.objects.values("full_name")
+    )
+    which_sanctions_regime = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        choices=checkbox_choices,
+        label=content.WHICH_SANCTIONS_REGIME["text"],
+    )
+    unknown_regime = forms.BooleanField(label="I do not know")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.layout = Layout(
+            Field("which_sanctions_regime"),
+            HTML(mark_safe('<p class="govuk-checkboxes__divider">or</p>')),
+            Field("unknown_regime"),
+        )
 
 
 class SummaryForm(BaseForm):
