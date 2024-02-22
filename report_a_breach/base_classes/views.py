@@ -45,3 +45,22 @@ class BaseWizardView(NamedUrlSessionWizardView):
         if custom_getter := getattr(self, f"process_{self.steps.current}_step", None):
             return custom_getter(form)
         return super().process_step(form)
+
+    def render(self, form=None, **kwargs):
+        if self.steps.current == "verify":
+            return super().render(form, **kwargs)
+        elif redirect_to := self.request.session.get("redirect"):
+            self.request.session["redirect"] = None
+            return self.render_goto_step(redirect_to)
+        return super().render(form, **kwargs)
+
+    def post(self, *args, **kwargs):
+        session = self.request.session
+
+        # allow the user to change previously entered data and be redirected
+        # back to the summary page once complete
+        if redirect_to := self.request.GET.get("redirect", None):
+            session["redirect"] = redirect_to
+           
+
+        return super().post(*args, **kwargs)
