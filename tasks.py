@@ -27,6 +27,11 @@ def migrate(context, app="report_a_breach"):
 
 
 @task
+def runserver(context):
+    context.run("pipenv run python manage.py runserver", hide=False, pty=True)
+
+
+@task
 def black(context, directory="."):
     print("Running black formatting")
     context.run(f"pipenv run black {directory}")

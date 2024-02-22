@@ -48,7 +48,7 @@ docker-compose up -d
 ### 5. Run the web server
 After following the setup, use the following to run the web app
 
-`pipenv run python manage.py runserver`
+`invoke runserver`
 
 Django will provide the local url which should be http://127.0.0.1:8000/, navigate to this in your browser to see through the prototype.
 
