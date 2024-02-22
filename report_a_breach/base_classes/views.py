@@ -59,6 +59,6 @@ class BaseWizardView(NamedUrlSessionWizardView):
         # back to the summary page once complete
         if redirect_to := self.request.GET.get("redirect", None):
             session["redirect"] = redirect_to
-            return super().post(*args, **kwargs)
+           
 
         return super().post(*args, **kwargs)
