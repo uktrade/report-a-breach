@@ -28,9 +28,11 @@ class BaseModelFormView(BaseView):
 
 
 class BaseWizardView(NamedUrlSessionWizardView):
+    template_names_lookup = {}
+
     def get_template_names(self):
-        if custom_getter := getattr(self, f"get_{self.steps.current}_template_name", None):
-            return custom_getter()
+        if custom_template_name := self.template_names_lookup.get(self.steps.current, None):
+            return custom_template_name
         return super().get_template_names()
 
     def get_context_data(self, form, **kwargs):
