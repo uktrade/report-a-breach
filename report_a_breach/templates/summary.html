@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 {% block column_content %}
     <form method="post">
         <div>
@@ -61,15 +60,42 @@
                     </div>
                 </dl>
             </div>
+            <div class="govuk-summary-card__title-wrapper">
+                <h2 class="govuk-summary-card__title">Sanctions breach details</h2>
+            </div>
+            <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Regimes breached
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% for regime in which_sanctions_regime %}
+                                {{ regime }}
+                                <br>
+                            {% endfor %}
+                            {% if unknown_regime %}
+                                Unknown regime
+                            {% endif %}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" href="/report_a_breach/which_sanctions_regime?redirect=summary">Change<span class="govuk-visually-hidden"> regime breached (Sanctions breach details)</span></a>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
         </div>
+        {% csrf_token %}
         {{ wizard.management_form }}
-        {% if wizard.form.forms %}
-            {{ wizard.form.management_form }}
-            {% for form in wizard.form.forms %}
-                {% crispy form %}
-            {% endfor %}
-        {% else %}
-            {% crispy wizard.form %}
-        {% endif %}
+        {% crispy wizard.form %}
+<!--        {{ wizard.management_form }}-->
+<!--        {% if wizard.form.forms %}-->
+<!--            {{ wizard.form.management_form }}-->
+<!--            {% for form in wizard.form.forms %}-->
+<!--                {% crispy form %}-->
+<!--            {% endfor %}-->
+<!--        {% else %}-->
+<!--            {% crispy wizard.form %}-->
+<!--        {% endif %}-->
     </form>
 {% endblock column_content %}

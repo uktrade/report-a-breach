@@ -38,7 +38,7 @@ class Breach(BaseModel):
     reporter_email_address = models.EmailField(verbose_name=EMAIL["text"])
     reporter_full_name = models.CharField(verbose_name=FULL_NAME["text"], max_length=255)
     sanctions_regimes = models.ManyToManyField(
-        "SanctionsRegime", through="SanctionsRegimeBreachThrough"
+        "SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True, null=True
     )
     additional_information = models.TextField(verbose_name=ADDITIONAL_INFORMATION["text"])
     what_were_the_goods = models.TextField(verbose_name=WHAT_WERE_THE_GOODS["text"])
@@ -85,9 +85,12 @@ class PersonOrCompany(BaseModel):
     type_of_relationship = models.CharField(choices=TYPE_OF_RELATIONSHIP_CHOICES, max_length=9)
 
 
+# TODO: reference sanctions regime comments above
 class SanctionsRegimeBreachThrough(BaseModel):
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
-    sanctions_regime = models.ForeignKey("SanctionsRegime", on_delete=models.CASCADE)
+    sanctions_regime = models.ForeignKey(
+        "SanctionsRegime", on_delete=models.CASCADE, blank=True, null=True
+    )
 
 
 class SanctionsRegime(BaseModel):

@@ -8,9 +8,8 @@ from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_email
 
-from .forms import (
+from .forms import (  # CheckCompanyDetailsForm,; DoYouKnowTheRegisteredCompanyNumberForm,
     AreYouReportingABusinessOnCompaniesHouseForm,
-    DoYouKnowTheRegisteredCompanyNumberForm,
     EmailForm,
     EmailVerifyForm,
     NameForm,
@@ -24,19 +23,18 @@ from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
 
 class ReportABreachWizardView(BaseWizardView):
     form_list = [
-        # TODO: remove before PR, at the top for debugging
-        ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("start", StartForm),
         ("email", EmailForm),
         ("verify", EmailVerifyForm),
         ("name", NameForm),
+        ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("what_were_the_goods", WhatWereTheGoodsForm),
         (
             "are_you_reporting_a_business_on_companies_house",
             AreYouReportingABusinessOnCompaniesHouseForm,
         ),
-        ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
-        ("check_company_details", SummaryForm),
+        # ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
+        # ("check_company_details", CheckCompanyDetailsForm),
         ("summary", SummaryForm),
     ]
     template_names_lookup = {
@@ -64,6 +62,10 @@ class ReportABreachWizardView(BaseWizardView):
         if form.cleaned_data.get("do_you_know_the_registered_company_number") == "yes":
             self.request.session["company_details"] = form.cleaned_data
 
+        else:
+            self.request.session["redirect"] = "summary"
+            self.request.session.modified = True
+
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
@@ -84,9 +86,6 @@ class ReportABreachWizardView(BaseWizardView):
 
     def done(self, form_list, **kwargs):
         all_cleaned_data = self.get_all_cleaned_data()
-        sanctions_regime = SanctionsRegime.objects.get(
-            full_name=all_cleaned_data["which_sanctions_regime"]
-        )
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data[
                 "reporter_professional_relationship"
@@ -96,16 +95,18 @@ class ReportABreachWizardView(BaseWizardView):
             what_were_the_goods=all_cleaned_data["what_were_the_goods"],
         )
 
+        if declared_sanction := all_cleaned_data["which_sanctions_regime"]:
+            sanctions_regime = SanctionsRegime.objects.get(full_name=declared_sanction)
+            sanctions_breach = SanctionsRegimeBreachThrough.objects.create(
+                breach=new_breach, sanctions_regime=sanctions_regime
+            )
+            sanctions_breach.save()
+            new_breach.sanctions_regimes.add(sanctions_regime)
+
         # temporary, to be removed when the forms are integrated into the user journey
         new_breach.additional_information = "N/A"
 
-        sanctions_breach = SanctionsRegimeBreachThrough.objects.create(
-            breach=new_breach, sanctions_regime=sanctions_regime
-        )
-        sanctions_breach.save()
-        new_breach.sanctions_regimes.add(sanctions_regime)
         new_breach.save()
-        self.request.session.clear()
         reference_id = str(new_breach.id).split("-")[0].upper()
 
         # TODO: the confirmation page is not currently rendering, to be fixed in DST-259

@@ -1,7 +1,6 @@
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
-    HTML,
     ConditionalQuestion,
     ConditionalRadios,
     Field,
@@ -9,7 +8,6 @@ from crispy_forms_gds.layout import (
     Submit,
 )
 from django import forms
-from django.utils.html import mark_safe
 
 import report_a_breach.question_content as content
 from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
@@ -105,34 +103,35 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             "do_you_know_the_registered_company_number"
         )
         registered_company_number = cleaned_data.get("registered_company_number")
-        if do_you_know_the_registered_company_number == "yes" and not registered_company_number:
-            self.add_error("registered_company_number", "Enter the company number")
+        if do_you_know_the_registered_company_number == "yes":
+            if not registered_company_number:
+                self.add_error("registered_company_number", "Enter the company number")
 
-        # now we need to get the company details from Companies House
-        # and store them in the form. First we check the request session to see if
-        # they're already been obtained
-        if session_company_details := self.request.session.get("company_details"):
-            if (
-                cleaned_data["registered_company_number"]
-                == session_company_details["registered_company_number"]
-            ):
-                cleaned_data["registered_company_name"] = session_company_details[
-                    "registered_company_name"
-                ]
-                cleaned_data["registered_office_address"] = session_company_details[
-                    "registered_office_address"
-                ]
-                return cleaned_data
+            # now we need to get the company details from Companies House
+            # and store them in the form. First we check the request session to see if
+            # they're already been obtained
+            if session_company_details := self.request.session.get("company_details"):
+                if (
+                    cleaned_data["registered_company_number"]
+                    == session_company_details["registered_company_number"]
+                ):
+                    cleaned_data["registered_company_name"] = session_company_details[
+                        "registered_company_name"
+                    ]
+                    cleaned_data["registered_office_address"] = session_company_details[
+                        "registered_office_address"
+                    ]
+                    return cleaned_data
 
-        try:
-            company_details = get_details_from_companies_house(registered_company_number)
-            cleaned_data["registered_company_number"] = company_details["company_number"]
-            cleaned_data["registered_company_name"] = company_details["company_name"]
-            cleaned_data["registered_office_address"] = get_formatted_address(
-                company_details["registered_office_address"]
-            )
-        except CompaniesHouseException:
-            self.add_error(None, "The company number you entered is not valid")
+            try:
+                company_details = get_details_from_companies_house(registered_company_number)
+                cleaned_data["registered_company_number"] = company_details["company_number"]
+                cleaned_data["registered_company_name"] = company_details["company_name"]
+                cleaned_data["registered_office_address"] = get_formatted_address(
+                    company_details["registered_office_address"]
+                )
+            except CompaniesHouseException:
+                self.add_error(None, "The company number you entered is not valid")
 
         return cleaned_data
 
@@ -149,13 +148,18 @@ class WhatWereTheGoodsForm(BaseModelForm):
 
 class WhichSanctionsRegimeForm(BaseForm):
     checkbox_choices = (
-        Choice(item["full_name"], item["full_name"])
-        for item in SanctionsRegime.objects.values("full_name")
+        (
+            Choice(item["full_name"], item["full_name"], divider="or")
+            if i == len(SanctionsRegime.objects.values("full_name")) - 1
+            else Choice(item["full_name"], item["full_name"])
+        )
+        for i, item in enumerate(SanctionsRegime.objects.values("full_name"))
     )
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=checkbox_choices,
         label=content.WHICH_SANCTIONS_REGIME["text"],
+        required=False,
     )
     unknown_regime = forms.BooleanField(label="I do not know")
 
@@ -163,9 +167,25 @@ class WhichSanctionsRegimeForm(BaseForm):
         super().__init__(*args, **kwargs)
         self.helper.layout = Layout(
             Field("which_sanctions_regime"),
-            HTML(mark_safe('<p class="govuk-checkboxes__divider">or</p>')),
             Field("unknown_regime"),
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get(
+            "unknown_regime"
+        ):
+            raise forms.ValidationError(
+                "Please select at least one regime or 'I do not know' to continue"
+            )
+        return cleaned_data
+
+
+class CheckCompanyDetailsForm(BaseForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("continue", "Continue", css_class="btn-primary"))
 
 
 class SummaryForm(BaseForm):
