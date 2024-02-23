@@ -85,7 +85,6 @@ class PersonOrCompany(BaseModel):
     type_of_relationship = models.CharField(choices=TYPE_OF_RELATIONSHIP_CHOICES, max_length=9)
 
 
-# TODO: reference sanctions regime comments above
 class SanctionsRegimeBreachThrough(BaseModel):
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
     sanctions_regime = models.ForeignKey(
