@@ -84,7 +84,9 @@ class ReportABreachWizardView(BaseWizardView):
 
     def done(self, form_list, **kwargs):
         all_cleaned_data = self.get_all_cleaned_data()
-        sanctions_regime = SanctionsRegime.objects.get(short_name="The Russia")
+        sanctions_regime = SanctionsRegime.objects.get(
+            full_name=all_cleaned_data["which_sanctions_regime"]
+        )
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data[
                 "reporter_professional_relationship"
