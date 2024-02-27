@@ -102,10 +102,8 @@ class ReportABreachWizardView(BaseWizardView):
         sanctions_breach.save()
         new_breach.sanctions_regimes.add(sanctions_regime)
         new_breach.save()
-        self.request.session.clear()
         reference_id = str(new_breach.id).split("-")[0].upper()
 
-        # TODO: the confirmation page is not currently rendering, to be fixed in DST-259
         kwargs["reference_id"] = reference_id
         return render(self.request, "confirmation.html")
 
