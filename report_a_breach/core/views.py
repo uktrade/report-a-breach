@@ -8,10 +8,8 @@ from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_email
 
-from .forms import (
+from .forms import (  # CheckCompanyDetailsForm,; DoYouKnowTheRegisteredCompanyNumberForm,
     AreYouReportingABusinessOnCompaniesHouseForm,
-    CheckCompanyDetailsForm,
-    DoYouKnowTheRegisteredCompanyNumberForm,
     EmailForm,
     EmailVerifyForm,
     NameForm,
@@ -35,8 +33,8 @@ class ReportABreachWizardView(BaseWizardView):
             "are_you_reporting_a_business_on_companies_house",
             AreYouReportingABusinessOnCompaniesHouseForm,
         ),
-        ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
-        ("check_company_details", CheckCompanyDetailsForm),
+        # ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
+        # ("check_company_details", CheckCompanyDetailsForm),
         ("summary", SummaryForm),
     ]
     template_names_lookup = {
