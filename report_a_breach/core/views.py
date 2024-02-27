@@ -8,8 +8,9 @@ from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_email
 
-from .forms import (  # CheckCompanyDetailsForm,; DoYouKnowTheRegisteredCompanyNumberForm,
+from .forms import (
     AreYouReportingABusinessOnCompaniesHouseForm,
+    DoYouKnowTheRegisteredCompanyNumberForm,
     EmailForm,
     EmailVerifyForm,
     NameForm,
@@ -33,8 +34,8 @@ class ReportABreachWizardView(BaseWizardView):
             "are_you_reporting_a_business_on_companies_house",
             AreYouReportingABusinessOnCompaniesHouseForm,
         ),
-        # ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
-        # ("check_company_details", CheckCompanyDetailsForm),
+        ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
+        ("check_company_details", SummaryForm),
         ("summary", SummaryForm),
     ]
     template_names_lookup = {
@@ -44,8 +45,6 @@ class ReportABreachWizardView(BaseWizardView):
     template_name = "form_steps/generic_form_step.html"
 
     def render(self, form=None, **kwargs):
-        if self.steps.current == "summary":
-            print(self.steps.next)
         rendered_response = super().render(form, **kwargs)
         return rendered_response
 
@@ -64,9 +63,7 @@ class ReportABreachWizardView(BaseWizardView):
         if form.cleaned_data.get("do_you_know_the_registered_company_number") == "yes":
             self.request.session["company_details"] = form.cleaned_data
 
-        else:
-            self.request.session["redirect"] = "summary"
-            self.request.session.modified = True
+        return self.get_form_step_data(form)
 
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")

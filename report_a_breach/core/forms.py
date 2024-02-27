@@ -99,6 +99,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+
         do_you_know_the_registered_company_number = cleaned_data.get(
             "do_you_know_the_registered_company_number"
         )

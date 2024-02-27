@@ -1,4 +1,5 @@
 from django.conf import settings
+from notifications_python_client.errors import HTTPError
 from notifications_python_client.notifications import NotificationsAPIClient
 
 
@@ -6,13 +7,17 @@ def send_email(email, context, template_id, reference=None) -> dict | bool:
     """Send an email using the GOV.UK Notify API."""
     if is_whitelisted(email):
         client = NotificationsAPIClient(settings.GOV_NOTIFY_API_KEY)
-        send_report = client.send_email_notification(
-            email_address=email,
-            template_id=template_id,
-            personalisation=get_context(context),
-            reference=reference,
-        )
-        return send_report
+        try:
+            send_report = client.send_email_notification(
+                email_address=email,
+                template_id=template_id,
+                personalisation=get_context(context),
+                reference=reference,
+            )
+            return send_report
+        except HTTPError:
+            # todo - handle exceptions here
+            return False
     else:
         return False
 
