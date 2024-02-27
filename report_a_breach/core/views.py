@@ -61,6 +61,8 @@ class ReportABreachWizardView(BaseWizardView):
         if form.cleaned_data.get("do_you_know_the_registered_company_number") == "yes":
             self.request.session["company_details"] = form.cleaned_data
 
+        return self.get_form_step_data(form)
+
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")

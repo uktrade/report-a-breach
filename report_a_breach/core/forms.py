@@ -98,38 +98,40 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+
         do_you_know_the_registered_company_number = cleaned_data.get(
             "do_you_know_the_registered_company_number"
         )
         registered_company_number = cleaned_data.get("registered_company_number")
-        if do_you_know_the_registered_company_number == "yes" and not registered_company_number:
-            self.add_error("registered_company_number", "Enter the company number")
+        if do_you_know_the_registered_company_number == "yes":
+            if not registered_company_number:
+                self.add_error("registered_company_number", "Enter the company number")
 
-        # now we need to get the company details from Companies House
-        # and store them in the form. First we check the request session to see if
-        # they're already been obtained
-        if session_company_details := self.request.session.get("company_details"):
-            if (
-                cleaned_data["registered_company_number"]
-                == session_company_details["registered_company_number"]
-            ):
-                cleaned_data["registered_company_name"] = session_company_details[
-                    "registered_company_name"
-                ]
-                cleaned_data["registered_office_address"] = session_company_details[
-                    "registered_office_address"
-                ]
-                return cleaned_data
+            # now we need to get the company details from Companies House
+            # and store them in the form. First we check the request session to see if
+            # they're already been obtained
+            if session_company_details := self.request.session.get("company_details"):
+                if (
+                    cleaned_data["registered_company_number"]
+                    == session_company_details["registered_company_number"]
+                ):
+                    cleaned_data["registered_company_name"] = session_company_details[
+                        "registered_company_name"
+                    ]
+                    cleaned_data["registered_office_address"] = session_company_details[
+                        "registered_office_address"
+                    ]
+                    return cleaned_data
 
-        try:
-            company_details = get_details_from_companies_house(registered_company_number)
-            cleaned_data["registered_company_number"] = company_details["company_number"]
-            cleaned_data["registered_company_name"] = company_details["company_name"]
-            cleaned_data["registered_office_address"] = get_formatted_address(
-                company_details["registered_office_address"]
-            )
-        except CompaniesHouseException:
-            self.add_error(None, "The company number you entered is not valid")
+            try:
+                company_details = get_details_from_companies_house(registered_company_number)
+                cleaned_data["registered_company_number"] = company_details["company_number"]
+                cleaned_data["registered_company_name"] = company_details["company_name"]
+                cleaned_data["registered_office_address"] = get_formatted_address(
+                    company_details["registered_office_address"]
+                )
+            except CompaniesHouseException:
+                self.add_error(None, "The company number you entered is not valid")
 
         return cleaned_data
 

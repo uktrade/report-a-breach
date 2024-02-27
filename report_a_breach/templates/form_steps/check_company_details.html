@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "base_form_step.html" %}
 
 {% load get_wizard_step_url %}
 
-{% block column_content %}
+{% block form_content %}
     <div>
         <h2 class="govuk-heading-l">
             Check company details
@@ -38,4 +38,4 @@
         </div>
     </dl>
     <input type="submit" name="continue" value="Continue" class="govuk-button btn-primary" id="submit-id-continue">
-{% endblock column_content %}
+{% endblock form_content %}

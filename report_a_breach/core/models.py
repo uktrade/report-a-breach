@@ -1,4 +1,3 @@
-from crispy_forms_gds.choices import Choice
 from django.contrib.postgres.fields import DateRangeField
 from django.db import models
 from django_countries.fields import CountryField
@@ -18,7 +17,6 @@ class Breach(BaseModel):
         ("person", "Person"),
         ("company", "Company"),
     )
-    Choice
     YES_NO_DO_NOT_KNOW_CHOICES = (
         ("yes", "Yes"),
         ("no", "No"),
