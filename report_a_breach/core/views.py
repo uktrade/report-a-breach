@@ -20,7 +20,7 @@ from .forms import (
     WhatWereTheGoodsForm,
     WhichSanctionsRegimeForm,
 )
-from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
+from .models import Breach, SanctionsRegime
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -98,10 +98,6 @@ class ReportABreachWizardView(BaseWizardView):
         if declared_sanctions := all_cleaned_data["which_sanctions_regime"]:
             for sanction in declared_sanctions:
                 sanctions_regime = SanctionsRegime.objects.get(full_name=sanction)
-                sanctions_breach = SanctionsRegimeBreachThrough.objects.create(
-                    breach=new_breach, sanctions_regime=sanctions_regime
-                )
-                sanctions_breach.save()
                 new_breach.sanctions_regimes.add(sanctions_regime)
         if unknown_regime := all_cleaned_data["unknown_regime"]:
             new_breach.unknown_sanctions_regime = unknown_regime

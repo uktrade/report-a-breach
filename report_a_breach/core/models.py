@@ -36,7 +36,7 @@ class Breach(BaseModel):
     reporter_email_address = models.EmailField(verbose_name=EMAIL["text"])
     reporter_full_name = models.CharField(verbose_name=FULL_NAME["text"], max_length=255)
     sanctions_regimes = models.ManyToManyField(
-        "SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True, null=True
+        "SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True
     )
     unknown_sanctions_regime = models.BooleanField(blank=True, null=True)
     additional_information = models.TextField(verbose_name=ADDITIONAL_INFORMATION["text"])
