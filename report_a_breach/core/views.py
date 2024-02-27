@@ -2,7 +2,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView
 
 from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
@@ -108,7 +108,7 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()
 
-        kwargs["reference_id"] = reference_id
+        self.request.session["reference_id"] = reference_id
         return render(self.request, "confirmation.html")
 
 
@@ -159,19 +159,3 @@ class SummaryView(FormView):
         self.instance.save()
         self.request.session["breach_instance"] = reporter_data
         return super().form_valid(form)
-
-
-class ReportSubmissionCompleteView(TemplateView):
-    """
-    The final step in the reporting a breach application.
-    This view will display the reporters reference number and information on the
-    next steps in the process.
-    """
-
-    # Note: we are not currently sending the confirmation email specified in the template.
-    template_name = "confirmation.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["application_reference_number"] = kwargs["reference_id"]
-        return context

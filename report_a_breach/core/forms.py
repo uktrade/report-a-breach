@@ -162,7 +162,7 @@ class WhichSanctionsRegimeForm(BaseForm):
         label=content.WHICH_SANCTIONS_REGIME["text"],
         required=False,
     )
-    unknown_regime = forms.BooleanField(label="I do not know")
+    unknown_regime = forms.BooleanField(label="I do not know", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
