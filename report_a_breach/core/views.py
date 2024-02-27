@@ -95,7 +95,6 @@ class ReportABreachWizardView(BaseWizardView):
         )
 
         if declared_sanctions := all_cleaned_data["which_sanctions_regime"]:
-            print(declared_sanctions)
             for sanction in declared_sanctions:
                 sanctions_regime = SanctionsRegime.objects.get(full_name=sanction)
                 sanctions_breach = SanctionsRegimeBreachThrough.objects.create(
@@ -103,6 +102,8 @@ class ReportABreachWizardView(BaseWizardView):
                 )
                 sanctions_breach.save()
                 new_breach.sanctions_regimes.add(sanctions_regime)
+        if unknown_regime := all_cleaned_data["unknown_regime"]:
+            new_breach.unknown_sanctions_regime = unknown_regime
 
         # temporary, to be removed when the forms are integrated into the user journey
         new_breach.additional_information = "N/A"
