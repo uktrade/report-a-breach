@@ -88,14 +88,5 @@
         {% csrf_token %}
         {{ wizard.management_form }}
         {% crispy wizard.form %}
-<!--        {{ wizard.management_form }}-->
-<!--        {% if wizard.form.forms %}-->
-<!--            {{ wizard.form.management_form }}-->
-<!--            {% for form in wizard.form.forms %}-->
-<!--                {% crispy form %}-->
-<!--            {% endfor %}-->
-<!--        {% else %}-->
-<!--            {% crispy wizard.form %}-->
-<!--        {% endif %}-->
     </form>
 {% endblock column_content %}

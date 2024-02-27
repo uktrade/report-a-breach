@@ -3,39 +3,43 @@
 {% load get_wizard_step_url %}
 
 {% block form_content %}
-    <div>
-        <h2 class="govuk-heading-l">
-            Check company details
-        </h2>
-    </div>
-    <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                Registered company number
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {{ request.session.company_details.registered_company_number }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link" href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}">Change<span class="govuk-visually-hidden"> name</span></a>
-            </dd>
+    <form method="post">
+        <div>
+            <h2 class="govuk-heading-l">
+                Check company details
+            </h2>
         </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                Registered company name
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {{ request.session.company_details.registered_company_name }}
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                Registered office address
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {{ request.session.company_details.registered_office_address }}
-            </dd>
-        </div>
-    </dl>
-    <input type="submit" name="continue" value="Continue" class="govuk-button btn-primary" id="submit-id-continue">
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered company number
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ request.session.company_details.registered_company_number }}
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}">Change<span class="govuk-visually-hidden"> name</span></a>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered company name
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ request.session.company_details.registered_company_name }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered office address
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ request.session.company_details.registered_office_address }}
+                </dd>
+            </div>
+        </dl>
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {% crispy wizard.form %}
+    </form>
 {% endblock form_content %}

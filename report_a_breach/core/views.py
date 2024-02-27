@@ -10,6 +10,7 @@ from report_a_breach.utils.notifier import send_email
 
 from .forms import (
     AreYouReportingABusinessOnCompaniesHouseForm,
+    CheckCompanyDetailsForm,
     DoYouKnowTheRegisteredCompanyNumberForm,
     EmailForm,
     EmailVerifyForm,
@@ -35,7 +36,7 @@ class ReportABreachWizardView(BaseWizardView):
             AreYouReportingABusinessOnCompaniesHouseForm,
         ),
         ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
-        ("check_company_details", SummaryForm),
+        ("check_company_details", CheckCompanyDetailsForm),
         ("summary", SummaryForm),
     ]
     template_names_lookup = {
