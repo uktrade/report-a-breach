@@ -148,14 +148,13 @@ class WhatWereTheGoodsForm(BaseModelForm):
 
 
 class WhichSanctionsRegimeForm(BaseForm):
-    checkbox_choices = (
-        (
-            Choice(item["full_name"], item["full_name"], divider="or")
-            if i == len(SanctionsRegime.objects.values("full_name")) - 1
-            else Choice(item["full_name"], item["full_name"])
-        )
-        for i, item in enumerate(SanctionsRegime.objects.values("full_name"))
-    )
+    checkbox_choices = []
+    for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
+        if i == len(SanctionsRegime.objects.values("full_name")) - 1:
+            checkbox_choices.append(Choice(item["full_name"], item["full_name"], divider="or"))
+        else:
+            checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
+    checkbox_choices = tuple(checkbox_choices)
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=checkbox_choices,
@@ -183,10 +182,7 @@ class WhichSanctionsRegimeForm(BaseForm):
 
 
 class CheckCompanyDetailsForm(BaseForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.add_input(Submit("continue", "Continue", css_class="btn-primary"))
+    pass
 
 
 class SummaryForm(BaseForm):
