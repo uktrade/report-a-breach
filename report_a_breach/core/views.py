@@ -2,7 +2,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView
 
 from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.question_content import RELATIONSHIP
@@ -10,6 +10,7 @@ from report_a_breach.utils.notifier import send_email
 
 from .forms import (
     AreYouReportingABusinessOnCompaniesHouseForm,
+    CheckCompanyDetailsForm,
     DoYouKnowTheRegisteredCompanyNumberForm,
     EmailForm,
     EmailVerifyForm,
@@ -17,8 +18,9 @@ from .forms import (
     StartForm,
     SummaryForm,
     WhatWereTheGoodsForm,
+    WhichSanctionsRegimeForm,
 )
-from .models import Breach, SanctionsRegime, SanctionsRegimeBreachThrough
+from .models import Breach, SanctionsRegime
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -27,13 +29,14 @@ class ReportABreachWizardView(BaseWizardView):
         ("email", EmailForm),
         ("verify", EmailVerifyForm),
         ("name", NameForm),
+        ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("what_were_the_goods", WhatWereTheGoodsForm),
         (
             "are_you_reporting_a_business_on_companies_house",
             AreYouReportingABusinessOnCompaniesHouseForm,
         ),
         ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
-        ("check_company_details", SummaryForm),
+        ("check_company_details", CheckCompanyDetailsForm),
         ("summary", SummaryForm),
     ]
     template_names_lookup = {
@@ -83,7 +86,6 @@ class ReportABreachWizardView(BaseWizardView):
 
     def done(self, form_list, **kwargs):
         all_cleaned_data = self.get_all_cleaned_data()
-        sanctions_regime = SanctionsRegime.objects.get(short_name="The Russia")
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data[
                 "reporter_professional_relationship"
@@ -93,18 +95,19 @@ class ReportABreachWizardView(BaseWizardView):
             what_were_the_goods=all_cleaned_data["what_were_the_goods"],
         )
 
+        if declared_sanctions := all_cleaned_data["which_sanctions_regime"]:
+            sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
+            new_breach.sanctions_regimes.set(sanctions_regimes)
+        if unknown_regime := all_cleaned_data["unknown_regime"]:
+            new_breach.unknown_sanctions_regime = unknown_regime
+
         # temporary, to be removed when the forms are integrated into the user journey
         new_breach.additional_information = "N/A"
 
-        sanctions_breach = SanctionsRegimeBreachThrough.objects.create(
-            breach=new_breach, sanctions_regime=sanctions_regime
-        )
-        sanctions_breach.save()
-        new_breach.sanctions_regimes.add(sanctions_regime)
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()
 
-        kwargs["reference_id"] = reference_id
+        self.request.session["reference_id"] = reference_id
         return render(self.request, "confirmation.html")
 
 
@@ -155,19 +158,3 @@ class SummaryView(FormView):
         self.instance.save()
         self.request.session["breach_instance"] = reporter_data
         return super().form_valid(form)
-
-
-class ReportSubmissionCompleteView(TemplateView):
-    """
-    The final step in the reporting a breach application.
-    This view will display the reporters reference number and information on the
-    next steps in the process.
-    """
-
-    # Note: we are not currently sending the confirmation email specified in the template.
-    template_name = "confirmation.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["application_reference_number"] = kwargs["reference_id"]
-        return context

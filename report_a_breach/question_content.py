@@ -37,3 +37,8 @@ WHAT_WERE_THE_GOODS = {
     "text": "What were the goods or services, or what was the technological assistance or technology?",
     "helper": "",
 }
+
+WHICH_SANCTIONS_REGIME = {
+    "text": "Which sanctions regimes do you suspect the company or person has breached?",
+    "helper": "",
+}

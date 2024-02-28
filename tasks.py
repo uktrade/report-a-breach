@@ -35,6 +35,11 @@ def runserver(context):
 
 
 @task
+def createsuperuser(context):
+    context.run("pipenv run python manage.py createsuperuser", hide=False, pty=True)
+
+
+@task
 def black(context, directory="."):
     print("Running black formatting")
     context.run(f"pipenv run black {directory}")
