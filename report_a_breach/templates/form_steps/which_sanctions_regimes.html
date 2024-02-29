@@ -1,0 +1,24 @@
+{% extends "base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+
+{% block form_content %}
+    {% crispy wizard.form %}
+{% endblock form_content %}
+
+<script>
+    const data = '{{ which_sanctions_regimes.checkbox_choices }}'
+    console.log(data)
+
+    const rdata = JSON.parse(data.replace(/&quot;/g, '"'))
+    console.log(rdata)
+    <!--need to grab the django model list here-->
+    const input = '{{ search_bar }}'
+
+    input[0].addEventListener("keyup", ()=>{
+        let filteredArr = []
+        box.innerHTML = ""
+        filteredArr = rdata.filter(info=> info["name"].includes(e.target.value))
+        console.log(filteredArr)
+    })
+
+</script>

@@ -148,6 +148,7 @@ class WhatWereTheGoodsForm(BaseModelForm):
 
 
 class WhichSanctionsRegimeForm(BaseForm):
+    search_bar = forms.CharField(label="Search", max_length=100, required=False)
     checkbox_choices = []
     for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
         if i == len(SanctionsRegime.objects.values("full_name")) - 1:
@@ -166,6 +167,7 @@ class WhichSanctionsRegimeForm(BaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper.layout = Layout(
+            Field("search_bar"),
             Field("which_sanctions_regime"),
             Field("unknown_regime"),
         )
