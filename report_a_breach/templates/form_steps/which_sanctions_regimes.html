@@ -4,21 +4,24 @@
 {% block form_content %}
     {% crispy wizard.form %}
 {% endblock form_content %}
-
-<script>
-    const data = '{{ which_sanctions_regimes.checkbox_choices }}'
-    console.log(data)
-
-    const rdata = JSON.parse(data.replace(/&quot;/g, '"'))
-    console.log(rdata)
-    <!--need to grab the django model list here-->
-    const input = '{{ search_bar }}'
-
-    input[0].addEventListener("keyup", ()=>{
-        let filteredArr = []
-        box.innerHTML = ""
-        filteredArr = rdata.filter(info=> info["name"].includes(e.target.value))
-        console.log(filteredArr)
-    })
-
-</script>
+{% block extra_script %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchBox =
+                document.getElementById('id_which_sanctions_regime-search_bar');
+            searchBox.addEventListener("keyup",
+                function() {
+                    const value = this.value.toLowerCase();
+                    const items = document.querySelectorAll('label[class="govuk-label govuk-checkboxes__label"]');
+                    console.log(items)
+                    items.forEach(function(item) {
+                        const text = item.textContent || item.innerText;
+                        item.style.display = text.toLowerCase().includes(value) ? "": "none";
+                    });
+                });
+        });
+        <!--<label class="govuk-label govuk-checkboxes__label" for="id_which_sanctions_regime-which_sanctions_regime_1">-->
+        <!--          The Afghanistan (Sanctions) (EU Exit) Regulations 2020-->
+        <!--        </label>-->
+    </script>
+{% endblock extra_script %}

@@ -50,6 +50,11 @@ class ReportABreachWizardView(BaseWizardView):
         rendered_response = super().render(form, **kwargs)
         return rendered_response
 
+    # def get(self, request, *args, **kwargs):
+    #     if self.steps.current == "which_sanctions_regime":
+    #         return JsonResponse(data=self.request.GET, *args, **kwargs, safe=False)
+    #     return super().get(*args, **kwargs)
+
     def get_summary_context_data(self, form, **kwargs):
         context = self.get_all_cleaned_data()
         choice_dict = dict(RELATIONSHIP["choices"])
