@@ -63,8 +63,12 @@ CRISPY_TEMPLATE_PACK = "gds"
 # AWS
 AWS_ACCESS_KEY_ID = env("S3_STORAGE_KEY", default=None)
 AWS_SECRET_ACCESS_KEY = env("S3_STORAGE_SECRET", default=None)
-AWS_STORAGE_BUCKET_NAME = env("S3_BUCKET_NAME", default=None)
+AWS_STORAGE_BUCKET_NAME = env("S3_BUCKET_NAME", default="static-files")
+AWS_S3_ENDPOINT_URL = "http://localhost:4566"
+AWS_S3_CUSTOM_DOMAIN = "static-files.s3.localhost:4566"
+AWS_LOCATION = "static/"
 AWS_REGION = env("AWS_REGION", default="eu-west-1")
+
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_ENCRYPTION = True
 # S3 client library to use
@@ -173,12 +177,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "/static/"
-# where static files are collected after running collectstatic:
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
-]
+# STATIC_ROOT = 'https://localhost:4566/'
+STATIC_URL = "static/"
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+# # where static files are collected after running collectstatic:
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
+# ]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
