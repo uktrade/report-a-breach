@@ -152,7 +152,7 @@ class WhichSanctionsRegimeForm(BaseForm):
         label=content.WHICH_SANCTIONS_REGIME["text"],
         max_length=100,
         required=False,
-        help_text="Search regimes",
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][0],
     )
     checkbox_choices = []
     for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
@@ -165,8 +165,8 @@ class WhichSanctionsRegimeForm(BaseForm):
         widget=forms.CheckboxSelectMultiple,
         choices=checkbox_choices,
         required=False,
-        help_text="Select all that apply",
-        label="",
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][1],
+        label="",  # empty as the question is set in the above search bar
     )
     unknown_regime = forms.BooleanField(label="I do not know", required=False)
 
