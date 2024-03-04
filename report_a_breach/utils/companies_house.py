@@ -5,9 +5,7 @@ from django.conf import settings
 
 from report_a_breach.exceptions import CompaniesHouseException
 
-COMPANIES_HOUSE_BASIC_AUTH = base64.b64encode(
-    bytes(f"{settings.COMPANIES_HOUSE_API_KEY}:", "utf-8")
-).decode("utf-8")
+COMPANIES_HOUSE_BASIC_AUTH = base64.b64encode(bytes(f"{settings.COMPANIES_HOUSE_API_KEY}:", "utf-8")).decode("utf-8")
 COMPANIES_HOUSE_BASE_DOMAIN = "https://api.companieshouse.gov.uk"
 
 
@@ -35,13 +33,13 @@ def get_formatted_address(address_dict: dict):
     line_1 = address_dict["address_line_1"]
     address_string += line_1
 
-    if line_2 := address_dict.get("address_line_2", ""):
+    if line_2 := address_dict.get("address_line_2"):
         address_string += f", {line_2}"
+
+    if postal_code := address_dict.get("postal_code"):
+        address_string += f", {postal_code}"
 
     country = address_dict["country"]
     address_string += f", {country}"
-
-    postal_code = address_dict["postal_code"]
-    address_string += f", {postal_code}"
 
     return address_string

@@ -24,9 +24,7 @@ class BaseModelFormView(BaseView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse(
-            self.success_path, kwargs={"pk": self.request.session["breach_instance"]["id"]}
-        )
+        return reverse(self.success_path, kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
 class BaseWizardView(NamedUrlSessionWizardView):
@@ -40,7 +38,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
         if custom_getter := getattr(self, f"get_{self.steps.current}_context_data", None):
-            context.update(custom_getter(form))
+            context = custom_getter(form, context)
         return context
 
     def process_step(self, form):

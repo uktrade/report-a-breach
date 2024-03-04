@@ -35,9 +35,7 @@ class Breach(BaseModel):
     )
     reporter_email_address = models.EmailField(verbose_name=EMAIL["text"])
     reporter_full_name = models.CharField(verbose_name=FULL_NAME["text"], max_length=255)
-    sanctions_regimes = models.ManyToManyField(
-        "SanctionsRegime", through="SanctionsRegimeBreachThrough"
-    )
+    sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough")
     additional_information = models.TextField(verbose_name=ADDITIONAL_INFORMATION["text"])
     what_were_the_goods = models.TextField(verbose_name=WHAT_WERE_THE_GOODS["text"])
     business_registered_on_companies_house = models.CharField(
@@ -70,17 +68,21 @@ class PersonOrCompany(BaseModel):
         choices=PERSON_OR_COMPANY_CHOICES,
         max_length=7,
     )
-    name = models.TextField()
-    website = models.URLField(null=True)
+    name = models.TextField(verbose_name="Name of business or person")
+    website = models.URLField(null=True, blank=True, verbose_name="Website address")
     address_line_1 = models.TextField()
-    address_line_2 = models.TextField(null=True)
-    address_line_3 = models.TextField(null=True)
-    address_line_4 = models.TextField(null=True)
+    address_line_2 = models.TextField(null=True, blank=True)
+    address_line_3 = models.TextField(null=True, blank=True)
+    address_line_4 = models.TextField(null=True, blank=True)
     town_or_city = models.TextField()
-    county = CountryField()
-    postcode = models.TextField()
+    country = CountryField()
+    county = models.TextField(null=True)
+    postal_code = models.TextField()
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
     type_of_relationship = models.CharField(choices=TYPE_OF_RELATIONSHIP_CHOICES, max_length=9)
+    when_did_you_first_suspect = models.TextField(
+        verbose_name="When did you first suspect the business or person had breached trade sanctions?"
+    )
 
 
 class SanctionsRegimeBreachThrough(BaseModel):

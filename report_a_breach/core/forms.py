@@ -1,22 +1,27 @@
+from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
     ConditionalQuestion,
     ConditionalRadios,
     Field,
-    Layout,
+    Fieldset,
+    Fluid,
+    Size,
     Submit,
 )
 from django import forms
 
 import report_a_breach.question_content as content
 from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
+from report_a_breach.base_classes.layout import Layout
 from report_a_breach.exceptions import CompaniesHouseException
 from report_a_breach.utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
 )
 
-from .models import Breach
+from ..fields import BooleanChoiceField
+from .models import Breach, PersonOrCompany
 
 # TODO: check the wording of any error messages to match what the UCD team expect
 
@@ -99,9 +104,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        do_you_know_the_registered_company_number = cleaned_data.get(
-            "do_you_know_the_registered_company_number"
-        )
+        do_you_know_the_registered_company_number = cleaned_data.get("do_you_know_the_registered_company_number")
         registered_company_number = cleaned_data.get("registered_company_number")
         if do_you_know_the_registered_company_number == "yes":
             if not registered_company_number:
@@ -111,29 +114,116 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             # and store them in the form. First we check the request session to see if
             # they're already been obtained
             if session_company_details := self.request.session.get("company_details"):
-                if (
-                    cleaned_data["registered_company_number"]
-                    == session_company_details["registered_company_number"]
-                ):
-                    cleaned_data["registered_company_name"] = session_company_details[
-                        "registered_company_name"
-                    ]
-                    cleaned_data["registered_office_address"] = session_company_details[
-                        "registered_office_address"
-                    ]
+                if cleaned_data["registered_company_number"] == session_company_details["registered_company_number"]:
+                    cleaned_data["registered_company_name"] = session_company_details["registered_company_name"]
+                    cleaned_data["registered_office_address"] = session_company_details["registered_office_address"]
                     return cleaned_data
 
             try:
                 company_details = get_details_from_companies_house(registered_company_number)
                 cleaned_data["registered_company_number"] = company_details["company_number"]
                 cleaned_data["registered_company_name"] = company_details["company_name"]
-                cleaned_data["registered_office_address"] = get_formatted_address(
-                    company_details["registered_office_address"]
-                )
+                cleaned_data["registered_office_address"] = get_formatted_address(company_details["registered_office_address"])
             except CompaniesHouseException:
                 self.add_error(None, "The company number you entered is not valid")
 
         return cleaned_data
+
+
+class WhereIsTheAddressOfTheBusinessOrPersonForm(BaseForm):
+    where_is_the_address = forms.ChoiceField(
+        label="Where is the address of the business or person who made the suspected breach?",
+        choices=(
+            ("in_the_uk", "In the UK"),
+            ("outside_the_uk", "Outside the UK"),
+        ),
+        widget=forms.RadioSelect,
+    )
+
+
+class BusinessOrPersonDetailsForm(BaseModelForm):
+    class Meta:
+        model = PersonOrCompany
+        fields = [
+            "name",
+            "website",
+            "country",
+            "address_line_1",
+            "address_line_2",
+            "address_line_3",
+            "address_line_4",
+            "town_or_city",
+            "county",
+            "postal_code",
+        ]
+        widgets = {
+            "name": forms.TextInput,
+            "website": forms.TextInput,
+            "country": forms.Select,
+            "address_line_1": forms.TextInput,
+            "address_line_2": forms.TextInput,
+            "address_line_3": forms.TextInput,
+            "address_line_4": forms.TextInput,
+            "town_or_city": forms.TextInput,
+            "county": forms.TextInput,
+            "postal_code": forms.TextInput,
+        }
+
+    def __init__(self, *args, is_uk_address=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        if is_uk_address:
+            self.fields["country"].initial = "GB"
+            self.fields["country"].widget = forms.HiddenInput()
+            del self.fields["address_line_3"]
+            del self.fields["address_line_4"]
+        else:
+            del self.fields["postal_code"]
+            del self.fields["county"]
+            del self.fields["town_or_city"]
+
+        self.helper.label_size = None
+        self.helper.layout = Layout(
+            Fieldset(
+                Field.text("name", field_width=Fluid.THREE_QUARTERS),
+                legend="Name",
+                legend_size=Size.MEDIUM,
+                legend_tag="h3",
+            ),
+            Fieldset(
+                Field.text("website", field_width=Fluid.THREE_QUARTERS),
+                legend="Website",
+                legend_size=Size.MEDIUM,
+                legend_tag="h3",
+            ),
+            Fieldset(
+                Field.text("country", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_1", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_2", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_3", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_4", field_width=Fluid.ONE_HALF),
+                Field.text("town_or_city", field_width=Fluid.ONE_HALF),
+                Field.text("county", field_width=Fluid.ONE_HALF),
+                Field.text("postal_code", field_width=Fluid.ONE_HALF),
+                legend="Address",
+                legend_size=Size.MEDIUM,
+                legend_tag="h3",
+            ),
+        )
+
+
+class WhenDidYouFirstSuspectForm(BaseModelForm):
+    class Meta:
+        model = PersonOrCompany
+        fields = [
+            "when_did_you_first_suspect",
+        ]
+        widgets = {
+            "when_did_you_first_suspect": forms.TextInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["when_did_you_first_suspect"].help_text = "You can enter an exact or approximate date"
 
 
 class WhatWereTheGoodsForm(BaseModelForm):
@@ -144,6 +234,158 @@ class WhatWereTheGoodsForm(BaseModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["what_were_the_goods"].widget.attrs = {"rows": 5}
+
+
+class WhereWereTheGoodsSuppliedFromForm(BaseForm):
+    where_were_the_goods_supplied_from = forms.ChoiceField(
+        choices=(()),
+        widget=forms.RadioSelect,
+        label="Where were the goods, services, technological assistance or technology supplied from?",
+    )
+
+    def __init__(self, *args, address_dict, **kwargs):
+        super().__init__(*args, **kwargs)
+        address_choices = []
+        if address_dict:
+            address_string = get_formatted_address(address_dict)
+            address_choices.append(Choice("same_address", address_string, divider="Or"))
+
+        address_choices += [
+            Choice("different_uk_address", "A different UK address"),
+            Choice("outside_the_uk", "Outside the UK"),
+            Choice("i_do_not_know", "I do not know"),
+            Choice("they_have_not_been_supplied", "They have not been supplied yet"),
+        ]
+        self.fields["where_were_the_goods_supplied_from"].choices = address_choices
+
+
+class WhereWereTheGoodsMadeAvailableForm(BaseForm):
+    where_were_the_goods_made_available_from = forms.ChoiceField(
+        choices=(()),
+        widget=forms.RadioSelect,
+        label="Where were the goods, services, technological assistance or technology made available from?",
+    )
+
+    def __init__(self, *args, address_dict, **kwargs):
+        super().__init__(*args, **kwargs)
+        address_choices = []
+        if address_dict:
+            address_string = get_formatted_address(address_dict)
+            address_choices.append(Choice("same_address", address_string, divider="Or"))
+
+        address_choices = [
+            Choice("different_uk_address", "A different UK address"),
+            Choice("outside_the_uk", "Outside the UK"),
+            Choice("i_do_not_know", "I do not know"),
+        ]
+        self.fields["where_were_the_goods_made_available_from"].choices = address_choices
+
+
+class WhereWereTheGoodsSuppliedToForm(BaseForm):
+    where_were_the_goods_supplied_to = forms.ChoiceField(
+        choices=(
+            Choice("in_the_uk", "The UK"),
+            Choice("outside_the_uk", "Outside the UK"),
+            Choice("i_do_not_know", "I do not know"),
+        ),
+        widget=forms.RadioSelect,
+        label="Where were the goods, services, technological assistance or technology supplied to?",
+    )
+
+
+class AboutTheEndUserForm(BaseModelForm):
+    name_of_person = forms.CharField(label="Name of person")
+    name_of_business = forms.CharField(label="Name of business")
+    email = forms.CharField(label="Email")
+    additional_contact_details = forms.CharField(
+        widget=forms.Textarea,
+        help_text="This could be a phone number, or details of a jurisdiction instead of a country",
+    )
+    readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    class Meta:
+        model = PersonOrCompany
+        fields = (
+            "website",
+            "country",
+            "address_line_1",
+            "address_line_2",
+            "address_line_3",
+            "address_line_4",
+            "town_or_city",
+            "county",
+            "postal_code",
+        )
+        widgets = {
+            "website": forms.TextInput,
+            "country": forms.Select,
+            "address_line_1": forms.TextInput,
+            "address_line_2": forms.TextInput,
+            "address_line_3": forms.TextInput,
+            "address_line_4": forms.TextInput,
+            "town_or_city": forms.TextInput,
+            "county": forms.TextInput,
+            "postal_code": forms.TextInput,
+        }
+
+    def __init__(self, *args, is_uk_address, **kwargs):
+        super().__init__(*args, **kwargs)
+        if is_uk_address:
+            self.fields["country"].initial = "GB"
+            self.fields["country"].widget = forms.HiddenInput()
+            del self.fields["address_line_3"]
+            del self.fields["address_line_4"]
+        else:
+            del self.fields["postal_code"]
+            del self.fields["county"]
+            del self.fields["town_or_city"]
+
+        self.helper.label_size = None
+        self.helper.layout = Layout(
+            Fieldset(
+                Field.text("name_of_person", field_width=Fluid.THREE_QUARTERS),
+                Field.text("name_of_business", field_width=Fluid.THREE_QUARTERS),
+                Field.text("email", field_width=Fluid.THREE_QUARTERS),
+                Field.text("website", field_width=Fluid.THREE_QUARTERS),
+                legend="Name and digital contact details",
+                legend_size=Size.MEDIUM,
+                legend_tag="h3",
+            ),
+            Fieldset(
+                Field.text("country", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_1", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_2", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_3", field_width=Fluid.ONE_HALF),
+                Field.text("address_line_4", field_width=Fluid.ONE_HALF),
+                Field.text("town_or_city", field_width=Fluid.ONE_HALF),
+                Field.text("county", field_width=Fluid.ONE_HALF),
+                Field.text("postal_code", field_width=Fluid.ONE_HALF),
+                legend="Address",
+                legend_size=Size.MEDIUM,
+                legend_tag="h3",
+            ),
+            Field.text(
+                "additional_contact_details",
+                field_width=Fluid.THREE_QUARTERS,
+                label_size=Size.MEDIUM,
+            ),
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
+        return cleaned_data
+
+
+class EndUserAddedForm(BaseForm):
+    do_you_want_to_add_another_end_user = BooleanChoiceField(
+        choices=(
+            Choice(True, "Yes"),
+            Choice(False, "No"),
+        ),
+        widget=forms.RadioSelect,
+        label="Do you want to add another end-user?",
+    )
 
 
 class SummaryForm(BaseForm):
