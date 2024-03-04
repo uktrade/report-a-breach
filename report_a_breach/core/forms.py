@@ -170,14 +170,6 @@ class WhichSanctionsRegimeForm(BaseForm):
     )
     unknown_regime = forms.BooleanField(label="I do not know", required=False)
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.helper.layout = Layout(
-    #         Field("search_bar"),
-    #         Field("which_sanctions_regime"),
-    #         Field("unknown_regime"),
-    #     )
-
     def clean(self):
         cleaned_data = super().clean()
         if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get(
