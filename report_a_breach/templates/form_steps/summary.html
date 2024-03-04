@@ -16,28 +16,39 @@
             <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Email
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ form_data.email.reporter_email_address }}
-                    </dd>
-                    <dd class="govuk-summary-list__actions">
-                        <a class="govuk-link" href="{% get_wizard_step_url 'email' %}?redirect=summary">Change<span
-                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
                         Full name
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {{ form_data.name.reporter_full_name }}
+                        {% if is_third_party_relationship %}
+                            {{ form_data.name_and_business_you_work_for.reporter_full_name }}
+                        {% else %}
+                            {{ form_data.name.reporter_full_name }}
+                        {% endif %}
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        <a class="govuk-link" href="{% get_wizard_step_url 'name' %}?redirect=summary">Change<span
-                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% if is_third_party_relationship %}
+                            <a class="govuk-link" href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% else %}
+                            <a class="govuk-link" href="{% get_wizard_step_url 'name' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% endif %}
                     </dd>
                 </div>
+                {% if is_third_party_relationship %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Business you work for
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ form_data.name_and_business_you_work_for.reporter_name_of_business_you_work_for }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        </dd>
+                    </div>
+                {% endif %}
             </dl>
         </div>
     </div>
@@ -52,14 +63,14 @@
                         Registered business number
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% if business_obtained_from_companies_house %}
+                        {% if is_company_obtained_from_companies_house %}
                             {{ form_data.do_you_know_the_registered_company_number.registered_company_number }}
                         {% else %}
                             N/A
                         {% endif %}
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        {% if business_obtained_from_companies_house %}
+                        {% if is_company_obtained_from_companies_house %}
                             <a class="govuk-link"
                                href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary">Change<span
                                 class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
@@ -75,14 +86,14 @@
                         Name
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% if business_obtained_from_companies_house %}
+                        {% if is_company_obtained_from_companies_house %}
                             {{ form_data.do_you_know_the_registered_company_number.registered_company_name }}
                         {% else %}
                             N/A
                         {% endif %}
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        {% if business_obtained_from_companies_house %}
+                        {% if is_company_obtained_from_companies_house %}
                         {% else %}
                             <a class="govuk-link"
                                href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
@@ -95,14 +106,14 @@
                         Address
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% if business_obtained_from_companies_house %}
+                        {% if is_company_obtained_from_companies_house %}
                             {{ form_data.do_you_know_the_registered_company_number.registered_office_address }}
                         {% else %}
                             N/A
                         {% endif %}
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        {% if business_obtained_from_companies_house %}
+                        {% if is_company_obtained_from_companies_house %}
                         {% else %}
                             <a class="govuk-link"
                                href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span

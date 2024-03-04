@@ -3,6 +3,6 @@
 
 echo "Loading all fixture data"
 
-python manage.py loaddata report_a_breach/fixtures/*.json
+pipenv run python manage.py loaddata report_a_breach/fixtures/*.json
 
 echo "Fixtures loaded"

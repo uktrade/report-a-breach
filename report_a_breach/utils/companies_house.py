@@ -30,8 +30,8 @@ def get_formatted_address(address_dict: dict):
     """Get formatted, human-readable address from Companies House address dict."""
     address_string = ""
 
-    line_1 = address_dict["address_line_1"]
-    address_string += line_1
+    if line_1 := address_dict.get("address_line_1"):
+        address_string += line_1
 
     if line_2 := address_dict.get("address_line_2"):
         address_string += f", {line_2}"
@@ -39,7 +39,8 @@ def get_formatted_address(address_dict: dict):
     if postal_code := address_dict.get("postal_code"):
         address_string += f", {postal_code}"
 
-    country = address_dict["country"]
-    address_string += f", {country}"
+    # todo - get full country name from country code
+    if country := address_dict.get("country"):
+        address_string += f", {country}"
 
     return address_string

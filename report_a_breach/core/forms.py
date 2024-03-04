@@ -62,7 +62,28 @@ class NameForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["reporter_full_name"]
-        widget = forms.TextInput(attrs={"id": "reporter_full_name"})
+
+
+class NameAndBusinessYouWorkForForm(BaseModelForm):
+    class Meta:
+        model = Breach
+        fields = ["reporter_full_name", "reporter_name_of_business_you_work_for"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["reporter_name_of_business_you_work_for"].help_text = (
+            "This is the business that employs you, not the business you're reporting"
+        )
+        self.helper.label_size = None
+        self.helper.layout = Layout(
+            Fieldset(
+                Field.text("reporter_full_name", field_width=Fluid.THREE_QUARTERS),
+                Field.text("reporter_name_of_business_you_work_for", field_width=Fluid.THREE_QUARTERS),
+                legend="Your details",
+                legend_size=Size.MEDIUM,
+                legend_tag="h3",
+            ),
+        )
 
 
 class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
@@ -231,6 +252,40 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
         self.fields["when_did_you_first_suspect"].help_text = "You can enter an exact or approximate date"
 
 
+class WhichSanctionsRegimeForm(BaseForm):
+    search_bar = forms.CharField(
+        label=content.WHICH_SANCTIONS_REGIME["text"],
+        max_length=100,
+        required=False,
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][0],
+    )
+    which_sanctions_regime = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        choices=(()),
+        required=False,
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][1],
+        label="",  # empty as the question is set in the above search bar
+    )
+    unknown_regime = forms.BooleanField(label="I do not know", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        checkbox_choices = []
+        for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
+            if i == len(SanctionsRegime.objects.values("full_name")) - 1:
+                checkbox_choices.append(Choice(item["full_name"], item["full_name"], divider="or"))
+            else:
+                checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
+        checkbox_choices = tuple(checkbox_choices)
+        self.fields["which_sanctions_regime"].choices = checkbox_choices
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get("unknown_regime"):
+            raise forms.ValidationError("Please select at least one regime or 'I do not know' to continue")
+        return cleaned_data
+
+
 class WhatWereTheGoodsForm(BaseModelForm):
     class Meta:
         model = Breach
@@ -278,7 +333,7 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
             address_string = get_formatted_address(address_dict)
             address_choices.append(Choice("same_address", address_string, divider="Or"))
 
-        address_choices = [
+        address_choices += [
             Choice("different_uk_address", "A different UK address"),
             Choice("outside_the_uk", "Outside the UK"),
             Choice("i_do_not_know", "I do not know"),
@@ -381,6 +436,13 @@ class AboutTheEndUserForm(BaseModelForm):
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
 
+    def is_valid(self):
+        # todo - we need to set this as True always for now, as the form really only gets validated
+        #  with a corresponding end_user_uuid, so we can't validate it here
+        #  we need to override render_done() in the WizardView so the resulting form_list
+        #  contains all instances of this form for each end_user
+        return super().is_valid() or True
+
 
 class EndUserAddedForm(BaseForm):
     do_you_want_to_add_another_end_user = BooleanChoiceField(
@@ -445,33 +507,3 @@ class SummaryForm(BaseForm):
 
 class DeclarationForm(BaseForm):
     declaration = forms.BooleanField(label="I agree and accept", required=True)
-
-
-class WhichSanctionsRegimeForm(BaseForm):
-    search_bar = forms.CharField(
-        label=content.WHICH_SANCTIONS_REGIME["text"],
-        max_length=100,
-        required=False,
-        help_text=content.WHICH_SANCTIONS_REGIME["helper"][0],
-    )
-    checkbox_choices = []
-    for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
-        if i == len(SanctionsRegime.objects.values("full_name")) - 1:
-            checkbox_choices.append(Choice(item["full_name"], item["full_name"], divider="or"))
-        else:
-            checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
-    checkbox_choices = tuple(checkbox_choices)
-    which_sanctions_regime = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
-        choices=checkbox_choices,
-        required=False,
-        help_text=content.WHICH_SANCTIONS_REGIME["helper"][1],
-        label="",  # empty as the question is set in the above search bar
-    )
-    unknown_regime = forms.BooleanField(label="I do not know", required=False)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get("unknown_regime"):
-            raise forms.ValidationError("Please select at least one regime or 'I do not know' to continue")
-        return cleaned_data

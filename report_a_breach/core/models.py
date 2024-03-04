@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.postgres.fields import DateRangeField
 from django.db import models
 from django_countries.fields import CountryField
@@ -34,7 +36,9 @@ class Breach(BaseModel):
         verbose_name=RELATIONSHIP["text"],
     )
     reporter_email_address = models.EmailField(verbose_name=EMAIL["text"])
+    reference = models.CharField(null=True, blank=True, verbose_name="Reference", max_length=6)
     reporter_full_name = models.CharField(verbose_name=FULL_NAME["text"], max_length=255)
+    reporter_name_of_business_you_work_for = models.CharField(max_length=300, verbose_name="Business you work for")
     sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True)
     unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
     additional_information = models.TextField(verbose_name=ADDITIONAL_INFORMATION["text"])
@@ -62,6 +66,15 @@ class Breach(BaseModel):
     tell_us_about_the_suspected_breach = models.TextField(
         null=True, blank=True, verbose_name="Tell us about the suspected breach"
     )
+
+    def assign_reference(self):
+        """Assigns a unique reference to this Breach object"""
+        reference = uuid.uuid4().hex[:6].upper()
+        if self.__class__.objects.filter(reference=reference).exists():
+            return self.assign_reference()
+        self.reference = reference
+        self.save()
+        return reference
 
 
 class PersonOrCompany(BaseModel):

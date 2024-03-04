@@ -3,13 +3,12 @@ import uuid
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import FormView
+from django.views.generic import TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
-from report_a_breach.question_content import RELATIONSHIP
 from report_a_breach.utils.notifier import send_email
 
 from .forms import (
@@ -21,6 +20,7 @@ from .forms import (
     EmailForm,
     EmailVerifyForm,
     EndUserAddedForm,
+    NameAndBusinessYouWorkForForm,
     NameForm,
     StartForm,
     SummaryForm,
@@ -35,7 +35,7 @@ from .forms import (
     WhereWereTheGoodsSuppliedToForm,
     WhichSanctionsRegimeForm,
 )
-from .models import Breach, SanctionsRegime
+from .models import Breach
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -44,7 +44,7 @@ class ReportABreachWizardView(BaseWizardView):
         ("email", EmailForm),
         ("verify", EmailVerifyForm),
         ("name", NameForm),
-        ("which_sanctions_regime", WhichSanctionsRegimeForm),
+        ("name_and_business_you_work_for", NameAndBusinessYouWorkForForm),
         (
             "are_you_reporting_a_business_on_companies_house",
             AreYouReportingABusinessOnCompaniesHouseForm,
@@ -55,13 +55,14 @@ class ReportABreachWizardView(BaseWizardView):
             "where_is_the_address_of_the_business_or_person",
             WhereIsTheAddressOfTheBusinessOrPersonForm,
         ),
-        ("business_or_person_details", BusinessOrPersonDetailsForm),
+        # ("business_or_person_details", BusinessOrPersonDetailsForm),
         ("when_did_you_first_suspect", WhenDidYouFirstSuspectForm),
+        ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("what_were_the_goods", WhatWereTheGoodsForm),
         ("where_were_the_goods_supplied_from", WhereWereTheGoodsSuppliedFromForm),
+        ("about_the_supplier", BusinessOrPersonDetailsForm),
         ("where_were_the_goods_made_available_from", WhereWereTheGoodsMadeAvailableForm),
         ("where_were_the_goods_supplied_to", WhereWereTheGoodsSuppliedToForm),
-        ("about_the_supplier", BusinessOrPersonDetailsForm),
         ("about_the_end_user", AboutTheEndUserForm),
         ("end_user_added", EndUserAddedForm),
         ("were_there_other_addresses_in_the_supply_chain", WereThereOtherAddressesInTheSupplyChainForm),
@@ -85,18 +86,35 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
 
     def get_summary_context_data(self, form, context):
+        """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
+        a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
+        that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
+
+        # we're importing these methods here to avoid circular imports
+        from report_a_breach.core.form_step_conditions import (
+            show_check_company_details_page_condition,
+            show_name_and_business_you_work_for_page,
+        )
+
         cleaned_data = self.get_all_cleaned_data()
         context["form_data"] = cleaned_data
-        context["business_obtained_from_companies_house"] = (
-            cleaned_data["do_you_know_the_registered_company_number"]["do_you_know_the_registered_company_number"] == "yes"
-        )
+        context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
+        context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
+        return context
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        if self.steps.current == "about_the_supplier":
+            context["form_title"] = "About the supplier"
+        elif self.steps.current == "about_the_end_user":
+            context["form_title"] = "About the end-user"
         return context
 
     def get(self, request, *args, **kwargs):
         if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
             # we are on a specific end-user step
-            self.storage.current_step = "about_the_end_user"
-            return super().get(request, *args, step="about_the_end_user", **kwargs)
+            self.storage.current_step = "where_were_the_goods_supplied_to"
+            return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
         return super().get(request, *args, **kwargs)
 
     def get_step_url(self, step):
@@ -123,7 +141,7 @@ class ReportABreachWizardView(BaseWizardView):
 
     def render_next_step(self, form, **kwargs):
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
-            return redirect(self.get_step_url("about_the_end_user"))
+            return redirect(self.get_step_url("where_were_the_goods_supplied_to"))
         return super().render_next_step(form, **kwargs)
 
     def process_do_you_know_the_registered_company_number_step(self, form):
@@ -201,8 +219,25 @@ class ReportABreachWizardView(BaseWizardView):
 
         return kwargs
 
+    def get_all_cleaned_data(self):
+        """Return a merged dictionary of all step cleaned_data dictionaries with the conditional logic applied.
+
+        e.g. The full name can be entered in 2 different steps depending on the answers to the previous questions,
+        this method will figure out where to get the correct name and return it in the dictionary under 1 unified key.
+        """
+        cleaned_data = {}
+        for form_key in self.get_form_list():
+            if form_key == "about_the_end_user":
+                continue
+            form_obj = self.get_form(
+                step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
+            )
+            if form_obj.is_valid():
+                cleaned_data[form_key] = form_obj.cleaned_data
+        return cleaned_data
+
     def done(self, form_list, **kwargs):
-        all_cleaned_data = self.get_all_cleaned_data()
+        """all_cleaned_data = self.get_all_cleaned_data()
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],
             reporter_email_address=all_cleaned_data["reporter_email_address"],
@@ -220,53 +255,14 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach.additional_information = "N/A"
 
         new_breach.save()
-        reference_id = str(new_breach.id).split("-")[0].upper()
+        reference_id = str(new_breach.id).split("-")[0].upper()"""
 
-        self.request.session["reference_id"] = reference_id
-        return render(self.request, "confirmation.html")
+        new_breach = Breach.objects.create()
+        new_reference = new_breach.assign_reference()
+
+        self.request.session["reference_id"] = new_reference
+        return redirect(reverse("complete"))
 
 
-# TODO: remove or archive
-class SummaryView(FormView):
-    """
-    The summary page will display the information the reporter has provided,
-    and give them a chance to change any of it.
-    The data is saved to the database after the reporter submits.
-    """
-
-    template_name = "summary.html"
-    form_class = SummaryForm
-
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, self.get_context_data(**kwargs))
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        data = self.request.session.get("breach_instance")
-        context["email"] = data["reporter_email_address"]
-        context["full_name"] = data["reporter_full_name"]
-        # map the DB label to the question text
-        choice_dict = dict(RELATIONSHIP["choices"])
-        context["company_relationship"] = choice_dict.get(data["reporter_professional_relationship"])
-        context["pk"] = data["id"]
-        return context
-
-    def get_success_url(self):
-        return reverse(
-            "confirmation",
-            kwargs={"pk": self.request.session["breach_instance"]["id"]},
-        )
-
-    def form_valid(self, form):
-        reporter_data = self.request.session.get("breach_instance")
-        reference_id = reporter_data["id"].split("-")[0].upper()
-        reporter_data["reporter_confirmation_id"] = reference_id
-        self.instance = Breach(id=reporter_data["id"])
-        self.instance.reporter_email_address = reporter_data["reporter_email_address"]
-        self.instance.reporter_full_name = reporter_data["reporter_full_name"]
-        self.instance.reporter_professional_relationship = reporter_data["reporter_professional_relationship"]
-        # TODO: remove  N/A when the real form is implemented
-        self.instance.additional_information = "N/A"
-        self.instance.save()
-        self.request.session["breach_instance"] = reporter_data
-        return super().form_valid(form)
+class CompleteView(TemplateView):
+    template_name = "complete.html"
