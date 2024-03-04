@@ -2,15 +2,29 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 
 {% block assets %}
-    {{ wizard.form.media }}
+  {{ wizard.form.media }}
 {% endblock assets %}
 
+{% block header__service %}
+  <div class="govuk-header__content">
+    <a href="{% block header__service__url %}{% endblock %}" class="govuk-header__link govuk-header__service-name">
+      {% block header__service__name %}
+        Report a suspected breach of trade sanctions
+      {% endblock %}
+    </a>
+    {% block header__service__navigaton %}
+    {% endblock %}
+  </div>
+{% endblock %}
+
+
+
 {% block column_content %}
-    {% error_summary form %}
-    <form method="post">
-        {% csrf_token %}
-        {{ wizard.management_form }}
-        {% block form_content %}
-        {% endblock form_content %}
-    </form>
+  {% error_summary form %}
+  <form method="post">
+    {% csrf_token %}
+    {{ wizard.management_form }}
+    {% block form_content %}
+    {% endblock form_content %}
+  </form>
 {% endblock column_content %}
