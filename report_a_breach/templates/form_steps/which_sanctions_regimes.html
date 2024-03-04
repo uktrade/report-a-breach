@@ -16,23 +16,12 @@
                     const items = document.querySelectorAll('label[class="govuk-label govuk-checkboxes__label"]');
                     items.forEach(function(item) {
                         const text = item.textContent || item.innerText;
-                        item.style.display = text.toLowerCase().includes(value) ? "": "none";
+                        item.parentNode.style.display = text.toLowerCase().includes(value) ? "block": "none";
                     });
-                    <!-- Need to move the elements to the top of the container -->
-                    var fragment = document.createDocumentFragment();
-                    items.forEach(function(item) {
-                        if (item.style.display !== "") {
-                            console.log(item)
-                            fragment.appendChild(item.parentNode);
-                        }
-                    });
-                    <!--                checkboxContainer.style.display = 'none';-->
-                    <!--                checkboxContainer.appendChild(fragment);-->
-                    <!--                console.log(checkboxContainer)-->
+                    if (value.length > 0) {
+                        document.getElementsByClassName('govuk-checkboxes__divider')[0].style.display = "none";
+                    }
                 });
         });
-        <!--<label class="govuk-label govuk-checkboxes__label" for="id_which_sanctions_regime-which_sanctions_regime_1">-->
-        <!--          The Afghanistan (Sanctions) (EU Exit) Regulations 2020-->
-        <!--        </label>-->
     </script>
 {% endblock extra_script %}
