@@ -51,6 +51,16 @@ class Breach(BaseModel):
         blank=False,
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
+    were_there_other_addresses_in_the_supply_chain = models.CharField(
+        choices=YES_NO_DO_NOT_KNOW_CHOICES,
+        max_length=11,
+        verbose_name="Were there any other addresses in the supply chain?",
+        blank=False,
+    )
+    other_addresses_in_the_supply_chain = models.TextField(null=True, blank=True, verbose_name="Give all addresses")
+    tell_us_about_the_suspected_breach = models.TextField(
+        null=True, blank=True, verbose_name="Tell us about the suspected breach"
+    )
 
 
 class PersonOrCompany(BaseModel):

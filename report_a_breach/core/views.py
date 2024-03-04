@@ -1,6 +1,8 @@
+import os
 import uuid
 
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -14,6 +16,7 @@ from .forms import (
     AboutTheEndUserForm,
     AreYouReportingABusinessOnCompaniesHouseForm,
     BusinessOrPersonDetailsForm,
+    DeclarationForm,
     DoYouKnowTheRegisteredCompanyNumberForm,
     EmailForm,
     EmailVerifyForm,
@@ -21,6 +24,9 @@ from .forms import (
     NameForm,
     StartForm,
     SummaryForm,
+    TellUsAboutTheSuspectedBreachForm,
+    UploadDocumentsForm,
+    WereThereOtherAddressesInTheSupplyChainForm,
     WhatWereTheGoodsForm,
     WhenDidYouFirstSuspectForm,
     WhereIsTheAddressOfTheBusinessOrPersonForm,
@@ -56,20 +62,32 @@ class ReportABreachWizardView(BaseWizardView):
         ("about_the_supplier", BusinessOrPersonDetailsForm),
         ("about_the_end_user", AboutTheEndUserForm),
         ("end_user_added", EndUserAddedForm),
+        ("were_there_other_addresses_in_the_supply_chain", WereThereOtherAddressesInTheSupplyChainForm),
+        ("upload_documents", UploadDocumentsForm),
+        ("tell_us_about_the_suspected_breach", TellUsAboutTheSuspectedBreachForm),
         ("summary", SummaryForm),
+        ("declaration", DeclarationForm),
     ]
 
     template_names_lookup = {
-        "summary": "summary.html",
+        "summary": "form_steps/summary.html",
         "check_company_details": "form_steps/check_company_details.html",
         "end_user_added": "form_steps/end_user_added.html",
+        "declaration": "form_steps/declaration.html",
     }
     template_name = "form_steps/generic_form_step.html"
     storage_name = "report_a_breach.session.SessionStorage"
 
-    def render(self, form=None, **kwargs):
-        rendered_response = super().render(form, **kwargs)
-        return rendered_response
+    # todo - use AWS S3 for this
+    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
+
+    def get_summary_context_data(self, form, context):
+        cleaned_data = self.get_all_cleaned_data()
+        context["form_data"] = cleaned_data
+        context["business_obtained_from_companies_house"] = (
+            cleaned_data["do_you_know_the_registered_company_number"]["do_you_know_the_registered_company_number"] == "yes"
+        )
+        return context
 
     def get(self, request, *args, **kwargs):
         if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
@@ -99,11 +117,6 @@ class ReportABreachWizardView(BaseWizardView):
         self.request.session["end_users"] = current_end_users
         self.request.session.modified = True
         return self.get_form_step_data(form)
-
-    def get_summary_context_data(self, form, context, **kwargs):
-        start_form = self.get_cleaned_data_for_step("start") or {}
-        context["company_relationship"] = dict(RELATIONSHIP["choices"]).get(start_form["reporter_professional_relationship"])
-        return context
 
     def render_next_step(self, form, **kwargs):
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
@@ -135,6 +148,8 @@ class ReportABreachWizardView(BaseWizardView):
     def get_form(self, step=None, data=None, files=None):
         if step is None:
             step = self.steps.current
+        # we are overriding this method, so we call self.form_list rather than self.get_form_list(). The latter will
+        # apply the conditional logic to the form list, which we don't want to do here.
         form_class = self.form_list[step]
         # prepare the kwargs for the form instance.
         kwargs = self.get_form_kwargs(step)

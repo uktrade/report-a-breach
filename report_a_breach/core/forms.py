@@ -1,26 +1,24 @@
 from crispy_forms_gds.choices import Choice
-from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
     ConditionalQuestion,
     ConditionalRadios,
     Field,
     Fieldset,
     Fluid,
+    Layout,
     Size,
-    Submit,
 )
 from django import forms
 
 import report_a_breach.question_content as content
 from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
-from report_a_breach.base_classes.layout import Layout
 from report_a_breach.exceptions import CompaniesHouseException
 from report_a_breach.utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
 )
 
-from ..fields import BooleanChoiceField
+from ..form_fields import BooleanChoiceField
 from .models import Breach, PersonOrCompany
 
 # TODO: check the wording of any error messages to match what the UCD team expect
@@ -210,6 +208,13 @@ class BusinessOrPersonDetailsForm(BaseModelForm):
             ),
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
+        return cleaned_data
+
+    # todo - merge this form with the AboutTheEndUserForm, or any other address form that changes from UK to non-UK
+
 
 class WhenDidYouFirstSuspectForm(BaseModelForm):
     class Meta:
@@ -388,8 +393,55 @@ class EndUserAddedForm(BaseForm):
     )
 
 
-class SummaryForm(BaseForm):
+class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
+    class Meta:
+        model = Breach
+        fields = ("were_there_other_addresses_in_the_supply_chain", "other_addresses_in_the_supply_chain")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.add_input(Submit("submit", "Submit and Save", css_class="btn-primary"))
+        self.fields["were_there_other_addresses_in_the_supply_chain"].choices.pop(0)
+        self.helper.layout = Layout(
+            ConditionalRadios(
+                "were_there_other_addresses_in_the_supply_chain",
+                ConditionalQuestion(
+                    "Yes",
+                    Field.text("other_addresses_in_the_supply_chain"),
+                ),
+                "No",
+                "I do not know",
+            )
+        )
+
+
+class UploadDocumentsForm(BaseForm):
+    # todo - add a custom crispy forms widget to make it render like the prototype
+    documents = forms.FileField(
+        label="Upload documents (optional)",
+        help_text="You can upload items such as your own compliance investigation report, "
+        "commercial invoices, terms of appointment or other contractual documents.",
+        required=False,
+    )
+
+
+class TellUsAboutTheSuspectedBreachForm(BaseModelForm):
+    class Meta:
+        model = Breach
+        # todo - make all fields variables a tuple
+        fields = ["tell_us_about_the_suspected_breach"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["tell_us_about_the_suspected_breach"].help_text = (
+            "Include anything you've not already told us or uploaded. You could add specific details, "
+            "such as any licence numbers or shipping numbers. If you've uploaded your own compliance "
+            "investigation, you could give a summary here."
+        )
+
+
+class SummaryForm(BaseForm):
+    pass
+
+
+class DeclarationForm(BaseForm):
+    declaration = forms.BooleanField(label="I agree and accept", required=True)

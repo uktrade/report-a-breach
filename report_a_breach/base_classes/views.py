@@ -49,17 +49,32 @@ class BaseWizardView(NamedUrlSessionWizardView):
     def render(self, form=None, **kwargs):
         if self.steps.current == "verify":
             return super().render(form, **kwargs)
-        elif redirect_to := self.request.session.get("redirect"):
+        # if we have a redirect set in the session, we want to redirect to that step, but only if the form is valid.
+        # if the form is not valid, we want to show the user the errors on the current step
+        elif redirect_to := self.request.session.get("redirect") and form.is_valid():
             self.request.session["redirect"] = None
             return self.render_goto_step(redirect_to)
         return super().render(form, **kwargs)
 
     def post(self, *args, **kwargs):
-        session = self.request.session
-
         # allow the user to change previously entered data and be redirected
         # back to the summary page once complete
         if redirect_to := self.request.GET.get("redirect", None):
-            session["redirect"] = redirect_to
+            self.request.session["redirect"] = redirect_to
 
         return super().post(*args, **kwargs)
+
+    def get_all_cleaned_data(self):
+        """
+        Returns a merged dictionary of all step cleaned_data dictionaries.
+        If a step contains a `FormSet`, the key will be prefixed with
+        'formset-' and contain a list of the formset cleaned_data dictionaries.
+        """
+        cleaned_data = {}
+        for form_key in self.get_form_list():
+            form_obj = self.get_form(
+                step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
+            )
+            if form_obj.is_valid():
+                cleaned_data[form_key] = form_obj.cleaned_data
+        return cleaned_data

@@ -1,8 +1,6 @@
 from crispy_forms_gds.helper import FormHelper
-from crispy_forms_gds.layout import Size, Submit
+from crispy_forms_gds.layout import Layout, Size, Submit
 from django import forms
-
-from report_a_breach.base_classes.layout import Layout
 
 
 class EmptyForm(forms.Form):
