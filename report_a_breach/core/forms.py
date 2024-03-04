@@ -19,7 +19,7 @@ from report_a_breach.utils.companies_house import (
 )
 
 from ..form_fields import BooleanChoiceField
-from .models import Breach, PersonOrCompany
+from .models import Breach, PersonOrCompany, SanctionsRegime
 
 # TODO: check the wording of any error messages to match what the UCD team expect
 
@@ -445,3 +445,33 @@ class SummaryForm(BaseForm):
 
 class DeclarationForm(BaseForm):
     declaration = forms.BooleanField(label="I agree and accept", required=True)
+
+
+class WhichSanctionsRegimeForm(BaseForm):
+    search_bar = forms.CharField(
+        label=content.WHICH_SANCTIONS_REGIME["text"],
+        max_length=100,
+        required=False,
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][0],
+    )
+    checkbox_choices = []
+    for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
+        if i == len(SanctionsRegime.objects.values("full_name")) - 1:
+            checkbox_choices.append(Choice(item["full_name"], item["full_name"], divider="or"))
+        else:
+            checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
+    checkbox_choices = tuple(checkbox_choices)
+    which_sanctions_regime = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        choices=checkbox_choices,
+        required=False,
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][1],
+        label="",  # empty as the question is set in the above search bar
+    )
+    unknown_regime = forms.BooleanField(label="I do not know", required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get("unknown_regime"):
+            raise forms.ValidationError("Please select at least one regime or 'I do not know' to continue")
+        return cleaned_data
