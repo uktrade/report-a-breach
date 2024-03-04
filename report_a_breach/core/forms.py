@@ -148,6 +148,12 @@ class WhatWereTheGoodsForm(BaseModelForm):
 
 
 class WhichSanctionsRegimeForm(BaseForm):
+    search_bar = forms.CharField(
+        label=content.WHICH_SANCTIONS_REGIME["text"],
+        max_length=100,
+        required=False,
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][0],
+    )
     checkbox_choices = []
     for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
         if i == len(SanctionsRegime.objects.values("full_name")) - 1:
@@ -158,17 +164,11 @@ class WhichSanctionsRegimeForm(BaseForm):
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=checkbox_choices,
-        label=content.WHICH_SANCTIONS_REGIME["text"],
         required=False,
+        help_text=content.WHICH_SANCTIONS_REGIME["helper"][1],
+        label="",  # empty as the question is set in the above search bar
     )
     unknown_regime = forms.BooleanField(label="I do not know", required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.layout = Layout(
-            Field("which_sanctions_regime"),
-            Field("unknown_regime"),
-        )
 
     def clean(self):
         cleaned_data = super().clean()
