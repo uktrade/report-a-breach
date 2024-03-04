@@ -11,7 +11,7 @@
   </div>
 {% endblock %}
 
-{% block content %}
+{% block main_content %}
   <div class="govuk-width-container">
     <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
       <div class="govuk-grid-row">
@@ -21,7 +21,7 @@
               Submission complete
             </h1>
             <div class="govuk-panel__body">
-              Your reference number<br><strong>{{ application_reference_number }}</strong>
+              Your reference number<br><strong>{{ request.session.reference_id }}</strong>
             </div>
           </div>
 <!--   We have not! The confirmation template needs to be created in GovNotify and the send_email method used in the associated view -->

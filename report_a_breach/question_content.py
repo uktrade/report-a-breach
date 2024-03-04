@@ -13,8 +13,7 @@ EMAIL = {
 VERIFY = {"text": "We've sent you an email", "helper": "Enter the 6 digit security code"}
 
 RELATIONSHIP = {
-    "text": "What is the professional relationship with the company or person suspected of breaching "
-    "sanctions?",
+    "text": "What is the professional relationship with the company or person suspected of breaching " "sanctions?",
     "choices": (
         ("owner", "I'm an owner, officer or employee of the company, or I am the person"),
         (
@@ -36,4 +35,9 @@ ADDITIONAL_INFORMATION = {"text": "Tell us about the suspected breach", "helper"
 WHAT_WERE_THE_GOODS = {
     "text": "What were the goods or services, or what was the technological assistance or technology?",
     "helper": "",
+}
+
+WHICH_SANCTIONS_REGIME = {
+    "text": "Which sanctions regimes do you suspect the company or person has breached?",
+    "helper": ("Search regimes", "Select all that apply"),
 }
