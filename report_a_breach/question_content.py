@@ -40,5 +40,5 @@ WHAT_WERE_THE_GOODS = {
 
 WHICH_SANCTIONS_REGIME = {
     "text": "Which sanctions regimes do you suspect the company or person has breached?",
-    "helper": "",
+    "helper": ("Search regimes", "Select all that apply"),
 }

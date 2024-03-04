@@ -40,6 +40,7 @@ class ReportABreachWizardView(BaseWizardView):
         ("summary", SummaryForm),
     ]
     template_names_lookup = {
+        "which_sanctions_regime": "form_steps/which_sanctions_regimes.html",
         "summary": "summary.html",
         "check_company_details": "form_steps/check_company_details.html",
     }
@@ -111,6 +112,7 @@ class ReportABreachWizardView(BaseWizardView):
         return render(self.request, "confirmation.html")
 
 
+# TODO: remove or archive
 class SummaryView(FormView):
     """
     The summary page will display the information the reporter has provided,
