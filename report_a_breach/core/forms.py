@@ -280,13 +280,10 @@ class WhichSanctionsRegimeForm(BaseForm):
         checkbox_choices = tuple(checkbox_choices)
         self.fields["which_sanctions_regime"].choices = checkbox_choices
         self.helper.layout = Layout(
-            ConditionalRadios(
+            ConditionalQuestion(
                 "other_regime",
-                ConditionalQuestion(
-                    True,
-                    Field.text("Name of regime"),
-                ),
-                False,
+                forms.Textarea(),
+                "other_regime",
             )
         )
 
