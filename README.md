@@ -47,16 +47,23 @@ docker-compose up -d
 
 ### 5. Setup AWS localstack
 
-Create dummy AWS credentials as localstack requires these details but doesn't validate them.
-
+Configure the AWS CLI:
 ```
 aws configure
+```
+
+You can use the following dummy credentials that are provided by AWS. Alternatively, you can use your own credentials
+if you have an AWS account, Localstack does not validate them anyway.
+```
+AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
+AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+Default region [None]: eu-west-2
 ```
 
 Copy the static files to aws localstack s3 bucket
 
 ```
-python manage.py collectstatic --no-input
+pipenv run python manage.py collectstatic --no-input
 ```
 
 ### 6. Run the web server
@@ -78,6 +85,9 @@ To add a new dependency to the project, use the following command:\
 `pipenv install <package-name>`
 
 ### Localstack
+We use Localstack to emulate AWS services locally, specifically S3. A bucket is created called
+`static-files` that's used to store static files.
+
 Localstack works similarly to the awscli. For example, to see objects inside the static-files bucket, run command:\
 `awslocal s3 ls static-files`
 
