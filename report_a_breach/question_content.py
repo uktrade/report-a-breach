@@ -13,8 +13,7 @@ EMAIL = {
 VERIFY = {"text": "We've sent you an email", "helper": "Enter the 6 digit security code"}
 
 RELATIONSHIP = {
-    "text": "What is the professional relationship with the company or person suspected of breaching "
-    "sanctions?",
+    "text": "What is the professional relationship with the company or person suspected of breaching " "sanctions?",
     "choices": (
         ("owner", "I'm an owner, officer or employee of the company, or I am the person"),
         (

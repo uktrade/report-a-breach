@@ -2,15 +2,18 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 
 {% block assets %}
-  {{ wizard.form.media }}
+    {{ wizard.form.media }}
 {% endblock assets %}
 
 {% block column_content %}
-  {% error_summary form %}
-  <form method="post">
-    {% csrf_token %}
-    {{ wizard.management_form }}
-    {% block form_content %}
-    {% endblock form_content %}
-  </form>
+    {% error_summary form %}
+    {% if form_title %}
+        <h2 class="govuk-heading-l">{{ form_title }}</h2>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {% block form_content %}
+        {% endblock form_content %}
+    </form>
 {% endblock column_content %}
