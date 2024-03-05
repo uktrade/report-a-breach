@@ -249,7 +249,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["what_were_the_goods"].widget.attrs = {"rows": 5}
+        self.fields["when_did_you_first_suspect"].widget.attrs = {"rows": 5}
 
 
 class WhichSanctionsRegimeForm(BaseForm):
