@@ -17,6 +17,7 @@ LOGGING = {
     "handlers": {
         "ecs": {
             "formatter": "ecs_formatter",
+            "class": "logging.StreamHandler",
         },
     },
     "loggers": {
@@ -24,4 +25,5 @@ LOGGING = {
             "handlers": ["ecs"],
         },
     },
+    "version": 1,
 }
