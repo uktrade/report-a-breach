@@ -45,7 +45,21 @@ Use docker-compose to run the backing services
 docker-compose up -d
 ```
 
-### 5. Run the web server
+### 5. Setup AWS localstack
+
+Create dummy AWS credentials as localstack requires these details but doesn't validate them.
+
+```
+aws configure
+```
+
+Copy the static files to aws localstack s3 bucket
+
+```
+python manage.py collectstatic --no-input
+```
+
+### 6. Run the web server
 After following the setup, use the following to run the web app
 
 `invoke runserver`
@@ -63,6 +77,9 @@ the following will be handy when making changes to the db model:\
 To add a new dependency to the project, use the following command:\
 `pipenv install <package-name>`
 
+### Localstack
+Localstack works similarly to the awscli. For example, to see objects inside the static-files bucket, run command:\
+`awslocal s3 ls static-files`
 
 ## Standards
 ### Linting and Formatting

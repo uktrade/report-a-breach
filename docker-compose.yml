@@ -23,3 +23,11 @@ services:
             - ./redis_data:/data
         ports:
             - "16379:6379"
+
+    localstack:
+        image: localstack/localstack
+        ports:
+          - "4566:4566"
+        volumes:
+          - ./aws:/etc/localstack/init/ready.d
+          - "/var/run/docker.sock:/var/run/docker.sock"
