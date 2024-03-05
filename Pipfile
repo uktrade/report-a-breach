@@ -22,7 +22,7 @@ sentry-sdk = "*"
 whitenoise = "*"
 django-simple-history = "~=3.4.0"
 django-extensions = "~=3.2"
-awscli = "*"
+awscli = "~=1.32"
 
 [dev-packages]
 black = "~=23.12"
@@ -34,8 +34,8 @@ djhtml = "*"
 pyproject-flake8 = "*"
 boto3 = "*"
 pytest-django = "*"
-localstack = "*"
-awscli-local = "*"
+localstack = "~=3.2"
+awscli-local = "~=0.22"
 
 [requires]
 python_version = "3.11"
