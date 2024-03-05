@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "59b789f2e6530bd6a8a52182134e58c1239979887e1c05240f957f4816b0bb87"
+            "sha256": "b3c93eb39c463e8f25eea8d6ed0ed065e872a32b330e97b3a9bdf2148be78090"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -230,6 +230,14 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
             "version": "==3.0.7"
         },
+        "django-log-formatter-ecs": {
+            "hashes": [
+                "sha256:1e8731dd25a11ac64e789f19931e12fe7ef8ad1a172b7bceb2ea5cab185a583e",
+                "sha256:6b9784fe31eb1bd6598dc7db0f7f647e03ea6c3926c73cd1c9221adefee289ad"
+            ],
+            "index": "pypi",
+            "version": "==0.0.5"
+        },
         "django-simple-history": {
             "hashes": [
                 "sha256:19bd1a87e1e2eba34dfd43eab1fcf2da5752221f343232f2372b2121c7e3b97d",
@@ -386,6 +394,22 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==1.0.1"
+        },
+        "kubi-ecs-logger": {
+            "hashes": [
+                "sha256:48e9a9a4b1e77b73631efd70d253386f34ca742da1b268b8e72624d903fff99b",
+                "sha256:f35bd3ae9ac4c23977ac5307779c8e98cd7cef0025c11f7368e443d482dc30f6"
+            ],
+            "markers": "python_version >= '3.6' and python_version < '4'",
+            "version": "==0.1.2"
+        },
+        "marshmallow": {
+            "hashes": [
+                "sha256:90032c0fd650ce94b6ec6dc8dfeb0e3ff50c144586462c389b81a07205bedb78",
+                "sha256:93f0958568da045b0021ec6aeb7ac37c81bfcccbb9a0e7ed8559885070b3a19b"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==3.19.0"
         },
         "notifications-python-client": {
             "hashes": [
