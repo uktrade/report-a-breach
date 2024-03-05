@@ -37,7 +37,7 @@ exclude_lines = [
 ]
 
 [tool.flake8]
-max-line-length = 100
+max-line-length = 130
 exclude = """
 /(
     */migrations/*
@@ -46,7 +46,7 @@ exclude = """
 """
 
 [tool.black]
-line-length = 100
+line-length = 130
 target-version = ['py311']
 exclude = '''
 /(

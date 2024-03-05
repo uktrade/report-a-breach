@@ -1,0 +1,327 @@
+{% extends "base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+{% load get_wizard_step_url %}
+{% load get_end_user_url %}
+{% block form_content %}
+    <div>
+        <h2 class="govuk-heading-l">
+            Check your answers before submitting
+        </h2>
+    </div>
+    <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Your details</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Full name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if is_third_party_relationship %}
+                            {{ form_data.name_and_business_you_work_for.reporter_full_name }}
+                        {% else %}
+                            {{ form_data.name.reporter_full_name }}
+                        {% endif %}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        {% if is_third_party_relationship %}
+                            <a class="govuk-link" href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% else %}
+                            <a class="govuk-link" href="{% get_wizard_step_url 'name' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% endif %}
+                    </dd>
+                </div>
+                {% if is_third_party_relationship %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Business you work for
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ form_data.name_and_business_you_work_for.reporter_name_of_business_you_work_for }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        </dd>
+                    </div>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+    <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Business or person suspected of breaching sanctions</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Registered business number
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if is_company_obtained_from_companies_house %}
+                            {{ form_data.do_you_know_the_registered_company_number.registered_company_number }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        {% if is_company_obtained_from_companies_house %}
+                            <a class="govuk-link"
+                               href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% else %}
+                            <a class="govuk-link"
+                               href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if is_company_obtained_from_companies_house %}
+                            {{ form_data.do_you_know_the_registered_company_number.registered_company_name }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        {% if is_company_obtained_from_companies_house %}
+                        {% else %}
+                            <a class="govuk-link"
+                               href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Address
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if is_company_obtained_from_companies_house %}
+                            {{ form_data.do_you_know_the_registered_company_number.registered_office_address }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        {% if is_company_obtained_from_companies_house %}
+                        {% else %}
+                            <a class="govuk-link"
+                               href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        {% endif %}
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+    <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">About the suspected breach</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        When did you first suspect the breach?
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ form_data.when_did_you_first_suspect.when_did_you_first_suspect }}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% get_wizard_step_url 'when_did_you_first_suspect' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Sanctions regimes breached
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        N/A
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        What was supplied or made available
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ form_data.what_were_the_goods.what_were_the_goods }}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% get_wizard_step_url 'what_were_the_goods' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+    <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Supplier of the goods or services</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Address
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ form_data.about_the_supplier.readable_address }}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+    {% for end_user_id, end_user in request.session.end_users.items %}
+        <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+                <h2 class="govuk-summary-card__title">End-user {{ forloop.counter }}</h2>
+            </div>
+            <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Name
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ end_user.cleaned_data.name_of_person }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link"
+                               href="{% get_end_user_url end_user_id %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Address
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ end_user.cleaned_data.readable_address }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link"
+                               href="{% get_end_user_url end_user_id %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Website
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ end_user.cleaned_data.website|default_if_none:"" }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link"
+                               href="{% get_end_user_url end_user_id %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Additional information
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ end_user.cleaned_data.additional_contact_details }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link"
+                               href="{% get_end_user_url end_user_id %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    {% endfor %}
+    <a class="govuk-link" href="{% get_wizard_step_url 'about_the_end_user' %}?redirect=summary">Add end-user<span
+        class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+
+    {% if form_data.were_there_other_addresses_in_the_supply_chain.were_there_other_addresses_in_the_supply_chain == "yes" %}
+        <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+                <h2 class="govuk-summary-card__title">Other addresses in the supply chain</h2>
+            </div>
+            <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Address
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {# todo - display this will new-line and tab characters, need to mark it safe but not too safe as risk of XSS #}
+                            {# todo - implement the 'show more' link #}
+                            {{ form_data.were_there_other_addresses_in_the_supply_chain.other_addresses_in_the_supply_chain }}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link"
+                               href="{% get_wizard_step_url 'were_there_other_addresses_in_the_supply_chain' %}?redirect=summary">Change<span
+                                class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    {% endif %}
+    <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Sanctions breach details</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Supporting documents
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        N/A
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% get_wizard_step_url 'upload_documents' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Summary
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {# todo - display this will new-line and tab characters, need to mark it safe but not too safe as risk of XSS #}
+                        {# todo - implement the 'show more' link #}
+                        {{ form_data.tell_us_about_the_suspected_breach.tell_us_about_the_suspected_breach }}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% get_wizard_step_url 'tell_us_about_the_suspected_breach' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+    {% crispy wizard.form %}
+{% endblock form_content %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block back_button %}{% endblock back_button %}
+
+{% block column_content %}
+    <div class="govuk-panel govuk-panel--confirmation">
+        <h1 class="govuk-panel__title">
+            Submission complete
+        </h1>
+        <div class="govuk-panel__body">
+            Your reference number<br><strong>{{ request.session.reference_id }}</strong>
+        </div>
+    </div>
+    <!--   We have not! The confirmation template needs to be created in GovNotify and the send_email method used in the associated view -->
+    <p class="govuk-body">We have sent you a confirmation email.</p>
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">
+        We’ve sent your report to the Department for Business and Trade.
+    </p>
+    <p class="govuk-body">
+        They may contact you to ask for more information.
+    </p>
+    <p class="govuk-body">
+        <!--This is a placeholder, currently no survey link -->
+        <a href="#" class="govuk-link">What did you think of this service?</a> (takes 30 seconds)
+    </p>
+{% endblock column_content %}
