@@ -56,13 +56,13 @@
                         </span>
                     </a>
                 </div>
-                {% block header__service %}
+                {% block header_service %}
                     <div class="govuk-header__content">
-                        <a href="{% block header__service__url %}/{% endblock %}" class="govuk-header__link govuk-header__service-name">
+                        <a href="{% block header_service_url %}#{% endblock header_service_url %}" class="govuk-header__link govuk-header__service-name">
                             {% block service_name %}Report a suspected breach of trade sanctions{% endblock service_name %}
                         </a>
                     </div>
-                {% endblock header__service %}
+                {% endblock header_service %}
 
             </div>
         </header>
