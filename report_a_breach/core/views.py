@@ -82,7 +82,6 @@ class ReportABreachWizardView(BaseWizardView):
     template_name = "form_steps/generic_form_step.html"
     storage_name = "report_a_breach.session.SessionStorage"
 
-    # todo - use AWS S3 for this
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
 
     def get_summary_context_data(self, form, context):
