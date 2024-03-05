@@ -169,6 +169,21 @@ class WhichSanctionsRegimeForm(BaseForm):
         label="",  # empty as the question is set in the above search bar
     )
     unknown_regime = forms.BooleanField(label="I do not know", required=False)
+    other_regime = forms.BooleanField(label="Other regime", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            ConditionalRadios(
+                "other_regime",
+                ConditionalQuestion(
+                    True,
+                    Field.text("Name of regime"),
+                ),
+                False,
+            )
+        )
 
     def clean(self):
         cleaned_data = super().clean()
