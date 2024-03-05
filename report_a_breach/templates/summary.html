@@ -1,16 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
 
-{% block header__service %}
-    <div class="govuk-header__content">
-        <a href="{% block header__service__url %}{% endblock %}" class="govuk-header__link govuk-header__service-name">
-            {% block header__service__name %}
-                Report a suspected breach of trade sanctions
-            {% endblock header__service__name %}
-        </a>
-    </div>
-{% endblock header__service %}
-
 {% block column_content %}
     <form method="post">
         <div>
