@@ -268,6 +268,9 @@ class WhichSanctionsRegimeForm(BaseForm):
     )
     unknown_regime = forms.BooleanField(label="I do not know", required=False)
     other_regime = forms.BooleanField(label="Other regime", required=False)
+    other_regime_details = forms.CharField(
+        show_hidden_initial=True, label="Please provide the name of the regime", required=False
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -280,16 +283,19 @@ class WhichSanctionsRegimeForm(BaseForm):
         checkbox_choices = tuple(checkbox_choices)
         self.fields["which_sanctions_regime"].choices = checkbox_choices
         self.helper.layout = Layout(
-            ConditionalQuestion(
-                "other_regime",
-                forms.Textarea(),
-                "other_regime",
-            )
+            Fieldset("search_bar"),
+            Fieldset("which_sanctions_regime"),
+            Fieldset("unknown_regime"),
+            Fieldset("other_regime"),
+            Fieldset("other_regime_details"),
         )
+        # add helper text to explain if other regime, please provide details
+        # needs to be displayed automatically if js disabled, handle hiding it in js
+        self.fields["other_regime_details"].widget = forms.HiddenInput()
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get("unknown_regime"):
+        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get("other_regime"):
             raise forms.ValidationError("Please select at least one regime or 'I do not know' to continue")
         return cleaned_data
 

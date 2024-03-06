@@ -63,7 +63,7 @@ Default region [None]: eu-west-2
 Copy the static files to aws localstack s3 bucket
 
 ```
-pipenv run python manage.py collectstatic --no-input
+invoke collectstatic
 ```
 
 ### 6. Run the web server

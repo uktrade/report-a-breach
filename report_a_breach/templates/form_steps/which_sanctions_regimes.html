@@ -23,5 +23,24 @@
                     }
                 });
         });
+        const toggleFields = document.getElementById('id_which_sanctions_regime-other_regime');
+        const fields = document.getElementById('id_which_sanctions_regime-other_regime_details');toggleFields.addEventListener('change', () => {
+            if (toggleFields.checked) {
+                console.log(fields)
+                fields.className = "govuk-input";
+                fields.type = '';
+            } else {
+                fields.style.display = 'none';
+                fields.type = 'hidden';
+            }
+        });
+        <!--        <input type="text" name="which_sanctions_regime-search_bar" maxlength="100" aria-describedby="id_which_sanctions_regime-search_bar_hint" class="govuk-input" id="id_which_sanctions_regime-search_bar">-->
+        <!--        <div id="div_id_which_sanctions_regime-other_regime" class="govuk-form-group"> <div class="govuk-checkboxes"> <div class="govuk-checkboxes__item"> <input type="checkbox" name="which_sanctions_regime-other_regime" class="govuk-checkboxes__input" id="id_which_sanctions_regime-other_regime"> <label class="govuk-label govuk-checkboxes__label" for="id_which_sanctions_regime-other_regime">-->
+        <!--              Other regime-->
+        <!--            </label> </div> </div> </div>-->
+        <!--        <label class="govuk-label govuk-checkboxes__label" for="id_which_sanctions_regime-other_regime">-->
+        <!--              Other regime-->
+        <!--            </label>-->
+        <!--        <input type="hidden" name="which_sanctions_regime-other_regime_details" id="id_which_sanctions_regime-other_regime_details">-->
     </script>
 {% endblock extra_script %}
