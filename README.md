@@ -7,7 +7,7 @@ The project requires Python 3.11. Backing services are provided by Docker whilst
 ### 1. Setting up your virtual environment
 We use Pipenv to manage our virtual environment, dependencies, and environment variables. You can install it with either of the following commands:
 ```
-# with homebrew
+# without homebrew
 pip install --user pipenv
 
 # OR with homebrew
