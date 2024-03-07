@@ -91,8 +91,8 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 FILE_UPLOAD_HANDLERS = (
-    "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django_chunk_upload_handlers.s3.S3FileUploadHandler",
 )  # Order is important
 
@@ -102,6 +102,8 @@ DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 CLAM_AV_USERNAME = env.str("CLAM_AV_USERNAME", default=None)
 CLAM_AV_PASSWORD = env.str("CLAM_AV_PASSWORD", default=None)
 CLAM_AV_DOMAIN = env.str("CLAM_AV_DOMAIN", default=None)
+
+CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = True
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

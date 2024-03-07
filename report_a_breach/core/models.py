@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import DateRangeField
 from django.db import models
+from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from django_countries.fields import CountryField
 
 from report_a_breach.base_classes.models import BaseModel
@@ -121,5 +122,9 @@ class SanctionsRegime(BaseModel):
 
 
 class UploadedDocument(BaseModel):
-    file = models.FileField()
+    file = models.FileField(
+        validators=[
+            validate_virus_check_result,
+        ],
+    )
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
