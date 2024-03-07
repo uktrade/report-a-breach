@@ -38,14 +38,9 @@ Copy and paste the `.env.example` file and rename it to `.env`
 ```
 cp .env.example .env
 ```
+Ask your colleagues to provide the missing values in your `.env` file.
 
-### 4. Run the backing services
-Use docker-compose to run the backing services
-```
-docker-compose up -d
-```
-
-### 5. Setup AWS localstack
+### 4. Setup AWS localstack
 
 Configure the AWS CLI:
 ```
@@ -55,15 +50,21 @@ aws configure
 You can use the following dummy credentials that are provided by AWS. Alternatively, you can use your own credentials
 if you have an AWS account, Localstack does not validate them anyway.
 ```
-AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
-AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-Default region [None]: eu-west-2
+AWS Access Key ID : AKIAIOSFODNN7EXAMPLE
+AWS Secret Access Key : wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+Default region : eu-west-2
 ```
 
 Copy the static files to aws localstack s3 bucket
 
 ```
 pipenv run python manage.py collectstatic --no-input
+```
+
+### 5. Run the backing services
+Use docker-compose to run the backing services
+```
+docker-compose up -d
 ```
 
 ### 6. Run the web server
