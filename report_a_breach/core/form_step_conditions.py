@@ -1,6 +1,6 @@
 def show_check_company_details_page_condition(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("do_you_know_the_registered_company_number") or {}
-    return cleaned_data.get("do_you_know_the_registered_company_number", False) and cleaned_data.get(
+    return cleaned_data.get("do_you_know_the_registered_company_number", False) == "yes" and cleaned_data.get(
         "registered_company_number", False
     )
 
