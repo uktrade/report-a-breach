@@ -3,6 +3,8 @@
 
 echo "Loading all fixture data"
 
+
+cd ".." || exit
 pipenv run python manage.py loaddata report_a_breach/fixtures/*.json
 
 echo "Fixtures loaded"

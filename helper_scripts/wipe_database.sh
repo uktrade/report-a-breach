@@ -1,7 +1,8 @@
 #!/bin/bash
 
-docker-compose down
+cd ".." || exit
 rm -r pgdata
+docker-compose down
 docker-compose up -d
-sleep 20
+sleep 35
 pipenv run python manage.py migrate

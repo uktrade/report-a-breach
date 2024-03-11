@@ -56,7 +56,7 @@ class ReportABreachWizardView(BaseWizardView):
             "where_is_the_address_of_the_business_or_person",
             WhereIsTheAddressOfTheBusinessOrPersonForm,
         ),
-        # ("business_or_person_details", BusinessOrPersonDetailsForm),
+        ("business_or_person_details", BusinessOrPersonDetailsForm),
         ("when_did_you_first_suspect", WhenDidYouFirstSuspectForm),
         ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("what_were_the_goods", WhatWereTheGoodsForm),
