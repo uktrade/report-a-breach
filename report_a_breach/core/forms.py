@@ -249,7 +249,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["when_did_you_first_suspect"].widget.attrs = {"rows": 5}
+        self.fields["when_did_you_first_suspect"].help_text = "You can enter an exact or approximate date"
 
 
 class WhichSanctionsRegimeForm(BaseForm):
