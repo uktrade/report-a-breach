@@ -58,7 +58,7 @@ Default region : eu-west-2
 Copy the static files to aws localstack s3 bucket
 
 ```
-pipenv run python manage.py collectstatic --no-input
+invoke collectstatic
 ```
 
 ### 5. Run the backing services

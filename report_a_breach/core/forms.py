@@ -267,6 +267,7 @@ class WhichSanctionsRegimeForm(BaseForm):
         label="",  # empty as the question is set in the above search bar
     )
     unknown_regime = forms.BooleanField(label="I do not know", required=False)
+    other_regime = forms.BooleanField(label="Other regime", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -281,8 +282,12 @@ class WhichSanctionsRegimeForm(BaseForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get("unknown_regime"):
-            raise forms.ValidationError("Please select at least one regime or 'I do not know' to continue")
+        if (
+            not cleaned_data.get("which_sanctions_regime")
+            and not cleaned_data.get("other_regime")
+            and not cleaned_data.get("unknown_regime")
+        ):
+            raise forms.ValidationError("Please select at least one of the below options to continue")
         return cleaned_data
 
 

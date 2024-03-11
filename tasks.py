@@ -40,6 +40,11 @@ def createsuperuser(context):
 
 
 @task
+def collectstatic(context):
+    context.run("pipenv run python manage.py collectstatic --no-input", hide=False, pty=True)
+
+
+@task
 def black(context, directory="."):
     print("Running black formatting")
     context.run(f"pipenv run black {directory}")
