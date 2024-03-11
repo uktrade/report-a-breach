@@ -37,7 +37,7 @@ class Breach(BaseModel):
         verbose_name=RELATIONSHIP["text"],
     )
     reporter_email_address = models.EmailField(verbose_name=EMAIL["text"])
-    reporter_email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.CASCADE)
+    reporter_email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.CASCADE, blank=True, null=True)
     reference = models.CharField(null=True, blank=True, verbose_name="Reference", max_length=6)
     reporter_full_name = models.CharField(verbose_name=FULL_NAME["text"], max_length=255)
     reporter_name_of_business_you_work_for = models.CharField(max_length=300, verbose_name="Business you work for")
