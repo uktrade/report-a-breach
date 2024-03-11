@@ -41,6 +41,7 @@ class Breach(BaseModel):
     reporter_name_of_business_you_work_for = models.CharField(max_length=300, verbose_name="Business you work for")
     sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True)
     unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
+    other_sanctions_regime = models.BooleanField(blank=True, default=False)
     additional_information = models.TextField(verbose_name=ADDITIONAL_INFORMATION["text"])
     what_were_the_goods = models.TextField(verbose_name=WHAT_WERE_THE_GOODS["text"])
     business_registered_on_companies_house = models.CharField(
