@@ -235,8 +235,14 @@ class ReportABreachWizardView(BaseWizardView):
         return cleaned_data
 
     def upload_documents_to_s3(self):
-        uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
-        default_storage.save(uploaded_docs.name, uploaded_docs)
+        """
+        Uploads documents from the upload_documents step to the default storage option.
+        """
+        try:
+            uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+            default_storage.save(uploaded_docs.name, uploaded_docs)
+        except TypeError:
+            uploaded_docs = []
         return uploaded_docs
 
     def done(self, form_list, **kwargs):
