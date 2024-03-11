@@ -260,6 +260,8 @@ class ReportABreachWizardView(BaseWizardView):
         new_reference = new_breach.assign_reference()
 
         self.request.session["reference_id"] = new_reference
+        self.storage.reset()
+        self.storage.current_step = self.steps.first
         return redirect(reverse("complete"))
 
 

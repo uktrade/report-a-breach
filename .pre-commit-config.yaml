@@ -18,6 +18,7 @@ repos:
     rev: 'v6.1.0'
     hooks:
     -   id: pyproject-flake8
+        args: ['--ignore=W503, W504']
 -   repo: https://github.com/rtts/djhtml
     rev: '3.0.6'
     hooks:
