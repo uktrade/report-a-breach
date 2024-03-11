@@ -148,11 +148,20 @@
                         Sanctions regimes breached
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        N/A
+                        {% for regime in sanctions_regimes %}
+                            {{ regime }}
+                            <br>
+                        {% endfor %}
+                        {% if unknown_regime %}
+                            Unknown regime
+                        {% endif %}
+                        {% if other_regime %}
+                            Other regime
+                        {% endif %}
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                           href="{% get_wizard_step_url 'which_sanctions_regime' %}?redirect=summary">Change<span
                             class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
                     </dd>
                 </div>
