@@ -145,7 +145,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 cleaned_data["registered_company_name"] = company_details["company_name"]
                 cleaned_data["registered_office_address"] = get_formatted_address(company_details["registered_office_address"])
             except CompaniesHouseException:
-                self.add_error(None, "The company number you entered is not valid")
+                self.add_error("registered_company_number", "The company number you entered is not valid")
 
         return cleaned_data
 
@@ -268,6 +268,7 @@ class WhichSanctionsRegimeForm(BaseForm):
         label="",  # empty as the question is set in the above search bar
     )
     unknown_regime = forms.BooleanField(label="I do not know", required=False)
+    other_regime = forms.BooleanField(label="Other regime", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -282,8 +283,12 @@ class WhichSanctionsRegimeForm(BaseForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get("which_sanctions_regime") and not cleaned_data.get("unknown_regime"):
-            raise forms.ValidationError("Please select at least one regime or 'I do not know' to continue")
+        if (
+            not cleaned_data.get("which_sanctions_regime")
+            and not cleaned_data.get("other_regime")
+            and not cleaned_data.get("unknown_regime")
+        ):
+            raise forms.ValidationError("Please select at least one of the below options to continue")
         return cleaned_data
 
 

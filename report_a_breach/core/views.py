@@ -55,7 +55,7 @@ class ReportABreachWizardView(BaseWizardView):
             "where_is_the_address_of_the_business_or_person",
             WhereIsTheAddressOfTheBusinessOrPersonForm,
         ),
-        # ("business_or_person_details", BusinessOrPersonDetailsForm),
+        ("business_or_person_details", BusinessOrPersonDetailsForm),
         ("when_did_you_first_suspect", WhenDidYouFirstSuspectForm),
         ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("what_were_the_goods", WhatWereTheGoodsForm),
@@ -269,6 +269,8 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
         self.request.session["reference_id"] = new_reference
+        self.storage.reset()
+        self.storage.current_step = self.steps.first
         return redirect(reverse("complete"))
 
 
