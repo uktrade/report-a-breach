@@ -44,6 +44,7 @@ exclude = """
     */question_content.py
 )/
 """
+ignore = "F405"
 
 [tool.black]
 line-length = 130
