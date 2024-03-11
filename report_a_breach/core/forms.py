@@ -54,25 +54,23 @@ class EmailVerifyForm(BaseModelForm):
         help_text=f"{content.VERIFY['helper']}",
     )
 
-    def clean_reporter_verify_email(self):
-        value = self.cleaned_data["email_verification_code"]
-        print(value)
+    def clean(self):
+        cleaned_data = super().clean()
+        value = cleaned_data.get("email_verification_code")
         verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
         )
-        print(verification_objects)
-        if session_verify_code := verification_objects.email_verification_code:
-            if value != session_verify_code:
+        if verify_code := verification_objects.email_verification_code:
+            if value != verify_code:
                 raise forms.ValidationError("The code you entered is incorrect")
+
             # magic number for timedelta object, should this be stored in a constants file? Or an end_date field added?
-            elif verification_objects.date_created > (now() + datetime.timedelta(hours=1)):
-                print(verification_objects.date_created)
-                print(now() - datetime.timedelta(hours=1))
+            if verification_objects.date_created > (now() + datetime.timedelta(hours=1)):
                 raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
+            print(verify_code, "verified")
+            return cleaned_data
         else:
             raise forms.ValidationError("Please provide the 6 digit code sent to your email to continue")
-        print("verified")
-        return value
 
 
 class NameForm(BaseModelForm):
