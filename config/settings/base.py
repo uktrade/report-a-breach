@@ -93,6 +93,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "report_a_breach.custom_upload_handler.CustomFileUploadHandler",
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 )  # Order is important
 
 # File storage
