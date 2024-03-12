@@ -148,14 +148,14 @@
                         Sanctions regimes breached
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% for regime in sanctions_regimes %}
+                        {% for regime in form_data.which_sanctions_regime.which_sanctions_regime %}
                             {{ regime }}
                             <br>
                         {% endfor %}
-                        {% if unknown_regime %}
-                            Unknown regime
+                        {% if form_data.which_sanctions_regime.unknown_regime %}
+                            Unknown regime<br>
                         {% endif %}
-                        {% if other_regime %}
+                        {% if form_data.which_sanctions_regime.other_regime %}
                             Other regime
                         {% endif %}
                     </dd>

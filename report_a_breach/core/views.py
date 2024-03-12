@@ -97,10 +97,6 @@ class ReportABreachWizardView(BaseWizardView):
 
         cleaned_data = self.get_all_cleaned_data()
         context["form_data"] = cleaned_data
-        regimes = cleaned_data["which_sanctions_regime"]
-        context["sanctions_regimes"] = regimes["which_sanctions_regime"]
-        context["unknown_regime"] = regimes["unknown_regime"]
-        context["other_regime"] = regimes["other_regime"]
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         return context
