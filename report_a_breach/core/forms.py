@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.layout import (
@@ -57,6 +58,7 @@ class EmailVerifyForm(BaseModelForm):
     def clean(self):
         cleaned_data = super().clean()
         value = cleaned_data.get("email_verification_code")
+        verify_timeout_seconds = int(os.getenv("EMAIL_VERIFY_TIMEOUT_SECONDS"))
         verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
         )
@@ -64,10 +66,10 @@ class EmailVerifyForm(BaseModelForm):
             if value != verify_code:
                 raise forms.ValidationError("The code you entered is incorrect")
 
-            # magic number for timedelta object, should this be stored in a constants file? Or an end_date field added?
-            if verification_objects.date_created > (now() + datetime.timedelta(hours=1)):
+            # check if the user has submitted the verify code within the specified timeframe
+            allowed_lapse = verification_objects.date_created + datetime.timedelta(seconds=verify_timeout_seconds)
+            if allowed_lapse < now():
                 raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
-            print(verify_code, "verified email")
             return cleaned_data
         else:
             raise forms.ValidationError("Please provide the 6 digit code sent to your email to continue")

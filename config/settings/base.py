@@ -204,3 +204,6 @@ if SENTRY_DSN and SENTRY_ENVIRONMENT:
         integrations=[DjangoIntegration()],
         traces_sample_rate=0,
     )
+
+# Email Verification settings
+EMAIL_VERIFY_TIMEOUT_SECONDS = env("EMAIL_VERIFY_TIMEOUT_SECONDS", default=1)
