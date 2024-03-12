@@ -157,7 +157,7 @@ class ReportABreachWizardView(BaseWizardView):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
         user_session = Session.objects.get(session_key=self.request.session.session_key)
-        email_verification_instance = ReporterEmailVerification.objects.create(
+        ReporterEmailVerification.objects.create(
             reporter_session=user_session,
             email_verification_code=verify_code,
         )
@@ -167,7 +167,6 @@ class ReportABreachWizardView(BaseWizardView):
             context={"verification_code": verify_code},
             template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
         )
-        email_verification_instance.save()
         return self.get_form_step_data(form)
 
     def get_form(self, step=None, data=None, files=None):
