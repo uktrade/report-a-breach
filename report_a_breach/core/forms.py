@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.layout import (
     ConditionalQuestion,
@@ -9,6 +11,8 @@ from crispy_forms_gds.layout import (
     Size,
 )
 from django import forms
+from django.conf import settings
+from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 
 import report_a_breach.question_content as content
@@ -20,7 +24,7 @@ from report_a_breach.utils.companies_house import (
 )
 
 from ..form_fields import BooleanChoiceField
-from .models import Breach, PersonOrCompany, SanctionsRegime
+from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 
 # TODO: check the wording of any error messages to match what the UCD team expect
 
@@ -42,21 +46,33 @@ class EmailForm(BaseModelForm):
         fields = ["reporter_email_address"]
 
 
-class EmailVerifyForm(BaseForm):
-    reporter_verify_email = forms.CharField(
+class EmailVerifyForm(BaseModelForm):
+    class Meta:
+        model = ReporterEmailVerification
+        fields = ["email_verification_code"]
+
+    email_verification_code = forms.CharField(
         label=f"{content.VERIFY['text']}",
         help_text=f"{content.VERIFY['helper']}",
+        error_messages={"required": "Please provide the 6 digit code sent to your email to continue"},
     )
 
-    def clean_reporter_verify_email(self):
-        value = self.cleaned_data["reporter_verify_email"]
-        if session_verify_code := self.request.session.get("verify_code"):
-            if value != session_verify_code:
-                raise forms.ValidationError("The code you entered is incorrect")
-        else:
-            raise Exception("No verify code in session")
+    def clean_email_verification_code(self):
+        email_verification_code = self.cleaned_data["email_verification_code"]
+        verify_timeout_seconds = settings.EMAIL_VERIFY_TIMEOUT_SECONDS
+        verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
+            "date_created"
+        )
+        verify_code = verification_objects.email_verification_code
+        if email_verification_code != verify_code:
+            raise forms.ValidationError("The code you entered is incorrect")
 
-        return value
+        # check if the user has submitted the verify code within the specified timeframe
+        allowed_lapse = verification_objects.date_created + timedelta(seconds=verify_timeout_seconds)
+        if allowed_lapse < now():
+            raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
+
+        return email_verification_code
 
 
 class NameForm(BaseModelForm):
