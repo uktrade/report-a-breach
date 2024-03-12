@@ -2,6 +2,7 @@ import os
 import uuid
 
 from django.conf import settings
+from django.contrib.sessions.models import Session
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -35,7 +36,7 @@ from .forms import (
     WhereWereTheGoodsSuppliedToForm,
     WhichSanctionsRegimeForm,
 )
-from .models import Breach
+from .models import Breach, ReporterEmailVerification
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -155,14 +156,17 @@ class ReportABreachWizardView(BaseWizardView):
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
-        self.request.session["verify_code"] = verify_code
+        user_session = Session.objects.get(session_key=self.request.session.session_key)
+        ReporterEmailVerification.objects.create(
+            reporter_session=user_session,
+            email_verification_code=verify_code,
+        )
         print(verify_code)
         send_email(
             email=reporter_email_address,
             context={"verification_code": verify_code},
             template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
         )
-        self.request.session.modified = True
         return self.get_form_step_data(form)
 
     def get_form(self, step=None, data=None, files=None):
