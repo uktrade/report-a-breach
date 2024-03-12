@@ -1,5 +1,5 @@
-import datetime
 import os
+from datetime import timedelta
 
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.layout import (
@@ -67,7 +67,7 @@ class EmailVerifyForm(BaseModelForm):
                 raise forms.ValidationError("The code you entered is incorrect")
 
             # check if the user has submitted the verify code within the specified timeframe
-            allowed_lapse = verification_objects.date_created + datetime.timedelta(seconds=verify_timeout_seconds)
+            allowed_lapse = verification_objects.date_created + timedelta(seconds=verify_timeout_seconds)
             if allowed_lapse < now():
                 raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
             return cleaned_data
