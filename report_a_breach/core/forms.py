@@ -67,7 +67,7 @@ class EmailVerifyForm(BaseModelForm):
             # magic number for timedelta object, should this be stored in a constants file? Or an end_date field added?
             if verification_objects.date_created > (now() + datetime.timedelta(hours=1)):
                 raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
-            print(verify_code, "verified")
+            print(verify_code, "verified email")
             return cleaned_data
         else:
             raise forms.ValidationError("Please provide the 6 digit code sent to your email to continue")
