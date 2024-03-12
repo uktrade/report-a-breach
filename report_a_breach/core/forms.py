@@ -1,4 +1,3 @@
-import os
 from datetime import timedelta
 
 from crispy_forms_gds.choices import Choice
@@ -12,6 +11,7 @@ from crispy_forms_gds.layout import (
     Size,
 )
 from django import forms
+from django.conf import settings
 from django.utils.timezone import now
 
 import report_a_breach.question_content as content
@@ -53,26 +53,25 @@ class EmailVerifyForm(BaseModelForm):
     email_verification_code = forms.CharField(
         label=f"{content.VERIFY['text']}",
         help_text=f"{content.VERIFY['helper']}",
+        error_messages={"required": "Please provide the 6 digit code sent to your email to continue"},
     )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        value = cleaned_data.get("email_verification_code")
-        verify_timeout_seconds = int(os.getenv("EMAIL_VERIFY_TIMEOUT_SECONDS"))
+    def clean_email_verification_code(self):
+        email_verification_code = self.cleaned_data["email_verification_code"]
+        verify_timeout_seconds = settings.EMAIL_VERIFY_TIMEOUT_SECONDS
         verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
         )
-        if verify_code := verification_objects.email_verification_code:
-            if value != verify_code:
-                raise forms.ValidationError("The code you entered is incorrect")
+        verify_code = verification_objects.email_verification_code
+        if email_verification_code != verify_code:
+            raise forms.ValidationError("The code you entered is incorrect")
 
-            # check if the user has submitted the verify code within the specified timeframe
-            allowed_lapse = verification_objects.date_created + timedelta(seconds=verify_timeout_seconds)
-            if allowed_lapse < now():
-                raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
-            return cleaned_data
-        else:
-            raise forms.ValidationError("Please provide the 6 digit code sent to your email to continue")
+        # check if the user has submitted the verify code within the specified timeframe
+        allowed_lapse = verification_objects.date_created + timedelta(seconds=verify_timeout_seconds)
+        if allowed_lapse < now():
+            raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
+
+        return email_verification_code
 
 
 class NameForm(BaseModelForm):
