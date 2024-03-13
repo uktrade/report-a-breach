@@ -1,0 +1,8 @@
+<pingdom_http_custom_check>
+    <status>
+        <strong>{% if all_good %}OK{% else %}FAIL{% endif %}</strong>
+    </status>
+    <response_time>
+        <strong>{{ time_taken }}</strong>
+    </response_time>
+</pingdom_http_custom_check>
