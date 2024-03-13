@@ -10,7 +10,7 @@
     {% if form_title %}
         <h2 class="govuk-heading-l">{{ form_title }}</h2>
     {% endif %}
-    <form method="post">
+    <form method="post" enctype='multipart/form-data'>
         {% csrf_token %}
         {{ wizard.management_form }}
         {% block form_content %}

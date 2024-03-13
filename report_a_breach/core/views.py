@@ -3,7 +3,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import FileSystemStorage, default_storage
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -219,7 +219,6 @@ class ReportABreachWizardView(BaseWizardView):
             # todo - get address dict from companies house form
             address_dict = self.get_cleaned_data_for_step("business_or_person_details") or {}
             kwargs["address_dict"] = address_dict
-
         return kwargs
 
     def get_all_cleaned_data(self):
@@ -238,6 +237,17 @@ class ReportABreachWizardView(BaseWizardView):
             if form_obj.is_valid():
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
+
+    def upload_documents_to_s3(self):
+        """
+        Uploads documents from the upload_documents step to the default storage option.
+        """
+        try:
+            uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+            default_storage.save(uploaded_docs.name, uploaded_docs)
+        except TypeError:
+            uploaded_docs = []
+        return uploaded_docs
 
     def done(self, form_list, **kwargs):
         """all_cleaned_data = self.get_all_cleaned_data()
@@ -259,10 +269,9 @@ class ReportABreachWizardView(BaseWizardView):
 
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()"""
-
+        self.upload_documents_to_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
-
         self.request.session["reference_id"] = new_reference
         self.storage.reset()
         self.storage.current_step = self.steps.first
