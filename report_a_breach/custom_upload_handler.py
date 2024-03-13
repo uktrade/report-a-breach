@@ -10,16 +10,10 @@ CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = settings.CHUNK_UPLOADER_RAISE_EX
 
 class CustomFileUploadHandler(FileUploadHandler):
 
-    def new_file(self, *args, **kwargs):
-        """
-        Create the file object to append to as data is coming in.
-        """
-        super().new_file(*args, **kwargs)
-
-    def receive_data_chunk(self, raw_data, start):
+    def receive_data_chunk(self, raw_data):
         return raw_data
 
-    def file_complete(self, file_size):
+    def file_complete(self):
         """
         Check if scanned file has a virus or not.
         If it does, raise an exception on the form.
