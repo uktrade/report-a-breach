@@ -4,6 +4,7 @@ from django.conf import settings
 import django.contrib.postgres.fields.ranges
 from django.db import migrations, models
 import django.db.models.deletion
+import django_chunk_upload_handlers.clam_av
 import django_countries.fields
 import simple_history.models
 import uuid
@@ -96,7 +97,10 @@ class Migration(migrations.Migration):
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("modified_at", models.DateTimeField(auto_now=True)),
-                ("file", models.FileField(upload_to="")),
+                (
+                    "file",
+                    models.FileField(upload_to="", validators=[django_chunk_upload_handlers.clam_av.validate_virus_check_result]),
+                ),
                 ("breach", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="report_a_breach.breach")),
             ],
             options={
@@ -170,7 +174,12 @@ class Migration(migrations.Migration):
                 ("id", models.UUIDField(db_index=True, default=uuid.uuid4, editable=False)),
                 ("created_at", models.DateTimeField(blank=True, editable=False)),
                 ("modified_at", models.DateTimeField(blank=True, editable=False)),
-                ("file", models.TextField(max_length=100)),
+                (
+                    "file",
+                    models.TextField(
+                        max_length=100, validators=[django_chunk_upload_handlers.clam_av.validate_virus_check_result]
+                    ),
+                ),
                 ("history_id", models.AutoField(primary_key=True, serialize=False)),
                 ("history_date", models.DateTimeField(db_index=True)),
                 ("history_change_reason", models.CharField(max_length=100, null=True)),
