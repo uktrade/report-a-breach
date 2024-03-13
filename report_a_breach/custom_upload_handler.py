@@ -29,7 +29,7 @@ class CustomFileUploadHandler(FileUploadHandler):
                 if result["file_name"] == self.file_name:
                     # Set AV headers
                     if not result["av_passed"]:
-                        if CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND:
+                        if settings.CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND:
                             raise VirusFoundInFileException()
                         else:
                             return FileWithVirus(field_name=self.field_name)
