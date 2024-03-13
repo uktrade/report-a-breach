@@ -1,8 +1,19 @@
 def show_check_company_details_page_condition(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step("do_you_know_the_registered_company_number") or {}
-    return cleaned_data.get("do_you_know_the_registered_company_number", False) == "yes" and cleaned_data.get(
-        "registered_company_number", False
+    do_you_know_the_registered_company_number_cleaned_data = (
+        wizard.get_cleaned_data_for_step("do_you_know_the_registered_company_number") or {}
     )
+    are_you_reporting_a_business_on_companies_house_step_cleaned_data = (
+        wizard.get_cleaned_data_for_step("are_you_reporting_a_business_on_companies_house") or {}
+    )
+
+    show_page = (
+        do_you_know_the_registered_company_number_cleaned_data.get("do_you_know_the_registered_company_number", False) == "yes"
+        and do_you_know_the_registered_company_number_cleaned_data.get("registered_company_number", False)
+        and are_you_reporting_a_business_on_companies_house_step_cleaned_data.get("business_registered_on_companies_house", False)
+        == "yes"
+    )
+
+    return show_page
 
 
 def show_where_is_the_address_of_the_business_or_person_page_condition(wizard):

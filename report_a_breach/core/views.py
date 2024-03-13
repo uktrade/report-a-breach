@@ -12,8 +12,10 @@ from django.views.generic import TemplateView
 from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.utils.notifier import send_email
 
+from ..utils.companies_house import get_formatted_address
 from .forms import (
     AboutTheEndUserForm,
+    AboutTheSupplierForm,
     AreYouReportingABusinessOnCompaniesHouseForm,
     BusinessOrPersonDetailsForm,
     DeclarationForm,
@@ -61,7 +63,7 @@ class ReportABreachWizardView(BaseWizardView):
         ("which_sanctions_regime", WhichSanctionsRegimeForm),
         ("what_were_the_goods", WhatWereTheGoodsForm),
         ("where_were_the_goods_supplied_from", WhereWereTheGoodsSuppliedFromForm),
-        ("about_the_supplier", BusinessOrPersonDetailsForm),
+        ("about_the_supplier", AboutTheSupplierForm),
         ("where_were_the_goods_made_available_from", WhereWereTheGoodsMadeAvailableForm),
         ("where_were_the_goods_supplied_to", WhereWereTheGoodsSuppliedToForm),
         ("about_the_end_user", AboutTheEndUserForm),
@@ -85,6 +87,31 @@ class ReportABreachWizardView(BaseWizardView):
 
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
 
+    def get(self, request, *args, **kwargs):
+        if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
+            # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
+            if "end_user_uuid" not in self.request.resolver_match.kwargs:
+                self.storage.current_step = "where_were_the_goods_supplied_to"
+                return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
+            else:
+                # we're trying to edit an existing end-user, so we need to load the form with the existing data
+                self.storage.current_step = "about_the_end_user"
+                return super().get(request, *args, step="about_the_end_user", **kwargs)
+        return super().get(request, *args, **kwargs)
+
+    def get_step_url(self, step):
+        if step == "about_the_end_user" and "end_user_uuid" in self.kwargs:
+            return reverse(
+                "report_a_breach_about_the_end_user",
+                kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
+            )
+        return super().get_step_url(step)
+
+    def render_next_step(self, form, **kwargs):
+        if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
+            return redirect(self.get_step_url("where_were_the_goods_supplied_to"))
+        return super().render_next_step(form, **kwargs)
+
     def get_summary_context_data(self, form, context):
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
@@ -102,28 +129,16 @@ class ReportABreachWizardView(BaseWizardView):
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         return context
 
-    def get_context_data(self, form, **kwargs):
-        context = super().get_context_data(form, **kwargs)
-        if self.steps.current == "about_the_supplier":
-            context["form_title"] = "About the supplier"
-        elif self.steps.current == "about_the_end_user":
-            context["form_title"] = "About the end-user"
-        return context
+    def process_are_you_reporting_a_business_on_companies_house_step(self, form):
+        """We want to clear the company details from the session if the user selects anything but 'yes', if they do
+        select 'yes' then we want to delete the step data for the next step(s) in the chain of conditionals."""
+        if form.cleaned_data["business_registered_on_companies_house"] != "yes":
+            self.request.session.pop("company_details", None)
+            self.request.session.modified = True
+        else:
+            self.storage.delete_step_data("where_is_the_address_of_the_business_or_person", "business_or_person_details")
 
-    def get(self, request, *args, **kwargs):
-        if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
-            # we are on a specific end-user step
-            self.storage.current_step = "where_were_the_goods_supplied_to"
-            return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
-        return super().get(request, *args, **kwargs)
-
-    def get_step_url(self, step):
-        if step == "about_the_end_user" and "end_user_uuid" in self.kwargs:
-            return reverse(
-                "report_a_breach_about_the_end_user",
-                kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
-            )
-        return super().get_step_url(step)
+        return self.get_form_step_data(form)
 
     def process_about_the_end_user_step(self, form):
         current_end_users = self.request.session.get("end_users", {})
@@ -138,11 +153,6 @@ class ReportABreachWizardView(BaseWizardView):
         self.request.session["end_users"] = current_end_users
         self.request.session.modified = True
         return self.get_form_step_data(form)
-
-    def render_next_step(self, form, **kwargs):
-        if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
-            return redirect(self.get_step_url("where_were_the_goods_supplied_to"))
-        return super().render_next_step(form, **kwargs)
 
     def process_do_you_know_the_registered_company_number_step(self, form):
         self.request.session.pop("company_details", None)
@@ -216,9 +226,19 @@ class ReportABreachWizardView(BaseWizardView):
             "where_were_the_goods_supplied_from",
             "where_were_the_goods_made_available_from",
         ):
-            # todo - get address dict from companies house form
-            address_dict = self.get_cleaned_data_for_step("business_or_person_details") or {}
-            kwargs["address_dict"] = address_dict
+            from report_a_breach.core.form_step_conditions import (
+                show_check_company_details_page_condition,
+            )
+
+            obtained_from_companies_house = show_check_company_details_page_condition(self)
+            if obtained_from_companies_house:
+                address_string = self.get_cleaned_data_for_step("do_you_know_the_registered_company_number").get(
+                    "registered_office_address"
+                )
+            else:
+                address_string = get_formatted_address(self.get_cleaned_data_for_step("business_or_person_details"))
+
+            kwargs["address_string"] = address_string
 
         return kwargs
 

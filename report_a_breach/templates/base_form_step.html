@@ -7,10 +7,10 @@
 
 {% block column_content %}
     {% error_summary form %}
-    {% if form_title %}
-        <h2 class="govuk-heading-l">{{ form_title }}</h2>
-    {% endif %}
     <form method="post">
+        {% if form_h1_header %}
+            <h1 class="govuk-heading-l">{{ form_h1_header }}</h1>
+        {% endif %}
         {% csrf_token %}
         {{ wizard.management_form }}
         {% block form_content %}

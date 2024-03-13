@@ -72,15 +72,19 @@
         <div class="govuk-width-container">
 
             {% block back_button %}
-                <a class="govuk-back-link govuk-link--no-visited-state"
-                   href="{% block back_button_link %}javascript: window.history.go(-1){% endblock back_button_link %}">Back</a>
+                {# if we have a form and the form doesn't want to display the back_button, then don't show it #}
+                {% if form and not form.show_back_button %}
+                {% else %}
+                    <a class="govuk-back-link govuk-link--no-visited-state"
+                       href="{% block back_button_link %}javascript: window.history.go(-1){% endblock back_button_link %}">Back</a>
+                {% endif %}
             {% endblock %}
             {% block main %}
                 <main class="govuk-main-wrapper" id="main-content" role="main">
                     {% block main_content %}
                         <div class="govuk-grid-row">
                             {% block row_content %}
-                                <div class="govuk-grid-column-two-thirds">
+                                <div class="govuk-grid-column-three-quarters">
                                     {% block column_content %}
                                     {% endblock column_content %}
                                 </div>

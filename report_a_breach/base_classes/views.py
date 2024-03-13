@@ -39,6 +39,8 @@ class BaseWizardView(NamedUrlSessionWizardView):
         context = super().get_context_data(form=form, **kwargs)
         if custom_getter := getattr(self, f"get_{self.steps.current}_context_data", None):
             context = custom_getter(form, context)
+        if form_h1_header := getattr(form, "form_h1_header", None):
+            context["form_h1_header"] = form_h1_header
         return context
 
     def process_step(self, form):
@@ -66,9 +68,8 @@ class BaseWizardView(NamedUrlSessionWizardView):
 
     def get_all_cleaned_data(self):
         """
-        Returns a merged dictionary of all step cleaned_data dictionaries.
-        If a step contains a `FormSet`, the key will be prefixed with
-        'formset-' and contain a list of the formset cleaned_data dictionaries.
+        Overriding this as want the cleaned_data dictionary to have a key per form, not 1 big dictionary with all the
+        form's cleaned_data
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
@@ -78,3 +79,17 @@ class BaseWizardView(NamedUrlSessionWizardView):
             if form_obj.is_valid():
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
+
+    def get_cleaned_data_for_step(self, step):
+        """overriding this to return an empty dictionary if the form is not valid or the step isn't found.
+
+        This makes it easier to write self.get_cleaned_data_for_step.get("value")"""
+        if step in self.form_list:
+            form_obj = self.get_form(
+                step=step,
+                data=self.storage.get_step_data(step),
+                files=self.storage.get_step_files(step),
+            )
+            if form_obj.is_valid() and form_obj.cleaned_data:
+                return form_obj.cleaned_data
+        return {}

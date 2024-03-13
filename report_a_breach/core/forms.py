@@ -14,8 +14,11 @@ from django import forms
 from django.conf import settings
 from django.utils.timezone import now
 
-import report_a_breach.question_content as content
-from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
+from report_a_breach.base_classes.forms import (
+    BaseForm,
+    BaseModelForm,
+    BasePersonBusinessDetailsForm,
+)
 from report_a_breach.exceptions import CompaniesHouseException
 from report_a_breach.utils.companies_house import (
     get_details_from_companies_house,
@@ -26,13 +29,23 @@ from ..form_fields import BooleanChoiceField
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 
 # TODO: check the wording of any error messages to match what the UCD team expect
+Field.template = "custom_fields/field.html"
+
+
+# NonGdsField.template = "custom_fields/field.html"
 
 
 class StartForm(BaseModelForm):
+    show_back_button = False
+
     class Meta:
         model = Breach
         fields = ["reporter_professional_relationship"]
         widgets = {"reporter_professional_relationship": forms.RadioSelect}
+        labels = {
+            "reporter_professional_relationship": "What is your professional relationship with "
+            "the business or person suspected of breaching sanctions?",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -43,16 +56,20 @@ class EmailForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["reporter_email_address"]
+        help_texts = {
+            "reporter_email_address": "We need to send you an email to verify your email address.",
+        }
+        labels = {
+            "reporter_email_address": "What is your email address?",
+        }
 
 
-class EmailVerifyForm(BaseModelForm):
-    class Meta:
-        model = ReporterEmailVerification
-        fields = ["email_verification_code"]
+class EmailVerifyForm(BaseForm):
+    bold_labels = False
+    form_h1_header = "We've sent you an email"
 
     email_verification_code = forms.CharField(
-        label=f"{content.VERIFY['text']}",
-        help_text=f"{content.VERIFY['helper']}",
+        label="Enter the 6 digit security code",
         error_messages={"required": "Please provide the 6 digit code sent to your email to continue"},
     )
 
@@ -78,27 +95,31 @@ class NameForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["reporter_full_name"]
+        labels = {
+            "reporter_full_name": "What is your full name?",
+        }
 
 
 class NameAndBusinessYouWorkForForm(BaseModelForm):
+    form_h1_header = "Your details"
+
     class Meta:
         model = Breach
         fields = ["reporter_full_name", "reporter_name_of_business_you_work_for"]
+        labels = {
+            "reporter_full_name": "Full name",
+            "reporter_name_of_business_you_work_for": "Business you work for",
+        }
+        help_texts = {
+            "reporter_name_of_business_you_work_for": "This is the business that employs you, not the business you're reporting",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["reporter_name_of_business_you_work_for"].help_text = (
-            "This is the business that employs you, not the business you're reporting"
-        )
         self.helper.label_size = None
         self.helper.layout = Layout(
-            Fieldset(
-                Field.text("reporter_full_name", field_width=Fluid.THREE_QUARTERS),
-                Field.text("reporter_name_of_business_you_work_for", field_width=Fluid.THREE_QUARTERS),
-                legend="Your details",
-                legend_size=Size.MEDIUM,
-                legend_tag="h3",
-            ),
+            Field.text("reporter_full_name", field_width=Fluid.ONE_HALF),
+            Field.text("reporter_name_of_business_you_work_for", field_width=Fluid.ONE_HALF),
         )
 
 
@@ -107,13 +128,14 @@ class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
         model = Breach
         fields = ["business_registered_on_companies_house"]
         widgets = {"business_registered_on_companies_house": forms.RadioSelect}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["business_registered_on_companies_house"].choices.pop(0)
+        labels = {
+            "business_registered_on_companies_house": "Are you reporting a business which is registered with Companies House?"
+        }
 
 
 class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
+    hide_optional_label_fields = ["registered_company_number"]
+
     registered_company_name = forms.CharField(required=False)
     registered_office_address = forms.CharField(required=False)
 
@@ -121,16 +143,25 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
         model = Breach
         fields = ["do_you_know_the_registered_company_number", "registered_company_number"]
         widgets = {"do_you_know_the_registered_company_number": forms.RadioSelect}
+        labels = {
+            "do_you_know_the_registered_company_number": "Do you know the registered company number?",
+            "registered_company_number": "Registered company number",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["do_you_know_the_registered_company_number"].choices.pop(0)
+
+        # todo - abstract the following logic to apply to all ConditionalRadios forms
+        self.helper.legend_tag = "h1"
+        self.helper.legend_size = Size.LARGE
+        self.helper.label_tag = ""
+        self.helper.label_size = None
         self.helper.layout = Layout(
             ConditionalRadios(
                 "do_you_know_the_registered_company_number",
                 ConditionalQuestion(
                     "Yes",
-                    Field.text("registered_company_number"),
+                    Field.text("registered_company_number", field_width=Fluid.ONE_THIRD),
                 ),
                 "No",
             )
@@ -176,8 +207,10 @@ class WhereIsTheAddressOfTheBusinessOrPersonForm(BaseForm):
     )
 
 
-class BusinessOrPersonDetailsForm(BaseModelForm):
-    class Meta:
+class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
+    form_h1_header = "Business or person details"
+
+    class Meta(BasePersonBusinessDetailsForm.Meta):
         model = PersonOrCompany
         fields = [
             "name",
@@ -191,99 +224,78 @@ class BusinessOrPersonDetailsForm(BaseModelForm):
             "county",
             "postal_code",
         ]
-        widgets = {
-            "name": forms.TextInput,
-            "website": forms.TextInput,
-            "country": forms.Select,
-            "address_line_1": forms.TextInput,
-            "address_line_2": forms.TextInput,
-            "address_line_3": forms.TextInput,
-            "address_line_4": forms.TextInput,
-            "town_or_city": forms.TextInput,
-            "county": forms.TextInput,
-            "postal_code": forms.TextInput,
-        }
 
-    def __init__(self, *args, is_uk_address=False, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if is_uk_address:
-            self.fields["country"].initial = "GB"
-            self.fields["country"].widget = forms.HiddenInput()
-            del self.fields["address_line_3"]
-            del self.fields["address_line_4"]
-        else:
-            del self.fields["postal_code"]
-            del self.fields["county"]
-            del self.fields["town_or_city"]
-
-        self.helper.label_size = None
         self.helper.layout = Layout(
             Fieldset(
-                Field.text("name", field_width=Fluid.THREE_QUARTERS),
+                Field.text("name", field_width=Fluid.ONE_HALF),
                 legend="Name",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
             Fieldset(
-                Field.text("website", field_width=Fluid.THREE_QUARTERS),
+                Field.text("website", field_width=Fluid.ONE_HALF),
                 legend="Website",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
             Fieldset(
-                Field.text("country", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_1", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_2", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_3", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_4", field_width=Fluid.ONE_HALF),
-                Field.text("town_or_city", field_width=Fluid.ONE_HALF),
-                Field.text("county", field_width=Fluid.ONE_HALF),
-                Field.text("postal_code", field_width=Fluid.ONE_HALF),
+                Field.text("country", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_1", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_2", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_3", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_4", field_width=Fluid.ONE_THIRD),
+                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
+                Field.text("county", field_width=Fluid.ONE_THIRD),
+                Field.text("postal_code", field_width=Fluid.ONE_THIRD),
                 legend="Address",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
         )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
-        return cleaned_data
 
-    # todo - merge this form with the AboutTheEndUserForm, or any other address form that changes from UK to non-UK
+class AboutTheSupplierForm(BusinessOrPersonDetailsForm):
+    form_h1_header = "About the supplier"
+
+    class Meta(BusinessOrPersonDetailsForm.Meta):
+        model = BusinessOrPersonDetailsForm.Meta.model
+        fields = BusinessOrPersonDetailsForm.Meta.fields
+        labels = BusinessOrPersonDetailsForm.Meta.labels
+        widgets = BusinessOrPersonDetailsForm.Meta.widgets
 
 
 class WhenDidYouFirstSuspectForm(BaseModelForm):
     class Meta:
-        model = PersonOrCompany
+        model = Breach
         fields = [
             "when_did_you_first_suspect",
         ]
         widgets = {
             "when_did_you_first_suspect": forms.TextInput,
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["when_did_you_first_suspect"].help_text = "You can enter an exact or approximate date"
+        help_texts = {
+            "when_did_you_first_suspect": "You can enter an exact or approximate date",
+        }
+        labels = {
+            "when_did_you_first_suspect": "When did you first suspect the business or person had breached trade sanctions?",
+        }
 
 
 class WhichSanctionsRegimeForm(BaseForm):
+    form_h1_header = "Which sanctions regimes do you suspect the company or person has breached?"
     search_bar = forms.CharField(
-        label=content.WHICH_SANCTIONS_REGIME["text"],
+        label="Search regimes",
         max_length=100,
         required=False,
-        help_text=content.WHICH_SANCTIONS_REGIME["helper"][0],
     )
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=(()),
-        required=False,
-        help_text=content.WHICH_SANCTIONS_REGIME["helper"][1],
-        label="",  # empty as the question is set in the above search bar
+        required=True,
+        label="Select all that apply",
     )
-    unknown_regime = forms.BooleanField(label="I do not know", required=False)
-    other_regime = forms.BooleanField(label="Other regime", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -293,24 +305,26 @@ class WhichSanctionsRegimeForm(BaseForm):
                 checkbox_choices.append(Choice(item["full_name"], item["full_name"], divider="or"))
             else:
                 checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
-        checkbox_choices = tuple(checkbox_choices)
+
+        checkbox_choices.append(Choice("don't know", "I don't know"))
+        checkbox_choices.append(Choice("other_regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if (
-            not cleaned_data.get("which_sanctions_regime")
-            and not cleaned_data.get("other_regime")
-            and not cleaned_data.get("unknown_regime")
-        ):
-            raise forms.ValidationError("Please select at least one of the below options to continue")
-        return cleaned_data
+        self.helper.layout = Layout(
+            Field.text("search_bar", field_width=Fluid.THREE_QUARTERS),
+            Field.checkboxes("which_sanctions_regime"),
+        )
+        self.helper.label_size = None
+        self.helper.label_tag = None
 
 
 class WhatWereTheGoodsForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["what_were_the_goods"]
+        labels = {
+            "what_were_the_goods": "What were the goods or services, or what was the technological assistance or technology?",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -318,18 +332,21 @@ class WhatWereTheGoodsForm(BaseModelForm):
 
 
 class WhereWereTheGoodsSuppliedFromForm(BaseForm):
+    labels = {
+        "where_were_the_goods_supplied_from": "Where were the goods, services, "
+        "technological assistance or technology supplied from?",
+    }
+
     where_were_the_goods_supplied_from = forms.ChoiceField(
         choices=(()),
         widget=forms.RadioSelect,
-        label="Where were the goods, services, technological assistance or technology supplied from?",
     )
 
-    def __init__(self, *args, address_dict, **kwargs):
+    def __init__(self, *args, address_string, **kwargs):
         super().__init__(*args, **kwargs)
         address_choices = []
-        if address_dict:
-            address_string = get_formatted_address(address_dict)
-            address_choices.append(Choice("same_address", address_string, divider="Or"))
+        if address_string:
+            address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
             Choice("different_uk_address", "A different UK address"),
@@ -352,7 +369,7 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         address_choices = []
         if address_dict:
             address_string = get_formatted_address(address_dict)
-            address_choices.append(Choice("same_address", address_string, divider="Or"))
+            address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
             Choice("different_uk_address", "A different UK address"),
@@ -371,20 +388,29 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         ),
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology supplied to?",
+        help_text="This is the adresss of the end-user",
     )
 
 
-class AboutTheEndUserForm(BaseModelForm):
-    name_of_person = forms.CharField(label="Name of person")
-    name_of_business = forms.CharField(label="Name of business")
-    email = forms.CharField(label="Email")
+class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
+    form_h1_header = "About the end-user"
+    labels = {
+        "name_of_person": "Name of person",
+        "name_of_business": "Name of business",
+        "email": "Email address",
+    }
+    help_texts = {
+        "name_of_business": "If the end-user is a ship, enter the ship's name",
+    }
+
+    name_of_person = forms.CharField()
+    name_of_business = forms.CharField()
+    email = forms.CharField()
     additional_contact_details = forms.CharField(
         widget=forms.Textarea,
-        help_text="This could be a phone number, or details of a jurisdiction instead of a country",
     )
-    readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
 
-    class Meta:
+    class Meta(BasePersonBusinessDetailsForm.Meta):
         model = PersonOrCompany
         fields = (
             "website",
@@ -397,57 +423,47 @@ class AboutTheEndUserForm(BaseModelForm):
             "county",
             "postal_code",
         )
-        widgets = {
-            "website": forms.TextInput,
-            "country": forms.Select,
-            "address_line_1": forms.TextInput,
-            "address_line_2": forms.TextInput,
-            "address_line_3": forms.TextInput,
-            "address_line_4": forms.TextInput,
-            "town_or_city": forms.TextInput,
-            "county": forms.TextInput,
-            "postal_code": forms.TextInput,
-        }
+        widgets = BasePersonBusinessDetailsForm.Meta.widgets
+        labels = BasePersonBusinessDetailsForm.Meta.labels
 
-    def __init__(self, *args, is_uk_address, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if is_uk_address:
-            self.fields["country"].initial = "GB"
-            self.fields["country"].widget = forms.HiddenInput()
-            del self.fields["address_line_3"]
-            del self.fields["address_line_4"]
-        else:
-            del self.fields["postal_code"]
-            del self.fields["county"]
-            del self.fields["town_or_city"]
 
-        self.helper.label_size = None
+        if not self.is_uk_address:
+            self.fields["additional_contact_details"].help_text = (
+                "This could be a phone number, or details of a jurisdiction instead of a country"
+            )
+
+        # all fields on this form are optional
+        for _, field in self.fields.items():
+            field.required = False
+
         self.helper.layout = Layout(
             Fieldset(
-                Field.text("name_of_person", field_width=Fluid.THREE_QUARTERS),
-                Field.text("name_of_business", field_width=Fluid.THREE_QUARTERS),
-                Field.text("email", field_width=Fluid.THREE_QUARTERS),
-                Field.text("website", field_width=Fluid.THREE_QUARTERS),
+                Field.text("name_of_person", field_width=Fluid.ONE_HALF),
+                Field.text("name_of_business", field_width=Fluid.ONE_HALF),
+                Field.text("email", field_width=Fluid.ONE_HALF),
+                Field.text("website", field_width=Fluid.ONE_HALF),
                 legend="Name and digital contact details",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
             Fieldset(
-                Field.text("country", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_1", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_2", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_3", field_width=Fluid.ONE_HALF),
-                Field.text("address_line_4", field_width=Fluid.ONE_HALF),
-                Field.text("town_or_city", field_width=Fluid.ONE_HALF),
-                Field.text("county", field_width=Fluid.ONE_HALF),
-                Field.text("postal_code", field_width=Fluid.ONE_HALF),
+                Field.text("country", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_1", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_2", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_3", field_width=Fluid.ONE_THIRD),
+                Field.text("address_line_4", field_width=Fluid.ONE_THIRD),
+                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
+                Field.text("county", field_width=Fluid.ONE_THIRD),
+                Field.text("postal_code", field_width=Fluid.ONE_THIRD),
                 legend="Address",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
             Field.text(
                 "additional_contact_details",
-                field_width=Fluid.THREE_QUARTERS,
+                field_width=Fluid.FULL,
                 label_size=Size.MEDIUM,
             ),
         )
@@ -475,26 +491,51 @@ class EndUserAddedForm(BaseForm):
         label="Do you want to add another end-user?",
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.legend_size = Size.MEDIUM
+        self.helper.legend_tag = None
+
 
 class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
+    hide_optional_label_fields = ["other_addresses_in_the_supply_chain"]
+
     class Meta:
         model = Breach
         fields = ("were_there_other_addresses_in_the_supply_chain", "other_addresses_in_the_supply_chain")
+        labels = {
+            "were_there_other_addresses_in_the_supply_chain": "Were there any other addresses in the supply chain?",
+            "other_addresses_in_the_supply_chain": "Give all addresses",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["were_there_other_addresses_in_the_supply_chain"].choices.pop(0)
+        self.fields["were_there_other_addresses_in_the_supply_chain"].empty_label = None
+        # todo - abstract the following logic to apply to all ConditionalRadios forms
+        self.helper.legend_tag = "h1"
+        self.helper.legend_size = Size.LARGE
+        self.helper.label_tag = ""
+        self.helper.label_size = None
         self.helper.layout = Layout(
             ConditionalRadios(
                 "were_there_other_addresses_in_the_supply_chain",
                 ConditionalQuestion(
                     "Yes",
-                    Field.text("other_addresses_in_the_supply_chain"),
+                    Field.text("other_addresses_in_the_supply_chain", field_width=Fluid.TWO_THIRDS),
                 ),
                 "No",
                 "I do not know",
             )
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if (
+            cleaned_data["were_there_other_addresses_in_the_supply_chain"] == "yes"
+            and not cleaned_data["other_addresses_in_the_supply_chain"]
+        ):
+            self.add_error("other_addresses_in_the_supply_chain", "required")
+        return cleaned_data
 
 
 class UploadDocumentsForm(BaseForm):
@@ -512,14 +553,15 @@ class TellUsAboutTheSuspectedBreachForm(BaseModelForm):
         model = Breach
         # todo - make all fields variables a tuple
         fields = ["tell_us_about_the_suspected_breach"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["tell_us_about_the_suspected_breach"].help_text = (
-            "Include anything you've not already told us or uploaded. You could add specific details, "
-            "such as any licence numbers or shipping numbers. If you've uploaded your own compliance "
-            "investigation, you could give a summary here."
-        )
+        labels = {
+            "tell_us_about_the_suspected_breach": "Tell us about the suspected breach",
+        }
+        help_texts = {
+            "tell_us_about_the_suspected_breach": "Include anything you've not already told us or uploaded. "
+            "You could add specific details, such as any licence numbers or "
+            "shipping numbers. If you've uploaded your own compliance investigation, "
+            "you could give a summary here. ",
+        }
 
 
 class SummaryForm(BaseForm):
