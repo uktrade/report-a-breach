@@ -2,7 +2,8 @@ import os
 import uuid
 
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
+from django.contrib.sessions.models import Session
+from django.core.files.storage import FileSystemStorage, default_storage
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -35,7 +36,7 @@ from .forms import (
     WhereWereTheGoodsSuppliedToForm,
     WhichSanctionsRegimeForm,
 )
-from .models import Breach
+from .models import Breach, ReporterEmailVerification
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -155,14 +156,17 @@ class ReportABreachWizardView(BaseWizardView):
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
-        self.request.session["verify_code"] = verify_code
+        user_session = Session.objects.get(session_key=self.request.session.session_key)
+        ReporterEmailVerification.objects.create(
+            reporter_session=user_session,
+            email_verification_code=verify_code,
+        )
         print(verify_code)
         send_email(
             email=reporter_email_address,
             context={"verification_code": verify_code},
             template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
         )
-        self.request.session.modified = True
         return self.get_form_step_data(form)
 
     def get_form(self, step=None, data=None, files=None):
@@ -215,7 +219,6 @@ class ReportABreachWizardView(BaseWizardView):
             # todo - get address dict from companies house form
             address_dict = self.get_cleaned_data_for_step("business_or_person_details") or {}
             kwargs["address_dict"] = address_dict
-
         return kwargs
 
     def get_all_cleaned_data(self):
@@ -234,6 +237,17 @@ class ReportABreachWizardView(BaseWizardView):
             if form_obj.is_valid():
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
+
+    def upload_documents_to_s3(self):
+        """
+        Uploads documents from the upload_documents step to the default storage option.
+        """
+        try:
+            uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+            default_storage.save(uploaded_docs.name, uploaded_docs)
+        except TypeError:
+            uploaded_docs = []
+        return uploaded_docs
 
     def done(self, form_list, **kwargs):
         """all_cleaned_data = self.get_all_cleaned_data()
@@ -255,10 +269,9 @@ class ReportABreachWizardView(BaseWizardView):
 
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()"""
-
+        self.upload_documents_to_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
-
         self.request.session["reference_id"] = new_reference
         self.storage.reset()
         self.storage.current_step = self.steps.first
