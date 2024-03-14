@@ -278,7 +278,6 @@
                             {{ end_user.name }}
                         </dd>
                         <dd class="govuk-summary-list__actions">
-{#                TODO: get url for additional end users #}
                             <a class="govuk-link"
                                href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
                                 class="govuk-visually-hidden"></span></a>
@@ -289,7 +288,6 @@
                             Address
                         </dt>
                         <dd class="govuk-summary-list__value">
-{#                        TODO: this does not appear in the cleaned data #}
                             {{ end_user.where_were_the_goods_supplied_to }}
                         </dd>
                         <dd class="govuk-summary-list__actions">
@@ -308,7 +306,6 @@
                             {{ end_user.additional_details }}
                         </dd>
                         <dd class="govuk-summary-list__actions">
-{#            TODO: get url for additional end users    #}
                             <a class="govuk-link"
                                href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
                                 class="govuk-visually-hidden"> </span></a>
