@@ -13,6 +13,7 @@ from crispy_forms_gds.layout import (
 from django import forms
 from django.conf import settings
 from django.utils.timezone import now
+from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 
 import report_a_breach.question_content as content
 from report_a_breach.base_classes.forms import BaseForm, BaseModelForm
@@ -504,6 +505,9 @@ class UploadDocumentsForm(BaseForm):
         help_text="You can upload items such as your own compliance investigation report, "
         "commercial invoices, terms of appointment or other contractual documents.",
         required=False,
+        validators=[
+            validate_virus_check_result,
+        ],
     )
 
 
