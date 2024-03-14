@@ -5,7 +5,7 @@
 {% block form_content %}
     <div>
         <h2 class="govuk-heading-l">
-            Check your answers before submitting
+            Check your answers
         </h2>
     </div>
     <h2 class="govuk-heading-m">Your details</h2>
@@ -31,22 +31,28 @@
                 {% endif %}
             </dd>
         </div>
-        {% if is_third_party_relationship %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Business you work for
-                </dt>
+
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Business you work for
+            </dt>
+            {% if is_third_party_relationship %}
                 <dd class="govuk-summary-list__value">
                     {{ form_data.name_and_business_you_work_for.reporter_name_of_business_you_work_for }}
                 </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link" href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
-                        class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+            {% else %}
+                <dd class="govuk-summary-list__value">
+                    {{ form_data.business_or_person_details.name }}
                 </dd>
-            </div>
-        {% endif %}
+            {% endif %}
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"> {# todo - hidden copy #}</span></a>
+            </dd>
+        </div>
+
     </dl>
-    <h2 class="govuk-heading-m">Company or person suspected of breaching sanctions</h2>
+    <h2 class="govuk-heading-m">Business or person suspected of breaching sanctions</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
             <dt class="govuk-!-font-weight-regular">
@@ -112,64 +118,11 @@
             </dd>
         </div>
     </dl>
-    <h2 class="govuk-heading-m">Recipient of goods or services</h2>
+    <h2 class="govuk-heading-m">About the suspected breach</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
             <dt class="govuk-!-font-weight-regular">
-                Name
-            </dt>
-            <dd class="govuk-summary-list__value">
-{#                        todo check if this data exists #}
-                {{ form_data.where_were_the_goods_supplied_to.name }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                {% if is_company_obtained_from_companies_house %}
-                    <a class="govuk-link"
-                       href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary">Change<span
-                        class="govuk-visually-hidden"></span></a>
-                {% else %}
-                    <a class="govuk-link"
-                       href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
-                        class="govuk-visually-hidden"> </span></a>
-                {% endif %}
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-!-font-weight-regular">
-                Contact details
-            </dt>
-            <dd class="govuk-summary-list__value">
-{#                        todo check if this data exists #}
-                {{ form_data.where_were_the_goods_supplied_to.where_were_the_goods_supplied_to }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link"
-                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
-                    class="govuk-visually-hidden"> </span></a>
-
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-!-font-weight-regular">
-                Additional contact details
-            </dt>
-            <dd class="govuk-summary-list__value">
-{#                        todo check if this data exists #}
-                {{ form_data.where_were_the_goods_supplied_to.additional_details }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link"
-                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
-                    class="govuk-visually-hidden"> </span></a>
-
-            </dd>
-        </div>
-    </dl>
-    <h2 class="govuk-heading-m">Sanctions breach details</h2>
-    <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-!-font-weight-regular">
-                Date of breach
+                When did you first suspect the breach?
             </dt>
             <dd class="govuk-summary-list__value">
                 {{ form_data.when_did_you_first_suspect.when_did_you_first_suspect }}
@@ -182,7 +135,7 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-!-font-weight-regular">
-                Regime breached
+                Sanctions regimes breached
             </dt>
             <dd class="govuk-summary-list__value">
                 {% for regime in form_data.which_sanctions_regime.which_sanctions_regime %}
@@ -204,11 +157,122 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-!-font-weight-regular">
-                Supporting documents (optional)
+                What was supplied or made available?
             </dt>
             <dd class="govuk-summary-list__value">
-{#                        todo: can we get the file name from the form data? #}
-                {{ form_data.upload_documents.documents }}
+                {{ form_data.what_were_the_goods.what_were_the_goods }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% get_wizard_step_url 'what_were_the_goods' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"></span></a>
+            </dd>
+        </div>
+    </dl>
+    <h2 class="govuk-heading-m">Supplier of the goods of services</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Name
+            </dt>
+            <dd class="govuk-summary-list__value">
+{#                        TODO: this does not appear in the cleaned data #}
+                {{ form_data.where_were_the_goods_supplied_from.name }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"></span></a>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Website
+            </dt>
+            <dd class="govuk-summary-list__value">
+{#                        TODO: this does not appear in the cleaned data #}
+                {{ form_data.where_were_the_goods_supplied_from.website }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"> </span></a>
+
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Address
+            </dt>
+            <dd class="govuk-summary-list__value">
+{#                        TODO: this does not appear in the cleaned data #}
+                {{ form_data.where_were_the_goods_supplied_from.address }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"> </span></a>
+
+            </dd>
+        </div>
+    </dl>
+    <h2 class="govuk-heading-m">End-user of the goods or services</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Name of person
+            </dt>
+            <dd class="govuk-summary-list__value">
+{#                        TODO: this does not appear in the cleaned data #}
+                {{ form_data.where_were_the_goods_supplied_to.name }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"></span></a>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Address
+            </dt>
+            <dd class="govuk-summary-list__value">
+{#                        TODO: this does not appear in the cleaned data #}
+                {{ form_data.where_were_the_goods_supplied_to.where_were_the_goods_supplied_to }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"> </span></a>
+
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Additional information
+            </dt>
+            <dd class="govuk-summary-list__value">
+{#                        TODO: this does not appear in the cleaned data #}
+                {{ form_data.where_were_the_goods_supplied_to.additional_details }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                    class="govuk-visually-hidden"> </span></a>
+
+            </dd>
+        </div>
+    </dl>
+{#    TODO: need to add conditional here for multiple end users, ie End-user 2 #}
+ {#    TODO: need to add conditional here for other addresses in the supply chain #}
+    <h2 class="govuk-heading-m">Sanctions breach details</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-!-font-weight-regular">
+                Supporting documents
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ form_data.uploaded_file_name }}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"

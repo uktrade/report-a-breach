@@ -499,7 +499,7 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
 
 class UploadDocumentsForm(BaseForm):
     # todo - add a custom crispy forms widget to make it render like the prototype
-    documents = forms.FileField(
+    file = forms.FileField(
         label="Upload documents (optional)",
         help_text="You can upload items such as your own compliance investigation report, "
         "commercial invoices, terms of appointment or other contractual documents.",
