@@ -20,8 +20,8 @@ class PlaywrightTestBase(TransactionTestCase):
         cls.playwright = sync_playwright().start()
         cls.browser = cls.playwright.chromium.launch(headless=settings.HEADLESS)
 
-        if cls.create_new_test_breach:
-            cls.create_test_breach()
+        # if cls.create_new_test_breach:
+        #     cls.create_test_breach()
 
     @classmethod
     def tearDownClass(cls):
@@ -183,19 +183,20 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Summary Page
         #
-        page.get_by_role("button", name="Continue").click()
-        page.get_by_label("I agree and accept").check()
-        page.get_by_role("button", name="Continue").click()
-        #
-        # Declaration Page
-        #
-        page.get_by_role("heading", name="Submission complete").click()
-        page.get_by_text("Your reference number").click()
-        page.get_by_role("heading", name="What happens next").click()
-        page.get_by_text("We’ve sent your report to the").click()
+        # page.get_by_role("button", name="Continue").click()
+        # page.get_by_label("I agree and accept").check()
+        # page.get_by_role("button", name="Continue").click()
+        # #
+        # # Declaration Page
+        # #
+        # page.get_by_role("heading", name="Submission complete").click()
+        # page.get_by_text("Your reference number").click()
+        # page.get_by_role("heading", name="What happens next").click()
+        # page.get_by_text("We’ve sent your report to the").click()
 
-        context.close()
-        new_browser.close()
+        return page
+        # context.close()
+        # new_browser.close()
 
 
 # def _verify_user(self, base_url: str, storage_state: str) -> None:

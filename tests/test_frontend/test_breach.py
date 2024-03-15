@@ -1,5 +1,8 @@
 # # import pytest
 # from playwright.sync_api import Page
+import re
+
+from playwright.sync_api import expect
 
 from . import conftest
 
@@ -7,6 +10,10 @@ from . import conftest
 class TestChangeBreachDetails(conftest.PlaywrightTestBase):
     def test_change_full_name(self):
         self.page.goto(self.get_form_step_page("summary"))
+
+    def test_create_breach(self):
+        self.page = self.create_test_breach()
+        expect(self.page).to_have_url(re.compile(r".*/summary"))
 
 
 # def test_example(page: Page) -> None:
