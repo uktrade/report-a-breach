@@ -92,6 +92,17 @@ We use Localstack to emulate AWS services locally, specifically S3. A bucket is 
 Localstack works similarly to the awscli. For example, to see objects inside the static-files bucket, run command:\
 `awslocal s3 ls static-files`
 
+
+### Testing
+We use playwright for end-to-end testing.
+To run the end-to-end tests for report a breach, start the django server using the test config settings:\
+`python manage.py runserver --settings=config.settings.test`\
+Then while in the report_a_breach directory run:\
+`pytest`\
+A useful command for writing end-to-end tests is:\
+`playwright codegen http://localhost:8000/report_a_breach/start/`
+
+
 ## Standards
 ### Linting and Formatting
 We use:

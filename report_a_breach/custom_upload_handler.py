@@ -5,8 +5,6 @@ from django_chunk_upload_handlers.clam_av import (
     VirusFoundInFileException,
 )
 
-CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = settings.CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND
-
 
 class CustomFileUploadHandler(FileUploadHandler):
 
