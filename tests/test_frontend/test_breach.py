@@ -1,11 +1,12 @@
 # # import pytest
 # from playwright.sync_api import Page
 
-# # from . import conftest
+from . import conftest
 
-# # class TestChangeBreachDetails(conftest.PlaywrightTestBase):
-# #     def test_change_full_name(self):
-# #         self.page.goto(self.get_breach_summary_page())
+
+class TestChangeBreachDetails(conftest.PlaywrightTestBase):
+    def test_change_full_name(self):
+        self.page.goto(self.get_form_step_page("summary"))
 
 
 # def test_example(page: Page) -> None:

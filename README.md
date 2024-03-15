@@ -94,11 +94,14 @@ Localstack works similarly to the awscli. For example, to see objects inside the
 
 
 ### Testing
+
+#### End-to-End tests
 We use playwright for end-to-end testing.
 To run the end-to-end tests for report a breach, start the django server using the test config settings:\
-`python manage.py runserver --settings=config.settings.test`\
-Then while in the report_a_breach directory run:\
-`pytest`\
+`python manage.py runserver --settings=config.settings.test`
+
+To run end-to-end tests only:\
+`pytest test/test_frontend`\
 A useful command for writing end-to-end tests is:\
 `playwright codegen http://localhost:8000/report_a_breach/start/`
 

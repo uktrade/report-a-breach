@@ -39,8 +39,8 @@ class PlaywrightTestBase(TransactionTestCase):
         self.page.close()
 
     @classmethod
-    def get_breach_summary_page(cls):
-        return f"{cls.base_url}/summary/"
+    def get_form_step_page(cls, form_step):
+        return f"{cls.base_url}/{form_step}/"
 
     @classmethod
     def create_test_breach(cls):
@@ -104,7 +104,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Town or city").press("Tab")
         page.get_by_label("County").fill("County")
         page.get_by_label("County").press("Tab")
-        page.get_by_label("Postal code").fill("NP7 0EE")
+        page.get_by_label("Postal code").fill("AA0 0AA")
         page.get_by_role("button", name="Continue").click()
         #
         # When Did You First Suspect Page
@@ -127,7 +127,7 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Where Were the Goods Supplied From Page
         #
-        page.get_by_label("A1, A2, NP7 0EE, GB").check()
+        page.get_by_label("A1, A2, AA0 0AA, GB").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
@@ -153,7 +153,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("County").click()
         page.get_by_label("County").fill("County2")
         page.get_by_label("County").press("Tab")
-        page.get_by_label("Postal code").fill("NP7 0EE")
+        page.get_by_label("Postal code").fill("AA0 0AA")
         page.get_by_label("Postal code").press("Tab")
         page.get_by_label("Additional contact details").fill("contact")
         page.get_by_label("Additional contact details").press("Tab")
@@ -172,7 +172,7 @@ class PlaywrightTestBase(TransactionTestCase):
         # Upload Documents Page
         #
         page.get_by_label("Upload documents (optional)").click()
-        page.get_by_label("Upload documents (optional)").set_input_files("Photos Library.photoslibrary.zip")
+        # page.get_by_label("Upload documents (optional)").set_input_files("Photos Library.photoslibrary.zip")
         page.get_by_role("button", name="Continue").click()
         #
         # Tell Us About Suspected Breach Page
@@ -190,7 +190,7 @@ class PlaywrightTestBase(TransactionTestCase):
         # Declaration Page
         #
         page.get_by_role("heading", name="Submission complete").click()
-        page.get_by_text("Your reference number01462C").click()
+        page.get_by_text("Your reference number").click()
         page.get_by_role("heading", name="What happens next").click()
         page.get_by_text("We’ve sent your report to the").click()
 

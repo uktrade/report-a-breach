@@ -1,7 +1,7 @@
-from . import PlaywrightTestBase
+from . import conftest
 
 
-class TestVerify(PlaywrightTestBase):
+class TestVerify(conftest.PlaywrightTestBase):
     def test_user_verify(self):
         self.page.goto("http://localhost:8000/report_a_breach/email/")
         self.page.get_by_label("What is your email address?").click()
