@@ -8,6 +8,17 @@ from playwright.sync_api import sync_playwright
 
 from . import types
 
+EMAIL_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
+ADDRESS_DETAILS = {
+    "name": "business",
+    "website": "example.com",
+    "address_line_1": "A1",
+    "address_line_2": "A2",
+    "town": "Town",
+    "county": "County",
+    "postcode": "AA0 0AA",
+}
+
 
 class PlaywrightTestBase(TransactionTestCase):
     create_new_test_breach = True
@@ -43,6 +54,63 @@ class PlaywrightTestBase(TransactionTestCase):
         return f"{cls.base_url}/{form_step}/"
 
     @classmethod
+    def verify_email_details(cls, page, details=EMAIL_DETAILS):
+        #
+        # Email page
+        #
+        page.get_by_label("What is your email address?").click()
+        page.get_by_label("What is your email address?").fill(details["email"])
+        page.get_by_role("button", name="Continue").click()
+        #
+        # Verify Page
+        #
+        page.get_by_label("We've sent you an email").click()
+        page.get_by_label("We've sent you an email").fill(details["verify_code"])
+        page.get_by_role("button", name="Continue").click()
+
+        return page
+
+    @classmethod
+    def fill_uk_address_details(cls, page, details=ADDRESS_DETAILS):
+        #
+        # Business or Person Details Page
+        #
+        page.get_by_label("Name of business or person").click()
+        page.get_by_label("Name of business or person").fill(details["name"])
+        page.get_by_label("Name of business or person").press("Tab")
+        page.get_by_label("Website address").fill(details["website"])
+        page.get_by_label("Website address").press("Tab")
+        page.get_by_label("Address line 1").fill(details["address_line_1"])
+        page.get_by_label("Address line 1").press("Tab")
+        page.get_by_label("Address line 2").fill(details["address_line_2"])
+        page.get_by_label("Address line 2").press("Tab")
+        page.get_by_label("Town or city").fill(details["town"])
+        page.get_by_label("Town or city").press("Tab")
+        page.get_by_label("County").fill(details["county"])
+        page.get_by_label("County").press("Tab")
+        page.get_by_label("Postal code").fill(details["postcode"])
+        page.get_by_role("button", name="Continue").click()
+
+        return page
+
+    @classmethod
+    def summary_and_declaration_page(cls, page):
+        #
+        # Summary Page
+        #
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_label("I agree and accept").check()
+        page.get_by_role("button", name="Continue").click()
+        #
+        # Declaration Page
+        #
+        page.get_by_role("heading", name="Submission complete").click()
+        page.get_by_text("Your reference number").click()
+        page.get_by_role("heading", name="What happens next").click()
+        page.get_by_text("We’ve sent your report to the").click()
+        return page
+
+    @classmethod
     def create_test_breach(cls):
         new_browser = cls.playwright.chromium.launch(headless=True)
         context = new_browser.new_context()
@@ -54,21 +122,9 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         page.get_by_label("I'm an owner, officer or").check()
         page.get_by_role("button", name="Continue").click()
-        #
-        # Email page
-        #
-        page.get_by_label("What is your email address?").click()
-        page.get_by_label("What is your email address?").fill("test@digital.gov.uk")
-        page.get_by_role("button", name="Continue").click()
-        #
-        # Verify Page
-        #
-        page.get_by_label("We've sent you an email").click()
-        page.get_by_label("We've sent you an email").fill("012345")
-        page.get_by_role("button", name="Continue").click()
-        #
-        # Name Page
-        #
+
+        page = cls.verify_email_details(page)
+
         page.get_by_label("What is your full name?").click()
         page.get_by_label("What is your full name?").fill("John Smith")
         page.get_by_role("button", name="Continue").click()
@@ -85,27 +141,7 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Business or Person Details Page
         #
-        page.get_by_label("Name of business or person").click()
-        page.get_by_label("Name of business or person").fill("Business")
-        page.get_by_label("Name of business or person").press("Tab")
-        page.get_by_label("Website address").fill("business.com")
-        page.get_by_label("Website address").press("Tab")
-        page.get_by_label("Address line 1").fill("A1")
-        page.get_by_label("Address line 1").press("Tab")
-        page.get_by_label("Address line 2").press("Tab")
-        page.get_by_label("Town or city").press("Tab")
-        page.get_by_label("County").press("Tab")
-        page.get_by_label("Postal code").press("Shift+Tab")
-        page.get_by_label("County").press("Shift+Tab")
-        page.get_by_label("Town or city").press("Shift+Tab")
-        page.get_by_label("Address line 2").fill("A2")
-        page.get_by_label("Address line 2").press("Tab")
-        page.get_by_label("Town or city").fill("Town")
-        page.get_by_label("Town or city").press("Tab")
-        page.get_by_label("County").fill("County")
-        page.get_by_label("County").press("Tab")
-        page.get_by_label("Postal code").fill("AA0 0AA")
-        page.get_by_role("button", name="Continue").click()
+        page = cls.fill_uk_address_details(page)
         #
         # When Did You First Suspect Page
         #
@@ -180,19 +216,6 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Tell us about the suspected").click()
         page.get_by_label("Tell us about the suspected").fill("hj")
         page.get_by_role("button", name="Continue").click()
-        #
-        # Summary Page
-        #
-        # page.get_by_role("button", name="Continue").click()
-        # page.get_by_label("I agree and accept").check()
-        # page.get_by_role("button", name="Continue").click()
-        # #
-        # # Declaration Page
-        # #
-        # page.get_by_role("heading", name="Submission complete").click()
-        # page.get_by_text("Your reference number").click()
-        # page.get_by_role("heading", name="What happens next").click()
-        # page.get_by_text("We’ve sent your report to the").click()
 
         return page
         # context.close()
