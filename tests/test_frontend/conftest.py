@@ -1,12 +1,9 @@
 import os
-from typing import List
 
 import pytest
 from django.conf import settings
 from django.test.testcases import TransactionTestCase
 from playwright.sync_api import sync_playwright
-
-from . import types
 
 EMAIL_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
 ADDRESS_DETAILS = {
@@ -31,9 +28,6 @@ class PlaywrightTestBase(TransactionTestCase):
         cls.playwright = sync_playwright().start()
         cls.browser = cls.playwright.chromium.launch(headless=settings.HEADLESS)
 
-        # if cls.create_new_test_breach:
-        #     cls.create_test_breach()
-
     @classmethod
     def tearDownClass(cls):
         cls.browser.close()
@@ -51,7 +45,8 @@ class PlaywrightTestBase(TransactionTestCase):
 
     @classmethod
     def get_form_step_page(cls, form_step):
-        return f"{cls.base_url}/{form_step}/"
+        print(f"{cls.base_url}/{form_step}/")
+        return f"{cls.base_url}/report_a_breach/{form_step}/"
 
     @classmethod
     def verify_email_details(cls, page, details=EMAIL_DETAILS):
@@ -108,6 +103,16 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_text("Your reference number").click()
         page.get_by_role("heading", name="What happens next").click()
         page.get_by_text("We’ve sent your report to the").click()
+        return page
+
+    @classmethod
+    def upload_documents_page(cls, page):
+        #
+        # Upload Documents Page
+        #
+        page.get_by_label("Upload documents (optional)").click()
+        # page.get_by_label("Upload documents (optional)").set_input_files('test_file.txt')
+        page.get_by_role("button", name="Continue").click()
         return page
 
     @classmethod
@@ -207,9 +212,7 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Upload Documents Page
         #
-        page.get_by_label("Upload documents (optional)").click()
-        # page.get_by_label("Upload documents (optional)").set_input_files("Photos Library.photoslibrary.zip")
-        page.get_by_role("button", name="Continue").click()
+        page = cls.upload_documents_page(page)
         #
         # Tell Us About Suspected Breach Page
         #
@@ -218,43 +221,8 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_role("button", name="Continue").click()
 
         return page
-        # context.close()
-        # new_browser.close()
-
-
-# def _verify_user(self, base_url: str, storage_state: str) -> None:
-#     usertype = storage_state
-#     context: BrowserContext = self.browser.new_context(
-#         base_url=base_url, **self.browser_context_args
-#     )
-
-#     page: Page = context.new_page()
-#     # Go to base url (redirects to report-a-breach/start/)
-#     page.goto("")
-
-#         #
-#     # Start page
-#     #
-#     page.get_by_label("I'm an owner, officer or").check()
-#     page.get_by_label("I'm an owner, officer or").check()
-#     page.get_by_label("I do not work for the company").check()
-#     page.get_by_label("I work for a third party with").check()
-#     page.get_by_label("I do not have a professional").check()
-#     page.get_by_role("button", name="Continue").click()
-#     #
-#     # Email page
-#     #
-#     page.get_by_label("What is your email address?").click()
-#     page.get_by_label("What is your email address?").fill("morgan.rees@digital.gov.uk")
-#     page.get_by_role("button", name="Continue").click()
-#     #
-#     # Verify Page
-#     #
-#     page.get_by_label("We've sent you an email").click()
-#     page.get_by_label("We've sent you an email").fill("012345")
-#     page.get_by_role("button", name="Continue").click()
 
 
 @pytest.fixture()
-def sample_upload_file() -> List[types.FilePayload]:
+def sample_upload_file():
     return [{"name": "test.txt", "mimeType": "text/plain", "buffer": b"test"}]
