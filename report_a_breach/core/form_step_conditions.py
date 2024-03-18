@@ -18,15 +18,12 @@ def show_check_company_details_page_condition(wizard):
 
 def show_where_is_the_address_of_the_business_or_person_page_condition(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("are_you_reporting_a_business_on_companies_house")
-    return cleaned_data.get("business_registered_on_companies_house", False) == "no"
+    return cleaned_data.get("business_registered_on_companies_house", False) in ["no", "do_not_know"]
 
 
 def show_do_you_know_the_registered_company_number_page(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("are_you_reporting_a_business_on_companies_house")
-    return cleaned_data.get("business_registered_on_companies_house", False) in [
-        "yes",
-        "do_not_know",
-    ]
+    return cleaned_data.get("business_registered_on_companies_house", False) == "yes"
 
 
 def show_about_the_supplier_page(wizard):

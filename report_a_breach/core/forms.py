@@ -133,6 +133,10 @@ class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
             "business_registered_on_companies_house": "Are you reporting a business which is registered with Companies House?"
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["business_registered_on_companies_house"].choices.pop(0)
+
 
 class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
     hide_optional_label_fields = ["registered_company_number"]
