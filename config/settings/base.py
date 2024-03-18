@@ -23,8 +23,7 @@ env = environ.Env(
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
-BASE_DIR = ROOT_DIR
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = env.str("DJANGO_SECRET_KEY")
 # Quick-start development settings - unsuitable for production
@@ -83,11 +82,13 @@ if env.bool("USE_S3_STATIC_FILES", default=True):
     STATIC_URL = f"{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}"
 else:
     STATIC_URL = "static/"
-    STATIC_ROOT = ROOT_DIR / "static"
-    STATICFILES_DIRS = [BASE_DIR / "static"]
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
+    ]
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(ROOT_DIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",

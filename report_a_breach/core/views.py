@@ -127,6 +127,10 @@ class ReportABreachWizardView(BaseWizardView):
         context["form_data"] = cleaned_data
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
+
+        if uploaded_file_name := self.request.session.get("uploaded_file_name", None):
+            context["form_data"]["uploaded_file_name"] = uploaded_file_name
+
         return context
 
     def process_are_you_reporting_a_business_on_companies_house_step(self, form):
@@ -195,6 +199,10 @@ class ReportABreachWizardView(BaseWizardView):
                 "initial": self.get_form_initial(step),
             }
         )
+        if data:
+            if uploaded_file_name := kwargs["data"].get("upload_documents-file", None):
+                self.request.session["uploaded_file_name"] = uploaded_file_name
+                self.request.session.modified = True
         return form_class(**kwargs)
 
     def get_form_kwargs(self, step=None):
