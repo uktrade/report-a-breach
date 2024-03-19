@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
 
-{% block assets %}
-    {{ wizard.form.media }}
-{% endblock assets %}
+{% block extra_css %}
+    {{ wizard.form.media.css }}
+{% endblock extra_css %}
 
 {% block column_content %}
     {% error_summary form %}
@@ -17,3 +17,7 @@
         {% endblock form_content %}
     </form>
 {% endblock column_content %}
+
+{% block extra_js %}
+    {{ wizard.form.media.js }}
+{% endblock extra_js %}

@@ -23,10 +23,10 @@
         <link rel="apple-touch-icon" href="{% static "govuk/images/govuk-apple-touch-icon.png" %}">
         <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
 
-        <link rel="stylesheet" href="{% static "stylesheets/govuk-frontend-5.2.0.min.css" %}">
+        <link rel="stylesheet" href="{% static "stylesheets/govuk/govuk-frontend-5.2.0.min.css" %}">
 
 
-        {% block assets %}{% endblock assets %}
+        {% block extra_css %}{% endblock extra_css %}
     </head>
 
     <body class="govuk-template__body ">
@@ -120,11 +120,11 @@
                 </div>
             </div>
         </div>
-        <script src="{% static "javascript/govuk-frontend-5.2.0.min.js" %}"></script>
+        <script src="{% static "javascript/govuk/govuk-frontend-5.2.0.min.js" %}"></script>
         <script>
             window.GOVUKFrontend.initAll()
         </script>
-        {% block extra_script %}{% endblock %}
+        {% block extra_js %}{% endblock extra_js %}
     </footer>
 </body>
 </html>
