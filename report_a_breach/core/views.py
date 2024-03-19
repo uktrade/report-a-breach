@@ -211,12 +211,17 @@ class ReportABreachWizardView(BaseWizardView):
 
         if step == "business_or_person_details":
             where_is_the_address = (
-                self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person")
-                or self.get_cleaned_data_for_step("do_you_know_the_registered_company_number")
-                or {}
-            ).get("where_is_the_address", "")
-            is_uk_address = where_is_the_address == "in_the_uk"
-            kwargs["is_uk_address"] = is_uk_address
+                self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person").get("where_is_the_address")
+                == "in_the_uk"
+            )
+            do_you_know_the_registered_company_number = (
+                self.get_cleaned_data_for_step("do_you_know_the_registered_company_number").get(
+                    "do_you_know_the_registered_company_number"
+                )
+                == "no"
+            )
+            if where_is_the_address or do_you_know_the_registered_company_number:
+                kwargs["is_uk_address"] = "in_the_uk"
 
         if step == "about_the_supplier":
             where_were_the_goods_supplied_from = (self.get_cleaned_data_for_step("where_were_the_goods_supplied_from") or {}).get(
