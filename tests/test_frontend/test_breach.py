@@ -8,7 +8,7 @@ from . import conftest
 class TestChangeBreachDetails(conftest.PlaywrightTestBase):
     def test_can_change_full_name_breach(self):
         self.page = self.create_test_breach()
-        self.page.get_by_role("heading", name="Check your answers before").click()
+        self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Your details").click()
         self.page.get_by_text("Full name", exact=True).click()
         self.page.locator("dl").filter(has_text="Full name John Smith Change").get_by_role("link").click()
@@ -16,7 +16,7 @@ class TestChangeBreachDetails(conftest.PlaywrightTestBase):
         self.page.get_by_label("What is your full name?").fill("Jane Doe")
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/summary"))
-        self.page.get_by_role("heading", name="Check your answers before").click()
+        self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Your details").click()
         self.page.get_by_text("Full name", exact=True).click()
         self.page.locator("#main-content div").filter(has_text="Full name Jane Doe Change").nth(3).click()

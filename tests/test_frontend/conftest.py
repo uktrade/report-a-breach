@@ -59,8 +59,8 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Verify Page
         #
-        page.get_by_label("We've sent you an email").click()
-        page.get_by_label("We've sent you an email").fill(details["verify_code"])
+        page.get_by_role("heading", name="We've sent you an email").click()
+        page.get_by_label("Enter the 6 digit security").fill(details["verify_code"])
         page.get_by_role("button", name="Continue").click()
 
         return page
@@ -83,7 +83,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Town or city").press("Tab")
         page.get_by_label("County").fill(details["county"])
         page.get_by_label("County").press("Tab")
-        page.get_by_label("Postal code").fill(details["postcode"])
+        page.get_by_label("Postcode").fill(details["postcode"])
         page.get_by_role("button", name="Continue").click()
 
         return page
@@ -194,8 +194,8 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("County").click()
         page.get_by_label("County").fill("County2")
         page.get_by_label("County").press("Tab")
-        page.get_by_label("Postal code").fill("AA0 0AA")
-        page.get_by_label("Postal code").press("Tab")
+        page.get_by_label("Postcode").fill("AA0 0AA")
+        page.get_by_label("Postcode").press("Tab")
         page.get_by_label("Additional contact details").fill("contact")
         page.get_by_label("Additional contact details").press("Tab")
         page.get_by_role("button", name="Continue").press("Enter")
