@@ -197,7 +197,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 cleaned_data["registered_office_address"] = get_formatted_address(company_details["registered_office_address"])
             except CompaniesHouseException:
                 self.add_error("registered_company_number", "The company number you entered is not valid")
-                
+
         return cleaned_data
 
 
