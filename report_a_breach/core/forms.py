@@ -302,6 +302,9 @@ class WhichSanctionsRegimeForm(BaseForm):
         label="Select all that apply",
     )
 
+    class Media:
+        js = ("javascript/form_steps/which_sanctions_regimes.js",)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         checkbox_choices = []
