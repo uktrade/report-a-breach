@@ -108,7 +108,9 @@ class ReportABreachWizardView(BaseWizardView):
 
     def render_next_step(self, form, **kwargs):
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
-            return redirect(self.get_step_url("where_were_the_goods_supplied_to"))
+            # we want to redirect them to 'where is the end user' page, but pass another query parameter to indicate that they
+            # know about another end-user, so we can remove the last option 'I don't know' from the list of options
+            return redirect(f"{self.get_step_url('where_were_the_goods_supplied_to')}?add_another_end_user=yes")
         return super().render_next_step(form, **kwargs)
 
     def get_summary_context_data(self, form, context):
