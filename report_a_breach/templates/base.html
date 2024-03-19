@@ -22,11 +22,10 @@
               href="{% static "govuk/images/govuk-apple-touch-icon-152x152.png" %}">
         <link rel="apple-touch-icon" href="{% static "govuk/images/govuk-apple-touch-icon.png" %}">
         <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
-
+      
         <link rel="stylesheet" href="{% static "stylesheets/govuk-frontend-4.7.0.min.css" %}">
 
-
-        {% block assets %}{% endblock assets %}
+        {% block extra_css %}{% endblock extra_css %}
     </head>
 
     <body class="govuk-template__body ">
