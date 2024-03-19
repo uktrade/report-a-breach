@@ -1,10 +1,12 @@
 from django.urls import path, re_path
 
 from .form_step_conditions import (
+    show_about_the_end_user_page,
     show_about_the_supplier_page,
     show_business_or_personal_details_page,
     show_check_company_details_page_condition,
     show_do_you_know_the_registered_company_number_page,
+    show_end_user_added_page,
     show_name_and_business_you_work_for_page,
     show_name_page,
     show_where_is_the_address_of_the_business_or_person_page_condition,
@@ -24,6 +26,8 @@ report_a_breach_wizard = ReportABreachWizardView.as_view(
         "do_you_know_the_registered_company_number": show_do_you_know_the_registered_company_number_page,
         "about_the_supplier": show_about_the_supplier_page,
         "where_were_the_goods_made_available_from": show_where_were_the_goods_made_available_from_page,
+        "about_the_end_user": show_about_the_end_user_page,
+        "end_user_added": show_end_user_added_page,
     },
 )
 

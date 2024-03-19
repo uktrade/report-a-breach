@@ -76,7 +76,6 @@ class ReportABreachWizardView(BaseWizardView):
     ]
 
     template_names_lookup = {
-        "which_sanctions_regime": "form_steps/which_sanctions_regimes.html",
         "summary": "form_steps/summary.html",
         "check_company_details": "form_steps/check_company_details.html",
         "end_user_added": "form_steps/end_user_added.html",
