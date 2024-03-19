@@ -210,9 +210,11 @@ class ReportABreachWizardView(BaseWizardView):
         kwargs["request"] = self.request
 
         if step == "business_or_person_details":
-            where_is_the_address = (self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person") or {}).get(
-                "where_is_the_address", ""
-            )
+            where_is_the_address = (
+                self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person")
+                or self.get_cleaned_data_for_step("do_you_know_the_registered_company_number")
+                or {}
+            ).get("where_is_the_address", "")
             is_uk_address = where_is_the_address == "in_the_uk"
             kwargs["is_uk_address"] = is_uk_address
 
