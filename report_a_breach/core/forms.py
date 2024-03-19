@@ -234,13 +234,13 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
         super().__init__(*args, **kwargs)
         self.helper.layout = Layout(
             Fieldset(
-                Field.text("name", field_width=Fluid.ONE_HALF),
+                Field.text("name", field_width=Fluid.TWO_THIRDS),
                 legend="Name",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
             Fieldset(
-                Field.text("website", field_width=Fluid.ONE_HALF),
+                Field.text("website", field_width=Fluid.TWO_THIRDS),
                 legend="Website",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
