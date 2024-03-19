@@ -27,3 +27,5 @@ LOGGING = {
     },
     "version": 1,
 }
+
+ENVIRONMENT = "production"
