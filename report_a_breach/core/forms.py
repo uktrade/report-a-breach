@@ -245,19 +245,7 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
-            Fieldset(
-                Field.text("country", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_1", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_2", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_3", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_4", field_width=Fluid.ONE_THIRD),
-                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
-                Field.text("county", field_width=Fluid.ONE_THIRD),
-                Field.text("postal_code", field_width=Fluid.ONE_THIRD),
-                legend="Address",
-                legend_size=Size.MEDIUM,
-                legend_tag="h3",
-            ),
+            self.address_fieldset,
         )
 
 
@@ -454,27 +442,15 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
 
         self.helper.layout = Layout(
             Fieldset(
-                Field.text("name_of_person", field_width=Fluid.ONE_HALF),
-                Field.text("name_of_business", field_width=Fluid.ONE_HALF),
-                Field.text("email", field_width=Fluid.ONE_HALF),
-                Field.text("website", field_width=Fluid.ONE_HALF),
+                Field.text("name_of_person", field_width=Fluid.TWO_THIRDS),
+                Field.text("name_of_business", field_width=Fluid.TWO_THIRDS),
+                Field.text("email", field_width=Fluid.TWO_THIRDS),
+                Field.text("website", field_width=Fluid.TWO_THIRDS),
                 legend="Name and digital contact details",
                 legend_size=Size.MEDIUM,
                 legend_tag="h3",
             ),
-            Fieldset(
-                Field.text("country", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_1", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_2", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_3", field_width=Fluid.ONE_THIRD),
-                Field.text("address_line_4", field_width=Fluid.ONE_THIRD),
-                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
-                Field.text("county", field_width=Fluid.ONE_THIRD),
-                Field.text("postal_code", field_width=Fluid.ONE_THIRD),
-                legend="Address",
-                legend_size=Size.MEDIUM,
-                legend_tag="h3",
-            ),
+            self.address_fieldset,
             Field.text(
                 "additional_contact_details",
                 field_width=Fluid.FULL,

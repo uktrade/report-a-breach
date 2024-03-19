@@ -1,5 +1,6 @@
 from crispy_forms_gds.helper import FormHelper
-from crispy_forms_gds.layout import Layout, Size, Submit
+from crispy_forms_gds.layout import Field, Fieldset, Layout, Size, Submit
+from crispy_forms_gds.layout.constants import Fluid
 from django import forms
 
 from report_a_breach.utils.companies_house import get_formatted_address
@@ -102,6 +103,27 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             del self.fields["county"]
             self.fields["town_or_city"].required = False
             self.fields["address_line_1"].required = False
+
+        if self.is_uk_address:
+            self.address_fieldset = Fieldset(
+                Field.text("address_line_1", field_width=Fluid.TWO_THIRDS),
+                Field.text("address_line_2", field_width=Fluid.TWO_THIRDS),
+                Field.text("town_or_city", field_width=Fluid.ONE_HALF),
+                Field.text("county", field_width=Fluid.ONE_HALF),
+                Field.text("postal_code", field_width=Fluid.ONE_THIRD),
+                legend="Address",
+                legend_size=Size.MEDIUM,
+                legend_tag="h3",
+            )
+        else:
+            self.address_fieldset = Fieldset(
+                Field.text("country", field_width=Fluid.TWO_THIRDS),
+                Field.text("town_or_city", field_width=Fluid.TWO_THIRDS),
+                Field.text("address_line_1", field_width=Fluid.TWO_THIRDS),
+                Field.text("address_line_2", field_width=Fluid.TWO_THIRDS),
+                Field.text("address_line_3", field_width=Fluid.TWO_THIRDS),
+                Field.text("address_line_4", field_width=Fluid.TWO_THIRDS),
+            )
 
         self.helper.label_size = None
 
