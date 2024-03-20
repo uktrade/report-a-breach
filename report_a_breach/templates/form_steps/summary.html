@@ -85,7 +85,7 @@
                 {% if is_company_obtained_from_companies_house %}
                     {{ form_data.do_you_know_the_registered_company_number.registered_company_name }}
                 {% else %}
-                    N/A
+                    {{ form_data.business_or_person_details.name }}
                 {% endif %}
             </dd>
             <dd class="govuk-summary-list__actions">
@@ -103,9 +103,9 @@
             </dt>
             <dd class="govuk-summary-list__value">
                 {% if is_company_obtained_from_companies_house %}
-                    {{ form_data.do_you_know_the_registered_company_number.registered_office_address }}
+                    {{ form_data.do_you_know_the_registered_company_number.registered_office_address | linebreaksbr }}
                 {% else %}
-                    N/A
+                    {{ form_data.business_or_person_details.readable_address | linebreaksbr }}
                 {% endif %}
             </dd>
             <dd class="govuk-summary-list__actions">
@@ -176,8 +176,7 @@
                 Name
             </dt>
             <dd class="govuk-summary-list__value">
-{#                        TODO: this does not appear in the cleaned data #}
-                {{ form_data.where_were_the_goods_supplied_from.name }}
+                {{ form_data.about_the_supplier.name }}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
@@ -190,8 +189,7 @@
                 Website
             </dt>
             <dd class="govuk-summary-list__value">
-{#                        TODO: this does not appear in the cleaned data #}
-                {{ form_data.where_were_the_goods_supplied_from.website }}
+                {{ form_data.about_the_supplier.website }}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
@@ -205,8 +203,7 @@
                 Address
             </dt>
             <dd class="govuk-summary-list__value">
-{#                        TODO: this does not appear in the cleaned data #}
-                {{ form_data.where_were_the_goods_supplied_from.address }}
+                {{ form_data.about_the_supplier.readable_address | linebreaksbr }}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
