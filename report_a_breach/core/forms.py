@@ -302,6 +302,9 @@ class WhichSanctionsRegimeForm(BaseForm):
         label="Select all that apply",
     )
 
+    class Media:
+        js = ("javascript/form_steps/which_sanctions_regimes.js",)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         checkbox_choices = []
@@ -395,6 +398,12 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         label="Where were the goods, services, technological assistance or technology supplied to?",
         help_text="This is the adresss of the end-user",
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.request.GET.get("add_another_end_user") == "yes":
+            # the user is trying to add another end-user, let's pop the "I do not know" option
+            self.fields["where_were_the_goods_supplied_to"].choices.pop(-1)
 
 
 class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
