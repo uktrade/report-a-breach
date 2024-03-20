@@ -117,7 +117,10 @@ class ReportABreachWizardView(BaseWizardView):
         ):
             # want to show companies house details and then redirect back to summary
             # if yes:
-            return redirect(f"{self.get_step_url('check_company_details')}?redirect=summary")
+            if form.cleaned_data["do_you_know_the_registered_company_number"] == "yes":
+                return redirect(f"{self.get_step_url('check_company_details')}?redirect=summary")
+            else:
+                return redirect(f"{self.get_step_url('business_or_person_details')}?redirect=summary")
             # if no:
 
         return super().render_next_step(form, **kwargs)
