@@ -68,7 +68,7 @@
             <dd class="govuk-summary-list__actions">
                 {% if is_company_obtained_from_companies_house %}
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary">Change<span
+                       href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?change_company_number=yes">Change<span
                         class="govuk-visually-hidden"></span></a>
                 {% else %}
                     <a class="govuk-link"
