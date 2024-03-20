@@ -40,11 +40,19 @@ def show_where_were_the_goods_made_available_from_page(wizard):
 
 
 def show_business_or_personal_details_page(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person")
+    where_is_the_address_cleaned_data = wizard.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person")
+    do_you_know_the_registered_company_number_cleaned_data = wizard.get_cleaned_data_for_step(
+        "do_you_know_the_registered_company_number"
+    )
 
+    show_page = (
+        where_is_the_address_cleaned_data.get("where_is_the_address")
+        or do_you_know_the_registered_company_number_cleaned_data.get("do_you_know_the_registered_company_number", False) == "no"
+    )
+
+    return show_page
     # we just want to check that the user has filled out this form as a way of checking if they have filled out the
     # previous form in the chain of conditionals. A -> B -> C. If B is filled out, then A must-have been filled out.
-    return cleaned_data.get("where_is_the_address")
 
 
 def show_name_and_business_you_work_for_page(wizard):
