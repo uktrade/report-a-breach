@@ -63,3 +63,13 @@ def show_name_and_business_you_work_for_page(wizard):
 def show_name_page(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("start")
     return cleaned_data.get("reporter_professional_relationship") in ("owner", "acting")
+
+
+def show_about_the_end_user_page(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
+    return cleaned_data.get("where_were_the_goods_supplied_to") in ["in_the_uk", "outside_the_uk"]
+
+
+def show_end_user_added_page(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
+    return cleaned_data.get("where_were_the_goods_supplied_to") in ["in_the_uk", "outside_the_uk"]
