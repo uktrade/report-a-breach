@@ -372,11 +372,10 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         label="Where were the goods, services, technological assistance or technology made available from?",
     )
 
-    def __init__(self, *args, address_dict, **kwargs):
+    def __init__(self, address_string=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         address_choices = []
-        if address_dict:
-            address_string = get_formatted_address(address_dict)
+        if address_string is not None:
             address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
