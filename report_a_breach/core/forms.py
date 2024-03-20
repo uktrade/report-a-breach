@@ -237,13 +237,13 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
                 Field.text("name", field_width=Fluid.ONE_HALF),
                 legend="Name",
                 legend_size=Size.MEDIUM,
-                legend_tag="h3",
+                legend_tag="h2",
             ),
             Fieldset(
                 Field.text("website", field_width=Fluid.ONE_HALF),
                 legend="Website",
                 legend_size=Size.MEDIUM,
-                legend_tag="h3",
+                legend_tag="h2",
             ),
             Fieldset(
                 Field.text("country", field_width=Fluid.ONE_THIRD),
@@ -422,6 +422,7 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
     email = forms.CharField()
     additional_contact_details = forms.CharField(
         widget=forms.Textarea,
+        label="Additional contact details",
     )
 
     class Meta(BasePersonBusinessDetailsForm.Meta):
@@ -460,7 +461,7 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
                 Field.text("website", field_width=Fluid.ONE_HALF),
                 legend="Name and digital contact details",
                 legend_size=Size.MEDIUM,
-                legend_tag="h3",
+                legend_tag="h2",
             ),
             Fieldset(
                 Field.text("country", field_width=Fluid.ONE_THIRD),
@@ -473,13 +474,9 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
                 Field.text("postal_code", field_width=Fluid.ONE_THIRD),
                 legend="Address",
                 legend_size=Size.MEDIUM,
-                legend_tag="h3",
+                legend_tag="h2",
             ),
-            Field.text(
-                "additional_contact_details",
-                field_width=Fluid.FULL,
-                label_size=Size.MEDIUM,
-            ),
+            Field.textarea("additional_contact_details", field_width=Fluid.FULL, label_tag="h2", label_size=Size.MEDIUM),
         )
 
     def clean(self):
