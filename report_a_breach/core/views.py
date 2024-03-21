@@ -34,6 +34,7 @@ from .forms import (
     WhenDidYouFirstSuspectForm,
     WhereIsTheAddressOfTheBusinessOrPersonForm,
     WhereWereTheGoodsMadeAvailableForm,
+    WhereWereTheGoodsMadeAvailableToForm,
     WhereWereTheGoodsSuppliedFromForm,
     WhereWereTheGoodsSuppliedToForm,
     WhichSanctionsRegimeForm,
@@ -66,6 +67,7 @@ class ReportABreachWizardView(BaseWizardView):
         ("about_the_supplier", AboutTheSupplierForm),
         ("where_were_the_goods_made_available_from", WhereWereTheGoodsMadeAvailableForm),
         ("where_were_the_goods_supplied_to", WhereWereTheGoodsSuppliedToForm),
+        ("where_were_the_goods_made_available_to", WhereWereTheGoodsMadeAvailableToForm),
         ("about_the_end_user", AboutTheEndUserForm),
         ("end_user_added", EndUserAddedForm),
         ("were_there_other_addresses_in_the_supply_chain", WereThereOtherAddressesInTheSupplyChainForm),
@@ -111,6 +113,14 @@ class ReportABreachWizardView(BaseWizardView):
             # we want to redirect them to 'where is the end user' page, but pass another query parameter to indicate that they
             # know about another end-user, so we can remove the last option 'I don't know' from the list of options
             return redirect(f"{self.get_step_url('where_were_the_goods_supplied_to')}?add_another_end_user=yes")
+
+        if self.steps.current == "where_were_the_goods_made_available_from":
+            # we don't want to call super() here as that appears to be calling the next item in the form list
+            # rather than applying the condition logic
+            if form.cleaned_data["where_were_the_goods_made_available_from"] in ["different_uk_address", "outside_the_uk"]:
+                return redirect(self.get_step_url("about_the_supplier"))
+            elif form.cleaned_data["where_were_the_goods_made_available_from"] in ["same_address", "i_do_not_know"]:
+                return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
     def get_summary_context_data(self, form, context):
@@ -187,6 +197,9 @@ class ReportABreachWizardView(BaseWizardView):
     def get_form(self, step=None, data=None, files=None):
         if step is None:
             step = self.steps.current
+        # if step == "where_were_the_goods_made_available_from":
+        #     form_class = self.get_form_list().get(step)
+        # else:
         # we are overriding this method, so we call self.form_list rather than self.get_form_list(). The latter will
         # apply the conditional logic to the form list, which we don't want to do here.
         form_class = self.form_list[step]
@@ -228,8 +241,15 @@ class ReportABreachWizardView(BaseWizardView):
             where_were_the_goods_supplied_from = (self.get_cleaned_data_for_step("where_were_the_goods_supplied_from") or {}).get(
                 "where_were_the_goods_supplied_from", ""
             )
-            is_uk_address = where_were_the_goods_supplied_from == "different_uk_address"
-            kwargs["is_uk_address"] = is_uk_address
+            if where_were_the_goods_supplied_from:
+                is_uk_address = where_were_the_goods_supplied_from == "different_uk_address"
+                kwargs["is_uk_address"] = is_uk_address
+            where_were_the_goods_made_available_from = (
+                self.get_cleaned_data_for_step("where_were_the_goods_made_available_from") or {}
+            ).get("where_were_the_goods_made_available_from", "")
+            if where_were_the_goods_made_available_from:
+                is_uk_address = where_were_the_goods_made_available_from == "different_uk_address"
+                kwargs["is_uk_address"] = is_uk_address
 
         if step == "about_the_end_user":
             where_were_the_goods_supplied_to = (self.get_cleaned_data_for_step("where_were_the_goods_supplied_to") or {}).get(
