@@ -131,7 +131,8 @@ class ReportABreachWizardView(BaseWizardView):
 
         if uploaded_file_name := self.request.session.get("uploaded_file_name", None):
             context["form_data"]["uploaded_file_name"] = uploaded_file_name
-
+        if end_users := self.request.session.get("end_users", None):
+            context["form_data"]["end_users"] = end_users
         return context
 
     def process_are_you_reporting_a_business_on_companies_house_step(self, form):
