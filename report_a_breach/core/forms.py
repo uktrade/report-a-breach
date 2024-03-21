@@ -406,7 +406,7 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
 
 
 class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
-    where_were_the_goods_supplied_to = forms.ChoiceField(
+    where_were_the_goods_made_available_to = forms.ChoiceField(
         choices=(
             Choice("in_the_uk", "The UK"),
             Choice("outside_the_uk", "Outside the UK"),
@@ -421,7 +421,7 @@ class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
-            self.fields["where_were_the_goods_supplied_to"].choices.pop(-1)
+            self.fields["where_were_the_goods_made_available_too"].choices.pop(-1)
 
 
 class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
