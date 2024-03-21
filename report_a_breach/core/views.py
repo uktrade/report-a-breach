@@ -111,17 +111,6 @@ class ReportABreachWizardView(BaseWizardView):
             # we want to redirect them to 'where is the end user' page, but pass another query parameter to indicate that they
             # know about another end-user, so we can remove the last option 'I don't know' from the list of options
             return redirect(f"{self.get_step_url('where_were_the_goods_supplied_to')}?add_another_end_user=yes")
-
-        if (
-            self.steps.current == "do_you_know_the_registered_company_number"
-            and self.request.GET.get("change_company_number") == "yes"
-        ):
-            # If they know the number, show companies house details and then redirect back to summary
-            # If not, show business or person details (uk address) and then redirect back to summary
-            if form.cleaned_data["do_you_know_the_registered_company_number"] == "yes":
-                return redirect(f"{self.get_step_url('check_company_details')}?redirect=summary")
-            else:
-                return redirect(f"{self.get_step_url('business_or_person_details')}?redirect=summary")
         return super().render_next_step(form, **kwargs)
 
     def get_summary_context_data(self, form, context):

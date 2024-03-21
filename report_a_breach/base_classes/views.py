@@ -49,8 +49,18 @@ class BaseWizardView(NamedUrlSessionWizardView):
         return super().process_step(form)
 
     def render(self, form=None, **kwargs):
-        if self.steps.current == "verify":
+
+        steps_to_continue = [
+            "verify",
+            "business_or_person_details",
+            "check_company_details",
+            "about_the_supplier",
+            "about_the_end_user",
+        ]
+
+        if self.steps.current in steps_to_continue:
             return super().render(form, **kwargs)
+
         # if we have a redirect set in the session, we want to redirect to that step, but only if the form is valid.
         # if the form is not valid, we want to show the user the errors on the current step
         elif redirect_to := self.request.session.get("redirect"):
