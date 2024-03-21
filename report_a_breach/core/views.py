@@ -197,9 +197,6 @@ class ReportABreachWizardView(BaseWizardView):
     def get_form(self, step=None, data=None, files=None):
         if step is None:
             step = self.steps.current
-        # if step == "where_were_the_goods_made_available_from":
-        #     form_class = self.get_form_list().get(step)
-        # else:
         # we are overriding this method, so we call self.form_list rather than self.get_form_list(). The latter will
         # apply the conditional logic to the form list, which we don't want to do here.
         form_class = self.form_list[step]
