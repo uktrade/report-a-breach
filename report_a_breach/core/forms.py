@@ -395,7 +395,7 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         ),
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology supplied to?",
-        help_text="This is the adresss of the end-user",
+        help_text="This is the address of the end-user",
     )
 
     def __init__(self, *args, **kwargs):
