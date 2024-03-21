@@ -103,6 +103,3 @@ def show_where_were_the_goods_made_available_to_page(wizard):
         show_page = cleaned_data.get("where_were_the_goods_made_available_from") in ["different_uk_address", "outside_the_uk"]
 
     return show_page
-
-
-# TODO: raise ticket to fix address capture from the made_available_to page
