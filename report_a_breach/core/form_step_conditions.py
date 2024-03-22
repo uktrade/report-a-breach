@@ -28,14 +28,25 @@ def show_do_you_know_the_registered_company_number_page(wizard):
 
 def show_about_the_supplier_page(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_from")
-    return cleaned_data.get("where_were_the_goods_supplied_from", False) in (
-        "different_uk_address",
-        "outside_the_uk",
+    cleaned_data_available = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_from")
+    choices = ["different_uk_address", "outside_the_uk"]
+
+    show_page = (
+        cleaned_data.get("where_were_the_goods_supplied_from", False) in choices
+        or cleaned_data_available.get("where_were_the_goods_made_available_from", False) in choices
     )
+
+    return show_page
 
 
 def show_where_were_the_goods_made_available_from_page(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_from")
+
+    # if this data exists, we have already submitted this form and the user should be directed to the next
+    cleaned_data_available_step = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_from")
+    if cleaned_data_available_step:
+        return False
+
     return cleaned_data.get("where_were_the_goods_supplied_from", False) == "they_have_not_been_supplied"
 
 
@@ -73,3 +84,22 @@ def show_about_the_end_user_page(wizard):
 def show_end_user_added_page(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
     return cleaned_data.get("where_were_the_goods_supplied_to") in ["in_the_uk", "outside_the_uk"]
+
+
+def show_where_were_the_goods_supplied_to_page(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_from")
+    # ensure the supplied_to page is not shown when the user is on the made_available journey
+    return not cleaned_data.get("where_were_the_goods_made_available_from")
+
+
+def show_where_were_the_goods_made_available_to_page(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_from")
+    cleaned_data_supplier_step = wizard.get_cleaned_data_for_step("about_the_supplier")
+    show_page = False
+
+    if not cleaned_data_supplier_step:
+        show_page = cleaned_data.get("where_were_the_goods_made_available_from") in ["same_address", "i_do_not_know"]
+    else:
+        show_page = cleaned_data.get("where_were_the_goods_made_available_from") in ["different_uk_address", "outside_the_uk"]
+
+    return show_page

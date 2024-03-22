@@ -9,7 +9,6 @@ CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = settings.CHUNK_UPLOADER_RAISE_EX
 
 
 class CustomFileUploadHandler(FileUploadHandler):
-
     def receive_data_chunk(self, raw_data):
         return raw_data
 

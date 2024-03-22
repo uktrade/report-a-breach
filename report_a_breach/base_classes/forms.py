@@ -26,7 +26,7 @@ class BaseForm(forms.Form):
             "all": ["form.css"],
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, address_string=None, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
         super().__init__(*args, **kwargs)
