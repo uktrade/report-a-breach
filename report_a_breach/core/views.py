@@ -335,6 +335,7 @@ class ReportABreachWizardView(BaseWizardView):
         self.upload_documents_to_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
+        del self.request.session["end_users"]
         self.request.session["reference_id"] = new_reference
         self.storage.reset()
         self.storage.current_step = self.steps.first
