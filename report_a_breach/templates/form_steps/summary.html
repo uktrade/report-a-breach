@@ -189,7 +189,11 @@
                 Website
             </dt>
             <dd class="govuk-summary-list__value">
-                {{ form_data.about_the_supplier.website }}
+                {% if form_data.about_the_supplier.website %}
+                    <a class="govuk-link"
+                       href="{{ form_data.about_the_supplier.website }}">{{ form_data.about_the_supplier.website }}<span
+                        class="govuk-visually-hidden"> </span></a>
+                {% endif %}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
@@ -233,6 +237,24 @@
                 </div>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-!-font-weight-regular">
+                        Website
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if value.cleaned_data.website %}
+                            <a class="govuk-link"
+                               href="{{value.cleaned_data.website }}">{{ value.cleaned_data.website }}<span
+                                class="govuk-visually-hidden"> </span></a>
+                        {% endif %}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> </span></a>
+
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-!-font-weight-regular">
                         Address
                     </dt>
                     <dd class="govuk-summary-list__value">
@@ -262,9 +284,11 @@
             </dl>
         {% endfor %}
     {% endif %}
-    <a class="govuk-link"
-       href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Add end-user<span
-        class="govuk-visually-hidden"></span></a>
+    <dl class="govuk-summary-list">
+        <a class="govuk-link"
+           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Add end-user<span
+            class="govuk-visually-hidden"></span></a>
+    </dl>
  {#    TODO: need to add conditional here for other addresses in the supply chain #}
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">
