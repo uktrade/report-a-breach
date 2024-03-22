@@ -286,14 +286,13 @@ class ReportABreachWizardView(BaseWizardView):
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
-            if form_key == "about_the_end_user":
+            if form_key == "about_the_end_user" or form_key == "end_user_added":
                 continue
             form_obj = self.get_form(
                 step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
             )
             if form_obj.is_valid():
                 cleaned_data[form_key] = form_obj.cleaned_data
-
         return cleaned_data
 
     def upload_documents_to_s3(self):
