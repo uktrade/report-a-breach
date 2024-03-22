@@ -143,6 +143,8 @@ class ReportABreachWizardView(BaseWizardView):
             context["form_data"]["uploaded_file_name"] = uploaded_file_name
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
+        if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
+            context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
     def process_are_you_reporting_a_business_on_companies_house_step(self, form):
@@ -291,6 +293,7 @@ class ReportABreachWizardView(BaseWizardView):
             )
             if form_obj.is_valid():
                 cleaned_data[form_key] = form_obj.cleaned_data
+
         return cleaned_data
 
     def upload_documents_to_s3(self):
