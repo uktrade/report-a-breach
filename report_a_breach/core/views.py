@@ -144,7 +144,13 @@ class ReportABreachWizardView(BaseWizardView):
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
         if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
-            context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
+            if show_check_company_details_page_condition(self):
+                registered_company = context["form_data"]["do_you_know_the_registered_company_number"]
+                context["form_data"]["about_the_supplier"] = {}
+                context["form_data"]["about_the_supplier"]["name"] = registered_company["registered_company_name"]
+                context["form_data"]["about_the_supplier"]["readable_address"] = registered_company["registered_office_address"]
+            else:
+                context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
     def process_are_you_reporting_a_business_on_companies_house_step(self, form):
