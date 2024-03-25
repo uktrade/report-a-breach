@@ -74,6 +74,11 @@ class BaseWizardView(NamedUrlSessionWizardView):
         # back to the summary page once complete
         if redirect_to := self.request.GET.get("redirect", None):
             self.request.session["redirect"] = redirect_to
+            self.request.session.modified = True
+
+        if self.steps.current == "where_were_the_goods_made_available_to":
+            self.request.session["made_available_journey"] = True
+            self.request.session.modified = True
 
         return super().post(*args, **kwargs)
 
