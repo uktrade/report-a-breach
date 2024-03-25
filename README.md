@@ -101,7 +101,7 @@ To run the end-to-end tests for report a breach, start the django server using t
 `pipenv run python manage.py runserver --settings=config.settings.test`
 
 To run end-to-end tests only:\
-`pipenv run pytest test/test_frontend`\
+`pipenv run pytest tests/test_frontend`\
 A useful command for writing end-to-end tests is:\
 `pipenv run playwright codegen http://localhost:8000/report_a_breach/start/`
 

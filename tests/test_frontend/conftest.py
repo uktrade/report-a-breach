@@ -102,7 +102,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_role("heading", name="Submission complete").click()
         page.get_by_text("Your reference number").click()
         page.get_by_role("heading", name="What happens next").click()
-        page.get_by_text("We’ve sent your report to the").click()
+        page.get_by_text("We've sent your report to the").click()
         return page
 
     @classmethod
@@ -168,7 +168,7 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Where Were the Goods Supplied From Page
         #
-        page.get_by_label("A1, A2, AA0 0AA, GB").check()
+        page.get_by_label("A1, A2, Town, AA0 0AA, GB").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
