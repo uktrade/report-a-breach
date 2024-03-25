@@ -231,8 +231,9 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% url 'report_a_breach_about_the_end_user' end_user_uuid=end_user%}?redirect=summary">Change<span
-                            class="govuk-visually-hidden"></span></a>
+                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                            class="govuk-visually-hidden"> </span></a>
+
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
