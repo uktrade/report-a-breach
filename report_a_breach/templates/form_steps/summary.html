@@ -231,9 +231,8 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                           href="{% url 'report_a_breach_where_were_the_goods_supplied_to' end_user_uuid=end_user %}?redirect=summary">Change<span
                             class="govuk-visually-hidden"> </span></a>
-
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
@@ -249,9 +248,8 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                           href="{% url 'report_a_breach_where_were_the_goods_supplied_to' end_user_uuid=end_user %}?redirect=summary">Change<span
                             class="govuk-visually-hidden"> </span></a>
-
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
@@ -263,9 +261,8 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                           href="{% url 'report_a_breach_where_were_the_goods_supplied_to' end_user_uuid=end_user %}?redirect=summary">Change<span
                             class="govuk-visually-hidden"> </span></a>
-
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
@@ -277,9 +274,8 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
+                           href="{% url 'report_a_breach_where_were_the_goods_supplied_to' end_user_uuid=end_user %}?redirect=summary">Change<span
                             class="govuk-visually-hidden"> </span></a>
-
                     </dd>
                 </div>
             </dl>
@@ -287,7 +283,7 @@
     {% endif %}
     <dl class="govuk-summary-list">
         <a class="govuk-link"
-           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Add end-user<span
+           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect=summary">Add end-user<span
             class="govuk-visually-hidden"></span></a>
     </dl>
  {#    TODO: need to add conditional here for other addresses in the supply chain #}
