@@ -34,13 +34,15 @@ def get_formatted_address(address_dict: dict):
         address_string += line_1
 
     if line_2 := address_dict.get("address_line_2"):
-        address_string += f", {line_2}"
+        address_string += f",\n {line_2}"
 
+    if town_or_city := address_dict.get("town_or_city"):
+        address_string += f",\n {town_or_city}"
     if postal_code := address_dict.get("postal_code"):
-        address_string += f", {postal_code}"
+        address_string += f",\n {postal_code}"
 
     # todo - get full country name from country code
     if country := address_dict.get("country"):
-        address_string += f", {country}"
+        address_string += f",\n {country}"
 
     return address_string

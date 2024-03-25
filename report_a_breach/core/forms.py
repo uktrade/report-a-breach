@@ -525,6 +525,13 @@ class EndUserAddedForm(BaseForm):
         self.helper.legend_size = Size.MEDIUM
         self.helper.legend_tag = None
 
+    def is_valid(self):
+        # todo - we need to set this as True always for now, as the form really only gets validated
+        #  with a corresponding end_user_uuid, so we can't validate it here
+        #  we need to override render_done() in the WizardView so the resulting form_list
+        #  contains all instances of this form for each end_user
+        return super().is_valid() or True
+
 
 class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
     hide_optional_label_fields = ["other_addresses_in_the_supply_chain"]

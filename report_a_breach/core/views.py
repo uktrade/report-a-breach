@@ -141,7 +141,16 @@ class ReportABreachWizardView(BaseWizardView):
 
         if uploaded_file_name := self.request.session.get("uploaded_file_name", None):
             context["form_data"]["uploaded_file_name"] = uploaded_file_name
-
+        if end_users := self.request.session.get("end_users", None):
+            context["form_data"]["end_users"] = end_users
+        if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
+            if show_check_company_details_page_condition(self):
+                registered_company = context["form_data"]["do_you_know_the_registered_company_number"]
+                context["form_data"]["about_the_supplier"] = {}
+                context["form_data"]["about_the_supplier"]["name"] = registered_company["registered_company_name"]
+                context["form_data"]["about_the_supplier"]["readable_address"] = registered_company["registered_office_address"]
+            else:
+                context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
     def process_are_you_reporting_a_business_on_companies_house_step(self, form):
@@ -283,7 +292,7 @@ class ReportABreachWizardView(BaseWizardView):
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
-            if form_key == "about_the_end_user":
+            if form_key == "about_the_end_user" or form_key == "end_user_added":
                 continue
             form_obj = self.get_form(
                 step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
@@ -326,6 +335,7 @@ class ReportABreachWizardView(BaseWizardView):
         self.upload_documents_to_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
+        del self.request.session["end_users"]
         self.request.session["reference_id"] = new_reference
         self.storage.reset()
         self.storage.current_step = self.steps.first
