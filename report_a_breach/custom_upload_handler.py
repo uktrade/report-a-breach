@@ -7,7 +7,6 @@ from django_chunk_upload_handlers.clam_av import (
 
 
 class CustomFileUploadHandler(FileUploadHandler):
-
     def receive_data_chunk(self, raw_data, start):
         return raw_data
 

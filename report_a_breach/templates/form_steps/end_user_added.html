@@ -4,8 +4,7 @@
 
 {% block form_content %}
     <h1 class="govuk-heading-l">
-        You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}
-            s{% endif %}
+        You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}
     </h1>
     {% for id, end_user in request.session.end_users.items %}
         <h3 class="govuk-heading-m">End-user {{ forloop.counter }}</h3>

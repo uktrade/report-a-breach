@@ -34,6 +34,7 @@ from .forms import (
     WhenDidYouFirstSuspectForm,
     WhereIsTheAddressOfTheBusinessOrPersonForm,
     WhereWereTheGoodsMadeAvailableForm,
+    WhereWereTheGoodsMadeAvailableToForm,
     WhereWereTheGoodsSuppliedFromForm,
     WhereWereTheGoodsSuppliedToForm,
     WhichSanctionsRegimeForm,
@@ -66,6 +67,7 @@ class ReportABreachWizardView(BaseWizardView):
         ("about_the_supplier", AboutTheSupplierForm),
         ("where_were_the_goods_made_available_from", WhereWereTheGoodsMadeAvailableForm),
         ("where_were_the_goods_supplied_to", WhereWereTheGoodsSuppliedToForm),
+        ("where_were_the_goods_made_available_to", WhereWereTheGoodsMadeAvailableToForm),
         ("about_the_end_user", AboutTheEndUserForm),
         ("end_user_added", EndUserAddedForm),
         ("were_there_other_addresses_in_the_supply_chain", WereThereOtherAddressesInTheSupplyChainForm),
@@ -87,11 +89,15 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
 
     def get(self, request, *args, **kwargs):
-        if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
+        if request.GET.get("add_another_end_user", None) == "yes":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
-                self.storage.current_step = "where_were_the_goods_supplied_to"
-                return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
+                default_redirect = "where_were_the_goods_supplied_to"
+                if self.request.session.get("made_available_journey"):
+                    default_redirect = "where_were_the_goods_made_available_to"
+                self.storage.current_step = default_redirect
+                kwargs["step"] = default_redirect
+                return super().get(request, *args, **kwargs)
             else:
                 # we're trying to edit an existing end-user, so we need to load the form with the existing data
                 self.storage.current_step = "about_the_end_user"
@@ -108,9 +114,20 @@ class ReportABreachWizardView(BaseWizardView):
 
     def render_next_step(self, form, **kwargs):
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
+            default_path = "where_were_the_goods_supplied_to"
+            if self.request.session.get("made_available_journey"):
+                default_path = "where_were_the_goods_made_available_to"
             # we want to redirect them to 'where is the end user' page, but pass another query parameter to indicate that they
             # know about another end-user, so we can remove the last option 'I don't know' from the list of options
-            return redirect(f"{self.get_step_url('where_were_the_goods_supplied_to')}?add_another_end_user=yes")
+            return redirect(f"{self.get_step_url(default_path)}?add_another_end_user=yes")
+
+        if self.steps.current == "where_were_the_goods_made_available_from":
+            # we don't want to call super() here as that appears to be calling the next item in the form list
+            # rather than applying the condition logic
+            if form.cleaned_data["where_were_the_goods_made_available_from"] in ["different_uk_address", "outside_the_uk"]:
+                return redirect(self.get_step_url("about_the_supplier"))
+            elif form.cleaned_data["where_were_the_goods_made_available_from"] in ["same_address", "i_do_not_know"]:
+                return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
     def get_summary_context_data(self, form, context):
@@ -131,7 +148,16 @@ class ReportABreachWizardView(BaseWizardView):
 
         if uploaded_file_name := self.request.session.get("uploaded_file_name", None):
             context["form_data"]["uploaded_file_name"] = uploaded_file_name
-
+        if end_users := self.request.session.get("end_users", None):
+            context["form_data"]["end_users"] = end_users
+        if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
+            if show_check_company_details_page_condition(self):
+                registered_company = context["form_data"]["do_you_know_the_registered_company_number"]
+                context["form_data"]["about_the_supplier"] = {}
+                context["form_data"]["about_the_supplier"]["name"] = registered_company["registered_company_name"]
+                context["form_data"]["about_the_supplier"]["readable_address"] = registered_company["registered_office_address"]
+            else:
+                context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
     def process_are_you_reporting_a_business_on_companies_house_step(self, form):
@@ -231,15 +257,30 @@ class ReportABreachWizardView(BaseWizardView):
             where_were_the_goods_supplied_from = (self.get_cleaned_data_for_step("where_were_the_goods_supplied_from") or {}).get(
                 "where_were_the_goods_supplied_from", ""
             )
-            is_uk_address = where_were_the_goods_supplied_from == "different_uk_address"
-            kwargs["is_uk_address"] = is_uk_address
+            if where_were_the_goods_supplied_from:
+                is_uk_address = where_were_the_goods_supplied_from == "different_uk_address"
+                kwargs["is_uk_address"] = is_uk_address
+            where_were_the_goods_made_available_from = (
+                self.get_cleaned_data_for_step("where_were_the_goods_made_available_from") or {}
+            ).get("where_were_the_goods_made_available_from", "")
+            if where_were_the_goods_made_available_from:
+                is_uk_address = where_were_the_goods_made_available_from == "different_uk_address"
+                kwargs["is_uk_address"] = is_uk_address
 
         if step == "about_the_end_user":
             where_were_the_goods_supplied_to = (self.get_cleaned_data_for_step("where_were_the_goods_supplied_to") or {}).get(
                 "where_were_the_goods_supplied_to", ""
             )
-            is_uk_address = where_were_the_goods_supplied_to == "in_the_uk"
-            kwargs["is_uk_address"] = is_uk_address
+            if where_were_the_goods_supplied_to:
+                is_uk_address = where_were_the_goods_supplied_to == "in_the_uk"
+                kwargs["is_uk_address"] = is_uk_address
+
+            where_were_the_goods_made_available_to = (
+                self.get_cleaned_data_for_step("where_were_the_goods_made_available_to") or {}
+            ).get("where_were_the_goods_made_available_to", "")
+            if where_were_the_goods_made_available_to:
+                is_uk_address = where_were_the_goods_made_available_to == "in_the_uk"
+                kwargs["is_uk_address"] = is_uk_address
 
         if step in (
             "where_were_the_goods_supplied_from",
@@ -269,7 +310,7 @@ class ReportABreachWizardView(BaseWizardView):
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
-            if form_key == "about_the_end_user":
+            if form_key == "about_the_end_user" or form_key == "end_user_added":
                 continue
             form_obj = self.get_form(
                 step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
@@ -312,6 +353,7 @@ class ReportABreachWizardView(BaseWizardView):
         self.upload_documents_to_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
+        del self.request.session["end_users"]
         self.request.session["reference_id"] = new_reference
         self.storage.reset()
         self.storage.current_step = self.steps.first
