@@ -172,7 +172,6 @@ class ReportABreachWizardView(BaseWizardView):
         return self.get_form_step_data(form)
 
     def process_about_the_end_user_step(self, form):
-        # todo add session object that can be picked up in post if the previous step was available_to
         current_end_users = self.request.session.get("end_users", {})
 
         end_user_uuid = self.kwargs.get("end_user_uuid", str(uuid.uuid4()))
