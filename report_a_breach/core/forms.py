@@ -372,11 +372,10 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         label="Where were the goods, services, technological assistance or technology made available from?",
     )
 
-    def __init__(self, *args, address_dict, **kwargs):
+    def __init__(self, address_string=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         address_choices = []
-        if address_dict:
-            address_string = get_formatted_address(address_dict)
+        if address_string is not None:
             address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
@@ -396,7 +395,7 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         ),
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology supplied to?",
-        help_text="This is the adresss of the end-user",
+        help_text="This is the address of the end-user",
     )
 
     def __init__(self, *args, **kwargs):
@@ -404,6 +403,25 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
             self.fields["where_were_the_goods_supplied_to"].choices.pop(-1)
+
+
+class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
+    where_were_the_goods_made_available_to = forms.ChoiceField(
+        choices=(
+            Choice("in_the_uk", "The UK"),
+            Choice("outside_the_uk", "Outside the UK"),
+            Choice("i_do_not_know", "I do not know"),
+        ),
+        widget=forms.RadioSelect,
+        label="Where were the goods, services, technological assistance or technology made available to?",
+        help_text="This is the address of the end-user",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.request.GET.get("add_another_end_user") == "yes":
+            # the user is trying to add another end-user, let's pop the "I do not know" option
+            self.fields["where_were_the_goods_made_available_to"].choices.pop(-1)
 
 
 class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
