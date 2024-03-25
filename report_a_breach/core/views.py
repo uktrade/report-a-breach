@@ -156,6 +156,7 @@ class ReportABreachWizardView(BaseWizardView):
         return self.get_form_step_data(form)
 
     def process_about_the_end_user_step(self, form):
+        # todo add session object that can be picked up in post if the previous step was available_to
         current_end_users = self.request.session.get("end_users", {})
 
         end_user_uuid = self.kwargs.get("end_user_uuid", str(uuid.uuid4()))
@@ -252,8 +253,16 @@ class ReportABreachWizardView(BaseWizardView):
             where_were_the_goods_supplied_to = (self.get_cleaned_data_for_step("where_were_the_goods_supplied_to") or {}).get(
                 "where_were_the_goods_supplied_to", ""
             )
-            is_uk_address = where_were_the_goods_supplied_to == "in_the_uk"
-            kwargs["is_uk_address"] = is_uk_address
+            if where_were_the_goods_supplied_to:
+                is_uk_address = where_were_the_goods_supplied_to == "in_the_uk"
+                kwargs["is_uk_address"] = is_uk_address
+
+            where_were_the_goods_made_available_to = (
+                self.get_cleaned_data_for_step("where_were_the_goods_made_available_to") or {}
+            ).get("where_were_the_goods_made_available_to", "")
+            if where_were_the_goods_made_available_to:
+                is_uk_address = where_were_the_goods_made_available_to == "in_the_uk"
+                kwargs["is_uk_address"] = is_uk_address
 
         if step in (
             "where_were_the_goods_supplied_from",

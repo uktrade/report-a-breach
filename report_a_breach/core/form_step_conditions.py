@@ -78,12 +78,22 @@ def show_name_page(wizard):
 
 def show_about_the_end_user_page(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
-    return cleaned_data.get("where_were_the_goods_supplied_to") in ["in_the_uk", "outside_the_uk"]
+    cleaned_data_available_step = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_to")
+    choices = ["in_the_uk", "outside_the_uk"]
+    return (
+        cleaned_data.get("where_were_the_goods_supplied_to") in choices
+        or cleaned_data_available_step.get("where_were_the_goods_made_available_to") in choices
+    )
 
 
 def show_end_user_added_page(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
-    return cleaned_data.get("where_were_the_goods_supplied_to") in ["in_the_uk", "outside_the_uk"]
+    cleaned_data_available_step = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_to")
+    choices = ["in_the_uk", "outside_the_uk"]
+    return (
+        cleaned_data.get("where_were_the_goods_supplied_to") in choices
+        or cleaned_data_available_step.get("where_were_the_goods_made_available_to") in choices
+    )
 
 
 def show_where_were_the_goods_supplied_to_page(wizard):
