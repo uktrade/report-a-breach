@@ -89,11 +89,15 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
 
     def get(self, request, *args, **kwargs):
-        if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
+        if request.GET.get("add_another_end_user", None) == "yes":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
-                self.storage.current_step = "where_were_the_goods_supplied_to"
-                return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
+                default_redirect = "where_were_the_goods_supplied_to"
+                if self.request.session.get("made_available_journey"):
+                    default_redirect = "where_were_the_goods_made_available_to"
+                self.storage.current_step = default_redirect
+                kwargs["step"] = default_redirect
+                return super().get(request, *args, **kwargs)
             else:
                 # we're trying to edit an existing end-user, so we need to load the form with the existing data
                 self.storage.current_step = "about_the_end_user"
@@ -110,9 +114,12 @@ class ReportABreachWizardView(BaseWizardView):
 
     def render_next_step(self, form, **kwargs):
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
+            default_path = "where_were_the_goods_supplied_to"
+            if self.request.session.get("made_available_journey"):
+                default_path = "where_were_the_goods_made_available_to"
             # we want to redirect them to 'where is the end user' page, but pass another query parameter to indicate that they
             # know about another end-user, so we can remove the last option 'I don't know' from the list of options
-            return redirect(f"{self.get_step_url('where_were_the_goods_supplied_to')}?add_another_end_user=yes")
+            return redirect(f"{self.get_step_url(default_path)}?add_another_end_user=yes")
 
         if self.steps.current == "where_were_the_goods_made_available_from":
             # we don't want to call super() here as that appears to be calling the next item in the form list
@@ -261,8 +268,16 @@ class ReportABreachWizardView(BaseWizardView):
             where_were_the_goods_supplied_to = (self.get_cleaned_data_for_step("where_were_the_goods_supplied_to") or {}).get(
                 "where_were_the_goods_supplied_to", ""
             )
-            is_uk_address = where_were_the_goods_supplied_to == "in_the_uk"
-            kwargs["is_uk_address"] = is_uk_address
+            if where_were_the_goods_supplied_to:
+                is_uk_address = where_were_the_goods_supplied_to == "in_the_uk"
+                kwargs["is_uk_address"] = is_uk_address
+
+            where_were_the_goods_made_available_to = (
+                self.get_cleaned_data_for_step("where_were_the_goods_made_available_to") or {}
+            ).get("where_were_the_goods_made_available_to", "")
+            if where_were_the_goods_made_available_to:
+                is_uk_address = where_were_the_goods_made_available_to == "in_the_uk"
+                kwargs["is_uk_address"] = is_uk_address
 
         if step in (
             "where_were_the_goods_supplied_from",
