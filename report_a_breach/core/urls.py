@@ -47,6 +47,11 @@ urlpatterns = [
         report_a_breach_wizard,
         name="report_a_breach_where_were_the_goods_supplied_to",
     ),
+    path(
+        "report_a_breach/where_were_the_goods_made_available_to/<str:end_user_uuid>/",
+        report_a_breach_wizard,
+        name="report_a_breach_where_were_the_goods_made_available_to",
+    ),
     re_path(r"report_a_breach/(?P<step>.+)/$", report_a_breach_wizard, name="report_a_breach_step"),
     path("complete", CompleteView.as_view(), name="complete"),
 ]
