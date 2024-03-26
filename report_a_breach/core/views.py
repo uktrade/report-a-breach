@@ -102,12 +102,22 @@ class ReportABreachWizardView(BaseWizardView):
                 # we're trying to edit an existing end-user, so we need to load the form with the existing data
                 self.storage.current_step = "about_the_end_user"
                 return super().get(request, *args, step="about_the_end_user", **kwargs)
+
+        if request.resolver_match.url_name == "report_a_breach_where_were_the_goods_supplied_to":
+            self.storage.current_step = "where_were_the_goods_supplied_to"
+            return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
         return super().get(request, *args, **kwargs)
 
     def get_step_url(self, step):
         if step == "about_the_end_user" and "end_user_uuid" in self.kwargs:
             return reverse(
                 "report_a_breach_about_the_end_user",
+                kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
+            )
+
+        if step == "where_were_the_goods_supplied_to" and "end_user_uuid" in self.kwargs:
+            return reverse(
+                "report_a_breach_where_were_the_goods_supplied_to",
                 kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
             )
         return super().get_step_url(step)
