@@ -5,14 +5,12 @@ from django_chunk_upload_handlers.clam_av import (
     VirusFoundInFileException,
 )
 
-CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = settings.CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND
-
 
 class CustomFileUploadHandler(FileUploadHandler):
-    def receive_data_chunk(self, raw_data):
+    def receive_data_chunk(self, raw_data, start):
         return raw_data
 
-    def file_complete(self):
+    def file_complete(self, file_size):
         """
         Check if scanned file has a virus or not.
         If it does, raise an exception on the form.
