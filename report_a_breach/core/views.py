@@ -1,9 +1,9 @@
-import os
 import uuid
 
+import boto3
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.core.files.storage import FileSystemStorage, default_storage
+from django.core.files.storage import DefaultStorage
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -86,7 +86,7 @@ class ReportABreachWizardView(BaseWizardView):
     template_name = "form_steps/generic_form_step.html"
     storage_name = "report_a_breach.session.SessionStorage"
 
-    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
+    file_storage = DefaultStorage()
 
     def get(self, request, *args, **kwargs):
         if request.GET.get("add_another_end_user", None) == "yes":
@@ -329,13 +329,16 @@ class ReportABreachWizardView(BaseWizardView):
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
 
-    def upload_documents_to_s3(self):
+    def store_documents_s3(self):
         """
-        Uploads documents from the upload_documents step to the default storage option.
+        Copies documents from the default storage to permanent storage on s3
         """
+
+        s3 = boto3.resource("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
         try:
             uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
-            default_storage.save(uploaded_docs.name, uploaded_docs)
+            copy_source = {"Bucket": "static-files", "Key": f"media/{uploaded_docs.name}"}
+            s3.meta.client.copy(copy_source, "static-files", f"permanent_files/{uploaded_docs.name}")
         except TypeError:
             uploaded_docs = []
         return uploaded_docs
@@ -360,7 +363,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()"""
-        self.upload_documents_to_s3()
+        self.store_documents_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
         del self.request.session["end_users"]
