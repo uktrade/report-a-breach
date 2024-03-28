@@ -1,13 +1,12 @@
 {% load static i18n %}
 {% load gtm_enabled %}
 {% load get_gtm_id %}
-{% gtm_enabled as gtm_enabled_flag %}
+{% gtm_enabled as gtm_enabled %}
 
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
-
     <head>
-        {% if gtm_enabled_flag %}
+        {% if gtm_enabled %}
         <!-- Google Tag Manager -->
             <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -42,8 +41,8 @@
     </head>
 
     <body class="govuk-template__body ">
+        {% if gtm_enabled %}
         <!-- Google Tag Manager (noscript) -->
-        {% if gtm_enabled_flag %}
             <noscript><iframe src=https://www.googletagmanager.com/ns.html?id={% get_gtm_id %}
                               height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
