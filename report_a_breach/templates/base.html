@@ -1,8 +1,21 @@
 {% load static i18n %}
+{% load gtm_enabled %}
+{% load get_gtm_id %}
+{% gtm_enabled as gtm_enabled_flag %}
+
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
 
     <head>
+        {% if gtm_enabled_flag %}
+        <!-- Google Tag Manager -->
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                                                          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer', '{% get_gtm_id %}');</script>
+        <!-- End Google Tag Manager -->
+        {% endif %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="theme-color" content="#0b0c0c">
@@ -22,13 +35,20 @@
               href="{% static "govuk/images/govuk-apple-touch-icon-152x152.png" %}">
         <link rel="apple-touch-icon" href="{% static "govuk/images/govuk-apple-touch-icon.png" %}">
         <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
-      
+
         <link rel="stylesheet" href="{% static "stylesheets/govuk-frontend-4.7.0.min.css" %}">
 
         {% block extra_css %}{% endblock extra_css %}
     </head>
 
     <body class="govuk-template__body ">
+        <!-- Google Tag Manager (noscript) -->
+        {% if gtm_enabled_flag %}
+            <noscript><iframe src=https://www.googletagmanager.com/ns.html?id={% get_gtm_id %}
+                              height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+        {% endif %}
+
         <script>
             document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
         </script>
