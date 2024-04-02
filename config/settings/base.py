@@ -64,12 +64,13 @@ CRISPY_TEMPLATE_PACK = "gds"
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", default=None)
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", default=None)
 AWS_STATICFILES_BUCKET_NAME = env.str("AWS_STATICFILES_BUCKET_NAME", default=None)
+AWS_MEDIAFILES_BUCKET_NAME = env.str("AWS_MEDIAFILES_BUCKET_NAME", default=None)
 AWS_ENDPOINT_URL = env.str("AWS_ENDPOINT_URL", default=None)
 AWS_S3_ENDPOINT_URL = f"http://{AWS_ENDPOINT_URL}"
-AWS_S3_STATICFILES_CUSTOM_DOMAIN = f"{AWS_STATICFILES_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}"
 AWS_REGION = env.str("AWS_REGION", default="eu-west-2")
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
 AWS_PERMANENT_STORAGE_BUCKET_NAME = env.str("AWS_PERMANENT_STORAGE_BUCKET_NAME", default=None)
+USE_S3_MEDIA_FILES = env.bool("USE_S3_MEDIA_FILES", default=True)
 
 # We want to use HTTP for local development and HTTPS for production
 AWS_S3_URL_PROTOCOL = env.str("AWS_S3_URL_PROTOCOL", default="https:")
@@ -81,7 +82,7 @@ AWS_S3_URL_PROTOCOL = env.str("AWS_S3_URL_PROTOCOL", default="https:")
 STORAGES = {}
 
 if env.bool("USE_S3_STATIC_FILES", default=True):
-    STATIC_URL = f"{AWS_S3_STATICFILES_CUSTOM_DOMAIN}/static/"
+    STATIC_URL = f"{AWS_STATICFILES_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}/static/"
     STORAGES["staticfiles"] = {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {"bucket_name": "static-files", "location": "static"},
@@ -97,14 +98,15 @@ else:
 
 
 # Media Files storage
-if env.bool("USE_S3_MEDIA_FILES", default=True):
+if USE_S3_MEDIA_FILES:
+    MEDIA_URL = f"{AWS_S3_URL_PROTOCOL}//{AWS_MEDIAFILES_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}/media/"
     STORAGES["default"] = {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {"bucket_name": "media-files", "location": "media"},
     }
 
 else:
-    MEDIA_URL = "/media/temporary_storage"
+    MEDIA_URL = "/media/temporary_storage/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
     STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
 

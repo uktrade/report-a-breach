@@ -333,14 +333,15 @@ class ReportABreachWizardView(BaseWizardView):
         """
         Copies documents from the default storage to permanent storage on s3
         """
-
-        s3 = boto3.resource("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
-        try:
-            uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
-            copy_source = {"Bucket": settings.AWS_STORAGE_BUCKET_NAME, "Key": f"media/{uploaded_docs.name}"}
-            s3.meta.client.copy(copy_source, settings.AWS_PERMANENT_STORAGE_BUCKET_NAME, f"documents/{uploaded_docs.name}")
-        except TypeError:
-            uploaded_docs = []
+        uploaded_docs = []
+        if settings.USE_S3_MEDIA_FILES:
+            s3 = boto3.resource("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
+            try:
+                uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+                copy_source = {"Bucket": settings.AWS_MEDIAFILES_BUCKET_NAME, "Key": f"media/{uploaded_docs.name}"}
+                s3.meta.client.copy(copy_source, settings.AWS_PERMANENT_STORAGE_BUCKET_NAME, f"documents/{uploaded_docs.name}")
+            except TypeError:
+                uploaded_docs = []
         return uploaded_docs
 
     def done(self, form_list, **kwargs):
