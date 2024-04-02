@@ -212,3 +212,7 @@ if SENTRY_DSN and SENTRY_ENVIRONMENT:
 # Email Verification settings
 TEST_EMAIL_VERIFY_CODE = False
 EMAIL_VERIFY_TIMEOUT_SECONDS = env.int("EMAIL_VERIFY_TIMEOUT_SECONDS", default=3600)
+
+# Google Analytics
+GTM_ENABLED = env.str("GTM_ENABLED", default=False)
+GTM_ID = env.str("GTM_ID", default=None)
