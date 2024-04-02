@@ -63,12 +63,13 @@ CRISPY_TEMPLATE_PACK = "gds"
 # AWS
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", default=None)
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", default=None)
-AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME", default=None)
+AWS_STATICFILES_BUCKET_NAME = env.str("AWS_STATICFILES_BUCKET_NAME", default=None)
 AWS_ENDPOINT_URL = env.str("AWS_ENDPOINT_URL", default=None)
 AWS_S3_ENDPOINT_URL = f"http://{AWS_ENDPOINT_URL}"
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}"
+AWS_S3_STATICFILES_CUSTOM_DOMAIN = f"{AWS_STATICFILES_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}"
 AWS_REGION = env.str("AWS_REGION", default="eu-west-2")
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
+AWS_PERMANENT_STORAGE_BUCKET_NAME = env.str("AWS_PERMANENT_STORAGE_BUCKET_NAME", default=None)
 
 # We want to use HTTP for local development and HTTPS for production
 AWS_S3_URL_PROTOCOL = env.str("AWS_S3_URL_PROTOCOL", default="https:")
@@ -77,10 +78,14 @@ AWS_S3_URL_PROTOCOL = env.str("AWS_S3_URL_PROTOCOL", default="https:")
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 # where static files are collected after running collectstatic:
 
+STORAGES = {}
+
 if env.bool("USE_S3_STATIC_FILES", default=True):
-    STATICFILES_LOCATION = "static"
-    STATICFILES_STORAGE = "report_a_breach.custom_s3_storage.StaticStorage"
-    STATIC_URL = f"{AWS_S3_CUSTOM_DOMAIN}/static/"
+    STATIC_URL = f"{AWS_S3_STATICFILES_CUSTOM_DOMAIN}/static/"
+    STORAGES["staticfiles"] = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {"bucket_name": "static-files", "location": "static"},
+    }
 
 else:
     STATIC_URL = "static/"
@@ -88,17 +93,21 @@ else:
     STATICFILES_DIRS = [
         os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
     ]
+    STORAGES["staticfiles"] = {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}
 
-# File storage
+
+# Media Files storage
 if env.bool("USE_S3_MEDIA_FILES", default=True):
-    MEDIAFILES_LOCATION = "media"
-    MEDIA_URL = f"http://{AWS_S3_CUSTOM_DOMAIN}/media/"
-    DEFAULT_FILE_STORAGE = "report_a_breach.custom_s3_storage.MediaStorage"
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {"bucket_name": "media-files", "location": "media"},
+    }
 
 else:
     MEDIA_URL = "/media/temporary_storage"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
+
 
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
