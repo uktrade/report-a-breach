@@ -71,7 +71,7 @@ AWS_REGION = env.str("AWS_REGION", default="eu-west-2")
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
 AWS_PERMANENT_STORAGE_BUCKET_NAME = env.str("AWS_PERMANENT_STORAGE_BUCKET_NAME", default=None)
 USE_S3_MEDIA_FILES = env.bool("USE_S3_MEDIA_FILES", default=True)
-PRESIGNED_URL_EXPIRY = 600
+PRESIGNED_URL_EXPIRY = env.int("PRESIGNED_URL_EXPIRY", default=3600)
 # We want to use HTTP for local development and HTTPS for production
 AWS_S3_URL_PROTOCOL = env.str("AWS_S3_URL_PROTOCOL", default="https:")
 
