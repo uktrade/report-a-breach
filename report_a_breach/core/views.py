@@ -140,6 +140,18 @@ class ReportABreachWizardView(BaseWizardView):
                 return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
+    def generate_presigned_url(self, objectpath):
+        """Generates the Presigned URL so users can download their uploaded documents."""
+        client = boto3.client("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
+        print(settings.PRESIGNED_URL_EXPIRY)
+        presigned_url = client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": settings.AWS_MEDIAFILES_BUCKET_NAME, "Key": objectpath},
+            HttpMethod="GET",
+            ExpiresIn=settings.PRESIGNED_URL_EXPIRY,
+        )
+        return presigned_url
+
     def get_summary_context_data(self, form, context):
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
@@ -155,9 +167,9 @@ class ReportABreachWizardView(BaseWizardView):
         context["form_data"] = cleaned_data
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
-
-        if uploaded_file_name := self.request.session.get("uploaded_file_name", None):
-            context["form_data"]["uploaded_file_name"] = uploaded_file_name
+        if uploaded_file_name := context["form_data"]["upload_documents"]["documents"].name:
+            presigned_url = self.generate_presigned_url(f"media/{uploaded_file_name}")
+            context["form_data"]["upload_documents"]["url"] = presigned_url
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
         if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
