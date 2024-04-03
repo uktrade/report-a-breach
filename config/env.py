@@ -72,7 +72,7 @@ class GovPaasSettings(BaseSettings):
         redis: list[dict[str, Any]]
         aws_s3_bucket: list[dict[str, Any]] = Field(alias="aws-s3-bucket")
 
-    vcap_services: dict | None = VCAPServices
+    vcap_services: VCAPServices | None = VCAPServices
 
     @computed_field
     @property
