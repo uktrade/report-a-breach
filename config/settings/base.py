@@ -14,28 +14,22 @@ import os
 from pathlib import Path
 
 import dj_database_url
-import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
+from config.env import env
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+is_dbt_platform = "COPILOT_ENVIRONMENT_NAME" in os.environ
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = env.str("DJANGO_SECRET_KEY")
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+SECRET_KEY = env.django_secret_key
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = env.allowed_hosts
 
 # Application definition
-
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -61,32 +55,17 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_f
 CRISPY_TEMPLATE_PACK = "gds"
 
 # AWS
-AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", default=None)
-AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", default=None)
-AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME", default=None)
-AWS_ENDPOINT_URL = env.str("AWS_ENDPOINT_URL", default=None)
-AWS_S3_ENDPOINT_URL = f"http://{AWS_ENDPOINT_URL}"
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}"
-AWS_LOCATION = "static/"
-AWS_REGION = env.str("AWS_REGION", default="eu-west-2")
-
-# We want to use HTTP for local development and HTTPS for production
-AWS_S3_URL_PROTOCOL = env.str("AWS_S3_URL_PROTOCOL", default="https:")
+AWS_STORAGE_BUCKET_NAME = env.aws_storage_bucket_name
+AWS_REGION = env.aws_region
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-# where static files are collected after running collectstatic:
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
+]
 
-if env.bool("USE_S3_STATIC_FILES", default=True):
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-    STATIC_URL = f"{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}"
-else:
-    STATIC_URL = "static/"
-    STATIC_ROOT = os.path.join(BASE_DIR, "static")
-    STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
-    ]
-
+# Media files (user uploaded files)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
@@ -100,9 +79,9 @@ FILE_UPLOAD_HANDLERS = (
 # File storage
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-CLAM_AV_USERNAME = env.str("CLAM_AV_USERNAME", default=None)
-CLAM_AV_PASSWORD = env.str("CLAM_AV_PASSWORD", default=None)
-CLAM_AV_DOMAIN = env.str("CLAM_AV_DOMAIN", default=None)
+CLAM_AV_USERNAME = env.clam_av_username
+CLAM_AV_PASSWORD = env.clam_av_password
+CLAM_AV_DOMAIN = env.clam_av_domain
 
 CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = False
 
@@ -139,27 +118,18 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-_VCAP_SERVICES = env.json("VCAP_SERVICES", default={})
-
-if "postgres" in _VCAP_SERVICES:
-    DATABASES = {
-        "default": {
-            **dj_database_url.parse(
-                _VCAP_SERVICES["postgres"][0]["credentials"]["uri"],
-                engine="postgresql",
-                conn_max_age=0,
-            ),
-            "ENGINE": "django.db.backends.postgresql",
-        }
+DATABASES = {
+    "default": {
+        **dj_database_url.parse(
+            env.database_uri,
+            engine="postgresql",
+            conn_max_age=0,
+        ),
+        "ENGINE": "django.db.backends.postgresql",
     }
-else:
-    default_database = env.db()
-    DATABASES = {"default": default_database}
+}
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -176,43 +146,36 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # COMPANIES HOUSE API
-COMPANIES_HOUSE_API_KEY = env.str("COMPANIES_HOUSE_API_KEY", default="")
+COMPANIES_HOUSE_API_KEY = env.company_house_api_key
 
 # GOV NOTIFY
-GOV_NOTIFY_API_KEY = env.str("GOV_NOTIFY_API_KEY")
-EMAIL_VERIFY_CODE_TEMPLATE_ID = env.str("GOVUK_NOTIFY_TEMPLATE_EMAIL_VERIFICATION")
-RESTRICT_SENDING = env.bool("RESTRICT_SENDING", default=True)  # if True, only send to whitelisted domains
+GOV_NOTIFY_API_KEY = env.gov_notify_api_key
+EMAIL_VERIFY_CODE_TEMPLATE_ID = env.email_verify_code_template_id
+RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
 
 # SENTRY
-SENTRY_DSN = env.str("SENTRY_DSN", default="")
-SENTRY_ENVIRONMENT = env.str("SENTRY_ENVIRONMENT", default="")
+SENTRY_DSN = env.sentry_dsn
+SENTRY_ENVIRONMENT = env.sentry_environment
 if SENTRY_DSN and SENTRY_ENVIRONMENT:
     sentry_sdk.init(
-        dsn=env.str("SENTRY_DSN", default=""),
-        environment=env.str("SENTRY_ENVIRONMENT", default=""),
+        dsn=SENTRY_DSN,
+        environment=SENTRY_ENVIRONMENT,
         integrations=[DjangoIntegration()],
         traces_sample_rate=0,
     )
 
 # Email Verification settings
-TEST_EMAIL_VERIFY_CODE = False
-EMAIL_VERIFY_TIMEOUT_SECONDS = env.int("EMAIL_VERIFY_TIMEOUT_SECONDS", default=3600)
+EMAIL_VERIFY_TIMEOUT_SECONDS = env.email_verify_timeout_seconds
 
 # Google Analytics
-GTM_ENABLED = env.str("GTM_ENABLED", default=False)
-GTM_ID = env.str("GTM_ID", default=None)
+GTM_ENABLED = env.gtm_enabled
+GTM_ID = env.gtm_id

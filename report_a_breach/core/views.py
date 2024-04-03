@@ -217,10 +217,7 @@ class ReportABreachWizardView(BaseWizardView):
 
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
-        if settings.TEST_EMAIL_VERIFY_CODE:
-            verify_code = "012345"
-        else:
-            verify_code = get_random_string(6, allowed_chars="0123456789")
+        verify_code = get_random_string(6, allowed_chars="0123456789")
         user_session = Session.objects.get(session_key=self.request.session.session_key)
         ReporterEmailVerification.objects.create(
             reporter_session=user_session,
