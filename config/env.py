@@ -69,8 +69,6 @@ class GovPaasSettings(BaseSettings):
         model_config = ConfigDict(extra="ignore")
 
         postgres: list[dict[str, Any]]
-        redis: list[dict[str, Any]]
-        aws_s3_bucket: list[dict[str, Any]] = Field(alias="aws-s3-bucket")
 
     vcap_services: VCAPServices | None = VCAPServices
 
