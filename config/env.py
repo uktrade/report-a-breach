@@ -69,6 +69,7 @@ class GovPaasSettings(BaseSettings):
         model_config = ConfigDict(extra="ignore")
 
         postgres: list[dict[str, Any]]
+        aws_s3_bucket: list[dict[str, Any]] = Field(alias="aws-s3-bucket")
 
     vcap_services: VCAPServices | None = VCAPServices
 
@@ -79,8 +80,13 @@ class GovPaasSettings(BaseSettings):
 
     @computed_field
     @property
-    def s3_bucket_config(self) -> dict:
-        return self.vcap_services.aws_s3_bucket[0]["credentials"]
+    def temporary_s3_bucket_config(self) -> dict:
+        return next(s3_bucket for s3_bucket in self.vcap_services.aws_s3_bucket if s3_bucket["name"] == "temporary_media_bucket")
+
+    @computed_field
+    @property
+    def permanent_s3_bucket_config(self) -> dict | None:
+        return next(s3_bucket for s3_bucket in self.vcap_services.aws_s3_bucket if s3_bucket["name"] == "permanent_media_bucket")
 
 
 class DBTPlatformSettings(BaseSettings):
