@@ -106,7 +106,7 @@ if USE_S3_MEDIA_FILES:
     }
 
 else:
-    MEDIA_URL = "/media/temporary_storage/"
+    MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
     STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
 
