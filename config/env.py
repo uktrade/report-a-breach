@@ -35,10 +35,14 @@ class BaseSettings(PydanticBaseSettings):
     gtm_enabled: bool = False
     gtm_id: str | None = None
 
-    aws_storage_bucket_name: str | None = None
+    aws_access_key_id: str | None = None
+    aws_secret_access_key: str | None = None
     aws_endpoint_url: str | None = None
     aws_s3_url_protocol: str = "https:"
-    aws_region: str | None = None
+    aws_default_region: str = Field(alias="AWS_DEFAULT_REGION")
+    temporary_s3_bucket_name: str = ""
+    permanent_s3_bucket_name: str = ""
+    pre_signed_url_expiry_seconds: int = 3600
 
     @computed_field
     @property
@@ -63,16 +67,6 @@ class GovPaasSettings(BaseSettings):
     @property
     def database_uri(self) -> dict:
         return self.vcap_services.postgres[0]["credentials"]["uri"]
-
-    @computed_field
-    @property
-    def temporary_s3_bucket_config(self) -> dict:
-        return next(s3_bucket for s3_bucket in self.vcap_services.aws_s3_bucket if s3_bucket["name"] == "temporary_media_bucket")
-
-    @computed_field
-    @property
-    def permanent_s3_bucket_config(self) -> dict | None:
-        return next(s3_bucket for s3_bucket in self.vcap_services.aws_s3_bucket if s3_bucket["name"] == "permanent_media_bucket")
 
 
 class DBTPlatformSettings(BaseSettings):

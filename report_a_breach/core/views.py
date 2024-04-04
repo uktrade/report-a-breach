@@ -1,9 +1,7 @@
-import os
 import uuid
 
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.core.files.storage import FileSystemStorage, default_storage
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -11,7 +9,9 @@ from django.views.generic import TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.utils.notifier import send_email
+from report_a_breach.utils.s3 import generate_presigned_url
 
+from ..document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from ..utils.companies_house import get_formatted_address
 from .forms import (
     AboutTheEndUserForm,
@@ -86,7 +86,7 @@ class ReportABreachWizardView(BaseWizardView):
     template_name = "form_steps/generic_form_step.html"
     storage_name = "report_a_breach.session.SessionStorage"
 
-    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "temporary_storage"))
+    file_storage = TemporaryDocumentStorage()
 
     def get(self, request, *args, **kwargs):
         if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
@@ -167,11 +167,18 @@ class ReportABreachWizardView(BaseWizardView):
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         context["is_made_available_journey"] = self.request.session.get("made_available_journey")
-        if uploaded_file_name := self.request.session.get("uploaded_file_name", None):
-            context["form_data"]["uploaded_file_name"] = uploaded_file_name
+        if uploaded_file_name := context["form_data"]["upload_documents"]["documents"].name:
+            presigned_url = generate_presigned_url(
+                settings.TEMPORARY_S3_BUCKET_NAME, f"{self.request.session.session_key}/{uploaded_file_name}"
+            )
+            context["form_data"]["upload_documents"]["url"] = presigned_url
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
-        if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
+
+        if (
+            self.get_cleaned_data_for_step("where_were_the_goods_supplied_from").get("where_were_the_goods_supplied_from")
+            == "same_address"
+        ):
             if show_check_company_details_page_condition(self):
                 registered_company = context["form_data"]["do_you_know_the_registered_company_number"]
                 context["form_data"]["about_the_supplier"] = {}
@@ -337,15 +344,18 @@ class ReportABreachWizardView(BaseWizardView):
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
 
-    def upload_documents_to_s3(self):
+    def store_documents_in_s3(self):
         """
-        Uploads documents from the upload_documents step to the default storage option.
+        Copies documents from the default temporary storage to permanent storage on s3
         """
-        try:
-            uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
-            default_storage.save(uploaded_docs.name, uploaded_docs)
-        except TypeError:
-            uploaded_docs = []
+        permanent_storage_bucket = PermanentDocumentStorage()
+        uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+
+        object_key = f"{self.request.session.session_key}/{uploaded_docs.name}"
+
+        permanent_storage_bucket.bucket.meta.client.copy(
+            {"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key}, settings.PERMANENT_S3_BUCKET_NAME, object_key
+        )
         return uploaded_docs
 
     def done(self, form_list, **kwargs):
@@ -368,7 +378,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()"""
-        self.upload_documents_to_s3()
+        self.store_documents_in_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
         self.request.session.pop("end_users", None)

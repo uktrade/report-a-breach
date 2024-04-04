@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = env.django_secret_key
 
-DEBUG = True
+DEBUG = env.debug
 
 ALLOWED_HOSTS = env.allowed_hosts
 
@@ -55,20 +55,37 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_f
 CRISPY_TEMPLATE_PACK = "gds"
 
 # AWS
-AWS_STORAGE_BUCKET_NAME = env.aws_storage_bucket_name
-AWS_REGION = env.aws_region
+AWS_S3_REGION_NAME = env.aws_default_region
+AWS_ACCESS_KEY_ID = env.aws_access_key_id
+AWS_SECRET_ACCESS_KEY = env.aws_secret_access_key
+AWS_ENDPOINT_URL = env.aws_endpoint_url
+
+# S3
+AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
+PRE_SIGNED_URL_EXPIRY_SECONDS = env.pre_signed_url_expiry_seconds
+# The default bucket needs to be assigned to AWS_STORAGE_BUCKET_NAME
+AWS_STORAGE_BUCKET_NAME = TEMPORARY_S3_BUCKET_NAME = env.temporary_s3_bucket_name
+PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_name
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_DEFAULT_ACL = "private"
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "..", "report_a_breach", "static"),
-]
+STATICFILES_DIRS = (BASE_DIR / "report_a_breach" / "static",)
 
-# Media files (user uploaded files)
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# Media Files Storage
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {"bucket_name": env.temporary_s3_bucket_name, "location": "media"},
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
+# File storage
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "report_a_breach.custom_upload_handler.CustomFileUploadHandler",
@@ -76,15 +93,13 @@ FILE_UPLOAD_HANDLERS = (
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 )  # Order is important
 
-# File storage
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
+# CLAM AV
 CLAM_AV_USERNAME = env.clam_av_username
 CLAM_AV_PASSWORD = env.clam_av_password
 CLAM_AV_DOMAIN = env.clam_av_domain
-
 CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = False
 
+# MIDDLEWARE
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -110,6 +125,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.media",
             ],
         },
     },
