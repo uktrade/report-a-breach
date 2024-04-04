@@ -70,7 +70,6 @@ AWS_S3_ENDPOINT_URL = f"http://{AWS_ENDPOINT_URL}"
 AWS_REGION = env.str("AWS_REGION", default="eu-west-2")
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
 AWS_PERMANENT_STORAGE_BUCKET_NAME = env.str("AWS_PERMANENT_STORAGE_BUCKET_NAME", default=None)
-USE_S3_MEDIA_FILES = env.bool("USE_S3_MEDIA_FILES", default=True)
 PRESIGNED_URL_EXPIRY = env.int("PRESIGNED_URL_EXPIRY", default=3600)
 # We want to use HTTP for local development and HTTPS for production
 AWS_S3_URL_PROTOCOL = env.str("AWS_S3_URL_PROTOCOL", default="https:")
@@ -96,20 +95,12 @@ else:
     ]
     STORAGES["staticfiles"] = {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}
 
-
-# Media Files storage
-if USE_S3_MEDIA_FILES:
-    MEDIA_URL = f"{AWS_S3_URL_PROTOCOL}//{AWS_MEDIAFILES_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}/media/"
-    STORAGES["default"] = {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {"bucket_name": "media-files", "location": "media"},
-    }
-
-else:
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-    STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
-
+# Media Files Storage
+MEDIA_URL = f"{AWS_S3_URL_PROTOCOL}//{AWS_MEDIAFILES_BUCKET_NAME}.s3.{AWS_ENDPOINT_URL}/media/"
+STORAGES["default"] = {
+    "BACKEND": "storages.backends.s3.S3Storage",
+    "OPTIONS": {"bucket_name": "media-files", "location": "media"},
+}
 
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",

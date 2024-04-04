@@ -11,6 +11,7 @@ from django.views.generic import TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.utils.notifier import send_email
+from report_a_breach.utils.s3 import generate_presigned_url
 
 from ..utils.companies_house import get_formatted_address
 from .forms import (
@@ -140,17 +141,6 @@ class ReportABreachWizardView(BaseWizardView):
                 return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
-    def generate_presigned_url(self, objectpath):
-        """Generates the Presigned URL so users can download their uploaded documents."""
-        client = boto3.client("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
-        presigned_url = client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": settings.AWS_MEDIAFILES_BUCKET_NAME, "Key": objectpath},
-            HttpMethod="GET",
-            ExpiresIn=settings.PRESIGNED_URL_EXPIRY,
-        )
-        return presigned_url
-
     def get_summary_context_data(self, form, context):
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
@@ -167,9 +157,8 @@ class ReportABreachWizardView(BaseWizardView):
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         if uploaded_file_name := context["form_data"]["upload_documents"]["documents"].name:
-            if settings.USE_S3_MEDIA_FILES:
-                presigned_url = self.generate_presigned_url(f"media/{uploaded_file_name}")
-                context["form_data"]["upload_documents"]["url"] = presigned_url
+            presigned_url = generate_presigned_url(settings.AWS_MEDIAFILES_BUCKET_NAME, f"media/{uploaded_file_name}")
+            context["form_data"]["upload_documents"]["url"] = presigned_url
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
         if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
@@ -341,19 +330,18 @@ class ReportABreachWizardView(BaseWizardView):
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
 
-    def store_documents_s3(self):
+    def store_documents_in_s3(self):
         """
         Copies documents from the default storage to permanent storage on s3
         """
         uploaded_docs = []
-        if settings.USE_S3_MEDIA_FILES:
-            s3 = boto3.resource("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
-            try:
-                uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
-                copy_source = {"Bucket": settings.AWS_MEDIAFILES_BUCKET_NAME, "Key": f"media/{uploaded_docs.name}"}
-                s3.meta.client.copy(copy_source, settings.AWS_PERMANENT_STORAGE_BUCKET_NAME, f"documents/{uploaded_docs.name}")
-            except TypeError:
-                uploaded_docs = []
+        s3 = boto3.resource("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
+        try:
+            uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+            copy_source = {"Bucket": settings.AWS_MEDIAFILES_BUCKET_NAME, "Key": f"media/{uploaded_docs.name}"}
+            s3.meta.client.copy(copy_source, settings.AWS_PERMANENT_STORAGE_BUCKET_NAME, f"documents/{uploaded_docs.name}")
+        except TypeError:
+            uploaded_docs = []
         return uploaded_docs
 
     def done(self, form_list, **kwargs):
@@ -376,7 +364,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()"""
-        self.store_documents_s3()
+        self.store_documents_in_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
         del self.request.session["end_users"]
