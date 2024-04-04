@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+from dbt_copilot_python.database import database_url_from_env
 from dbt_copilot_python.network import setup_allowed_hosts
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 from pydantic_settings import BaseSettings as PydanticBaseSettings
@@ -84,6 +85,11 @@ class DBTPlatformSettings(BaseSettings):
             return self.RAB_ALLOWED_HOSTS
         else:
             return setup_allowed_hosts(self.RAB_ALLOWED_HOSTS)
+
+    @computed_field
+    @property
+    def database_uri(self) -> dict:
+        return database_url_from_env("DATABASE_CREDENTIALS")
 
 
 if "config.settings.local" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):

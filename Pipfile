@@ -25,6 +25,7 @@ django-extensions = "~=3.2"
 django-log-formatter-ecs = "~=0.0.5"
 dbt-copilot-python = "*"
 pydantic-settings = "*"
+django-log-formatter-asim = "*"
 
 [dev-packages]
 black = "~=24.3"
