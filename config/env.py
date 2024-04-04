@@ -83,7 +83,7 @@ class GovPaasSettings(BaseSettings):
         if temporary_bucket_configuration := next(
             (each for each in self.vcap_services.aws_s3_bucket if "temporary" in each["name"]), None
         ):
-            return temporary_bucket_configuration["configuration"]["bucket_name"]
+            return temporary_bucket_configuration["credentials"]["bucket_name"]
         return None
 
     @computed_field
@@ -92,7 +92,7 @@ class GovPaasSettings(BaseSettings):
         if temporary_bucket_configuration := next(
             (each for each in self.vcap_services.aws_s3_bucket if "permanent" in each["name"]), None
         ):
-            return temporary_bucket_configuration["configuration"]["bucket_name"]
+            return temporary_bucket_configuration["credentials"]["bucket_name"]
         return None
 
 
