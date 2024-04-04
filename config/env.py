@@ -18,9 +18,9 @@ class BaseSettings(PydanticBaseSettings):
     django_secret_key: str
     rab_allowed_hosts: list[str] = ["*"]
 
-    clam_av_username: str | None = None
-    clam_av_password: str | None = None
-    clam_av_domain: str | None = None
+    clam_av_username: str = ""
+    clam_av_password: str = ""
+    clam_av_domain: str = ""
 
     company_house_api_key: str | None = None
 
@@ -29,19 +29,18 @@ class BaseSettings(PydanticBaseSettings):
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
 
-    sentry_dsn: str | None = None
-    sentry_environment: str | None = None
+    sentry_dsn: str = ""
+    sentry_environment: str = ""
 
-    gtm_enabled: bool = False
-    gtm_id: str | None = None
+    gtm_enabled: bool = True
+    gtm_id: str = ""
 
-    aws_access_key_id: str | None = None
-    aws_secret_access_key: str | None = None
-    aws_endpoint_url: str | None = None
-    aws_s3_url_protocol: str = "https:"
-    aws_default_region: str = Field(alias="AWS_DEFAULT_REGION")
-    temporary_s3_bucket_name: str = ""
-    permanent_s3_bucket_name: str = ""
+    aws_access_key_id: str = ""
+    aws_secret_access_key: str = ""
+    aws_endpoint_url: str = ""
+    aws_default_region: str = "eu-west-2"
+    temporary_s3_bucket_name: str = "temporary-document-bucket"
+    permanent_s3_bucket_name: str = "permanent-document-bucket"
     pre_signed_url_expiry_seconds: int = 3600
 
     @computed_field
@@ -51,7 +50,7 @@ class BaseSettings(PydanticBaseSettings):
 
 
 class LocalSettings(BaseSettings):
-    database_uri: str | None = Field(alias="DATABASE_URL")
+    database_uri: str = Field(alias="DATABASE_URL")
 
 
 class GovPaasSettings(BaseSettings):
