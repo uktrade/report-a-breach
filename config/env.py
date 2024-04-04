@@ -41,27 +41,12 @@ class BaseSettings(PydanticBaseSettings):
 
     @computed_field
     @property
-    def aws_access_key_id(self) -> str:
-        return self.s3_bucket_config["access_key_id"]
-
-    @computed_field
-    @property
     def allowed_hosts(self) -> list[str]:
         return self.rab_allowed_hosts
 
-    @computed_field
-    @property
-    def database_uri(self) -> str:
-        return self.database_url
-
 
 class LocalSettings(BaseSettings):
-    database_url: str | None = None
-
-    @computed_field
-    @property
-    def database_uri(self) -> str:
-        return self.database_url
+    database_uri: str | None = Field(alias="DATABASE_URL")
 
 
 class GovPaasSettings(BaseSettings):
