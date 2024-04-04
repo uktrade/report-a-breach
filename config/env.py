@@ -39,14 +39,24 @@ class BaseSettings(PydanticBaseSettings):
     aws_secret_access_key: str = ""
     aws_endpoint_url: str = ""
     aws_default_region: str = "eu-west-2"
-    temporary_s3_bucket_name: str = "temporary-document-bucket"
-    permanent_s3_bucket_name: str = "permanent-document-bucket"
+    rab_temporary_s3_bucket_name: str = "temporary-document-bucket"
+    rab_permanent_s3_bucket_name: str = "permanent-document-bucket"
     pre_signed_url_expiry_seconds: int = 3600
 
     @computed_field
     @property
     def allowed_hosts(self) -> list[str]:
         return self.rab_allowed_hosts
+
+    @computed_field
+    @property
+    def temporary_s3_bucket_name(self) -> str:
+        return self.rab_temporary_s3_bucket_name
+
+    @computed_field
+    @property
+    def permanent_s3_bucket_name(self) -> str:
+        return self.rab_permanent_s3_bucket_name
 
 
 class LocalSettings(BaseSettings):
@@ -66,6 +76,24 @@ class GovPaasSettings(BaseSettings):
     @property
     def database_uri(self) -> dict:
         return self.vcap_services.postgres[0]["credentials"]["uri"]
+
+    @computed_field
+    @property
+    def temporary_s3_bucket_name(self) -> str | None:
+        if temporary_bucket_configuration := next(
+            (each for each in self.vcap_services.aws_s3_bucket if "temporary" in each["name"]), None
+        ):
+            return temporary_bucket_configuration["configuration"]["bucket_name"]
+        return None
+
+    @computed_field
+    @property
+    def permanent_s3_bucket_name(self) -> str | None:
+        if temporary_bucket_configuration := next(
+            (each for each in self.vcap_services.aws_s3_bucket if "permanent" in each["name"]), None
+        ):
+            return temporary_bucket_configuration["configuration"]["bucket_name"]
+        return None
 
 
 class DBTPlatformSettings(BaseSettings):
