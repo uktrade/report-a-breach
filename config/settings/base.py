@@ -43,6 +43,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 ]
 
 OUR_APPS = ["report_a_breach", "healthcheck"]
@@ -125,6 +126,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "django.contrib.sites.middleware.CurrentSiteMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -226,3 +228,14 @@ EMAIL_VERIFY_TIMEOUT_SECONDS = env.int("EMAIL_VERIFY_TIMEOUT_SECONDS", default=3
 # Google Analytics
 GTM_ENABLED = env.str("GTM_ENABLED", default=False)
 GTM_ID = env.str("GTM_ID", default=None)
+
+
+MIGRATION_MODULES = {
+    "sites": "report_a_breach.migrations.sites_migrations",
+}
+
+# Default Report a breach site
+SITE_ID = 1
+# Domain Names for Sites
+RAB_DOMAIN = "report-a-breach"
+VAB_DOMAIN = "view-a-suspected-breach"
