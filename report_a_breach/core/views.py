@@ -90,7 +90,7 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = DefaultStorage()
 
     def get(self, request, *args, **kwargs):
-        if request.GET.get("add_another_end_user", None) == "yes":
+        if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
                 default_redirect = "where_were_the_goods_supplied_to"
@@ -107,6 +107,10 @@ class ReportABreachWizardView(BaseWizardView):
         if request.resolver_match.url_name == "report_a_breach_where_were_the_goods_supplied_to":
             self.storage.current_step = "where_were_the_goods_supplied_to"
             return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
+
+        if request.resolver_match.url_name == "report_a_breach_where_were_the_goods_made_available_to":
+            self.storage.current_step = "where_were_the_goods_made_available_to"
+            return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
         return super().get(request, *args, **kwargs)
 
     def get_step_url(self, step):
@@ -121,6 +125,12 @@ class ReportABreachWizardView(BaseWizardView):
                 "report_a_breach_where_were_the_goods_supplied_to",
                 kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
             )
+
+        if step == "where_were_the_goods_made_available_to" and "end_user_uuid" in self.kwargs:
+            return reverse(
+                "report_a_breach_where_were_the_goods_made_available_to",
+                kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
+            )
         return super().get_step_url(step)
 
     def render_next_step(self, form, **kwargs):
@@ -128,6 +138,7 @@ class ReportABreachWizardView(BaseWizardView):
             default_path = "where_were_the_goods_supplied_to"
             if self.request.session.get("made_available_journey"):
                 default_path = "where_were_the_goods_made_available_to"
+
             # we want to redirect them to 'where is the end user' page, but pass another query parameter to indicate that they
             # know about another end-user, so we can remove the last option 'I don't know' from the list of options
             return redirect(f"{self.get_step_url(default_path)}?add_another_end_user=yes")
@@ -156,6 +167,7 @@ class ReportABreachWizardView(BaseWizardView):
         context["form_data"] = cleaned_data
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
+        context["is_made_available_journey"] = self.request.session.get("made_available_journey")
         if uploaded_file_name := context["form_data"]["upload_documents"]["documents"].name:
             presigned_url = generate_presigned_url(settings.AWS_MEDIAFILES_BUCKET_NAME, f"media/{uploaded_file_name}")
             context["form_data"]["upload_documents"]["url"] = presigned_url
@@ -367,7 +379,9 @@ class ReportABreachWizardView(BaseWizardView):
         self.store_documents_in_s3()
         new_breach = Breach.objects.create()
         new_reference = new_breach.assign_reference()
-        del self.request.session["end_users"]
+        self.request.session.pop("end_users", None)
+        self.request.session.pop("made_available_journey", None)
+        self.request.session.modified = True
         self.request.session["reference_id"] = new_reference
         self.storage.reset()
         self.storage.current_step = self.steps.first
