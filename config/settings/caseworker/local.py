@@ -1,4 +1,4 @@
-from ..base import *  # noqa
+from config.settings.local import *  # noqa
 
 ENVIRONMENT = "local"
 SITE_ID = 2

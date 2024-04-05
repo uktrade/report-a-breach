@@ -25,7 +25,7 @@ class BaseSettings(PydanticBaseSettings):
     company_house_api_key: str | None = None
 
     gov_notify_api_key: str = None
-    email_verify_code_template_id: str
+    email_verify_code_template_id: str = ""
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
 
@@ -133,7 +133,7 @@ class DBTPlatformSettings(BaseSettings):
         return database_url_from_env("DATABASE_CREDENTIALS")
 
 
-if "config.settings.local" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):
+if "config.settings.local" or "config.settings.caseworker.local" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):
     # Local development
     env = LocalSettings()
 elif "COPILOT_ENVIRONMENT_NAME" in os.environ:

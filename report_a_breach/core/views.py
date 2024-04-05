@@ -397,3 +397,7 @@ class ReportABreachWizardView(BaseWizardView):
 
 class CompleteView(TemplateView):
     template_name = "complete.html"
+
+
+class ViewABreachView(TemplateView):
+    template_name = "view_a_breach.html"

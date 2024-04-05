@@ -1,8 +1,8 @@
 from django.urls import path
 
-from .views import CompleteView
+from .views import ViewABreachView
 
 urlpatterns = [
-    path("", CompleteView.as_view(), name="view_a_suspected_breach"),
-    path("<str:uuid>", CompleteView.as_view(), name="view_a_suspected_breach_uuid"),
+    path("", ViewABreachView.as_view(), name="view_a_suspected_breach"),
+    path("<str:uuid>", ViewABreachView.as_view(), name="view_a_suspected_breach_uuid"),
 ]
