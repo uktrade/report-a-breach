@@ -236,6 +236,7 @@ MIGRATION_MODULES = {
 
 # Default Report a breach site
 SITE_ID = 1
+
 # Domain Names for Sites
 RAB_DOMAIN = "report-a-breach"
 VAB_DOMAIN = "view-a-suspected-breach"
