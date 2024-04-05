@@ -60,14 +60,22 @@ AWS_ACCESS_KEY_ID = env.aws_access_key_id
 AWS_SECRET_ACCESS_KEY = env.aws_secret_access_key
 AWS_ENDPOINT_URL = env.aws_endpoint_url
 
-# S3
+# General S3
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
 PRE_SIGNED_URL_EXPIRY_SECONDS = env.pre_signed_url_expiry_seconds
-# The default bucket needs to be assigned to AWS_STORAGE_BUCKET_NAME
-AWS_STORAGE_BUCKET_NAME = TEMPORARY_S3_BUCKET_NAME = env.temporary_s3_bucket_name
-PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_name
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_DEFAULT_ACL = "private"
+
+# Temporary document bucket
+TEMPORARY_S3_BUCKET_ACCESS_KEY_ID = env.temporary_s3_bucket_access_key_id
+TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY = env.temporary_s3_bucket_secret_access_key
+TEMPORARY_S3_BUCKET_NAME = env.temporary_s3_bucket_name
+
+# Permanent document bucket
+PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_access_key_id
+PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_secret_access_key
+PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_name
+
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"

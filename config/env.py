@@ -35,8 +35,12 @@ class BaseSettings(PydanticBaseSettings):
     gtm_enabled: bool = True
     gtm_id: str = ""
 
-    aws_access_key_id: str = ""
-    aws_secret_access_key: str = ""
+    temporary_s3_bucket_access_key_id: str = "test"
+    temporary_s3_bucket_secret_access_key: str = "test"
+
+    permanent_s3_bucket_access_key_id: str = "test"
+    permanent_s3_bucket_secret_access_key: str = "test"
+
     aws_endpoint_url: str = ""
     aws_default_region: str = "eu-west-2"
     rab_temporary_s3_bucket_name: str = "temporary-document-bucket"
@@ -50,13 +54,21 @@ class BaseSettings(PydanticBaseSettings):
 
     @computed_field
     @property
-    def temporary_s3_bucket_name(self) -> str:
-        return self.rab_temporary_s3_bucket_name
+    def temporary_s3_bucket_configuration(self) -> dict:
+        return {
+            "bucket_name": self.temporary_s3_bucket_name,
+            "access_key_id": self.temporary_s3_bucket_access_key_id,
+            "secret_access_key": self.temporary_s3_bucket_secret_access_key,
+        }
 
     @computed_field
     @property
-    def permanent_s3_bucket_name(self) -> str:
-        return self.rab_permanent_s3_bucket_name
+    def permanent_s3_bucket_configuration(self) -> dict:
+        return {
+            "bucket_name": self.permanent_s3_bucket_name,
+            "access_key_id": self.permanent_s3_bucket_access_key_id,
+            "secret_access_key": self.permanent_s3_bucket_secret_access_key,
+        }
 
 
 class LocalSettings(BaseSettings):
@@ -77,23 +89,31 @@ class GovPaasSettings(BaseSettings):
     def database_uri(self) -> dict:
         return self.vcap_services.postgres[0]["credentials"]["uri"]
 
-    @computed_field
     @property
-    def temporary_s3_bucket_name(self) -> str | None:
-        if temporary_bucket_configuration := next(
-            (each for each in self.vcap_services.aws_s3_bucket if "temporary" in each["name"]), None
-        ):
-            return temporary_bucket_configuration["credentials"]["bucket_name"]
-        return None
+    def get_temporary_bucket_vcap(self) -> dict:
+        return next((each["credentials"] for each in self.vcap_services.aws_s3_bucket if "temporary" in each["name"]), {})
+
+    @property
+    def get_permanent_bucket_vcap(self) -> dict:
+        return next((each["credentials"] for each in self.vcap_services.aws_s3_bucket if "permanent" in each["name"]), {})
 
     @computed_field
     @property
-    def permanent_s3_bucket_name(self) -> str | None:
-        if temporary_bucket_configuration := next(
-            (each for each in self.vcap_services.aws_s3_bucket if "permanent" in each["name"]), None
-        ):
-            return temporary_bucket_configuration["credentials"]["bucket_name"]
-        return None
+    def temporary_s3_bucket_configuration(self) -> dict:
+        return {
+            "bucket_name": self.self.get_temporary_bucket_vcap["bucket_name"],
+            "access_key_id": self.get_temporary_bucket_vcap["aws_access_key_id"],
+            "secret_access_key": self.get_temporary_bucket_vcap["aws_secret_access_key"],
+        }
+
+    @computed_field
+    @property
+    def permanent_s3_bucket_configuration(self) -> dict:
+        return {
+            "bucket_name": self.self.get_permanent_bucket_vcap["bucket_name"],
+            "access_key_id": self.get_permanent_bucket_vcap["aws_access_key_id"],
+            "secret_access_key": self.get_permanent_bucket_vcap["aws_secret_access_key"],
+        }
 
 
 class DBTPlatformSettings(BaseSettings):
@@ -103,9 +123,9 @@ class DBTPlatformSettings(BaseSettings):
     @property
     def allowed_hosts(self) -> list[str]:
         if self.in_build_step:
-            return self.RAB_ALLOWED_HOSTS
+            return self.rab_allowed_hosts
         else:
-            return setup_allowed_hosts(self.RAB_ALLOWED_HOSTS)
+            return setup_allowed_hosts(self.rab_allowed_hosts)
 
     @computed_field
     @property
