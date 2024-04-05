@@ -60,7 +60,7 @@ AWS_ENDPOINT_URL = env.aws_endpoint_url
 
 # General S3
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
-PRE_SIGNED_URL_EXPIRY_SECONDS = env.pre_signed_url_expiry_seconds
+PRESIGNED_URL_EXPIRY_SECONDS = env.presigned_url_expiry_seconds
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_DEFAULT_ACL = "private"
 

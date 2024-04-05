@@ -167,10 +167,8 @@ class ReportABreachWizardView(BaseWizardView):
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         context["is_made_available_journey"] = self.request.session.get("made_available_journey")
-        if uploaded_file_name := context["form_data"]["upload_documents"]["documents"].name:
-            presigned_url = generate_presigned_url(
-                settings.TEMPORARY_S3_BUCKET_NAME, f"{self.request.session.session_key}/{uploaded_file_name}"
-            )
+        if uploaded_file := context["form_data"]["upload_documents"]["documents"]:
+            presigned_url = generate_presigned_url(uploaded_file.file.obj)
             context["form_data"]["upload_documents"]["url"] = presigned_url
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
