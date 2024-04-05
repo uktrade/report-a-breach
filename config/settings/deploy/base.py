@@ -1,8 +1,8 @@
-from django_log_formatter_ecs import ECSFormatter
+"""Configuration settings for deployment to all environments."""
 
-from .base import *  # noqa
+from django_log_formatter_asim import ASIMFormatter
 
-DEBUG = False
+from config.settings.base import *  # noqa
 
 INSTALLED_APPS += ["django_audit_log_middleware"]
 
@@ -11,7 +11,7 @@ MIDDLEWARE += ["django_audit_log_middleware.AuditLogMiddleware"]
 LOGGING = {
     "formatters": {
         "ecs_formatter": {
-            "()": ECSFormatter,
+            "()": ASIMFormatter,
         },
     },
     "handlers": {
@@ -27,5 +27,3 @@ LOGGING = {
     },
     "version": 1,
 }
-
-ENVIRONMENT = "production"

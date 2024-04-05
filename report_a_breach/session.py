@@ -19,3 +19,21 @@ class SessionStorage(WizardSessionStorage):
     def delete_step_data(self, *steps):
         for step in steps:
             self.data[self.step_data_key].pop(step, None)
+
+    def set_step_files(self, step, files):
+        """Overwriting this to prepend the session key to the file name. This is to avoid conflicts when multiple users
+        upload files with the same name."""
+        if step not in self.data[self.step_files_key]:
+            self.data[self.step_files_key][step] = {}
+
+        for field, field_file in (files or {}).items():
+            session_keyed_file_name = f"{self.request.session.session_key}/{field_file.name}"
+            tmp_filename = self.file_storage.save(session_keyed_file_name, field_file)
+            file_dict = {
+                "tmp_name": tmp_filename,
+                "name": field_file.name,
+                "content_type": field_file.content_type,
+                "size": field_file.size,
+                "charset": field_file.charset,
+            }
+            self.data[self.step_files_key][step][field] = file_dict

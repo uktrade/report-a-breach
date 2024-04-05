@@ -23,6 +23,10 @@ whitenoise = "*"
 django-simple-history = "~=3.4.0"
 django-extensions = "~=3.2"
 django-log-formatter-ecs = "~=0.0.5"
+dbt-copilot-python = "*"
+pydantic-settings = "*"
+django-log-formatter-asim = "*"
+boto3 = "*"
 
 [dev-packages]
 black = "~=24.3"

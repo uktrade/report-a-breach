@@ -1,14 +1,12 @@
-import boto3
 from django.conf import settings
 
 
-def generate_presigned_url(bucket_name, object_key):
+def generate_presigned_url(s3_client_object, s3_file_object):
     """Generates a Presigned URL for the s3 object."""
-    client = boto3.client("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
-    presigned_url = client.generate_presigned_url(
+    presigned_url = s3_client_object.generate_presigned_url(
         "get_object",
-        Params={"Bucket": bucket_name, "Key": object_key},
+        Params={"Bucket": s3_file_object.bucket_name, "Key": s3_file_object.key},
         HttpMethod="GET",
-        ExpiresIn=settings.PRESIGNED_URL_EXPIRY,
+        ExpiresIn=settings.PRESIGNED_URL_EXPIRY_SECONDS,
     )
     return presigned_url
