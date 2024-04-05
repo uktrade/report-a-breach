@@ -5,9 +5,11 @@ from django.contrib.sessions.models import Session
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
+from report_a_breach.sites import require_report_a_breach, require_view_a_breach
 from report_a_breach.utils.notifier import send_email
 from report_a_breach.utils.s3 import generate_presigned_url
 
@@ -395,9 +397,15 @@ class ReportABreachWizardView(BaseWizardView):
         return redirect(reverse("complete"))
 
 
+@method_decorator(require_report_a_breach, name="dispatch")
 class CompleteView(TemplateView):
     template_name = "complete.html"
 
+    def dispatch(self, *args, **kwargs):
+        print(self.request)
+        return super().dispatch(*args, **kwargs)
 
+
+@method_decorator(require_view_a_breach, name="dispatch")
 class ViewABreachView(TemplateView):
     template_name = "view_a_breach.html"

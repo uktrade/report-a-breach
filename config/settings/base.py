@@ -134,6 +134,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.media",
+                # "report_a_breach.sites.context_processors.sites",
             ],
         },
     },
@@ -209,9 +210,6 @@ MIGRATION_MODULES = {
     "sites": "report_a_breach.migrations.sites_migrations",
 }
 
-# Default Report a breach site
 SITE_ID = 1
-
-# Domain Names for Sites
 RAB_DOMAIN = "report-a-breach"
-VAB_DOMAIN = "view-a-suspected-breach"
+VAB_DOMAIN = "view-a-breach"
