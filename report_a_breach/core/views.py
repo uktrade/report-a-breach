@@ -351,12 +351,16 @@ class ReportABreachWizardView(BaseWizardView):
 
         object_key = f"{self.request.session.session_key}/{uploaded_docs.name}"
 
-        permanent_storage_bucket.bucket.meta.client.copy(
-            CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
-            Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-            Key=object_key,
-            SourceClient=self.file_storage.bucket.meta.client,
-        )
+        try:
+            permanent_storage_bucket.bucket.meta.client.copy(
+                CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+                Key=object_key,
+                SourceClient=self.file_storage.bucket.meta.client,
+            )
+        except Exception:
+            # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigatee
+            pass
         return uploaded_docs
 
     def done(self, form_list, **kwargs):
