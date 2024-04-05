@@ -168,7 +168,7 @@ class ReportABreachWizardView(BaseWizardView):
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         context["is_made_available_journey"] = self.request.session.get("made_available_journey")
         if uploaded_file := context["form_data"]["upload_documents"]["documents"]:
-            presigned_url = generate_presigned_url(uploaded_file.file.obj)
+            presigned_url = generate_presigned_url(TemporaryDocumentStorage().bucket.meta.client, uploaded_file.file.obj)
             context["form_data"]["upload_documents"]["url"] = presigned_url
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
@@ -352,7 +352,10 @@ class ReportABreachWizardView(BaseWizardView):
         object_key = f"{self.request.session.session_key}/{uploaded_docs.name}"
 
         permanent_storage_bucket.bucket.meta.client.copy(
-            {"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key}, settings.PERMANENT_S3_BUCKET_NAME, object_key
+            CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+            Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+            Key=object_key,
+            SourceClient=self.file_storage.bucket.meta.client,
         )
         return uploaded_docs
 
