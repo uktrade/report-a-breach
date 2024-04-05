@@ -56,8 +56,6 @@ CRISPY_TEMPLATE_PACK = "gds"
 
 # AWS
 AWS_S3_REGION_NAME = env.aws_default_region
-AWS_ACCESS_KEY_ID = env.aws_access_key_id
-AWS_SECRET_ACCESS_KEY = env.aws_secret_access_key
 AWS_ENDPOINT_URL = env.aws_endpoint_url
 
 # General S3
