@@ -86,11 +86,13 @@ To add a new dependency to the project, use the following command:\
 `pipenv install <package-name>`
 
 ### Localstack
-We use Localstack to emulate AWS services locally, specifically S3. A bucket is created called
-`static-files` that's used to store static files.
+We use Localstack to emulate AWS services locally, specifically S3. Two buckets are created on container startup:
 
-Localstack works similarly to the awscli. For example, to see objects inside the static-files bucket, run command:\
-`awslocal s3 ls static-files`
+- `temporary-document-bucket` that's used to temporarily store uploaded files
+- `permanent-document-bucket` that's used to store uploaded files permanently
+
+Localstack works similarly to the awscli. For example, to see objects inside the `temporary-document-bucket` bucket, run command:\
+`awslocal s3 ls temporary-document-bucket`
 
 
 ### Testing

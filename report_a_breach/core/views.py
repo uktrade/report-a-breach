@@ -1,9 +1,7 @@
 import uuid
 
-import boto3
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.core.files.storage import DefaultStorage
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -13,6 +11,7 @@ from report_a_breach.base_classes.views import BaseWizardView
 from report_a_breach.utils.notifier import send_email
 from report_a_breach.utils.s3 import generate_presigned_url
 
+from ..document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from ..utils.companies_house import get_formatted_address
 from .forms import (
     AboutTheEndUserForm,
@@ -87,7 +86,7 @@ class ReportABreachWizardView(BaseWizardView):
     template_name = "form_steps/generic_form_step.html"
     storage_name = "report_a_breach.session.SessionStorage"
 
-    file_storage = DefaultStorage()
+    file_storage = TemporaryDocumentStorage()
 
     def get(self, request, *args, **kwargs):
         if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
@@ -168,12 +167,16 @@ class ReportABreachWizardView(BaseWizardView):
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         context["is_made_available_journey"] = self.request.session.get("made_available_journey")
-        if uploaded_file_name := context["form_data"]["upload_documents"]["documents"].name:
-            presigned_url = generate_presigned_url(settings.AWS_MEDIAFILES_BUCKET_NAME, f"media/{uploaded_file_name}")
+        if uploaded_file := context["form_data"]["upload_documents"]["documents"]:
+            presigned_url = generate_presigned_url(TemporaryDocumentStorage().bucket.meta.client, uploaded_file.file.obj)
             context["form_data"]["upload_documents"]["url"] = presigned_url
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
-        if context["form_data"]["where_were_the_goods_supplied_from"]["where_were_the_goods_supplied_from"] == "same_address":
+
+        if (
+            self.get_cleaned_data_for_step("where_were_the_goods_supplied_from").get("where_were_the_goods_supplied_from")
+            == "same_address"
+        ):
             if show_check_company_details_page_condition(self):
                 registered_company = context["form_data"]["do_you_know_the_registered_company_number"]
                 context["form_data"]["about_the_supplier"] = {}
@@ -219,10 +222,7 @@ class ReportABreachWizardView(BaseWizardView):
 
     def process_email_step(self, form):
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
-        if settings.TEST_EMAIL_VERIFY_CODE:
-            verify_code = "012345"
-        else:
-            verify_code = get_random_string(6, allowed_chars="0123456789")
+        verify_code = get_random_string(6, allowed_chars="0123456789")
         user_session = Session.objects.get(session_key=self.request.session.session_key)
         ReporterEmailVerification.objects.create(
             reporter_session=user_session,
@@ -344,16 +344,23 @@ class ReportABreachWizardView(BaseWizardView):
 
     def store_documents_in_s3(self):
         """
-        Copies documents from the default storage to permanent storage on s3
+        Copies documents from the default temporary storage to permanent storage on s3
         """
-        uploaded_docs = []
-        s3 = boto3.resource("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
+        permanent_storage_bucket = PermanentDocumentStorage()
+        uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+
+        object_key = f"{self.request.session.session_key}/{uploaded_docs.name}"
+
         try:
-            uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
-            copy_source = {"Bucket": settings.AWS_MEDIAFILES_BUCKET_NAME, "Key": f"media/{uploaded_docs.name}"}
-            s3.meta.client.copy(copy_source, settings.AWS_PERMANENT_STORAGE_BUCKET_NAME, f"documents/{uploaded_docs.name}")
-        except TypeError:
-            uploaded_docs = []
+            permanent_storage_bucket.bucket.meta.client.copy(
+                CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+                Key=object_key,
+                SourceClient=self.file_storage.bucket.meta.client,
+            )
+        except Exception:
+            # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigatee
+            pass
         return uploaded_docs
 
     def done(self, form_list, **kwargs):
