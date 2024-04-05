@@ -43,8 +43,8 @@ class BaseSettings(PydanticBaseSettings):
 
     aws_endpoint_url: str = ""
     aws_default_region: str = "eu-west-2"
-    rab_temporary_s3_bucket_name: str = "temporary-document-bucket"
-    rab_permanent_s3_bucket_name: str = "permanent-document-bucket"
+    temporary_s3_bucket_name: str = "temporary-document-bucket"
+    permanent_s3_bucket_name: str = "permanent-document-bucket"
     pre_signed_url_expiry_seconds: int = 3600
 
     @computed_field
