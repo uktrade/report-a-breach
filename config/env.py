@@ -101,7 +101,7 @@ class GovPaasSettings(BaseSettings):
     @property
     def temporary_s3_bucket_configuration(self) -> dict:
         return {
-            "bucket_name": self.self.get_temporary_bucket_vcap["bucket_name"],
+            "bucket_name": self.get_temporary_bucket_vcap["bucket_name"],
             "access_key_id": self.get_temporary_bucket_vcap["aws_access_key_id"],
             "secret_access_key": self.get_temporary_bucket_vcap["aws_secret_access_key"],
         }
@@ -110,7 +110,7 @@ class GovPaasSettings(BaseSettings):
     @property
     def permanent_s3_bucket_configuration(self) -> dict:
         return {
-            "bucket_name": self.self.get_permanent_bucket_vcap["bucket_name"],
+            "bucket_name": self.get_permanent_bucket_vcap["bucket_name"],
             "access_key_id": self.get_permanent_bucket_vcap["aws_access_key_id"],
             "secret_access_key": self.get_permanent_bucket_vcap["aws_secret_access_key"],
         }

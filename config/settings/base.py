@@ -65,14 +65,14 @@ AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_DEFAULT_ACL = "private"
 
 # Temporary document bucket
-TEMPORARY_S3_BUCKET_ACCESS_KEY_ID = env.temporary_s3_bucket_access_key_id
-TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY = env.temporary_s3_bucket_secret_access_key
-TEMPORARY_S3_BUCKET_NAME = env.temporary_s3_bucket_name
+TEMPORARY_S3_BUCKET_ACCESS_KEY_ID = env.temporary_s3_bucket_configuration["access_key_id"]
+TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY = env.temporary_s3_bucket_configuration["secret_access_key"]
+TEMPORARY_S3_BUCKET_NAME = env.temporary_s3_bucket_configuration["bucket_name"]
 
 # Permanent document bucket
-PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_access_key_id
-PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_secret_access_key
-PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_name
+PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_configuration["access_key_id"]
+PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_configuration["secret_access_key"]
+PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_configuration["bucket_name"]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -84,7 +84,7 @@ STATICFILES_DIRS = (BASE_DIR / "report_a_breach" / "static",)
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {"bucket_name": env.temporary_s3_bucket_name, "location": "media"},
+        "OPTIONS": {"bucket_name": env.temporary_s3_bucket_configuration["bucket_name"], "location": "media"},
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
