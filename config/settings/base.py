@@ -210,6 +210,5 @@ MIGRATION_MODULES = {
     "sites": "report_a_breach.migrations.sites_migrations",
 }
 
-SITE_ID = 1
 RAB_DOMAIN = "report-a-breach"
 VAB_DOMAIN = "view-a-breach"

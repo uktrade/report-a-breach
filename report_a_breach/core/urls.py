@@ -54,6 +54,5 @@ urlpatterns = [
     ),
     re_path(r"report_a_breach/(?P<step>.+)/$", report_a_breach_wizard, name="report_a_breach_step"),
     path("complete", CompleteView.as_view(), name="complete"),
-    path("view", ViewABreachView.as_view(), name="view_a_suspected_breach"),
-    # path("<str:uuid>", ViewABreachView.as_view(), name="view_a_suspected_breach_uuid"),
+    path("<str:uuid>", ViewABreachView.as_view(), name="view_a_suspected_breach_uuid"),
 ]
