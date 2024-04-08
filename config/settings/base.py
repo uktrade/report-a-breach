@@ -134,7 +134,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.media",
-                # "report_a_breach.sites.context_processors.sites",
+                "report_a_breach.sites.context_processors.sites",
             ],
         },
     },
