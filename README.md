@@ -66,13 +66,22 @@ Use docker-compose to run the backing services
 ```
 docker-compose up -d
 ```
+### 6. Setup local custom domains
+Add the below to your `/etc/hosts` file:
+```
+127.0.0.1       report-a-breach
+127.0.0.1       view-a-breach
+```
 
-### 6. Run the web server
+### 7. Run the web server
 After following the setup, use the following to run the web app
 
 `invoke runserver`
 
-Django will provide the local url which should be http://127.0.0.1:8000/, navigate to this in your browser to see through the prototype.
+Django will provide the local url which should be http://127.0.0.1:8000/. As we use the django sites framework, this will no longer resolve by default. \
+To view the report-a-breach app navigate to: http://report-a-breach:8000/ \
+To view the view-a-breach app, navigate to: http://view-a-breach:8000/
+
 
 ## Useful commands
 ### Django
