@@ -2,7 +2,6 @@ import uuid
 
 from django.contrib.postgres.fields import DateRangeField
 from django.contrib.sessions.models import Session
-from django.contrib.sites.models import Site
 from django.db import models
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from django_countries.fields import CountryField
@@ -74,8 +73,6 @@ class Breach(BaseModel):
     )
     other_addresses_in_the_supply_chain = models.TextField(null=True, blank=True)
     tell_us_about_the_suspected_breach = models.TextField(null=True, blank=True)
-
-    sites = models.ManyToManyField(Site)
 
     def assign_reference(self):
         """Assigns a unique reference to this Breach object"""

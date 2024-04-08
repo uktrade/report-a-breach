@@ -5,10 +5,15 @@ from django.contrib.sessions.models import Session
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
-from report_a_breach.sites import require_report_a_breach, require_view_a_breach
+from report_a_breach.sites import (
+    is_report_a_breach_site,
+    is_view_a_breach_site,
+    require_report_a_breach,
+    require_view_a_breach,
+)
 from report_a_breach.utils.notifier import send_email
 from report_a_breach.utils.s3 import generate_presigned_url
 
@@ -414,3 +419,14 @@ class ViewABreachView(TemplateView):
     @require_view_a_breach()
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+
+class RedirectBaseDomainView(RedirectView):
+    """Redirects base url visits to either report a breach app or view app default view"""
+
+    def get_redirect_url(self, *args, **kwargs):
+        if is_report_a_breach_site(self.request.site):
+            self.url = reverse("report_a_breach")
+        elif is_view_a_breach_site(self.request.site):
+            self.url = reverse("view_a_breach")
+        return super().get_redirect_url(*args, **kwargs)
