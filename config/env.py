@@ -133,7 +133,7 @@ class DBTPlatformSettings(BaseSettings):
         return database_url_from_env("DATABASE_CREDENTIALS")
 
 
-if "config.settings.local" or "config.settings.caseworker.local" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):
+if "config.settings.local" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):
     # Local development
     env = LocalSettings()
 elif "COPILOT_ENVIRONMENT_NAME" in os.environ:
