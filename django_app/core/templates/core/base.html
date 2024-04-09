@@ -37,7 +37,7 @@
         <link rel="apple-touch-icon" href="{% static "govuk/images/govuk-apple-touch-icon.png" %}">
         <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
 
-        <link rel="stylesheet" href="{% static "stylesheets/govuk-frontend-4.7.0.min.css" %}">
+        <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-4.7.0.min.css" %}">
 
         {% block extra_css %}{% endblock extra_css %}
     </head>
@@ -137,7 +137,7 @@
                     </div>
                 </div>
             </div>
-            <script src="{% static "javascript/govuk-frontend-4.7.0.min.js" %}"></script>
+            <script src="{% static "core/javascript/govuk-frontend-4.7.0.min.js" %}"></script>
             <script>
                 window.GOVUKFrontend.initAll()
             </script>

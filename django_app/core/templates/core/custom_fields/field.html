@@ -34,7 +34,7 @@
         {% endif %}
 
         {% if field|is_checkbox and form_show_labels %}
-            {% include 'custom_fields/help_text_and_errors.html' %}
+            {% include 'core/custom_fields/help_text_and_errors.html' %}
             <div class="govuk-checkboxes{% if checkboxes_small %} govuk-checkboxes--small{% endif %}">
                 <div class="govuk-checkboxes__item">
                     {% crispy_gds_field field %}
@@ -44,7 +44,7 @@
                 </div>
             </div>
         {% else %}
-            {% include 'custom_fields/help_text_and_errors.html' %}
+            {% include 'core/custom_fields/help_text_and_errors.html' %}
             {% crispy_gds_field field %}
             {% if max_characters or max_words %}
                 <span id="{{ field.id_for_label }}-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
