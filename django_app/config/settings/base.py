@@ -15,9 +15,8 @@ from pathlib import Path
 
 import dj_database_url
 import sentry_sdk
+from config.env import env
 from sentry_sdk.integrations.django import DjangoIntegration
-
-from django_app.config.env import env
 
 is_dbt_platform = "COPILOT_ENVIRONMENT_NAME" in os.environ
 
