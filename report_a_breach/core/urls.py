@@ -18,6 +18,7 @@ from .views import (
     CompleteView,
     RedirectBaseDomainView,
     ReportABreachWizardView,
+    ViewABreachLoginView,
     ViewABreachView,
 )
 
@@ -61,5 +62,6 @@ urlpatterns = [
     re_path(r"report_a_breach/(?P<step>.+)/$", report_a_breach_wizard, name="report_a_breach_step"),
     path("complete", CompleteView.as_view(), name="complete"),
     path("view_a_breach/", ViewABreachView.as_view(), name="view_a_breach"),
+    path("view_a_breach_login/", ViewABreachLoginView.as_view(), name="view_a_breach_login"),
     path("view_a_breach/<str:uuid>", ViewABreachView.as_view(), name="view_a_suspected_breach_uuid"),
 ]

@@ -15,6 +15,7 @@ from pathlib import Path
 
 import dj_database_url
 import sentry_sdk
+from django.urls import reverse_lazy
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from config.env import env
@@ -48,6 +49,7 @@ THIRD_PARTY_APPS = [
     "django_chunk_upload_handlers",
     "simple_history",
     "storages",
+    "authbroker_client",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
@@ -170,6 +172,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "authbroker_client.backends.AuthbrokerBackend",
+]
+
+LOGIN_URL = reverse_lazy("authbroker_client:login")
+LOGIN_REDIRECT_URL = reverse_lazy("complete")
+
 # Internationalization
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -212,3 +222,12 @@ MIGRATION_MODULES = {
 
 RAB_DOMAIN = "report-a-breach"
 VAB_DOMAIN = "view-a-breach"
+
+TEST_SSO_PROVIDER_SET_RETURNED_ACCESS_TOKEN = env.mock_sso_token
+AUTHBROKER_URL = env.authbroker_url
+AUTHBROKER_CLIENT_ID = env.authbroker_client_id
+AUTHBROKER_CLIENT_SECRET = env.authbroker_client_secret
+AUTHBROKER_TOKEN_SESSION_KEY = env.authbroker_token_session_key
+AUTHBROKER_STAFF_SSO_SCOPE = env.authbroker_staff_sso_scope
+
+OAUTHLIB_INSECURE_TRANSPORT = env.oauthlib_insecure_transport

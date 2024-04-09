@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -403,13 +404,20 @@ class ReportABreachWizardView(BaseWizardView):
         return redirect(reverse("complete"))
 
 
-@method_decorator(require_report_a_breach(), name="dispatch")
+# @method_decorator(require_report_a_breach(), name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class CompleteView(TemplateView):
     template_name = "complete.html"
 
 
+@method_decorator(login_required, name="dispatch")
 @method_decorator(require_view_a_breach(), name="dispatch")
 class ViewABreachView(TemplateView):
+    template_name = "view_a_breach.html"
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class ViewABreachLoginView(TemplateView):
     template_name = "view_a_breach.html"
 
 
@@ -420,5 +428,5 @@ class RedirectBaseDomainView(RedirectView):
         if is_report_a_breach_site(self.request.site):
             self.url = reverse("report_a_breach")
         elif is_view_a_breach_site(self.request.site):
-            self.url = reverse("view_a_breach")
+            self.url = reverse("view_a_breach_login")
         return super().get_redirect_url(*args, **kwargs)

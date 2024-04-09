@@ -14,7 +14,7 @@ class BaseSettings(PydanticBaseSettings):
         validate_default=False,
     )
 
-    debug: bool = False
+    debug: bool = True
     django_secret_key: str
     rab_allowed_hosts: list[str] = ["*"]
 
@@ -46,6 +46,18 @@ class BaseSettings(PydanticBaseSettings):
     temporary_s3_bucket_name: str = "temporary-document-bucket"
     permanent_s3_bucket_name: str = "permanent-document-bucket"
     presigned_url_expiry_seconds: int = 3600
+
+    authbroker_url: str = "http://docker.for.mac.localhost:8080/"
+    authbroker_client_id: str = "contact-web-ops-for-details"
+    authbroker_client_secret: str = "contact-web-ops-for-details"
+    authbroker_token_session_key: str = "authbroker_token"
+    authbroker_staff_sso_scope: str = "dummy-scope"
+
+    mock_sso_token: str = "dummy-token"
+    mock_sso_scope: str = "dummy-scope"
+    mock_sso_username: str = "testuser"
+    mock_sso_email_user_id: str = "testuser@example.com"
+    oauthlib_insecure_transport: int = 1
 
     @computed_field
     @property

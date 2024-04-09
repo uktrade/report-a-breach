@@ -16,8 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include
-from django.urls import path
+from django.urls import include, path
 
 
 def trigger_error(request):
@@ -28,4 +27,5 @@ urlpatterns = [
     path("", include("report_a_breach.urls")),
     path("throw_error/", trigger_error),
     path("admin/", admin.site.urls),
+    path("auth/", include("authbroker_client.urls")),
 ]
