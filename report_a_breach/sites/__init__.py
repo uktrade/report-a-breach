@@ -14,11 +14,11 @@ def require_view_a_breach():
         """Decorator to require that a view only accepts requests from the view a breach site."""
 
         @functools.wraps(f)
-        def _wrapped_view(self, *args, **kwargs):
-            if not is_view_a_breach_site(self.request.site):
+        def _wrapped_view(request, *args, **kwargs):
+            if not is_view_a_breach_site(request.site):
                 raise PermissionDenied("View a breach feature requires view a breach site.")
 
-            return f(self, *args, **kwargs)
+            return f(request, *args, **kwargs)
 
         return _wrapped_view
 
@@ -30,11 +30,10 @@ def require_report_a_breach():
         """Decorator to require that a view only accepts requests from the report a breach site."""
 
         @functools.wraps(func)
-        def _wrapped_view(self, *args, **kwargs):
-            print(self.request.site)
-            if not is_report_a_breach_site(self.request.site):
+        def _wrapped_view(request, *args, **kwargs):
+            if not is_report_a_breach_site(request.site):
                 raise PermissionDenied("Report a breach feature requires report a breach site.")
-            return func(self, *args, **kwargs)
+            return func(request, *args, **kwargs)
 
         return _wrapped_view
 

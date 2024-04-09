@@ -5,6 +5,7 @@ from django.contrib.sessions.models import Session
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.utils.decorators import method_decorator
 from django.views.generic import RedirectView, TemplateView
 
 from report_a_breach.base_classes.views import BaseWizardView
@@ -48,6 +49,7 @@ from .forms import (
 from .models import Breach, ReporterEmailVerification
 
 
+@method_decorator(require_report_a_breach(), name="dispatch")
 class ReportABreachWizardView(BaseWizardView):
     form_list = [
         ("start", StartForm),
@@ -400,11 +402,8 @@ class ReportABreachWizardView(BaseWizardView):
         self.storage.current_step = self.steps.first
         return redirect(reverse("complete"))
 
-    @require_report_a_breach()
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
 
-
+@method_decorator(require_report_a_breach(), name="dispatch")
 class CompleteView(TemplateView):
     template_name = "complete.html"
 
@@ -413,12 +412,9 @@ class CompleteView(TemplateView):
         return super().dispatch(*args, **kwargs)
 
 
+@method_decorator(require_view_a_breach(), name="dispatch")
 class ViewABreachView(TemplateView):
     template_name = "view_a_breach.html"
-
-    @require_view_a_breach()
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
 
 
 class RedirectBaseDomainView(RedirectView):
