@@ -39,7 +39,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-OUR_APPS = ["core", "report_a_breach", "healthcheck"]
+OUR_APPS = ["config", "core", "report_a_breach", "healthcheck"]
 
 THIRD_PARTY_APPS = [
     "crispy_forms",
