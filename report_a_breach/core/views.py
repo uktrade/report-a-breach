@@ -407,10 +407,6 @@ class ReportABreachWizardView(BaseWizardView):
 class CompleteView(TemplateView):
     template_name = "complete.html"
 
-    @require_report_a_breach()
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
 
 @method_decorator(require_view_a_breach(), name="dispatch")
 class ViewABreachView(TemplateView):
