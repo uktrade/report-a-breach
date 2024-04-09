@@ -14,7 +14,12 @@ from .form_step_conditions import (
     show_where_were_the_goods_made_available_to_page,
     show_where_were_the_goods_supplied_to_page,
 )
-from .views import CompleteView, ReportABreachWizardView
+from .views import (
+    CompleteView,
+    RedirectBaseDomainView,
+    ReportABreachWizardView,
+    ViewABreachView,
+)
 
 report_a_breach_wizard = ReportABreachWizardView.as_view(
     url_name="report_a_breach_step",
@@ -36,7 +41,7 @@ report_a_breach_wizard = ReportABreachWizardView.as_view(
 )
 
 urlpatterns = [
-    path("", report_a_breach_wizard, name="report_a_breach"),
+    path("", RedirectBaseDomainView.as_view(), name="initial_view"),
     path(
         "report_a_breach/about_the_end_user/<str:end_user_uuid>/",
         report_a_breach_wizard,
@@ -52,6 +57,9 @@ urlpatterns = [
         report_a_breach_wizard,
         name="report_a_breach_where_were_the_goods_made_available_to",
     ),
+    path("report_a_breach/", report_a_breach_wizard, name="report_a_breach"),
     re_path(r"report_a_breach/(?P<step>.+)/$", report_a_breach_wizard, name="report_a_breach_step"),
     path("complete", CompleteView.as_view(), name="complete"),
+    path("view_a_breach/", ViewABreachView.as_view(), name="view_a_breach"),
+    path("view_a_breach/<str:uuid>", ViewABreachView.as_view(), name="view_a_suspected_breach_uuid"),
 ]
