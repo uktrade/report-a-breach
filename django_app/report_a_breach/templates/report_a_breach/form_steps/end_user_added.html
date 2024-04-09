@@ -1,0 +1,47 @@
+{% extends "report_a_breach/base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+{% load get_wizard_step_url %}
+
+{% block form_content %}
+    <h1 class="govuk-heading-l">
+        You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}
+    </h1>
+    {% for id, end_user in request.session.end_users.items %}
+        <h3 class="govuk-heading-m">End-user {{ forloop.counter }}</h3>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Name
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {% if end_user.cleaned_data.name_of_person %}
+                        {{ end_user.cleaned_data.name_of_person }}
+                    {% elif end_user.cleaned_data.name_of_business %}
+                        {{ end_user.cleaned_data.name_of_business }}
+                    {% endif %}
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="{% url 'report_a_breach_about_the_end_user' end_user_uuid=id %}">Change<span
+                        class="govuk-visually-hidden"> name</span></a>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Address
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ end_user.cleaned_data.readable_address }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Country
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ end_user.cleaned_data.country }}
+                </dd>
+            </div>
+        </dl>
+    {% endfor %}
+    {% crispy wizard.form %}
+{% endblock form_content %}

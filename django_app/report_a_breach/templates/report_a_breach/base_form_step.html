@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+
+{% block extra_css %}
+    {{ wizard.form.media.css }}
+{% endblock extra_css %}
+
+{% block column_content %}
+    {% error_summary form %}
+    <form method="post" enctype='multipart/form-data'>
+        {% if form_h1_header %}
+            <h1 class="govuk-heading-l">{{ form_h1_header }}</h1>
+        {% endif %}
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {% block form_content %}
+        {% endblock form_content %}
+    </form>
+{% endblock column_content %}
+
+{% block extra_js %}
+    {{ wizard.form.media.js }}
+{% endblock extra_js %}

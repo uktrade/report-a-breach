@@ -1,0 +1,44 @@
+{% extends "report_a_breach/base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+{% load get_wizard_step_url %}
+
+{% block form_content %}
+    <form method="post">
+        <div>
+            <h1 class="govuk-heading-l">
+                Check company details
+            </h1>
+        </div>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered company number
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ request.session.company_details.registered_company_number }}
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}">Change<span class="govuk-visually-hidden"> name</span></a>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered company name
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ request.session.company_details.registered_company_name }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Registered office address
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ request.session.company_details.registered_office_address }}
+                </dd>
+            </div>
+        </dl>
+        {% csrf_token %}
+        {% crispy wizard.form %}
+    </form>
+{% endblock form_content %}

@@ -96,4 +96,4 @@ __pycache__/
 *.env
 /redis_data/
 /static/
-/report_a_breach/templates/report-a-breach-gds/
+/django_app/core/templates/core/report-a-breach-gds/
