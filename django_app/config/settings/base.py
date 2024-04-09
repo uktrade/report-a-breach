@@ -117,7 +117,7 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
-ROOT_URLCONF = "django_app.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
