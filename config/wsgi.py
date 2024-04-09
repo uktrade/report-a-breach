@@ -10,7 +10,11 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from opentelemetry.instrumentation.wsgi import OpenTelemetryMiddleware
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.prod")
 
 application = get_wsgi_application()
+
+if "COPILOT_ENVIRONMENT_NAME" in os.environ:
+    application = OpenTelemetryMiddleware(application)
