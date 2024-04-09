@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from core.form_fields import BooleanChoiceField
+from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.layout import (
     ConditionalQuestion,
@@ -14,10 +16,7 @@ from django import forms
 from django.conf import settings
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
-
-from django_app.core.form_fields import BooleanChoiceField
-from django_app.core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
-from django_app.utils.companies_house import (
+from utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
 )

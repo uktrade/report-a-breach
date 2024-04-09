@@ -1,20 +1,16 @@
 import uuid
 
+from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
+from core.views import BaseWizardView
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.generic import TemplateView
-
-from django_app.core.document_storage import (
-    PermanentDocumentStorage,
-    TemporaryDocumentStorage,
-)
-from django_app.core.views import BaseWizardView
-from django_app.utils.companies_house import get_formatted_address
-from django_app.utils.notifier import send_email
-from django_app.utils.s3 import generate_presigned_url
+from utils.companies_house import get_formatted_address
+from utils.notifier import send_email
+from utils.s3 import generate_presigned_url
 
 from .forms import (
     AboutTheEndUserForm,

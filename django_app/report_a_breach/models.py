@@ -1,12 +1,11 @@
 import uuid
 
+from core.models import BaseModel
 from django.contrib.postgres.fields import DateRangeField
 from django.contrib.sessions.models import Session
 from django.db import models
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from django_countries.fields import CountryField
-
-from django_app.core.models import BaseModel
 
 
 class Breach(BaseModel):

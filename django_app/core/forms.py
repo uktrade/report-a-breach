@@ -1,8 +1,7 @@
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import Layout, Size, Submit
 from django import forms
-
-from django_app.utils.companies_house import get_formatted_address
+from utils.companies_house import get_formatted_address
 
 
 class EmptyForm(forms.Form):
