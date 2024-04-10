@@ -132,4 +132,4 @@ class RedirectBaseDomainView(RedirectView):
         if url:
             return HttpResponseRedirect(url)
         else:
-            return Exception()
+            raise Exception()
