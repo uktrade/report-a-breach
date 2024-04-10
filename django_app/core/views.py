@@ -128,7 +128,11 @@ class RedirectBaseDomainView(RedirectView):
 
     def get(self, request, *args, **kwargs):
         url = self.get_redirect_url(*args, **kwargs)
-        print(request.site)
+        host = request.get_host()
+        raw_host = request._get_raw_host()
+        print(host)
+        print(raw_host)
+
         if url:
             return HttpResponseRedirect(url)
         else:
