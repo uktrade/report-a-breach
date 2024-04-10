@@ -1,9 +1,7 @@
 from core.sites import (
-    SiteName,
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
 )
-from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import FormView, RedirectView
 from formtools.wizard.views import NamedUrlSessionWizardView
@@ -126,16 +124,3 @@ class RedirectBaseDomainView(RedirectView):
             return reverse("report_a_suspected_breach:landing")
         elif is_view_a_suspected_breach_site(self.request.site):
             return reverse("view_a_suspected_breach:landing")
-
-    def get(self, request, *args, **kwargs):
-        url = self.get_redirect_url(*args, **kwargs)
-        if url:
-            return HttpResponseRedirect(url)
-        else:
-
-            raise Exception(
-                self.request.get_host(),
-                self.request.site.name,
-                SiteName.report_a_suspected_breach,
-                SiteName.view_a_suspected_breach,
-            )
