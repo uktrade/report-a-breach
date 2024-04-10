@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
                     "file",
                     models.FileField(upload_to="", validators=[django_chunk_upload_handlers.clam_av.validate_virus_check_result]),
                 ),
-                ("breach", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="report_a_breach.breach")),
+                ("breach", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="report_a_suspected_breach.breach")),
             ],
             options={
                 "abstract": False,
@@ -114,11 +114,14 @@ class Migration(migrations.Migration):
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("modified_at", models.DateTimeField(auto_now=True)),
-                ("breach", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="report_a_breach.breach")),
+                ("breach", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="report_a_suspected_breach.breach")),
                 (
                     "sanctions_regime",
                     models.ForeignKey(
-                        blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to="report_a_breach.sanctionsregime"
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="report_a_suspected_breach.sanctionsregime",
                     ),
                 ),
             ],
@@ -163,7 +166,7 @@ class Migration(migrations.Migration):
                         choices=[("breacher", "Breacher"), ("supplier", "Supplier"), ("recipient", "Recipient")], max_length=9
                     ),
                 ),
-                ("breach", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="report_a_breach.breach")),
+                ("breach", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="report_a_suspected_breach.breach")),
             ],
             options={
                 "abstract": False,
@@ -193,7 +196,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.DO_NOTHING,
                         related_name="+",
-                        to="report_a_breach.breach",
+                        to="report_a_suspected_breach.breach",
                     ),
                 ),
                 (
@@ -229,7 +232,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.DO_NOTHING,
                         related_name="+",
-                        to="report_a_breach.breach",
+                        to="report_a_suspected_breach.breach",
                     ),
                 ),
                 (
@@ -246,7 +249,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.DO_NOTHING,
                         related_name="+",
-                        to="report_a_breach.sanctionsregime",
+                        to="report_a_suspected_breach.sanctionsregime",
                     ),
                 ),
             ],
@@ -359,7 +362,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.DO_NOTHING,
                         related_name="+",
-                        to="report_a_breach.breach",
+                        to="report_a_suspected_breach.breach",
                     ),
                 ),
                 (
@@ -448,7 +451,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.DO_NOTHING,
                         related_name="+",
-                        to="report_a_breach.reporteremailverification",
+                        to="report_a_suspected_breach.reporteremailverification",
                     ),
                 ),
             ],
@@ -464,14 +467,19 @@ class Migration(migrations.Migration):
             model_name="breach",
             name="reporter_email_verification",
             field=models.ForeignKey(
-                blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to="report_a_breach.reporteremailverification"
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="report_a_suspected_breach.reporteremailverification",
             ),
         ),
         migrations.AddField(
             model_name="breach",
             name="sanctions_regimes",
             field=models.ManyToManyField(
-                blank=True, through="report_a_breach.SanctionsRegimeBreachThrough", to="report_a_breach.sanctionsregime"
+                blank=True,
+                through="report_a_suspected_breach.SanctionsRegimeBreachThrough",
+                to="report_a_suspected_breach.sanctionsregime",
             ),
         ),
     ]

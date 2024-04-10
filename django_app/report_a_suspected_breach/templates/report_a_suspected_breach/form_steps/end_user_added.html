@@ -1,4 +1,4 @@
-{% extends "report_a_breach/base_form_step.html" %}
+{% extends "report_a_suspected_breach/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load get_wizard_step_url %}
 
@@ -21,7 +21,7 @@
                     {% endif %}
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link" href="{% url 'report_a_breach_about_the_end_user' end_user_uuid=id %}">Change<span
+                    <a class="govuk-link" href="{% url 'report_a_suspected_breach_about_the_end_user' end_user_uuid=id %}">Change<span
                         class="govuk-visually-hidden"> name</span></a>
                 </dd>
             </div>

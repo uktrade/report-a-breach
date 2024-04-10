@@ -37,9 +37,10 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 ]
 
-OUR_APPS = ["config", "core", "report_a_breach", "healthcheck"]
+OUR_APPS = ["config", "core", "report_a_suspected_breach", "view_a_suspected_breach", "healthcheck"]
 
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -73,7 +74,6 @@ TEMPORARY_S3_BUCKET_NAME = env.temporary_s3_bucket_configuration["bucket_name"]
 PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_configuration["access_key_id"]
 PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_configuration["secret_access_key"]
 PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_configuration["bucket_name"]
-
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
@@ -115,6 +115,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "django.contrib.sites.middleware.CurrentSiteMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -131,6 +132,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.media",
+                "core.sites.context_processors.sites",
             ],
         },
     },
@@ -200,3 +202,7 @@ EMAIL_VERIFY_TIMEOUT_SECONDS = env.email_verify_timeout_seconds
 # Google Analytics
 GTM_ENABLED = env.gtm_enabled
 GTM_ID = env.gtm_id
+
+# Django sites
+REPORT_A_SUSPECTED_BREACH = env.report_a_suspected_breach_domain
+VIEW_A_SUSPECTED_BREACH_DOMAIN = env.view_a_suspected_breach_domain

@@ -25,6 +25,7 @@ class BaseSettings(PydanticBaseSettings):
     company_house_api_key: str | None = None
 
     gov_notify_api_key: str = None
+    email_verify_code_template_id: str = ""
     email_verify_code_template_id: str
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
@@ -46,6 +47,10 @@ class BaseSettings(PydanticBaseSettings):
     temporary_s3_bucket_name: str = "temporary-document-bucket"
     permanent_s3_bucket_name: str = "permanent-document-bucket"
     presigned_url_expiry_seconds: int = 3600
+
+    # Django sites
+    report_a_suspected_breach_domain: str
+    view_a_suspected_breach_domain: str
 
     @computed_field
     @property

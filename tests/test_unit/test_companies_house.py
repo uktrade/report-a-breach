@@ -2,9 +2,8 @@ import unittest
 from unittest.mock import patch
 
 from django.test import override_settings
-
-from report_a_breach.exceptions import CompaniesHouseException
-from report_a_breach.utils.companies_house import (
+from report_a_suspected_breach.exceptions import CompaniesHouseException
+from report_a_suspected_breach.utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
 )
@@ -33,7 +32,9 @@ class TestCompaniesHouse(unittest.TestCase):
 
     @override_settings(COMPANIES_HOUSE_API_KEY="1234")
     def test_basic_auth_token(self):
-        from report_a_breach.utils.companies_house import COMPANIES_HOUSE_BASIC_AUTH
+        from report_a_suspected_breach.utils.companies_house import (
+            COMPANIES_HOUSE_BASIC_AUTH,
+        )
 
         assert COMPANIES_HOUSE_BASIC_AUTH == "MTIzNA=="
 

@@ -82,13 +82,13 @@ class ReportABreachWizardView(BaseWizardView):
         "end_user_added": "form_steps/end_user_added.html",
         "declaration": "form_steps/declaration.html",
     }
-    template_name = "report_a_breach/generic_form_step.html"
-    storage_name = "report_a_breach.session.SessionStorage"
+    template_name = "report_a_suspected_breach/generic_form_step.html"
+    storage_name = "report_a_suspected_breach.session.SessionStorage"
 
     file_storage = TemporaryDocumentStorage()
 
     def get(self, request, *args, **kwargs):
-        if request.resolver_match.url_name == "report_a_breach_about_the_end_user":
+        if request.resolver_match.url_name == "report_a_suspected_breach_about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
                 default_redirect = "where_were_the_goods_supplied_to"
@@ -102,11 +102,11 @@ class ReportABreachWizardView(BaseWizardView):
                 self.storage.current_step = "about_the_end_user"
                 return super().get(request, *args, step="about_the_end_user", **kwargs)
 
-        if request.resolver_match.url_name == "report_a_breach_where_were_the_goods_supplied_to":
+        if request.resolver_match.url_name == "report_a_suspected_breach_where_were_the_goods_supplied_to":
             self.storage.current_step = "where_were_the_goods_supplied_to"
             return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
 
-        if request.resolver_match.url_name == "report_a_breach_where_were_the_goods_made_available_to":
+        if request.resolver_match.url_name == "report_a_suspected_breach_where_were_the_goods_made_available_to":
             self.storage.current_step = "where_were_the_goods_made_available_to"
             return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
         return super().get(request, *args, **kwargs)
@@ -114,19 +114,19 @@ class ReportABreachWizardView(BaseWizardView):
     def get_step_url(self, step):
         if step == "about_the_end_user" and "end_user_uuid" in self.kwargs:
             return reverse(
-                "report_a_breach_about_the_end_user",
+                "report_a_suspected_breach:about_the_end_user",
                 kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
             )
 
         if step == "where_were_the_goods_supplied_to" and "end_user_uuid" in self.kwargs:
             return reverse(
-                "report_a_breach_where_were_the_goods_supplied_to",
+                "report_a_suspected_breach:where_were_the_goods_supplied_to",
                 kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
             )
 
         if step == "where_were_the_goods_made_available_to" and "end_user_uuid" in self.kwargs:
             return reverse(
-                "report_a_breach_where_were_the_goods_made_available_to",
+                "report_a_suspected_breach:where_were_the_goods_made_available_to",
                 kwargs={"end_user_uuid": self.kwargs["end_user_uuid"]},
             )
         return super().get_step_url(step)
@@ -389,8 +389,8 @@ class ReportABreachWizardView(BaseWizardView):
         self.request.session["reference_id"] = new_reference
         self.storage.reset()
         self.storage.current_step = self.steps.first
-        return redirect(reverse("complete"))
+        return redirect(reverse("report_a_suspected_breach:complete"))
 
 
 class CompleteView(TemplateView):
-    template_name = "complete.html"
+    template_name = "report_a_suspected_breach/complete.html"

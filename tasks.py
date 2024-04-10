@@ -15,13 +15,13 @@ def pytest(context, project):
 
 
 @task
-def makemigrations(context, app="report_a_breach"):
+def makemigrations(context, app="report_a_suspected_breach"):
     print("Running manage.py makemigrations")
     context.run(f"pipenv run python django_app/manage.py makemigrations {app}")
 
 
 @task
-def migrate(context, app="report_a_breach"):
+def migrate(context, app="report_a_suspected_breach"):
     print("Running manage.py migrate")
     base_command = "pipenv run python django_app/manage.py migrate"
     if app:

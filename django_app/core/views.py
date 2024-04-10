@@ -1,5 +1,9 @@
+from core.sites import (
+    is_report_a_suspected_breach_site,
+    is_view_a_suspected_breach_site,
+)
 from django.urls import reverse
-from django.views.generic import FormView
+from django.views.generic import FormView, RedirectView
 from formtools.wizard.views import NamedUrlSessionWizardView
 
 
@@ -109,3 +113,14 @@ class BaseWizardView(NamedUrlSessionWizardView):
             if form_obj.is_valid() and form_obj.cleaned_data:
                 return form_obj.cleaned_data
         return {}
+
+
+class RedirectBaseDomainView(RedirectView):
+    """Redirects base url visits to either report a breach app or view app default view"""
+
+    def get_redirect_url(self, *args, **kwargs):
+        if is_report_a_suspected_breach_site(self.request.site):
+            self.url = reverse("report_a_suspected_breach:landing")
+        elif is_view_a_suspected_breach_site(self.request.site):
+            self.url = reverse("view_a_suspected_breach:landing")
+        return super().get_redirect_url(*args, **kwargs)

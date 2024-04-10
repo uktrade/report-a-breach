@@ -16,8 +16,8 @@ from .form_step_conditions import (
 )
 from .views import CompleteView, ReportABreachWizardView
 
-report_a_breach_wizard = ReportABreachWizardView.as_view(
-    url_name="report_a_breach_step",
+report_a_suspected_breach_wizard = ReportABreachWizardView.as_view(
+    url_name="report_a_suspected_breach:step",
     done_step_name="confirmation",
     condition_dict={
         "name": show_name_page,
@@ -35,23 +35,25 @@ report_a_breach_wizard = ReportABreachWizardView.as_view(
     },
 )
 
+app_name = "report_a_suspected_breach"
+
 urlpatterns = [
-    path("", report_a_breach_wizard, name="report_a_breach"),
+    path("", report_a_suspected_breach_wizard, name="landing"),
     path(
-        "report_a_breach/about_the_end_user/<str:end_user_uuid>/",
-        report_a_breach_wizard,
-        name="report_a_breach_about_the_end_user",
+        "about_the_end_user/<str:end_user_uuid>/",
+        report_a_suspected_breach_wizard,
+        name="about_the_end_user",
     ),
     path(
-        "report_a_breach/where_were_the_goods_supplied_to/<str:end_user_uuid>/",
-        report_a_breach_wizard,
-        name="report_a_breach_where_were_the_goods_supplied_to",
+        "where_were_the_goods_supplied_to/<str:end_user_uuid>/",
+        report_a_suspected_breach_wizard,
+        name="where_were_the_goods_supplied_to",
     ),
     path(
-        "report_a_breach/where_were_the_goods_made_available_to/<str:end_user_uuid>/",
-        report_a_breach_wizard,
-        name="report_a_breach_where_were_the_goods_made_available_to",
+        "where_were_the_goods_made_available_to/<str:end_user_uuid>/",
+        report_a_suspected_breach_wizard,
+        name="where_were_the_goods_made_available_to",
     ),
-    re_path(r"report_a_breach/(?P<step>.+)/$", report_a_breach_wizard, name="report_a_breach_step"),
+    re_path(r"(?P<step>.+)/$", report_a_suspected_breach_wizard, name="step"),
     path("complete", CompleteView.as_view(), name="complete"),
 ]

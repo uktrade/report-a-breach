@@ -1,5 +1,5 @@
 from botocore.exceptions import EndpointConnectionError
-from report_a_breach.document_storage import (
+from report_a_suspected_breach.document_storage import (
     PermanentDocumentStorage,
     TemporaryDocumentStorage,
 )

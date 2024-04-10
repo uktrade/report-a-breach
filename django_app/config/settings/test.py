@@ -12,7 +12,7 @@ ENVIRONMENT = "test"
 def test_process_email_step(self, form):
     """Monkey-patching the process_email_step of the wizard to always use the same verify code for testing."""
     from django.contrib.sessions.models import Session
-    from report_a_breach.models import ReporterEmailVerification
+    from report_a_suspected_breach.models import ReporterEmailVerification
 
     verify_code = "012345"
     user_session = Session.objects.get(session_key=self.request.session.session_key)

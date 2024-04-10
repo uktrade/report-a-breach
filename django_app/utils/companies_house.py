@@ -2,7 +2,7 @@ import base64
 
 import requests
 from django.conf import settings
-from report_a_breach.exceptions import CompaniesHouseException
+from report_a_suspected_breach.exceptions import CompaniesHouseException
 
 COMPANIES_HOUSE_BASIC_AUTH = base64.b64encode(bytes(f"{settings.COMPANIES_HOUSE_API_KEY}:", "utf-8")).decode("utf-8")
 COMPANIES_HOUSE_BASE_DOMAIN = "https://api.companieshouse.gov.uk"
