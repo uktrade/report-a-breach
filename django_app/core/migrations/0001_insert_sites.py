@@ -16,6 +16,6 @@ def insert_sites(apps, schema_editor):
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = []
+    dependencies = [("sites", "0002_alter_domain_unique")]
 
     operations = [migrations.RunPython(insert_sites)]
