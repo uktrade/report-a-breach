@@ -1,13 +1,12 @@
 import functools
 
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 
 
 class SiteName:
-    view_a_suspected_breach = settings.VIEW_A_SUSPECTED_BREACH_DOMAIN
-    report_a_suspected_breach = settings.REPORT_A_SUSPECTED_BREACH_DOMAIN
+    view_a_suspected_breach = "report-a-suspected-breach"
+    report_a_suspected_breach = "view-a-suspected-breach"
 
 
 def require_view_a_breach():

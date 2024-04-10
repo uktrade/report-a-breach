@@ -137,6 +137,10 @@ class RedirectBaseDomainView(RedirectView):
         site_domains = [each.domain for each in Site.objects.all()]
         site_name = [each.name for each in Site.objects.all()]
 
+        is_report_a_suspected_breach_site_value = is_report_a_suspected_breach_site(self.request.site)
+        is_view_a_suspected_breach_site_value = is_view_a_suspected_breach_site(self.request.site)
+        print(is_report_a_suspected_breach_site_value)
+        print(is_view_a_suspected_breach_site_value)
         official_report_site_name = SiteName.report_a_suspected_breach
         official_view_site_name = SiteName.view_a_suspected_breach
         print(official_report_site_name)
