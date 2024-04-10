@@ -3,7 +3,6 @@ from core.sites import (
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
 )
-from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import FormView, RedirectView
@@ -121,38 +120,22 @@ class BaseWizardView(NamedUrlSessionWizardView):
 class RedirectBaseDomainView(RedirectView):
     """Redirects base url visits to either report a breach app or view app default view"""
 
-    def get_redirect_url(self, *args, **kwargs):
+    @property
+    def url(self):
         if is_report_a_suspected_breach_site(self.request.site):
             return reverse("report_a_suspected_breach:landing")
         elif is_view_a_suspected_breach_site(self.request.site):
             return reverse("view_a_suspected_breach:landing")
-        return super().get_redirect_url(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         url = self.get_redirect_url(*args, **kwargs)
-        current_site_name = request.site.name
-        current_site_domain = request.site.domain
-        host = request.get_host()
-        raw_host = request._get_raw_host()
-        site_domains = [each.domain for each in Site.objects.all()]
-        site_name = [each.name for each in Site.objects.all()]
-
-        is_report_a_suspected_breach_site_value = is_report_a_suspected_breach_site(self.request.site)
-        is_view_a_suspected_breach_site_value = is_view_a_suspected_breach_site(self.request.site)
-        print(is_report_a_suspected_breach_site_value)
-        print(is_view_a_suspected_breach_site_value)
-        official_report_site_name = SiteName.report_a_suspected_breach
-        official_view_site_name = SiteName.view_a_suspected_breach
-        print(official_report_site_name)
-        print(official_view_site_name)
-        print(current_site_name)
-        print(current_site_domain)
-        print(host)
-        print(site_domains)
-        print(site_name)
-        print(raw_host)
-
         if url:
             return HttpResponseRedirect(url)
         else:
-            raise Exception()
+
+            raise Exception(
+                self.request.get_host(),
+                self.request.site.name,
+                SiteName.report_a_suspected_breach,
+                SiteName.view_a_suspected_breach,
+            )
