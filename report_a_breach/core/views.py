@@ -405,7 +405,6 @@ class ReportABreachWizardView(BaseWizardView):
 
 
 # @method_decorator(require_report_a_breach(), name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class CompleteView(TemplateView):
     template_name = "complete.html"
 

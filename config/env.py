@@ -47,10 +47,10 @@ class BaseSettings(PydanticBaseSettings):
     permanent_s3_bucket_name: str = "permanent-document-bucket"
     presigned_url_expiry_seconds: int = 3600
 
-    authbroker_url: str = "http://docker.for.mac.localhost:8080/"
+    authbroker_url: str = "http://localhost:8080"
     authbroker_client_id: str = "contact-web-ops-for-details"
     authbroker_client_secret: str = "contact-web-ops-for-details"
-    authbroker_token_session_key: str = "authbroker_token"
+    authbroker_token_session_key: str = "_authbroker_token"
     authbroker_staff_sso_scope: str = "dummy-scope"
 
     mock_sso_token: str = "dummy-token"
