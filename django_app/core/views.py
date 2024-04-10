@@ -123,9 +123,9 @@ class RedirectBaseDomainView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         if is_report_a_suspected_breach_site(self.request.site):
-            self.url = reverse("report_a_suspected_breach:landing")
+            return reverse("report_a_suspected_breach:landing")
         elif is_view_a_suspected_breach_site(self.request.site):
-            self.url = reverse("view_a_suspected_breach:landing")
+            return reverse("view_a_suspected_breach:landing")
         return super().get_redirect_url(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
