@@ -129,10 +129,12 @@ class RedirectBaseDomainView(RedirectView):
 
     def get(self, request, *args, **kwargs):
         url = self.get_redirect_url(*args, **kwargs)
+        site = request.site
         host = request.get_host()
         raw_host = request._get_raw_host()
         site_domains = [each.domain for each in Site.objects.all()]
         site_name = [each.name for each in Site.objects.all()]
+        print(site)
         print(host)
         print(site_domains)
         print(site_name)
