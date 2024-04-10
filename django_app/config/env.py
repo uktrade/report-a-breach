@@ -49,8 +49,8 @@ class BaseSettings(PydanticBaseSettings):
     presigned_url_expiry_seconds: int = 3600
 
     # Django sites
-    report_a_suspected_breach_domain: str
-    view_a_suspected_breach_domain: str
+    report_a_suspected_breach_domain: str = "report-a-suspected-breach"
+    view_a_suspected_breach_domain: str = "view-a-suspected-breach"
 
     @computed_field
     @property

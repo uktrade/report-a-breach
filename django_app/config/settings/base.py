@@ -204,5 +204,5 @@ GTM_ENABLED = env.gtm_enabled
 GTM_ID = env.gtm_id
 
 # Django sites
-REPORT_A_SUSPECTED_BREACH = env.report_a_suspected_breach_domain
+REPORT_A_SUSPECTED_BREACH_DOMAIN = env.report_a_suspected_breach_domain
 VIEW_A_SUSPECTED_BREACH_DOMAIN = env.view_a_suspected_breach_domain

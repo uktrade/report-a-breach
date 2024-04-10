@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 
 class SiteName:
     view_a_suspected_breach = settings.VIEW_A_SUSPECTED_BREACH_DOMAIN
-    report_a_suspected_breach = settings.REPORT_A_SUSPECTED_BREACH
+    report_a_suspected_breach = settings.REPORT_A_SUSPECTED_BREACH_DOMAIN
 
 
 def require_view_a_breach():
