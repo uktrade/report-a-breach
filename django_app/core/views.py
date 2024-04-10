@@ -2,6 +2,7 @@ from core.sites import (
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
 )
+from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import FormView, RedirectView
@@ -130,7 +131,9 @@ class RedirectBaseDomainView(RedirectView):
         url = self.get_redirect_url(*args, **kwargs)
         host = request.get_host()
         raw_host = request._get_raw_host()
+        sites = [each.domain for each in Site.objects.all()]
         print(host)
+        print(sites)
         print(raw_host)
 
         if url:
