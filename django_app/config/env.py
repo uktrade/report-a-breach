@@ -22,7 +22,7 @@ class BaseSettings(PydanticBaseSettings):
     clam_av_password: str = ""
     clam_av_domain: str = ""
 
-    company_house_api_key: str | None = None
+    companies_house_api_key: str | None = None
 
     gov_notify_api_key: str = None
     email_verify_code_template_id: str = ""

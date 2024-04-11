@@ -42,7 +42,7 @@ class BaseForm(forms.Form):
         self.helper = FormHelper()
         self.helper.add_input(Submit("continue", "Continue", css_class="btn-primary"))
 
-        if self.single_question_form:
+        if self.single_question_form and not self.form_h1_header:
             self.helper.label_tag = "h1"
             self.helper.legend_tag = "h1"
             self.helper.legend_size = Size.LARGE
