@@ -54,16 +54,16 @@ class BaseSettings(PydanticBaseSettings):
 
     # SSO
     enforce_staff_sso: bool = False
-    authbroker_url: str = "http://localhost:8080"
-    authbroker_client_id: str = "contact-web-ops-for-details"
-    authbroker_client_secret: str = "contact-web-ops-for-details"
-    authbroker_token_session_key: str = "_authbroker_token"
-    authbroker_staff_sso_scope: str = "dummy-scope"
+    authbroker_url: str = ""
+    authbroker_client_id: str = ""
+    authbroker_client_secret: str = ""
+    authbroker_token_session_key: str = ""
+    authbroker_staff_sso_scope: str = ""
 
-    mock_sso_token: str = "dummy-token"
-    mock_sso_scope: str = "dummy-scope"
-    mock_sso_username: str = "testuser"
-    mock_sso_email_user_id: str = "testuser@example.com"
+    mock_sso_token: str = ""
+    mock_sso_scope: str = ""
+    mock_sso_username: str = ""
+    mock_sso_email_user_id: str = ""
     oauthlib_insecure_transport: int
 
     @computed_field
