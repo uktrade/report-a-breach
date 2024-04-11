@@ -24,4 +24,6 @@ repos:
     hooks:
     -   id: djhtml
     -   id: djcss
+        exclude: .*/core/stylesheets/*
     -   id: djjs
+        exclude: .*/core/javascript/*
