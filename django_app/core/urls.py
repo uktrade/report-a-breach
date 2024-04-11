@@ -7,4 +7,5 @@ urlpatterns = [
     path("view_a_suspected_breach/", include("view_a_suspected_breach.urls")),
     path("pingdom/", include("healthcheck.urls")),
     path("throw_error/", lambda x: 1 / 0),
+    path("auth/", include("authbroker_client.urls")),
 ]

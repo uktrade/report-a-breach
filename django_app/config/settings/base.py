@@ -16,6 +16,7 @@ from pathlib import Path
 import dj_database_url
 import sentry_sdk
 from config.env import env
+from django.urls import reverse_lazy
 from sentry_sdk.integrations.django import DjangoIntegration
 
 is_dbt_platform = "COPILOT_ENVIRONMENT_NAME" in os.environ
@@ -48,6 +49,7 @@ THIRD_PARTY_APPS = [
     "django_chunk_upload_handlers",
     "simple_history",
     "storages",
+    "authbroker_client",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
@@ -206,3 +208,22 @@ GTM_ID = env.gtm_id
 # Django sites
 REPORT_A_SUSPECTED_BREACH_DOMAIN = env.report_a_suspected_breach_domain
 VIEW_A_SUSPECTED_BREACH_DOMAIN = env.view_a_suspected_breach_domain
+
+# Authentication - SSO
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "authbroker_client.backends.AuthbrokerBackend",
+]
+
+AUTHBROKER_URL = env.authbroker_url
+AUTHBROKER_CLIENT_ID = env.authbroker_client_id
+AUTHBROKER_CLIENT_SECRET = env.authbroker_client_secret
+AUTHBROKER_TOKEN_SESSION_KEY = env.authbroker_token_session_key
+AUTHBROKER_STAFF_SSO_SCOPE = env.authbroker_staff_sso_scope
+
+OAUTHLIB_INSECURE_TRANSPORT = env.oauthlib_insecure_transport
+TEST_SSO_PROVIDER_SET_RETURNED_ACCESS_TOKEN = env.mock_sso_token
+
+LOGIN_URL = reverse_lazy("authbroker_client:login")
+LOGIN_REDIRECT_URL = reverse_lazy("view_a_suspected_breach:landing")

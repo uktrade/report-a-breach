@@ -14,7 +14,7 @@ class BaseSettings(PydanticBaseSettings):
         validate_default=False,
     )
 
-    debug: bool = False
+    debug: bool = True
     django_secret_key: str
     rab_allowed_hosts: list[str] = ["*"]
 
@@ -51,6 +51,19 @@ class BaseSettings(PydanticBaseSettings):
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
+
+    # SSO
+    authbroker_url: str = "http://localhost:8080"
+    authbroker_client_id: str = "contact-web-ops-for-details"
+    authbroker_client_secret: str = "contact-web-ops-for-details"
+    authbroker_token_session_key: str = "_authbroker_token"
+    authbroker_staff_sso_scope: str = "dummy-scope"
+
+    mock_sso_token: str = "dummy-token"
+    mock_sso_scope: str = "dummy-scope"
+    mock_sso_username: str = "testuser"
+    mock_sso_email_user_id: str = "testuser@example.com"
+    oauthlib_insecure_transport: int
 
     @computed_field
     @property
