@@ -77,10 +77,10 @@ class ReportABreachWizardView(BaseWizardView):
     ]
 
     template_names_lookup = {
-        "summary": "form_steps/summary.html",
-        "check_company_details": "form_steps/check_company_details.html",
-        "end_user_added": "form_steps/end_user_added.html",
-        "declaration": "form_steps/declaration.html",
+        "summary": "report_a_suspected_breach/form_steps/summary.html",
+        "check_company_details": "report_a_suspected_breach/form_steps/check_company_details.html",
+        "end_user_added": "report_a_suspected_breach/form_steps/end_user_added.html",
+        "declaration": "report_a_suspected_breach/form_steps/declaration.html",
     }
     template_name = "report_a_suspected_breach/generic_form_step.html"
     storage_name = "report_a_suspected_breach.session.SessionStorage"
@@ -88,7 +88,7 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = TemporaryDocumentStorage()
 
     def get(self, request, *args, **kwargs):
-        if request.resolver_match.url_name == "report_a_suspected_breach_about_the_end_user":
+        if request.resolver_match.url_name == "about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
                 default_redirect = "where_were_the_goods_supplied_to"
@@ -102,11 +102,11 @@ class ReportABreachWizardView(BaseWizardView):
                 self.storage.current_step = "about_the_end_user"
                 return super().get(request, *args, step="about_the_end_user", **kwargs)
 
-        if request.resolver_match.url_name == "report_a_suspected_breach_where_were_the_goods_supplied_to":
+        if request.resolver_match.url_name == "where_were_the_goods_supplied_to":
             self.storage.current_step = "where_were_the_goods_supplied_to"
             return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
 
-        if request.resolver_match.url_name == "report_a_suspected_breach_where_were_the_goods_made_available_to":
+        if request.resolver_match.url_name == "where_were_the_goods_made_available_to":
             self.storage.current_step = "where_were_the_goods_made_available_to"
             return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
         return super().get(request, *args, **kwargs)

@@ -3,11 +3,12 @@
 
 {% block form_content %}
     <h1 class="govuk-heading-m">Declaration</h1>
-    <p class="govuk-body">If you have any commercially sensitive information, we'll consider how this might impact on any request we might receive under the Freedom of Information Act (FOIA). We can discuss this with you when we review your report, but we cannot guarantee that the information will not be disclosed in compliance with the FOIA.</p>
+    <p class="govuk-body">If you have any commercially sensitive information, we'll consider how this might impact on any request we might receive under the Freedom of Information Act (FOIA).</p>
+    <p class="govuk-body">We cannot guarantee that the information will not be disclosed in compliance with the FOIA.</p>
     <p class="govuk-body">By submitting this:</p>
     <ul class="govuk-list govuk-list--bullet">
         <li>you confirm that the information you've given is correct to the best of your knowledge</li>
-        <li>you understand and accept that the information you've given may be shared with third parties, in accordance with the disclosure of information regulations (in the relevant sanctions regulations)</li>
+        <li>you understand and accept that the information you've given may be shared with other departments, agencies and international partners, in accordance with the disclosure of information regulations (in the relevant sanctions regulations)</li>
         <li>you have read our privacy policy {# todo - privacy policy link #}</li>
     </ul>
     {% crispy wizard.form %}
