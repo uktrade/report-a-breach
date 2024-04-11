@@ -64,7 +64,7 @@ class BaseSettings(PydanticBaseSettings):
     mock_sso_scope: str = ""
     mock_sso_username: str = ""
     mock_sso_email_user_id: str = ""
-    oauthlib_insecure_transport: int
+    oauthlib_insecure_transport: int = 0
 
     @computed_field
     @property
@@ -152,7 +152,7 @@ class DBTPlatformSettings(BaseSettings):
         return database_url_from_env("DATABASE_CREDENTIALS")
 
 
-if "config.settings.local" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):
+if os.environ.get("DJANGO_SETTINGS_MODULE", "") in ["config.settings.local", "config.settings.test"]:
     # Local development
     env = LocalSettings()
 elif "COPILOT_ENVIRONMENT_NAME" in os.environ:
