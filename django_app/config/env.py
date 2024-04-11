@@ -14,7 +14,7 @@ class BaseSettings(PydanticBaseSettings):
         validate_default=False,
     )
 
-    debug: bool = True
+    debug: bool = False
     django_secret_key: str
     rab_allowed_hosts: list[str] = ["*"]
 
