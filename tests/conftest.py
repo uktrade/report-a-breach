@@ -7,7 +7,7 @@ from tests.helpers import get_test_client
 
 @pytest.fixture()
 def rasb_client(db):
-    """Client used to access the view-a-suspected-breach site.
+    """Client used to access the report-a-suspected-breach site.
 
     No user is logged in with this client.
     """
