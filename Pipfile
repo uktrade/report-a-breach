@@ -27,6 +27,7 @@ dbt-copilot-python = "=0.2.1"
 pydantic-settings = "*"
 django-log-formatter-asim = "*"
 boto3 = "*"
+django-staff-sso-client = "~=4.2.2"
 
 [dev-packages]
 black = "~=24.3"

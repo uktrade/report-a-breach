@@ -116,6 +116,8 @@ To run end-to-end tests only:\
 A useful command for writing end-to-end tests is:\
 `pipenv run playwright codegen http://report-a-suspected-breach:8000/`
 
+### Single Sign On (SSO)
+The app works out of the box with Mock SSO, which is part of the Docker Compose setup. If the OAuth 2.0 flow isn't working, try setting the AUTHBROKER_URL to docker.for.mac.localhost:8080 or host.docker.internal:8080 (value varies across platforms). This is because the Mock SSO service (configured with the AUTHBROKER_URL) must be accessible from outside of docker-compose for the authorization redirect, and also from within docker-compose to make the access token POST request.
 
 ## Standards
 ### Linting and Formatting

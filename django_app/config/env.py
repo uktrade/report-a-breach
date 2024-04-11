@@ -52,6 +52,20 @@ class BaseSettings(PydanticBaseSettings):
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
 
+    # SSO
+    enforce_staff_sso: bool = False
+    authbroker_url: str = ""
+    authbroker_client_id: str = ""
+    authbroker_client_secret: str = ""
+    authbroker_token_session_key: str = ""
+    authbroker_staff_sso_scope: str = ""
+
+    mock_sso_token: str = ""
+    mock_sso_scope: str = ""
+    mock_sso_username: str = ""
+    mock_sso_email_user_id: str = ""
+    oauthlib_insecure_transport: int
+
     @computed_field
     @property
     def allowed_hosts(self) -> list[str]:
