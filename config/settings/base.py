@@ -224,15 +224,10 @@ RAB_DOMAIN = "report-a-breach"
 VAB_DOMAIN = "view-a-breach"
 
 TEST_SSO_PROVIDER_SET_RETURNED_ACCESS_TOKEN = env.mock_sso_token
-AUTHBROKER_URL = "http://localhost:8080"
-AUTHBROKER_CLIENT_ID = "test_client"
-AUTHBROKER_CLIENT_SECRET = "dummy-secret"
-AUTHBROKER_TOKEN_SESSION_KEY = "_authbroker_token"
-AUTHBROKER_STAFF_SSO_SCOPE = "dummy-scope"
-
-MOCK_SSO_TOKEN = "dummy-token"
-MOCK_SSO_SCOPE = "dummy-scope"
-MOCK_SSO_USERNAME = "testuser"
-MOCK_SSO_EMAIL_USER_ID = "testuser@example.com"
+AUTHBROKER_URL = env.authbroker_url
+AUTHBROKER_CLIENT_ID = env.authbroker_client_id
+AUTHBROKER_CLIENT_SECRET = env.authbroker_client_secret
+AUTHBROKER_TOKEN_SESSION_KEY = env.authbroker_token_session_key
+AUTHBROKER_STAFF_SSO_SCOPE = env.authbroker_staff_sso_scope
 
 OAUTHLIB_INSECURE_TRANSPORT = env.oauthlib_insecure_transport

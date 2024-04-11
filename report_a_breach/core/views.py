@@ -404,6 +404,7 @@ class ReportABreachWizardView(BaseWizardView):
         return redirect(reverse("complete"))
 
 
+@method_decorator(login_required, name="dispatch")
 # @method_decorator(require_report_a_breach(), name="dispatch")
 class CompleteView(TemplateView):
     template_name = "complete.html"
@@ -415,6 +416,7 @@ class ViewABreachView(TemplateView):
     template_name = "view_a_breach.html"
 
 
+@method_decorator(login_required, name="dispatch")
 @method_decorator(require_view_a_breach(), name="dispatch")
 class ViewABreachLoginView(TemplateView):
     template_name = "view_a_breach.html"
