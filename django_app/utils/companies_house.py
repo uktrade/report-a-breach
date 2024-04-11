@@ -4,8 +4,14 @@ import requests
 from django.conf import settings
 from report_a_suspected_breach.exceptions import CompaniesHouseException
 
-COMPANIES_HOUSE_BASIC_AUTH = base64.b64encode(bytes(f"{settings.COMPANIES_HOUSE_API_KEY}:", "utf-8")).decode("utf-8")
 COMPANIES_HOUSE_BASE_DOMAIN = "https://api.companieshouse.gov.uk"
+
+
+def get_companies_house_basic_auth_token(api_key=settings.COMPANIES_HOUSE_API_KEY):
+    """
+    Returns the basic auth token for Companies House API.
+    """
+    return base64.b64encode(bytes(f"{api_key}:", "utf-8")).decode("utf-8")
 
 
 def get_details_from_companies_house(registration_number):
@@ -14,7 +20,7 @@ def get_details_from_companies_house(registration_number):
     using registration number that is passed in.
     """
 
-    get_company_headers = {"Authorization": f"Basic {COMPANIES_HOUSE_BASIC_AUTH}"}
+    get_company_headers = {"Authorization": f"Basic {get_companies_house_basic_auth_token()}"}
     response = requests.get(
         f"{COMPANIES_HOUSE_BASE_DOMAIN}/company/{registration_number}",
         headers=get_company_headers,
