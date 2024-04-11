@@ -53,6 +53,7 @@ class BaseSettings(PydanticBaseSettings):
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
 
     # SSO
+    enforce_staff_sso: bool = False
     authbroker_url: str = "http://localhost:8080"
     authbroker_client_id: str = "contact-web-ops-for-details"
     authbroker_client_secret: str = "contact-web-ops-for-details"
