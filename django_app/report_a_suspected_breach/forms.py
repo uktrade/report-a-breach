@@ -63,7 +63,7 @@ class EmailVerifyForm(BaseForm):
 
     email_verification_code = forms.CharField(
         label="Enter the 6 digit security code",
-        error_messages={"required": "Please provide the 6 digit code sent to your email to continue"},
+        error_messages={"required": "Enter the 6 digit security code we sent to your email"},
     )
 
     def clean_email_verification_code(self):
@@ -74,7 +74,7 @@ class EmailVerifyForm(BaseForm):
         )
         verify_code = verification_objects.email_verification_code
         if email_verification_code != verify_code:
-            raise forms.ValidationError("The code you entered is incorrect")
+            raise forms.ValidationError("Code is incorrect. Enter the 6 digit security code we sent to your email")
 
         # check if the user has submitted the verify code within the specified timeframe
         allowed_lapse = verification_objects.date_created + timedelta(seconds=verify_timeout_seconds)
@@ -122,7 +122,7 @@ class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
         fields = ["business_registered_on_companies_house"]
         widgets = {"business_registered_on_companies_house": forms.RadioSelect}
         labels = {
-            "business_registered_on_companies_house": "Are you reporting a business which is registered with Companies House?"
+            "business_registered_on_companies_house": "Are you reporting a business which is registered with UK Companies House?"
         }
 
     def __init__(self, *args, **kwargs):
@@ -195,7 +195,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
 
 class WhereIsTheAddressOfTheBusinessOrPersonForm(BaseForm):
     where_is_the_address = forms.ChoiceField(
-        label="Where is the address of the business or person who made the suspected breach?",
+        label="Where is the address of the business or person suspected of breaching sanctions?",
         choices=(
             ("in_the_uk", "In the UK"),
             ("outside_the_uk", "Outside the UK"),
@@ -264,6 +264,9 @@ class AboutTheSupplierForm(BusinessOrPersonDetailsForm):
 
 
 class WhenDidYouFirstSuspectForm(BaseModelForm):
+    form_h1_header = "Date you first suspected the business or person had breached trade sanctions"
+    bold_labels = False
+
     class Meta:
         model = Breach
         fields = [
@@ -273,10 +276,10 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
             "when_did_you_first_suspect": forms.TextInput,
         }
         help_texts = {
-            "when_did_you_first_suspect": "You can enter an exact or approximate date",
+            "when_did_you_first_suspect": "For example, 17 06 2024",
         }
         labels = {
-            "when_did_you_first_suspect": "When did you first suspect the business or person had breached trade sanctions?",
+            "when_did_you_first_suspect": "Enter the exact date or an approximate date",
         }
 
 
@@ -325,6 +328,9 @@ class WhatWereTheGoodsForm(BaseModelForm):
         labels = {
             "what_were_the_goods": "What were the goods or services, or what was the technological assistance or technology?",
         }
+        help_texts = {
+            "what_were_the_goods": "Give a short description. For example: accountancy services",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -349,7 +355,7 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
             address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
-            Choice("different_uk_address", "A different UK address"),
+            Choice("different_uk_address", "The UK"),
             Choice("outside_the_uk", "Outside the UK"),
             Choice("i_do_not_know", "I do not know"),
             Choice("they_have_not_been_supplied", "They have not been supplied yet"),
@@ -371,7 +377,7 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
             address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
-            Choice("different_uk_address", "A different UK address"),
+            Choice("different_uk_address", "The UK"),
             Choice("outside_the_uk", "Outside the UK"),
             Choice("i_do_not_know", "I do not know"),
         ]
@@ -580,6 +586,9 @@ class UploadDocumentsForm(BaseForm):
 
 
 class TellUsAboutTheSuspectedBreachForm(BaseModelForm):
+    form_h1_header = "Give a summary of the breach"
+    bold_labels = False
+
     class Meta:
         model = Breach
         # todo - make all fields variables a tuple
@@ -588,10 +597,9 @@ class TellUsAboutTheSuspectedBreachForm(BaseModelForm):
             "tell_us_about_the_suspected_breach": "Tell us about the suspected breach",
         }
         help_texts = {
-            "tell_us_about_the_suspected_breach": "Include anything you've not already told us or uploaded. "
-            "You could add specific details, such as any licence numbers or "
-            "shipping numbers. If you've uploaded your own compliance investigation, "
-            "you could give a summary here. ",
+            "tell_us_about_the_suspected_breach": "You can also include anything you've not already told us or "
+            "uploaded. You could add specific details, such as any "
+            "licence numbers or shipping numbers.",
         }
 
 

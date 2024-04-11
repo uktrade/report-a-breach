@@ -180,7 +180,7 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # COMPANIES HOUSE API
-COMPANIES_HOUSE_API_KEY = env.company_house_api_key
+COMPANIES_HOUSE_API_KEY = env.companies_house_api_key
 
 # GOV NOTIFY
 GOV_NOTIFY_API_KEY = env.gov_notify_api_key
