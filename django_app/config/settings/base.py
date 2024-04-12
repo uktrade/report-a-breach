@@ -16,8 +16,9 @@ from pathlib import Path
 import dj_database_url
 import sentry_sdk
 from config.env import env
-from django.urls import reverse_lazy
 from sentry_sdk.integrations.django import DjangoIntegration
+
+from django.urls import reverse_lazy
 
 is_dbt_platform = "COPILOT_ENVIRONMENT_NAME" in os.environ
 
@@ -224,7 +225,6 @@ if ENFORCE_STAFF_SSO:
     AUTHBROKER_STAFF_SSO_SCOPE = env.authbroker_staff_sso_scope
 
     OAUTHLIB_INSECURE_TRANSPORT = env.oauthlib_insecure_transport
-    TEST_SSO_PROVIDER_SET_RETURNED_ACCESS_TOKEN = env.mock_sso_token
 
     LOGIN_URL = reverse_lazy("authbroker_client:login")
     LOGIN_REDIRECT_URL = reverse_lazy("view_a_suspected_breach:landing")
