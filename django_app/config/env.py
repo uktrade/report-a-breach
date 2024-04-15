@@ -58,10 +58,10 @@ class BaseSettings(PydanticBaseSettings):
     authbroker_client_id: str = ""
     authbroker_client_secret: str = ""
     authbroker_token_session_key: str = ""
-    authbroker_staff_sso_scope: str = ""
+    authbroker_staff_sso_scope: str = "read"
 
     mock_sso_token: str = ""
-    mock_sso_scope: str = ""
+    mock_sso_scope: str = "read"
     mock_sso_username: str = ""
     mock_sso_email_user_id: str = ""
     oauthlib_insecure_transport: int = 0
