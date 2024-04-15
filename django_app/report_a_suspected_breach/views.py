@@ -339,26 +339,26 @@ class ReportABreachWizardView(BaseWizardView):
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
 
-    def store_documents_in_s3(self):
+    def store_documents_in_s3(self) -> None:
         """
         Copies documents from the default temporary storage to permanent storage on s3
         """
-        permanent_storage_bucket = PermanentDocumentStorage()
-        uploaded_docs = self.storage.get_step_files("upload_documents")["upload_documents-documents"]
+        if uploaded_docs := self.storage.get_step_files("upload_documents"):
+            permanent_storage_bucket = PermanentDocumentStorage()
+            files = uploaded_docs["upload_documents-documents"]
 
-        object_key = f"{self.request.session.session_key}/{uploaded_docs.name}"
+            object_key = f"{self.request.session.session_key}/{files.name}"
 
-        try:
-            permanent_storage_bucket.bucket.meta.client.copy(
-                CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
-                Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                Key=object_key,
-                SourceClient=self.file_storage.bucket.meta.client,
-            )
-        except Exception:
-            # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigatee
-            pass
-        return uploaded_docs
+            try:
+                permanent_storage_bucket.bucket.meta.client.copy(
+                    CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                    Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+                    Key=object_key,
+                    SourceClient=self.file_storage.bucket.meta.client,
+                )
+            except Exception:
+                # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
+                pass
 
     def done(self, form_list, **kwargs):
         """all_cleaned_data = self.get_all_cleaned_data()
