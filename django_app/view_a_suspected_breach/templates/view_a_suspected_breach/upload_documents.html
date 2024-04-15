@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block back_button %}{% endblock back_button %}
+
+{% block column_content %}
+  <div>
+    <h1 class="govuk-heading-l">
+      Suspected Breach Report
+    </h1>
+    <form
+      method="POST"
+      enctype="multipart/form-data"
+    >
+      {% csrf_token %}
+      {{ form }}
+
+      <button type="submit" class="btn">Submit</button>
+    </form>
+  </div>
+{% endblock column_content %}
