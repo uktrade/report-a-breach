@@ -1,8 +1,5 @@
 from botocore.exceptions import EndpointConnectionError
-from report_a_suspected_breach.document_storage import (
-    PermanentDocumentStorage,
-    TemporaryDocumentStorage,
-)
+from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 
 
 def s3_check() -> bool:
