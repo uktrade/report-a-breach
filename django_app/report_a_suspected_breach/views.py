@@ -343,8 +343,8 @@ class ReportABreachWizardView(BaseWizardView):
         """
         Copies documents from the default temporary storage to permanent storage on s3
         """
-        permanent_storage_bucket = PermanentDocumentStorage()
         if uploaded_docs := self.storage.get_step_files("upload_documents"):
+            permanent_storage_bucket = PermanentDocumentStorage()
             files = uploaded_docs["upload_documents-documents"]
 
             object_key = f"{self.request.session.session_key}/{files.name}"
