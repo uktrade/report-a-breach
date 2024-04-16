@@ -1,32 +1,120 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@4.1.0
+
+commands:
+  install_dependencies:
+    description: "Install Python dependencies"
+    steps:
+      - run:
+         name: Install Python dependencies
+         command: |
+             pip install pipenv && pipenv install --dev
+
+  restore_dependency_cache:
+    description: "Restore dependency cache."
+    steps:
+      - restore_cache:
+          key: deps2-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+
+  save_dependency_cache:
+    description: "Save dependency cache."
+    steps:
+      - save_cache:
+          key: deps2-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          paths:
+            - "/home/circleci/.local/share/virtualenvs/project-zxI9dQ-Q"
+
 jobs:
-    build:
+    code_hygiene:
         docker:
             - image: cimg/python:3.11.7
         environment:
-            DJANGO_SETTINGS_MODULE: config.settings.test
+            DJANGO_SETTINGS_MODULE: config.settings.local
             DJANGO_DEBUG: "True"
             DJANGO_SECRET_KEY: "CircleCI"
+            CIRCLECI: "True"
+            DATABASE_URL: ""
         steps:
-            - checkout
-            - run :
-                name: Install dependencies
-                command: pip install pipenv && pipenv install --dev
+          - checkout
+          - restore_dependency_cache
+          - install_dependencies
+          - save_dependency_cache
+          - run :
+              name: Install dependencies
+              command: pip install pipenv && pipenv install --dev
 
-            - run:
-                name: run black (code formatting check)
-                command: pipenv run black --check .
+          - run:
+              name: run black (code formatting check)
+              command: pipenv run black --check django_app
 
-            - run:
-                name: run isort (import formatter check)
-                command: pipenv run isort . --check
+          - run:
+              name: run isort (import formatter check)
+              command: pipenv run isort django_app --check
 
-            - run:
-                  name: Check missing migrations (changes to models that haven't been added to migrations)
-                  command: pipenv run python manage.py makemigrations --check --dry-run --settings=config.settings.local
+          - restore_cache:
+              keys:
+                - pre-commit-cache-{{ arch }}-{{ .Branch }}
+
+          - run:
+              name: Formatting checks
+              command: pipenv run pre-commit run --from-ref origin/HEAD --to-ref HEAD
+
+          - save_cache:
+              key: pre-commit-cache-{{ arch }}-{{ .Branch }}
+              paths:
+                - ~/.cache/pre-commit
+    run_tests:
+      docker:
+        - image: cimg/python:3.11.7
+          environment:
+            DJANGO_SETTINGS_MODULE: config.settings.local
+            DJANGO_DEBUG: "True"
+            DJANGO_SECRET_KEY: "CircleCI"
+            DATABASE_URI: "psql://postgres:password@127.0.0.1:5432/report_a_suspected_breach"
+            AWS_DEFAULT_REGION: eu-west-2
+            AWS_ENDPOINT_URL: http://localhost:4566
+            TEMPORARY_S3_BUCKET_NAME: temporary-document-bucket
+            TEMPORARY_S3_BUCKET_ACCESS_KEY_ID: test
+            TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY: test
+            PERMANENT_S3_BUCKET_NAME: permanent-document-bucket
+            PERMANENT_S3_BUCKET_ACCESS_KEY_ID: test
+            PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY: test
+        - image: cimg/postgres:16.1
+          environment:
+            POSTGRES_USER: postgres
+            POSTGRES_DB: report_a_suspected_breach
+            POSTGRES_PASSWORD: password
+        - image: localstack/localstack
+
+      steps:
+        - checkout
+        - restore_dependency_cache
+        - install_dependencies
+        - save_dependency_cache
+
+        - run:
+            name: Create S3 Buckets
+            command: |
+              pipenv run awslocal s3 mb s3://temporary-document-bucket
+              pipenv run awslocal s3 mb s3://permanent-document-bucket
+              pipenv run awslocal s3api put-bucket-cors --bucket temporary-document-bucket --cors-configuration file://./aws/cors.json
+              pipenv run awslocal s3api put-bucket-cors --bucket permanent-document-bucket --cors-configuration file://./aws/cors.json
+
+        - run:
+            name: Check missing migrations (changes to models that haven't been added to migrations)
+            command: pipenv run python django_app/manage.py makemigrations --check --dry-run --settings=config.settings.local
+
+        - run:
+            name: Run tests and save coverage report
+            command: |
+              pipenv run pytest tests/test_unit --cov-report=json
+
+        - codecov/upload
 
 workflows:
   build_and_test:
     jobs:
-      - build
+      - code_hygiene
+      - run_tests
