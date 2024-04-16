@@ -97,3 +97,4 @@ __pycache__/
 /redis_data/
 /static/
 /django_app/core/templates/core/report-a-breach-gds/
+/coverage.json
