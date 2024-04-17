@@ -1,9 +1,8 @@
 from core.sites import require_view_a_breach
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import FormView
-
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
 
 from .forms import FileFieldForm
 
@@ -24,3 +23,6 @@ class FileFieldFormView(FormView):
         for f in files:
             print(f)
         return super().form_valid(form)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
