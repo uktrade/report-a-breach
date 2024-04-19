@@ -75,10 +75,6 @@ python_files = ["tests.py", "test_*.py", "*_tests.py"]
 addopts = """
     --reuse-db
     --ds=config.settings.test
-    --cov=django_app
-    --no-cov-on-fail
-    --cov-config=.coveragerc
-    --cov-branch
 """
 django_find_project = false
 pythonpath = "django_app"
