@@ -28,7 +28,6 @@ pydantic-settings = "*"
 django-log-formatter-asim = "*"
 boto3 = "*"
 django-staff-sso-client = "~=4.2.2"
-ring = "*"
 
 [dev-packages]
 black = "~=24.3"
@@ -47,8 +46,6 @@ pytest-playwright = "~=0.4"
 coverage = "*"
 pytest-cov = "*"
 "awscli-local[ver1]" = "~=0.22"
-django-debug-toolbar = "*"
-pyinstrument = "*"
 
 [requires]
 python_version = "3.11"

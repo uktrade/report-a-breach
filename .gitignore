@@ -98,4 +98,3 @@ __pycache__/
 /static/
 /django_app/core/templates/core/report-a-breach-gds/
 /coverage.json
-/django_app/profiles/

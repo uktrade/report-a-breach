@@ -19,8 +19,6 @@ class BaseForm(forms.Form):
     labels = {}
     # same for help_texts
     help_texts = {}
-    # do we want this form to be revalidated when the user clicks Done
-    revalidate_on_done = True
 
     class Media:
         css = {

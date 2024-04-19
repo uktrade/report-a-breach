@@ -1,6 +1,5 @@
 from django.urls import path, re_path
 
-from . import views
 from .form_step_conditions import (
     show_about_the_end_user_page,
     show_about_the_supplier_page,
@@ -15,8 +14,9 @@ from .form_step_conditions import (
     show_where_were_the_goods_made_available_to_page,
     show_where_were_the_goods_supplied_to_page,
 )
+from .views import CompleteView, ReportABreachWizardView
 
-report_a_suspected_breach_wizard = views.ReportABreachWizardView.as_view(
+report_a_suspected_breach_wizard = ReportABreachWizardView.as_view(
     url_name="report_a_suspected_breach:step",
     done_step_name="confirmation",
     condition_dict={
@@ -55,5 +55,5 @@ urlpatterns = [
         name="where_were_the_goods_made_available_to",
     ),
     re_path(r"(?P<step>.+)/$", report_a_suspected_breach_wizard, name="step"),
-    path("complete", views.CompleteView.as_view(), name="complete"),
+    path("complete", CompleteView.as_view(), name="complete"),
 ]
