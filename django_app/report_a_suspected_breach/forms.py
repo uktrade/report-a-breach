@@ -60,7 +60,6 @@ class EmailForm(BaseModelForm):
 class EmailVerifyForm(BaseForm):
     bold_labels = False
     form_h1_header = "We've sent you an email"
-    revalidate_on_done = False
 
     email_verification_code = forms.CharField(
         label="Enter the 6 digit security code",

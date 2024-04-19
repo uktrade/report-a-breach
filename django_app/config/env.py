@@ -92,7 +92,6 @@ class BaseSettings(PydanticBaseSettings):
 
 class LocalSettings(BaseSettings):
     database_uri: str = Field(alias="DATABASE_URL")
-    profiling_enabled: bool = False
 
 
 class GovPaasSettings(BaseSettings):
