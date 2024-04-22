@@ -304,11 +304,6 @@ class WhichSanctionsRegimeForm(BaseForm):
         checkbox_choices.append(Choice("don't know", "I don't know"))
         checkbox_choices.append(Choice("other_regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
-
-        # self.helper.layout = Layout(
-        #     Field.text("search_bar", field_width=Fluid.THREE_QUARTERS),
-        #     Field.checkboxes("which_sanctions_regime"),
-        # )
         self.helper.label_size = None
         self.helper.label_tag = None
 
