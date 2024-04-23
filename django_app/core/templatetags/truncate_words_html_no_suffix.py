@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.template import Library
 from django.template.defaultfilters import stringfilter
 from django.utils.text import Truncator
@@ -7,7 +9,7 @@ register = Library()
 
 @register.filter(is_safe=True)
 @stringfilter
-def truncate_words_html_no_suffix(value, arg):
+def truncate_words_html_no_suffix(value: Any, arg: Any) -> str:
     """
     Truncate HTML after `arg` number of words.
     Preserve newlines in the HTML.
