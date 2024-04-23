@@ -1,38 +1,25 @@
+from collections import OrderedDict
+
+import ring
 from core.sites import (
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
 )
 from django.urls import reverse
-from django.views.generic import FormView, RedirectView
+from django.views.generic import RedirectView
 from formtools.wizard.views import NamedUrlSessionWizardView
-
-
-class BaseView(FormView):
-    # TODO: decide if we need to recreate form.html or other template to use here
-    # template_name = "form.html"
-    pass
-
-
-class BaseModelFormView(BaseView):
-    def __init__(self):
-        super().__init__()
-
-    def form_valid(self, form):
-        breach_instance = form.save(commit=False)
-        session_data = self.request.session.get("breach_instance", {})
-        if "id" not in session_data.keys():
-            session_data["id"] = str(breach_instance.id)
-        form_data = form.cleaned_data
-        session_data.update({key: value for key, value in form_data.items()})
-        self.request.session["breach_instance"] = session_data
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse(self.success_path, kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
 class BaseWizardView(NamedUrlSessionWizardView):
     template_names_lookup = {}
+
+    def __str__(self) -> str:
+        return "report_a_suspected_breach_wizard_view"
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        response.tasklist = getattr(self, "tasklist", None)
+        return response
 
     def get_template_names(self):
         if custom_template_name := self.template_names_lookup.get(self.steps.current, None):
@@ -48,12 +35,19 @@ class BaseWizardView(NamedUrlSessionWizardView):
         return context
 
     def process_step(self, form):
+        """Overriding this method to allow for custom processing of each step in the wizard."""
+
+        # the user has just POSTED, we need to clear the lru_cache for the corresponding step in the
+        # get_cleaned_data_for_step method as the data may be overwritten
+        self.get_cleaned_data_for_step.delete(self.steps.current)
+
+        # if a custom processor exists for the current step, call it
         if custom_getter := getattr(self, f"process_{self.steps.current}_step", None):
             return custom_getter(form)
         return super().process_step(form)
 
     def render(self, form=None, **kwargs):
-
+        """Controls the rendering of the response."""
         steps_to_continue = [
             "verify",
             "business_or_person_details",
@@ -93,6 +87,8 @@ class BaseWizardView(NamedUrlSessionWizardView):
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
+            if form_key == "about_the_end_user" or form_key == "end_user_added":
+                continue
             form_obj = self.get_form(
                 step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
             )
@@ -100,10 +96,16 @@ class BaseWizardView(NamedUrlSessionWizardView):
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
 
+    @ring.lru()
     def get_cleaned_data_for_step(self, step):
         """overriding this to return an empty dictionary if the form is not valid or the step isn't found.
 
-        This makes it easier to write self.get_cleaned_data_for_step.get("value")"""
+        This makes it easier to write self.get_cleaned_data_for_step.get({value})
+
+        We also add an LRU cache to this method as it is constantly called as part of the form validation process, and
+        also for checking where the user is in the overall tasklist. So we cache the results of this and invalidate
+        the cache for a particular step is the user has just POSTed data to that step.
+        """
         if step in self.form_list:
             form_obj = self.get_form(
                 step=step,
@@ -113,6 +115,48 @@ class BaseWizardView(NamedUrlSessionWizardView):
             if form_obj.is_valid() and form_obj.cleaned_data:
                 return form_obj.cleaned_data
         return {}
+
+    def get_form(self, step=None, data=None, files=None):
+        """Overriding this method, so it calls self.form_list rather than self.get_form_list().
+
+        The latter will apply the conditional logic to the form list, which we don't want to do here.
+        """
+        if step is None:
+            step = self.steps.current
+        form_class = self.form_list[step]
+        kwargs = self.get_form_kwargs(step)
+        kwargs.update(
+            {
+                "data": data,
+                "files": files,
+                "prefix": self.get_form_prefix(step, form_class),
+                "initial": self.get_form_initial(step),
+            }
+        )
+        return form_class(**kwargs)
+
+    def render_done(self, form, **kwargs):
+        """
+        Overwriting this method as there are some forms we don't want to revalidate on done, so we need to check if the
+        form has a revalidate_on_done attribute set to False. If it does, we don't want to revalidate the form when
+        the user is done.
+        """
+        final_forms = OrderedDict()
+        # walk through the form list and try to validate the data again.
+        for form_key in self.get_form_list():
+            form_obj = self.get_form(
+                step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
+            )
+            if not form_obj.is_valid() and form_obj.revalidate_on_done:
+                return self.render_revalidation_failure(form_key, form_obj, **kwargs)
+            final_forms[form_key] = form_obj
+
+        # render the done view and reset the wizard before returning the
+        # response. This is needed to prevent from rendering done with the
+        # same data twice.
+        done_response = self.done(list(final_forms.values()), form_dict=final_forms, **kwargs)
+        self.storage.reset()
+        return done_response
 
 
 class RedirectBaseDomainView(RedirectView):
