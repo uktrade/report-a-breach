@@ -22,6 +22,10 @@ class Breach(BaseModel):
         ("yes", "Yes"),
         ("no", "No"),
     )
+    IS_THE_DATE_ACCURATE_CHOICES = (
+        ("exact", "Exact date"),
+        ("approximate", "Approximate date"),
+    )
 
     reporter_professional_relationship = models.TextField(
         null=False,
@@ -48,7 +52,8 @@ class Breach(BaseModel):
     reference = models.CharField(null=True, blank=True, max_length=6)
     reporter_full_name = models.CharField(max_length=255)
     reporter_name_of_business_you_work_for = models.CharField(max_length=300, verbose_name="Business you work for")
-    when_did_you_first_suspect = models.TextField()
+    when_did_you_first_suspect = models.DateTimeField()
+    is_the_date_accurate = models.CharField(choices=IS_THE_DATE_ACCURATE_CHOICES, max_length=11)
     sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True)
     unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
     other_sanctions_regime = models.BooleanField(blank=True, default=False)

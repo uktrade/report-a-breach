@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import Layout, Size, Submit
@@ -21,13 +21,15 @@ class BaseForm(forms.Form):
     labels = {}
     # same for help_texts
     help_texts = {}
+    # do we want this form to be revalidated when the user clicks Done
+    revalidate_on_done = True
 
     class Media:
         css = {
             "all": ["form.css"],
         }
 
-    def __init__(self, address_string: Optional[str] = None, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
         super().__init__(*args, **kwargs)
