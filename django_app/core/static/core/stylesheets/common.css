@@ -1,0 +1,26 @@
+.line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.hidden {
+    display: none;
+}
+
+.js-enabled .show-on-js-enabled {
+    display: block;
+}
+
+.js-enabled .hide-on-js-enabled {
+    display: none;
+}
+
+.js-disabled .show-on-js-disabled {
+    display: block;
+}
+
+.js-disabled .hide-on-js-disabled {
+    display: none;
+}

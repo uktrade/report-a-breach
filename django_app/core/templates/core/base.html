@@ -45,12 +45,13 @@
         <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
 
         <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-5.3.0.min.css" %}">
+        <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
         <link rel="stylesheet" href="{% static "report_a_suspected_breach/stylesheets/report_a_suspected_breach.css" %}">
 
         {% block extra_css %}{% endblock extra_css %}
     </head>
 
-    <body class="govuk-template__body ">
+    <body class="govuk-template__body js-disabled">
         {% if gtm_enabled %}
 			<!-- Google Tag Manager (noscript) -->
             <noscript>
@@ -60,7 +61,10 @@
 			<!-- End Google Tag Manager (noscript) -->
         {% endif %}
 
-        <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+        <script>
+            document.body.classList.remove("js-disabled");
+            document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
+        </script>
 
         {% block skip_link %}
             <a href="#main-content" class="govuk-skip-link">{% trans 'Skip to main content' %}</a>
@@ -146,12 +150,13 @@
                     </div>
                 </div>
             </div>
+            <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
             <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"></script>
             <script type="module">
                 import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"
                 initAll()
             </script>
-            {% block extra_script %}{% endblock %}
+            {% block extra_js %}{% endblock %}
         </footer>
     </body>
 </html>
