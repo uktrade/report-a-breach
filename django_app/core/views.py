@@ -65,9 +65,10 @@ class BaseWizardView(NamedUrlSessionWizardView):
         # if we have a redirect set in the session, we want to redirect to that step, but only if the form is valid.
         # if the form is not valid, we want to show the user the errors on the current step
         elif redirect_to := self.request.session.get("redirect"):
-            if form.is_valid():
-                self.request.session["redirect"] = None
-                return self.render_goto_step(redirect_to)
+            if form is not None:
+                if form.is_valid():
+                    self.request.session["redirect"] = None
+                    return self.render_goto_step(redirect_to)
         return super().render(form, **kwargs)
 
     def post(self, *args, **kwargs) -> HttpResponse:

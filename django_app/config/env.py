@@ -24,9 +24,8 @@ class BaseSettings(PydanticBaseSettings):
 
     companies_house_api_key: str | None = None
 
-    gov_notify_api_key: str = None
+    gov_notify_api_key: str = ""
     email_verify_code_template_id: str = ""
-    email_verify_code_template_id: str
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
 
