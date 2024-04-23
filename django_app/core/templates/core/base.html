@@ -38,11 +38,12 @@
         <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
 
         <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-4.7.0.min.css" %}">
+        <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
 
         {% block extra_css %}{% endblock extra_css %}
     </head>
 
-    <body class="govuk-template__body ">
+    <body class="govuk-template__body js-disabled">
         {% if gtm_enabled %}
         <!-- Google Tag Manager (noscript) -->
             <noscript>
@@ -53,6 +54,7 @@
         {% endif %}
 
         <script>
+            document.body.classList.remove("js-disabled");
             document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
         </script>
 
@@ -138,10 +140,11 @@
                 </div>
             </div>
             <script src="{% static "core/javascript/govuk-frontend-4.7.0.min.js" %}"></script>
+            <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
             <script>
                 window.GOVUKFrontend.initAll()
             </script>
-            {% block extra_script %}{% endblock %}
+            {% block extra_js %}{% endblock %}
         </footer>
     </body>
 </html>
