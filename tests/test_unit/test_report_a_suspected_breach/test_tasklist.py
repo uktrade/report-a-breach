@@ -32,12 +32,12 @@ class TestTasklist:
         )
         assert isinstance(response.tasklist.current_task, tasklist.SanctionsBreachDetailsTask)
 
-    def test_just_started_new_task(self, rasb_client):
+    def test_should_show_task_list_page(self, rasb_client):
         response = rasb_client.get(reverse("report_a_suspected_breach:landing"))
-        assert response.tasklist.just_started_new_task() is True
+        assert response.tasklist.should_show_task_list_page() is True
 
         response = rasb_client.get(reverse("report_a_suspected_breach:step", kwargs={"step": "email"}), data={"start": "true"})
-        assert response.tasklist.just_started_new_task() is False
+        assert response.tasklist.should_show_task_list_page() is False
 
     def test_underscored_task_name(self, rasb_client):
         response = rasb_client.get(reverse("report_a_suspected_breach:landing"))

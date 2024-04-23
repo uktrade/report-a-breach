@@ -9,6 +9,7 @@ class Task:
     form_steps = {}
     name = ""
     hint_text = ""
+    show_on_tasklist = True
 
     def __init__(self, wizard_view: View, task_list: list["Task"]):
         super().__init__()
@@ -138,6 +139,14 @@ class SanctionsBreachDetailsTask(Task):
     hint_text = "Upload documents and give any additional information"
 
 
+class SummaryAndDeclaration(Task):
+    show_on_tasklist = False
+    form_steps = {
+        "summary": forms.SummaryForm,
+        "declaration": forms.DeclarationForm,
+    }
+
+
 class TaskList:
     def __init__(self, tasks, wizard_view):
         super().__init__()
@@ -152,10 +161,14 @@ class TaskList:
         """Get the current task object based on the current step in the wizard."""
         return self.get_task_from_step_name(self.wizard_view.steps.current)
 
-    def just_started_new_task(self) -> bool:
+    def should_show_task_list_page(self) -> bool:
+        """Should the user be shown the tasklist page.
+
+        Have they just started a new task?, or have they completed all tasks?"""
         """Check if the user has just started a new task. If so then show them the tasklist page"""
         if current_task := self.current_task:
             return self.wizard_view.steps.current == [*current_task.form_steps.keys()][0]
+
         return False
 
     def get_task_from_step_name(self, step_name: str) -> Task:
@@ -163,6 +176,10 @@ class TaskList:
         for task in self.tasks:
             if step_name in task.form_steps:
                 return task
+
+    def complete(self):
+        """Check if all the tasks are complete."""
+        return all(task.complete if task.show_on_tasklist else True for task in self.tasks)
 
 
 def get_tasklist(wizard_view: View) -> TaskList:
@@ -173,6 +190,7 @@ def get_tasklist(wizard_view: View) -> TaskList:
             OverviewOfTheSuspectedBreachTask,
             TheSupplyChainTask,
             SanctionsBreachDetailsTask,
+            SummaryAndDeclaration,
         ),
         wizard_view=wizard_view,
     )

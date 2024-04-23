@@ -13,12 +13,12 @@ from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
 from utils.s3 import generate_presigned_url
 
-from .forms import DeclarationForm, SummaryForm
 from .models import Breach, ReporterEmailVerification
 from .tasklist import (
     AboutThePersonOrBusinessTask,
     OverviewOfTheSuspectedBreachTask,
     SanctionsBreachDetailsTask,
+    SummaryAndDeclaration,
     TheSupplyChainTask,
     YourDetailsTask,
     get_tasklist,
@@ -44,17 +44,12 @@ class ReportABreachWizardView(BaseWizardView):
             OverviewOfTheSuspectedBreachTask,
             TheSupplyChainTask,
             SanctionsBreachDetailsTask,
+            SummaryAndDeclaration,
         )
         unpacked = []
         for task in task_list:
             for step_name, step_form in task.form_steps.items():
                 unpacked.append((step_name, step_form))
-
-        # now the other 'floating' forms
-        unpacked += (
-            ("summary", SummaryForm),
-            ("declaration", DeclarationForm),
-        )
 
         return unpacked
 
@@ -95,15 +90,16 @@ class ReportABreachWizardView(BaseWizardView):
                 self.storage.current_step = step_url
 
         # check if the user has completed a task, if so, redirect them to the tasklist
-        # the exception to this is if the user wants to start a new task, in which case we should let them
+        # the exception to this is if the user wants to explicitly start the next task, in which case we should let them
         # or, if they're trying to change their answers from the summary page
         self.tasklist = get_tasklist(self)
         if (
             not request.GET.get("start", "") == "true"
+            and not request.session.get("redirect") == "summary"
             and not request.GET.get("redirect", "") == "summary"
-            and self.tasklist.just_started_new_task()
+            and self.tasklist.should_show_task_list_page()
         ):
-            return render(request, "report_a_suspected_breach/tasklist.html", context={"tasklist": self.tasklist})
+            return render(request, "report_a_suspected_breach/tasklist.html", context={"tasklist": self.tasklist, "view": self})
 
         return super().get(request, *args, **kwargs)
 
