@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
@@ -41,7 +41,7 @@ class StartForm(BaseModelForm):
             "the business or person suspected of breaching sanctions?",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["reporter_professional_relationship"].choices.pop(0)
 
@@ -67,7 +67,7 @@ class EmailVerifyForm(BaseForm):
         error_messages={"required": "Enter the 6 digit security code we sent to your email"},
     )
 
-    def clean_email_verification_code(self):
+    def clean_email_verification_code(self) -> str:
         email_verification_code = self.cleaned_data["email_verification_code"]
         verify_timeout_seconds = settings.EMAIL_VERIFY_TIMEOUT_SECONDS
         verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
@@ -108,7 +108,7 @@ class NameAndBusinessYouWorkForForm(BaseModelForm):
             "reporter_name_of_business_you_work_for": "This is the business that employs you, not the business you're reporting",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.helper.label_size = None
         self.helper.layout = Layout(
@@ -126,7 +126,7 @@ class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
             "business_registered_on_companies_house": "Are you reporting a business which is registered with UK Companies House?"
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["business_registered_on_companies_house"].choices.pop(0)
 
@@ -146,7 +146,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             "registered_company_number": "Registered company number",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         # todo - abstract the following logic to apply to all ConditionalRadios forms
@@ -165,7 +165,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             )
         )
 
-    def clean(self):
+    def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
 
         do_you_know_the_registered_company_number = cleaned_data.get("do_you_know_the_registered_company_number")
@@ -223,7 +223,7 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
             "postal_code",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.helper.layout = Layout(
             Fieldset(
@@ -301,7 +301,7 @@ class WhichSanctionsRegimeForm(BaseForm):
     class Media:
         js = ("javascript/form_steps/which_sanctions_regimes.js",)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         checkbox_choices = []
         for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
@@ -333,7 +333,7 @@ class WhatWereTheGoodsForm(BaseModelForm):
             "what_were_the_goods": "Give a short description. For example: accountancy services",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["what_were_the_goods"].widget.attrs = {"rows": 5}
 
@@ -349,7 +349,7 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
         widget=forms.RadioSelect,
     )
 
-    def __init__(self, *args, address_string: Optional[str] = None, **kwargs):
+    def __init__(self, *args, address_string: Optional[str] = None, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string:
@@ -371,7 +371,7 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         label="Where were the goods, services, technological assistance or technology made available from?",
     )
 
-    def __init__(self, address_string: Optional[str] = None, *args, **kwargs):
+    def __init__(self, address_string: Optional[str] = None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string is not None:
@@ -397,7 +397,7 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         help_text="This is the address of the end-user",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
@@ -416,7 +416,7 @@ class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
         help_text="This is the address of the end-user",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
@@ -458,7 +458,7 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
         widgets = BasePersonBusinessDetailsForm.Meta.widgets
         labels = BasePersonBusinessDetailsForm.Meta.labels
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         if not self.is_uk_address:
@@ -496,12 +496,12 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
             Field.textarea("additional_contact_details", field_width=Fluid.FULL, label_tag="h2", label_size=Size.MEDIUM),
         )
 
-    def clean(self):
+    def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         # todo - we need to set this as True always for now, as the form really only gets validated
         #  with a corresponding end_user_uuid, so we can't validate it here
         #  we need to override render_done() in the WizardView so the resulting form_list
@@ -519,12 +519,12 @@ class EndUserAddedForm(BaseForm):
         label="Do you want to add another end-user?",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.helper.legend_size = Size.MEDIUM
         self.helper.legend_tag = None
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         # todo - we need to set this as True always for now, as the form really only gets validated
         #  with a corresponding end_user_uuid, so we can't validate it here
         #  we need to override render_done() in the WizardView so the resulting form_list
@@ -543,7 +543,7 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
             "other_addresses_in_the_supply_chain": "Give all addresses",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["were_there_other_addresses_in_the_supply_chain"].empty_label = None
         # todo - abstract the following logic to apply to all ConditionalRadios forms
@@ -563,7 +563,7 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
             )
         )
 
-    def clean(self):
+    def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
         if (
             cleaned_data["were_there_other_addresses_in_the_supply_chain"] == "yes"
