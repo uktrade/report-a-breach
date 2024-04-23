@@ -1,7 +1,10 @@
+from typing import Any, Dict, List
+
 from core.sites import (
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
 )
+from django.http import HttpResponse
 from django.urls import reverse
 from django.views.generic import FormView, RedirectView
 from formtools.wizard.views import NamedUrlSessionWizardView
@@ -14,10 +17,10 @@ class BaseView(FormView):
 
 
 class BaseModelFormView(BaseView):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-    def form_valid(self, form):
+    def form_valid(self, form: Any) -> HttpResponse:
         breach_instance = form.save(commit=False)
         session_data = self.request.session.get("breach_instance", {})
         if "id" not in session_data.keys():
@@ -27,19 +30,19 @@ class BaseModelFormView(BaseView):
         self.request.session["breach_instance"] = session_data
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> HttpResponse:
         return reverse(self.success_path, kwargs={"pk": self.request.session["breach_instance"]["id"]})
 
 
 class BaseWizardView(NamedUrlSessionWizardView):
     template_names_lookup = {}
 
-    def get_template_names(self):
+    def get_template_names(self) -> List[str]:
         if custom_template_name := self.template_names_lookup.get(self.steps.current, None):
             return custom_template_name
         return super().get_template_names()
 
-    def get_context_data(self, form, **kwargs):
+    def get_context_data(self, form: Any, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(form=form, **kwargs)
         if custom_getter := getattr(self, f"get_{self.steps.current}_context_data", None):
             context = custom_getter(form, context)
@@ -47,12 +50,12 @@ class BaseWizardView(NamedUrlSessionWizardView):
             context["form_h1_header"] = form_h1_header
         return context
 
-    def process_step(self, form):
+    def process_step(self, form: Any) -> Any:
         if custom_getter := getattr(self, f"process_{self.steps.current}_step", None):
             return custom_getter(form)
         return super().process_step(form)
 
-    def render(self, form=None, **kwargs):
+    def render(self, form: Any = None, **kwargs) -> HttpResponse:
 
         steps_to_continue = [
             "verify",
@@ -73,7 +76,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
                 return self.render_goto_step(redirect_to)
         return super().render(form, **kwargs)
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> HttpResponse:
         # allow the user to change previously entered data and be redirected
         # back to the summary page once complete
         if redirect_to := self.request.GET.get("redirect", None):
@@ -86,7 +89,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
 
         return super().post(*args, **kwargs)
 
-    def get_all_cleaned_data(self):
+    def get_all_cleaned_data(self) -> Dict[str, Any]:
         """
         Overriding this as want the cleaned_data dictionary to have a key per form, not 1 big dictionary with all the
         form's cleaned_data
@@ -100,7 +103,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
                 cleaned_data[form_key] = form_obj.cleaned_data
         return cleaned_data
 
-    def get_cleaned_data_for_step(self, step):
+    def get_cleaned_data_for_step(self, step: str) -> Dict[Any, Any]:
         """overriding this to return an empty dictionary if the form is not valid or the step isn't found.
 
         This makes it easier to write self.get_cleaned_data_for_step.get("value")"""
@@ -119,7 +122,7 @@ class RedirectBaseDomainView(RedirectView):
     """Redirects base url visits to either report a breach app or view app default view"""
 
     @property
-    def url(self):
+    def url(self) -> HttpResponse:
         if is_report_a_suspected_breach_site(self.request.site):
             return reverse("report_a_suspected_breach:landing")
         elif is_view_a_suspected_breach_site(self.request.site):

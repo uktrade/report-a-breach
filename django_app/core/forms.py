@@ -1,3 +1,5 @@
+from typing import Any, Dict, Optional
+
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import Layout, Size, Submit
 from django import forms
@@ -25,7 +27,7 @@ class BaseForm(forms.Form):
             "all": ["form.css"],
         }
 
-    def __init__(self, address_string=None, *args, **kwargs):
+    def __init__(self, address_string: Optional[str] = None, *args, **kwargs) -> None:
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
         super().__init__(*args, **kwargs)
@@ -88,7 +90,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
 
     readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.is_uk_address = kwargs.pop("is_uk_address", False)
         super().__init__(*args, **kwargs)
         if self.is_uk_address:
@@ -104,7 +106,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
 
         self.helper.label_size = None
 
-    def clean(self):
+    def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
