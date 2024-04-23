@@ -16,3 +16,8 @@ if settings.ENFORCE_STAFF_SSO:
     urlpatterns.append(
         path("auth/", include("authbroker_client.urls")),
     )
+
+if settings.ENVIRONMENT == "local":
+    urlpatterns.append(
+        path("__debug__/", include("debug_toolbar.urls")),
+    )

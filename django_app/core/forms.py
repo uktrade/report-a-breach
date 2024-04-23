@@ -19,13 +19,15 @@ class BaseForm(forms.Form):
     labels = {}
     # same for help_texts
     help_texts = {}
+    # do we want this form to be revalidated when the user clicks Done
+    revalidate_on_done = True
 
     class Media:
         css = {
             "all": ["form.css"],
         }
 
-    def __init__(self, address_string=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
         super().__init__(*args, **kwargs)
