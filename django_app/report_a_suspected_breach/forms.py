@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Optional
 
 from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
@@ -348,7 +349,7 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
         widget=forms.RadioSelect,
     )
 
-    def __init__(self, *args, address_string, **kwargs):
+    def __init__(self, *args, address_string: Optional[str] = None, **kwargs):
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string:
@@ -370,7 +371,7 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         label="Where were the goods, services, technological assistance or technology made available from?",
     )
 
-    def __init__(self, address_string=None, *args, **kwargs):
+    def __init__(self, address_string: Optional[str] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string is not None:

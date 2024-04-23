@@ -1,5 +1,5 @@
 import os
-from typing import Any
+from typing import Any, Dict, List
 
 from dbt_copilot_python.database import database_url_from_env
 from dbt_copilot_python.network import setup_allowed_hosts
@@ -68,12 +68,12 @@ class BaseSettings(PydanticBaseSettings):
 
     @computed_field
     @property
-    def allowed_hosts(self) -> list[str]:
+    def allowed_hosts(self) -> List[str]:
         return self.rab_allowed_hosts
 
     @computed_field
     @property
-    def temporary_s3_bucket_configuration(self) -> dict:
+    def temporary_s3_bucket_configuration(self) -> Dict[str, Any]:
         return {
             "bucket_name": self.temporary_s3_bucket_name,
             "access_key_id": self.temporary_s3_bucket_access_key_id,
@@ -82,7 +82,7 @@ class BaseSettings(PydanticBaseSettings):
 
     @computed_field
     @property
-    def permanent_s3_bucket_configuration(self) -> dict:
+    def permanent_s3_bucket_configuration(self) -> Dict[str, Any]:
         return {
             "bucket_name": self.permanent_s3_bucket_name,
             "access_key_id": self.permanent_s3_bucket_access_key_id,
@@ -105,20 +105,20 @@ class GovPaasSettings(BaseSettings):
 
     @computed_field
     @property
-    def database_uri(self) -> dict:
+    def database_uri(self) -> Dict[str, str]:
         return self.vcap_services.postgres[0]["credentials"]["uri"]
 
     @property
-    def get_temporary_bucket_vcap(self) -> dict:
+    def get_temporary_bucket_vcap(self) -> Dict[str, Any]:
         return next((each["credentials"] for each in self.vcap_services.aws_s3_bucket if "temporary" in each["name"]), {})
 
     @property
-    def get_permanent_bucket_vcap(self) -> dict:
+    def get_permanent_bucket_vcap(self) -> Dict[str, Any]:
         return next((each["credentials"] for each in self.vcap_services.aws_s3_bucket if "permanent" in each["name"]), {})
 
     @computed_field
     @property
-    def temporary_s3_bucket_configuration(self) -> dict:
+    def temporary_s3_bucket_configuration(self) -> Dict[str, Any]:
         return {
             "bucket_name": self.get_temporary_bucket_vcap["bucket_name"],
             "access_key_id": self.get_temporary_bucket_vcap["aws_access_key_id"],
@@ -127,7 +127,7 @@ class GovPaasSettings(BaseSettings):
 
     @computed_field
     @property
-    def permanent_s3_bucket_configuration(self) -> dict:
+    def permanent_s3_bucket_configuration(self) -> Dict[str, Any]:
         return {
             "bucket_name": self.get_permanent_bucket_vcap["bucket_name"],
             "access_key_id": self.get_permanent_bucket_vcap["aws_access_key_id"],
@@ -140,7 +140,7 @@ class DBTPlatformSettings(BaseSettings):
 
     @computed_field
     @property
-    def allowed_hosts(self) -> list[str]:
+    def allowed_hosts(self) -> List[str]:
         if self.in_build_step:
             return self.rab_allowed_hosts
         else:
@@ -148,7 +148,7 @@ class DBTPlatformSettings(BaseSettings):
 
     @computed_field
     @property
-    def database_uri(self) -> dict:
+    def database_uri(self) -> Dict[str, str]:
         return database_url_from_env("DATABASE_CREDENTIALS")
 
 

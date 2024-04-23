@@ -1,9 +1,11 @@
 import uuid
+from typing import Any, Dict, Iterable, Optional
 
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.views import BaseWizardView
 from django.conf import settings
 from django.contrib.sessions.models import Session
+from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -87,7 +89,7 @@ class ReportABreachWizardView(BaseWizardView):
 
     file_storage = TemporaryDocumentStorage()
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.resolver_match.url_name == "about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
@@ -111,7 +113,7 @@ class ReportABreachWizardView(BaseWizardView):
             return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
         return super().get(request, *args, **kwargs)
 
-    def get_step_url(self, step):
+    def get_step_url(self, step: str) -> str:
         if step == "about_the_end_user" and "end_user_uuid" in self.kwargs:
             return reverse(
                 "report_a_suspected_breach:about_the_end_user",
@@ -131,7 +133,7 @@ class ReportABreachWizardView(BaseWizardView):
             )
         return super().get_step_url(step)
 
-    def render_next_step(self, form, **kwargs):
+    def render_next_step(self, form: Any, **kwargs) -> HttpResponse:
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
             default_path = "where_were_the_goods_supplied_to"
             if self.request.session.get("made_available_journey"):
@@ -150,7 +152,7 @@ class ReportABreachWizardView(BaseWizardView):
                 return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
-    def get_summary_context_data(self, form, context):
+    def get_summary_context_data(self, form: Any, context: Dict[str, Any]) -> Dict[str, Any]:
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
         that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
@@ -185,7 +187,7 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
-    def process_are_you_reporting_a_business_on_companies_house_step(self, form):
+    def process_are_you_reporting_a_business_on_companies_house_step(self, form: Any) -> QueryDict:
         """We want to clear the company details from the session if the user selects anything but 'yes', if they do
         select 'yes' then we want to delete the step data for the next step(s) in the chain of conditionals."""
         if form.cleaned_data["business_registered_on_companies_house"] != "yes":
@@ -196,7 +198,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
-    def process_about_the_end_user_step(self, form):
+    def process_about_the_end_user_step(self, form: Any) -> QueryDict:
         current_end_users = self.request.session.get("end_users", {})
 
         end_user_uuid = self.kwargs.get("end_user_uuid", str(uuid.uuid4()))
@@ -210,7 +212,7 @@ class ReportABreachWizardView(BaseWizardView):
         self.request.session.modified = True
         return self.get_form_step_data(form)
 
-    def process_do_you_know_the_registered_company_number_step(self, form):
+    def process_do_you_know_the_registered_company_number_step(self, form: Any) -> QueryDict:
         self.request.session.pop("company_details", None)
         self.request.session.modified = True
 
@@ -219,7 +221,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
-    def process_email_step(self, form):
+    def process_email_step(self, form: Any) -> QueryDict:
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
         user_session = Session.objects.get(session_key=self.request.session.session_key)
@@ -235,7 +237,7 @@ class ReportABreachWizardView(BaseWizardView):
         )
         return self.get_form_step_data(form)
 
-    def get_form(self, step=None, data=None, files=None):
+    def get_form(self, step: Optional[str] = None, data: Any = None, files: Any = None) -> Any:
         if step is None:
             step = self.steps.current
         # we are overriding this method, so we call self.form_list rather than self.get_form_list(). The latter will
@@ -257,7 +259,7 @@ class ReportABreachWizardView(BaseWizardView):
                 self.request.session.modified = True
         return form_class(**kwargs)
 
-    def get_form_kwargs(self, step=None):
+    def get_form_kwargs(self, step: Optional[str] = None) -> Dict[str, Any]:
         kwargs = super().get_form_kwargs(step)
         kwargs["request"] = self.request
 
@@ -322,7 +324,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return kwargs
 
-    def get_all_cleaned_data(self):
+    def get_all_cleaned_data(self) -> Dict[str, Any]:
         """Return a merged dictionary of all step cleaned_data dictionaries with the conditional logic applied.
 
         e.g. The full name can be entered in 2 different steps depending on the answers to the previous questions,
@@ -360,7 +362,7 @@ class ReportABreachWizardView(BaseWizardView):
                 # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
                 pass
 
-    def done(self, form_list, **kwargs):
+    def done(self, form_list: Iterable, **kwargs) -> HttpResponse:
         """all_cleaned_data = self.get_all_cleaned_data()
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],

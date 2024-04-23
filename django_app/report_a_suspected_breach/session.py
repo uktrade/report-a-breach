@@ -1,8 +1,10 @@
+from typing import Any, Dict, Iterable, Optional
+
 from formtools.wizard.storage.session import SessionStorage as WizardSessionStorage
 
 
 class SessionStorage(WizardSessionStorage):
-    def get_step_data(self, step):
+    def get_step_data(self, step: str) -> Any:
         if step == "about_the_end_user":
             if end_user_uuid := self.request.resolver_match.kwargs.get("end_user_uuid", None):
                 if end_user_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None):
@@ -16,11 +18,11 @@ class SessionStorage(WizardSessionStorage):
             return None
         return super().get_step_data(step)
 
-    def delete_step_data(self, *steps):
+    def delete_step_data(self, *steps: Iterable[Any]) -> None:
         for step in steps:
             self.data[self.step_data_key].pop(step, None)
 
-    def set_step_files(self, step, files):
+    def set_step_files(self, step: str, files: Optional[Dict[Any, Any]] = None) -> None:
         """Overwriting this to prepend the session key to the file name. This is to avoid conflicts when multiple users
         upload files with the same name."""
         if step not in self.data[self.step_files_key]:
