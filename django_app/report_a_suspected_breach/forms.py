@@ -3,6 +3,7 @@ from datetime import timedelta
 from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
 from crispy_forms_gds.choices import Choice
+from crispy_forms_gds.fields import DateInputField
 from crispy_forms_gds.layout import (
     ConditionalQuestion,
     ConditionalRadios,
@@ -268,20 +269,32 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
     form_h1_header = "Date you first suspected the business or person had breached trade sanctions"
     bold_labels = False
 
+    when_did_you_first_suspect = DateInputField(
+        label="",
+        help_text="For example, 17 06 2024",
+        require_all_fields=True,
+    )
+
     class Meta:
         model = Breach
-        fields = [
-            "when_did_you_first_suspect",
-        ]
+        fields = ["when_did_you_first_suspect", "is_the_date_accurate"]
         widgets = {
-            "when_did_you_first_suspect": forms.TextInput,
+            "is_the_date_accurate": forms.RadioSelect,
         }
-        help_texts = {
-            "when_did_you_first_suspect": "For example, 17 06 2024",
-        }
-        labels = {
-            "when_did_you_first_suspect": "Enter the exact date or an approximate date",
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.label_size = None
+        self.helper.layout = Layout(
+            Fieldset(
+                Field("when_did_you_first_suspect", field_width=Fluid.ONE_HALF),
+                legend="Is the date you entered exact or approximate?",
+                legend_size=Size.MEDIUM,
+                legend_tag="h2",
+            ),
+            Field.radios("is_the_date_accurate", legend_size=Size.MEDIUM, legend_tag="h2", inline=False),
+        )
+        self.fields["is_the_date_accurate"].choices.pop(0)
 
 
 class WhichSanctionsRegimeForm(BaseForm):
