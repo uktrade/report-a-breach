@@ -162,7 +162,7 @@
                 What were the goods or services?
             </dt>
             <dd class="govuk-summary-list__value">
-                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.what_were_the_goods.what_were_the_goods %}
+                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.what_were_the_goods.what_were_the_goods|linebreaksbr %}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
@@ -309,7 +309,7 @@
                         Additional contact information
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.additional_contact_details %}
+                        {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.additional_contact_details|linebreaksbr %}
                     </dd>
                     {% if is_made_available_journey %}
                         <dd class="govuk-summary-list__actions">
@@ -363,7 +363,7 @@
                 Summary of the breach
             </dt>
             <dd class="govuk-summary-list__value">
-                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.tell_us_about_the_suspected_breach.tell_us_about_the_suspected_breach %}
+                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.tell_us_about_the_suspected_breach.tell_us_about_the_suspected_breach|linebreaksbr %}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
