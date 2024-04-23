@@ -286,20 +286,12 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
 class WhichSanctionsRegimeForm(BaseForm):
     form_h1_header = "Which sanctions regimes do you suspect the company or person has breached?"
-    search_bar = forms.CharField(
-        label="Search regimes",
-        max_length=100,
-        required=False,
-    )
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=(()),
         required=True,
         label="Select all that apply",
     )
-
-    class Media:
-        js = ("javascript/form_steps/which_sanctions_regimes.js",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -313,11 +305,6 @@ class WhichSanctionsRegimeForm(BaseForm):
         checkbox_choices.append(Choice("don't know", "I don't know"))
         checkbox_choices.append(Choice("other_regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
-
-        self.helper.layout = Layout(
-            Field.text("search_bar", field_width=Fluid.THREE_QUARTERS),
-            Field.checkboxes("which_sanctions_regime"),
-        )
         self.helper.label_size = None
         self.helper.label_tag = None
 
