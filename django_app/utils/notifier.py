@@ -6,7 +6,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_python_client.notifications import NotificationsAPIClient
 
 
-def send_email(email: str, context: dict[str, Any], template_id: str, reference: Any = None) -> HttpResponse | bool:
+def send_email(email: str, context: dict[str, Any], template_id: str, reference: str | None = None) -> HttpResponse | bool:
     """Send an email using the GOV.UK Notify API."""
     if is_whitelisted(email):
         client = NotificationsAPIClient(settings.GOV_NOTIFY_API_KEY)
