@@ -1,5 +1,4 @@
 from django import template
-from django.http import HttpResponse
 from django.urls import reverse
 from report_a_suspected_breach.urls import report_a_suspected_breach_wizard
 
