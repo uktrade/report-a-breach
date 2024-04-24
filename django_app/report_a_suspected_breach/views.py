@@ -40,7 +40,7 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = TemporaryDocumentStorage()
 
     @cached_classproperty
-    def form_list(cls) -> list[Any]:
+    def form_list(cls) -> list[list[str, Form]]:
         task_list = (
             YourDetailsTask,
             AboutThePersonOrBusinessTask,
