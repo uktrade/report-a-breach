@@ -9,7 +9,7 @@ register = Library()
 
 @register.filter(is_safe=True)
 @stringfilter
-def truncate_words_html_no_suffix(value: Any, arg: Any) -> str:
+def truncate_words_html_no_suffix(value: Any, arg: int) -> str:
     """
     Truncate HTML after `arg` number of words.
     Preserve newlines in the HTML.
