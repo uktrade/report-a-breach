@@ -7,5 +7,5 @@ register = template.Library()
 
 
 @register.simple_tag
-def get_wizard_step_url(step_name: str) -> HttpResponse:
+def get_wizard_step_url(step_name: str) -> str:
     return reverse(report_a_suspected_breach_wizard.view_initkwargs["url_name"], kwargs={"step": step_name})
