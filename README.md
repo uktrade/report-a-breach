@@ -61,7 +61,7 @@ Use docker-compose to run the backing services
 docker-compose up -d
 ```
 
-Copy the static files to aws localstack s3 bucket
+Collect the apps static files
 
 ```
 invoke collectstatic
