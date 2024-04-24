@@ -350,7 +350,7 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
         widget=forms.RadioSelect,
     )
 
-    def __init__(self, *args, address_string: str | None, **kwargs: object) -> None:
+    def __init__(self, *args: object, address_string: str | None, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string is not None:

@@ -12,7 +12,7 @@ class SiteName:
 
 
 def require_view_a_breach() -> Any:
-    def decorator(f) -> Any:
+    def decorator(f: Any) -> Any:
         """Decorator to require that a view only accepts requests from the view a breach site."""
 
         @functools.wraps(f)
@@ -28,7 +28,7 @@ def require_view_a_breach() -> Any:
 
 
 def require_report_a_suspected_breach() -> Any:
-    def decorator(func) -> Any:
+    def decorator(func: Any) -> Any:
         """Decorator to require that a view only accepts requests from the report a breach site."""
 
         @functools.wraps(func)
