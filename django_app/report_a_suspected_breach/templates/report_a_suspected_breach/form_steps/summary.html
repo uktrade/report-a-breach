@@ -159,7 +159,7 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-!-font-weight-regular">
-                What were the goods or services?
+                What was supplied or made available?
             </dt>
             <dd class="govuk-summary-list__value">
                 {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.what_were_the_goods.what_were_the_goods|linebreaksbr %}
@@ -188,10 +188,13 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-!-font-weight-regular">
-                Name
+                Name and address of the supplier
             </dt>
             <dd class="govuk-summary-list__value">
                 {{ form_data.about_the_supplier.name }}
+                <br>
+                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.about_the_supplier.readable_address|linebreaksbr %}
+
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"

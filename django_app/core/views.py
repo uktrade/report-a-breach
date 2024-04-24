@@ -172,3 +172,4 @@ class RedirectBaseDomainView(RedirectView):
             return reverse("report_a_suspected_breach:landing")
         elif is_view_a_suspected_breach_site(self.request.site):
             return reverse("view_a_suspected_breach:landing")
+        return ""
