@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -6,7 +6,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_python_client.notifications import NotificationsAPIClient
 
 
-def send_email(email: str, context: Dict[str, Any], template_id: str, reference: Optional[Any] = None) -> HttpResponse | bool:
+def send_email(email: str, context: dict[str, Any], template_id: str, reference: Any = None) -> HttpResponse | bool:
     """Send an email using the GOV.UK Notify API."""
     if is_whitelisted(email):
         client = NotificationsAPIClient(settings.GOV_NOTIFY_API_KEY)
@@ -25,7 +25,7 @@ def send_email(email: str, context: Dict[str, Any], template_id: str, reference:
         return False
 
 
-def get_context(extra_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def get_context(extra_context: dict | None = None) -> dict[str, Any]:
     extra_context = extra_context or {}
     footer = "Report a trade sanctions breach service"
     context = {

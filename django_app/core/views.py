@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Iterable
 
 import ring
 from core.sites import (
@@ -19,17 +19,17 @@ class BaseWizardView(NamedUrlSessionWizardView):
     def __str__(self) -> str:
         return "report_a_suspected_breach_wizard_view"
 
-    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def dispatch(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         response = super().dispatch(request, *args, **kwargs)
         response.tasklist = getattr(self, "tasklist", None)
         return response
 
-    def get_template_names(self) -> List[str]:
+    def get_template_names(self) -> list[str]:
         if custom_template_name := self.template_names_lookup.get(self.steps.current, None):
             return custom_template_name
         return super().get_template_names()
 
-    def get_context_data(self, form: Form, **kwargs) -> Dict[str, Any]:
+    def get_context_data(self, form: Form, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(form=form, **kwargs)
         if custom_getter := getattr(self, f"get_{self.steps.current}_context_data", None):
             context = custom_getter(form, context)
@@ -37,7 +37,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
             context["form_h1_header"] = form_h1_header
         return context
 
-    def process_step(self, form: Form) -> Dict[str, Any]:
+    def process_step(self, form: Form) -> dict[str, Any]:
         """Overriding this method to allow for custom processing of each step in the wizard."""
 
         # the user has just POSTED, we need to clear the lru_cache for the corresponding step in the
@@ -49,7 +49,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
             return custom_getter(form)
         return super().process_step(form)
 
-    def render(self, form: Optional[Form] = None, **kwargs) -> HttpResponse:
+    def render(self, form: Form | None = None, **kwargs: object) -> HttpResponse:
         """Controls the rendering of the response."""
         steps_to_continue = [
             "verify",
@@ -71,7 +71,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
                     return self.render_goto_step(redirect_to)
         return super().render(form, **kwargs)
 
-    def post(self, *args, **kwargs) -> HttpResponse:
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
         # allow the user to change previously entered data and be redirected
         # back to the summary page once complete
         if redirect_to := self.request.GET.get("redirect", None):
@@ -84,7 +84,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
 
         return super().post(*args, **kwargs)
 
-    def get_all_cleaned_data(self) -> Dict[str, Any]:
+    def get_all_cleaned_data(self) -> dict[str, Any]:
         """
         Overriding this as want the cleaned_data dictionary to have a key per form, not 1 big dictionary with all the
         form's cleaned_data
@@ -101,7 +101,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
         return cleaned_data
 
     @ring.lru()
-    def get_cleaned_data_for_step(self, step: str) -> Dict[Any, Any]:
+    def get_cleaned_data_for_step(self, step: str) -> dict[Any, Any]:
         """overriding this to return an empty dictionary if the form is not valid or the step isn't found.
 
         This makes it easier to write self.get_cleaned_data_for_step.get({value})
@@ -120,9 +120,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
                 return form_obj.cleaned_data
         return {}
 
-    def get_form(
-        self, step: Optional[str] = None, data: Optional[Any] = None, files: Optional[Iterable] = None, **kwargs
-    ) -> Form:
+    def get_form(self, step: str | None = None, data: Any = None, files: Iterable | None = None, **kwargs: object) -> Form:
         """Overriding this method, so it calls self.form_list rather than self.get_form_list().
 
         The latter will apply the conditional logic to the form list, which we don't want to do here.
@@ -141,7 +139,7 @@ class BaseWizardView(NamedUrlSessionWizardView):
         )
         return form_class(**kwargs)
 
-    def render_done(self, form: Form, **kwargs) -> HttpResponse:
+    def render_done(self, form: Form, **kwargs: object) -> HttpResponse:
         """
         Overwriting this method as there are some forms we don't want to revalidate on done, so we need to check if the
         form has a revalidate_on_done attribute set to False. If it does, we don't want to revalidate the form when

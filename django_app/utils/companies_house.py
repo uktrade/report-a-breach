@@ -1,5 +1,5 @@
 import base64
-from typing import Any, Dict
+from typing import Any
 
 import requests
 from django.conf import settings
@@ -15,7 +15,7 @@ def get_companies_house_basic_auth_token(api_key: str = settings.COMPANIES_HOUSE
     return base64.b64encode(bytes(f"{api_key}:", "utf-8")).decode("utf-8")
 
 
-def get_details_from_companies_house(registration_number: str) -> Dict[str, Any]:
+def get_details_from_companies_house(registration_number: str) -> dict[str, Any]:
     """
     Retrieves and returns details of a company from Companies House
     using registration number that is passed in.
@@ -32,7 +32,7 @@ def get_details_from_companies_house(registration_number: str) -> Dict[str, Any]
         raise CompaniesHouseException(f"Companies House API request failed: {response.status_code}")
 
 
-def get_formatted_address(address_dict: Dict[str, Any]) -> str:
+def get_formatted_address(address_dict: dict[str, Any]) -> str:
     """Get formatted, human-readable address from Companies House address dict."""
     address_string = ""
 

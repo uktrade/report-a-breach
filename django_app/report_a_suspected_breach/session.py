@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Iterable
 
 from formtools.wizard.storage.session import SessionStorage as WizardSessionStorage
 
@@ -22,7 +22,7 @@ class SessionStorage(WizardSessionStorage):
         for step in steps:
             self.data[self.step_data_key].pop(step, None)
 
-    def set_step_files(self, step: str, files: Optional[Dict[Any, Any]] = None) -> None:
+    def set_step_files(self, step: str, files: dict | None = None) -> None:
         """Overwriting this to prepend the session key to the file name. This is to avoid conflicts when multiple users
         upload files with the same name."""
         if step not in self.data[self.step_files_key]:

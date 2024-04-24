@@ -78,7 +78,7 @@ class Breach(BaseModel):
     other_addresses_in_the_supply_chain = models.TextField(null=True, blank=True)
     tell_us_about_the_suspected_breach = models.TextField(null=True, blank=True)
 
-    def assign_reference(self):
+    def assign_reference(self) -> str:
         """Assigns a unique reference to this Breach object"""
         reference = uuid.uuid4().hex[:6].upper()
         if self.__class__.objects.filter(reference=reference).exists():

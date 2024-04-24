@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any
 
 from core.decorators import cached_classproperty
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
@@ -40,7 +40,7 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = TemporaryDocumentStorage()
 
     @cached_classproperty
-    def form_list(cls) -> List[Any]:
+    def form_list(cls) -> list[Any]:
         task_list = (
             YourDetailsTask,
             AboutThePersonOrBusinessTask,
@@ -56,7 +56,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return unpacked
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         if "reset" in self.request.GET:
             for step_name, _ in self.form_list.items():
                 # clearing the lru_cache for get_cleaned_data_for_step
@@ -126,7 +126,7 @@ class ReportABreachWizardView(BaseWizardView):
             )
         return super().get_step_url(step)
 
-    def render_next_step(self, form: Form, **kwargs) -> HttpResponse:
+    def render_next_step(self, form: Form, **kwargs: object) -> HttpResponse:
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
             default_path = "where_were_the_goods_supplied_to"
             if self.request.session.get("made_available_journey"):
@@ -145,7 +145,7 @@ class ReportABreachWizardView(BaseWizardView):
                 return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
-    def get_summary_context_data(self, form: Form, context: Dict[str, Any]) -> Dict[str, Any]:
+    def get_summary_context_data(self, form: Form, context: dict[str, Any]) -> dict[str, Any]:
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
         that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
@@ -237,7 +237,7 @@ class ReportABreachWizardView(BaseWizardView):
             self.request.session.modified = True
         return super().process_step(form)
 
-    def get_form_kwargs(self, step: Optional[str] = None) -> Dict[str, Any]:
+    def get_form_kwargs(self, step: str | None) -> dict[str, Any]:
         kwargs = super().get_form_kwargs(step)
         kwargs["request"] = self.request
 
@@ -323,7 +323,7 @@ class ReportABreachWizardView(BaseWizardView):
                 # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
                 pass
 
-    def done(self, form_list: Iterable, **kwargs) -> HttpResponse:
+    def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         """all_cleaned_data = self.get_all_cleaned_data()
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],

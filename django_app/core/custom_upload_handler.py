@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any
 
 from django.conf import settings
 from django.core.files.uploadhandler import FileUploadHandler
@@ -12,7 +12,7 @@ class CustomFileUploadHandler(FileUploadHandler):
     def receive_data_chunk(self, raw_data: Any, start: Any) -> Any:
         return raw_data
 
-    def file_complete(self, file_size: Optional[float] = None) -> Union[None, FileWithVirus]:
+    def file_complete(self, file_size: float | None) -> FileWithVirus | None:
         """
         Check if scanned file has a virus or not.
         If it does, raise an exception on the form.

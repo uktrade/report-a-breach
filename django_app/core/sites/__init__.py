@@ -1,7 +1,9 @@
 import functools
+from typing import Any
 
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
+from django.http import HttpRequest, HttpResponse
 
 
 class SiteName:
@@ -9,12 +11,12 @@ class SiteName:
     report_a_suspected_breach = "report-a-suspected-breach"
 
 
-def require_view_a_breach():
-    def decorator(f):
+def require_view_a_breach() -> Any:
+    def decorator(f) -> Any:
         """Decorator to require that a view only accepts requests from the view a breach site."""
 
         @functools.wraps(f)
-        def _wrapped_view(request, *args, **kwargs):
+        def _wrapped_view(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
             if not is_view_a_suspected_breach_site(request.site):
                 raise PermissionDenied("View a breach feature requires view a breach site.")
 
@@ -25,12 +27,12 @@ def require_view_a_breach():
     return decorator
 
 
-def require_report_a_suspected_breach():
-    def decorator(func):
+def require_report_a_suspected_breach() -> Any:
+    def decorator(func) -> Any:
         """Decorator to require that a view only accepts requests from the report a breach site."""
 
         @functools.wraps(func)
-        def _wrapped_view(request, *args, **kwargs):
+        def _wrapped_view(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
             if not is_report_a_suspected_breach_site(request.site):
                 raise PermissionDenied("Report a breach feature requires report a breach site.")
             return func(request, *args, **kwargs)

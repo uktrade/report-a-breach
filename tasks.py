@@ -1,12 +1,6 @@
-from typing import Any, Optional
+from typing import Any
 
 from invoke import task
-
-
-@task
-def pylint(context: Any, directory: Optional[str]) -> None:
-    print(f"Running pylint in {directory}")
-    context.run(f"pylint {directory}")
 
 
 @task

@@ -158,7 +158,7 @@ class TaskList:
         return iter(self.tasks)
 
     @cached_property
-    def current_task(self) -> Task:
+    def current_task(self) -> Task | None:
         """Get the current task object based on the current step in the wizard."""
         return self.get_task_from_step_name(self.wizard_view.steps.current)
 
@@ -172,11 +172,12 @@ class TaskList:
 
         return False
 
-    def get_task_from_step_name(self, step_name: str) -> Task:
+    def get_task_from_step_name(self, step_name: str) -> Task | None:
         """Helper function to get the task object based on the step name."""
         for task in self.tasks:
             if step_name in task.form_steps:
                 return task
+        return None
 
     def complete(self) -> bool:
         """Check if all the tasks are complete."""
