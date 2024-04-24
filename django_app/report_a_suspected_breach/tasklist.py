@@ -1,7 +1,7 @@
 from functools import cached_property
 from typing import Iterable
 
-from django.views import View
+from views import ReportABreachWizardView
 
 from . import forms
 
@@ -12,7 +12,7 @@ class Task:
     hint_text = ""
     show_on_tasklist = True
 
-    def __init__(self, wizard_view: View, task_list: list["Task"]) -> None:
+    def __init__(self, wizard_view: ReportABreachWizardView, task_list: list["Task"]) -> None:
         super().__init__()
         self.wizard_view = wizard_view
         self.task_list = task_list
@@ -149,7 +149,7 @@ class SummaryAndDeclaration(Task):
 
 
 class TaskList:
-    def __init__(self, tasks: Iterable, wizard_view: View) -> None:
+    def __init__(self, tasks: Iterable, wizard_view: ReportABreachWizardView) -> None:
         super().__init__()
         self.wizard_view = wizard_view
         self.tasks = [task(wizard_view, self) for task in tasks]
@@ -184,7 +184,7 @@ class TaskList:
         return all(task.complete if task.show_on_tasklist else True for task in self.tasks)
 
 
-def get_tasklist(wizard_view: View) -> TaskList:
+def get_tasklist(wizard_view: ReportABreachWizardView) -> TaskList:
     return TaskList(
         tasks=(
             YourDetailsTask,
