@@ -167,7 +167,7 @@ class RedirectBaseDomainView(RedirectView):
     """Redirects base url visits to either report a breach app or view app default view"""
 
     @property
-    def url(self) -> HttpResponse:
+    def url(self) -> str:
         if is_report_a_suspected_breach_site(self.request.site):
             return reverse("report_a_suspected_breach:landing")
         elif is_view_a_suspected_breach_site(self.request.site):
