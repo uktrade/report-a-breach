@@ -52,3 +52,8 @@ def collectstatic(context: Any) -> None:
 def black(context: Any, directory: str = ".") -> None:
     print("Running black formatting")
     context.run(f"pipenv run black {directory}")
+
+
+@task
+def mypy(context: Any, module: str = "django_app") -> None:
+    context.run(f"mypy {module}", hide=False, pty=True)
