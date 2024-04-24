@@ -1,7 +1,7 @@
-from typing import OrderedDict
+from views import ReportABreachWizardView
 
 
-def show_check_company_details_page_condition(wizard: OrderedDict) -> bool:
+def show_check_company_details_page_condition(wizard: ReportABreachWizardView) -> bool:
     do_you_know_the_registered_company_number_cleaned_data = wizard.get_cleaned_data_for_step(
         "do_you_know_the_registered_company_number"
     )
@@ -19,17 +19,17 @@ def show_check_company_details_page_condition(wizard: OrderedDict) -> bool:
     return show_page
 
 
-def show_where_is_the_address_of_the_business_or_person_page_condition(wizard: OrderedDict) -> bool:
+def show_where_is_the_address_of_the_business_or_person_page_condition(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("are_you_reporting_a_business_on_companies_house")
     return cleaned_data.get("business_registered_on_companies_house", False) in ["no", "do_not_know"]
 
 
-def show_do_you_know_the_registered_company_number_page(wizard: OrderedDict) -> bool:
+def show_do_you_know_the_registered_company_number_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("are_you_reporting_a_business_on_companies_house")
     return cleaned_data.get("business_registered_on_companies_house", False) == "yes"
 
 
-def show_about_the_supplier_page(wizard: OrderedDict) -> bool:
+def show_about_the_supplier_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_from")
     cleaned_data_available = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_from")
     choices = ["different_uk_address", "outside_the_uk"]
@@ -42,7 +42,7 @@ def show_about_the_supplier_page(wizard: OrderedDict) -> bool:
     return show_page
 
 
-def show_where_were_the_goods_made_available_from_page(wizard: OrderedDict) -> bool:
+def show_where_were_the_goods_made_available_from_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_from")
 
     # if this data exists, we have already submitted this form and the user should be directed to the next
@@ -53,7 +53,7 @@ def show_where_were_the_goods_made_available_from_page(wizard: OrderedDict) -> b
     return cleaned_data.get("where_were_the_goods_supplied_from", False) == "they_have_not_been_supplied"
 
 
-def show_business_or_personal_details_page(wizard: OrderedDict) -> bool:
+def show_business_or_personal_details_page(wizard: ReportABreachWizardView) -> bool:
     where_is_the_address_cleaned_data = wizard.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person")
     do_you_know_the_registered_company_number_cleaned_data = wizard.get_cleaned_data_for_step(
         "do_you_know_the_registered_company_number"
@@ -69,17 +69,17 @@ def show_business_or_personal_details_page(wizard: OrderedDict) -> bool:
     # previous form in the chain of conditionals. A -> B -> C. If B is filled out, then A must-have been filled out.
 
 
-def show_name_and_business_you_work_for_page(wizard: OrderedDict) -> bool:
+def show_name_and_business_you_work_for_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("start")
     return cleaned_data.get("reporter_professional_relationship") in ("third_party", "no_professional_relationship")
 
 
-def show_name_page(wizard: OrderedDict) -> bool:
+def show_name_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("start")
     return cleaned_data.get("reporter_professional_relationship") in ("owner", "acting")
 
 
-def show_about_the_end_user_page(wizard: OrderedDict) -> bool:
+def show_about_the_end_user_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
     cleaned_data_available_step = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_to")
     choices = ["in_the_uk", "outside_the_uk"]
@@ -89,7 +89,7 @@ def show_about_the_end_user_page(wizard: OrderedDict) -> bool:
     )
 
 
-def show_end_user_added_page(wizard: OrderedDict) -> bool:
+def show_end_user_added_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
     cleaned_data_available_step = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_to")
     choices = ["in_the_uk", "outside_the_uk"]
@@ -99,13 +99,13 @@ def show_end_user_added_page(wizard: OrderedDict) -> bool:
     )
 
 
-def show_where_were_the_goods_supplied_to_page(wizard: OrderedDict) -> bool:
+def show_where_were_the_goods_supplied_to_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_from")
     # ensure the supplied_to page is not shown when the user is on the made_available journey
     return not cleaned_data.get("where_were_the_goods_made_available_from")
 
 
-def show_where_were_the_goods_made_available_to_page(wizard: OrderedDict) -> bool:
+def show_where_were_the_goods_made_available_to_page(wizard: ReportABreachWizardView) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_from")
     cleaned_data_supplier_step = wizard.get_cleaned_data_for_step("about_the_supplier")
     show_page = False
