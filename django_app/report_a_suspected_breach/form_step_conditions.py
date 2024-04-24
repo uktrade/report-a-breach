@@ -1,4 +1,4 @@
-from views import ReportABreachWizardView
+from .views import ReportABreachWizardView
 
 
 def show_check_company_details_page_condition(wizard: ReportABreachWizardView) -> bool:

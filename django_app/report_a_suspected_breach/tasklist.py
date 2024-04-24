@@ -1,9 +1,8 @@
 from functools import cached_property
 from typing import Iterable
 
-from views import ReportABreachWizardView
-
 from . import forms
+from .views import ReportABreachWizardView
 
 
 class Task:
