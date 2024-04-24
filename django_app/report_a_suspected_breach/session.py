@@ -18,7 +18,7 @@ class SessionStorage(WizardSessionStorage):
             return None
         return super().get_step_data(step)
 
-    def delete_step_data(self, *steps: Iterable[Any]) -> None:
+    def delete_step_data(self, *steps: Iterable[str]) -> None:
         for step in steps:
             self.data[self.step_data_key].pop(step, None)
 
