@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 from core.decorators import cached_classproperty
@@ -341,7 +342,7 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()"""
         self.store_documents_in_s3()
-        new_breach = Breach.objects.create()
+        new_breach = Breach.objects.create(when_did_you_first_suspect=datetime.datetime.now())
         new_reference = new_breach.assign_reference()
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)

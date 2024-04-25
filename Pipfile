@@ -49,6 +49,7 @@ pytest-cov = "*"
 "awscli-local[ver1]" = "~=0.22"
 django-debug-toolbar = "*"
 pyinstrument = "*"
+factory-boy = "*"
 
 [requires]
 python_version = "3.11"
