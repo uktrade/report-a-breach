@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+python django_app/manage.py migrate core --no-input
 python django_app/manage.py migrate --no-input
 python django_app/manage.py collectstatic --no-input
 
