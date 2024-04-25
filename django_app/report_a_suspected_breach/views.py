@@ -1,4 +1,3 @@
-import datetime
 import uuid
 
 from core.decorators import cached_classproperty
@@ -14,7 +13,7 @@ from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
 from utils.s3 import generate_presigned_url
 
-from .models import Breach, ReporterEmailVerification
+from .models import Breach, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
     OverviewOfTheSuspectedBreachTask,
@@ -321,29 +320,58 @@ class ReportABreachWizardView(BaseWizardView):
                 # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
                 pass
 
-    def done(self, form_list, **kwargs):
-        """all_cleaned_data = self.get_all_cleaned_data()
-        new_breach = Breach.objects.create(
-            reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],
-            reporter_email_address=all_cleaned_data["reporter_email_address"],
-            reporter_full_name=all_cleaned_data["reporter_full_name"],
-            what_were_the_goods=all_cleaned_data["what_were_the_goods"],
+    def done(self, **kwargs):
+        cleaned_data = self.get_all_cleaned_data()
+        self.store_documents_in_s3()
+
+        user_session = Session.objects.get(session_key=self.request.session.session_key)
+        reporter_email_verification = ReporterEmailVerification.objects.get(
+            reporter_session_id=user_session, email_verification_code=cleaned_data["verify"]["email_verification_code"]
         )
 
-        if declared_sanctions := all_cleaned_data["which_sanctions_regime"]:
-            sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
-            new_breach.sanctions_regimes.set(sanctions_regimes)
-        if unknown_regime := all_cleaned_data["unknown_regime"]:
-            new_breach.unknown_sanctions_regime = unknown_regime
+        new_breach = Breach.objects.create(
+            reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
+            reporter_email_address=cleaned_data["email"]["reporter_email_address"],
+            reporter_email_verification=reporter_email_verification,
+            reporter_full_name=cleaned_data["name_and_business_you_work_for"]["reporter_full_name"],
+            reporter_name_of_business_you_work_for=cleaned_data["name_and_business_you_work_for"][
+                "reporter_name_of_business_you_work_for"
+            ],
+            when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
+            is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
+            # additional_information="",
+            what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
+            business_registered_on_companies_house=cleaned_data["are_you_reporting_a_business_on_companies_house"][
+                "business_registered_on_companies_house"
+            ],
+            do_you_know_the_registered_company_number=cleaned_data["do_you_know_the_registered_company_number"][
+                "do_you_know_the_registered_company_number"
+            ],
+            registered_company_number=cleaned_data["do_you_know_the_registered_company_number"]["registered_company_number"],
+            were_there_other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
+                "were_there_other_addresses_in_the_supply_chain"
+            ],
+            other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
+                "other_addresses_in_the_supply_chain"
+            ],
+            tell_us_about_the_suspected_breach=cleaned_data["tell_us_about_the_suspected_breach"][
+                "tell_us_about_the_suspected_breach"
+            ],
+        )
 
-        # temporary, to be removed when the forms are integrated into the user journey
-        new_breach.additional_information = "N/A"
+        if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
+            for sanction in declared_sanctions:
+                if sanction == "unknown_regime":
+                    new_breach.unknown_sanctions_regime = True
+                elif sanction == "other_regime":
+                    new_breach.other_sanctions_regime = True
+                else:
+                    sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
+                    new_breach.sanctions_regimes.set(sanctions_regimes)
 
-        new_breach.save()
-        reference_id = str(new_breach.id).split("-")[0].upper()"""
-        self.store_documents_in_s3()
-        new_breach = Breach.objects.create(when_did_you_first_suspect=datetime.datetime.now())
         new_reference = new_breach.assign_reference()
+        new_breach.save()
+
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)
         self.request.session.modified = True
