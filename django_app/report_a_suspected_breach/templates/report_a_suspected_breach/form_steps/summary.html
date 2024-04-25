@@ -56,29 +56,21 @@
     </dl>
     <h2 class="govuk-heading-m">Person or business you're reporting</h2>
     <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-!-font-weight-regular">
-                Registered company number
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {% if is_company_obtained_from_companies_house %}
+        {% if is_company_obtained_from_companies_house %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-!-font-weight-regular">
+                    Registered company number
+                </dt>
+                <dd class="govuk-summary-list__value">
                     {{ form_data.do_you_know_the_registered_company_number.registered_company_number }}
-                {% else %}
-                    N/A
-                {% endif %}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                {% if is_company_obtained_from_companies_house %}
+                </dd>
+                <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
                        href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary">Change<span
                         class="govuk-visually-hidden">Change registered company number</span></a>
-                {% else %}
-                    <a class="govuk-link"
-                       href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
-                        class="govuk-visually-hidden">Change registered company number</span></a>
-                {% endif %}
-            </dd>
-        </div>
+                </dd>
+            </div>
+        {% endif %}
         <div class="govuk-summary-list__row">
             <dt class="govuk-!-font-weight-regular">
                 Name
