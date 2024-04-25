@@ -109,7 +109,7 @@ class TestTasklist:
         mock_wizard_view = MagicMock()
         mock_task_list = MagicMock()
         mocked_complete.return_value = True
-        assert tasklist.Task(mock_wizard_view, mock_task_list).status == "Complete"
+        assert tasklist.Task(mock_wizard_view, mock_task_list).status == "Completed"
 
     @patch("report_a_suspected_breach.tasklist.Task.complete", new_callable=PropertyMock)
     @patch("report_a_suspected_breach.tasklist.Task.can_start", new_callable=PropertyMock)

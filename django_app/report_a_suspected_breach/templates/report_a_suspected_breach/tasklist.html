@@ -16,15 +16,15 @@
                                     {{ forloop.counter }}. {{ task.name }}
                                 </a>
                             {% else %}
-                                <p class="govuk-body mb-1"
+                                <a class="govuk-body mb-1"
                                    aria-describedby="{{ task.underscored_task_name }}_hint {{ task.underscored_task_name }}_status">
                                     {{ forloop.counter }}. {{ task.name }}
-                                </p>
+                                </a>
                             {% endif %}
                             {% if task.hint_text %}
-                                <div id="{{ task.underscored_task_name }}_hint" class="govuk-task-list__hint">
+                                <p id="{{ task.underscored_task_name }}_hint" class="govuk-task-list__hint">
                                     {{ task.hint_text }}
-                                </div>
+                                </p>
                             {% endif %}
                         </div>
                         {% if task.can_start %}
