@@ -320,9 +320,37 @@ class ReportABreachWizardView(BaseWizardView):
                 # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
                 pass
 
-    def done(self, **kwargs):
+    def done(self, form_list, **kwargs):
+        # we're importing these methods here to avoid circular imports
+        from .form_step_conditions import show_check_company_details_page_condition
+
         cleaned_data = self.get_all_cleaned_data()
+        print(cleaned_data)
         self.store_documents_in_s3()
+        if cleaned_data["start"]["reporter_professional_relationship"] in ["acting", "owner"]:
+            reporter_full_name = cleaned_data["name"]["reporter_full_name"]
+            if show_check_company_details_page_condition(self):
+                reporter_name_of_business_you_work_for = cleaned_data["do_you_know_the_registered_company_number"][
+                    "registered_company_name"
+                ]
+            else:
+                reporter_name_of_business_you_work_for = cleaned_data["business_or_person_details"]["name"]
+        else:
+            reporter_full_name = cleaned_data["name_and_business_you_work_for"]["reporter_full_name"]
+            reporter_name_of_business_you_work_for = cleaned_data["name_and_business_you_work_for"][
+                "reporter_name_of_business_you_work_for"
+            ]
+        if cleaned_data["are_you_reporting_a_business_on_companies_house"]["business_registered_on_companies_house"] == "yes":
+            do_you_know_the_registered_company_number = cleaned_data["do_you_know_the_registered_company_number"][
+                "do_you_know_the_registered_company_number"
+            ]
+            if do_you_know_the_registered_company_number == "yes":
+                registered_company_number = cleaned_data["do_you_know_the_registered_company_number"]["registered_company_number"]
+            else:
+                registered_company_number = ""
+        else:
+            do_you_know_the_registered_company_number = ""
+            registered_company_number = ""
 
         user_session = Session.objects.get(session_key=self.request.session.session_key)
         reporter_email_verification = ReporterEmailVerification.objects.get(
@@ -333,10 +361,8 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
             reporter_email_address=cleaned_data["email"]["reporter_email_address"],
             reporter_email_verification=reporter_email_verification,
-            reporter_full_name=cleaned_data["name_and_business_you_work_for"]["reporter_full_name"],
-            reporter_name_of_business_you_work_for=cleaned_data["name_and_business_you_work_for"][
-                "reporter_name_of_business_you_work_for"
-            ],
+            reporter_full_name=reporter_full_name,
+            reporter_name_of_business_you_work_for=reporter_name_of_business_you_work_for,
             when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
             is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
             # additional_information="",
@@ -344,10 +370,8 @@ class ReportABreachWizardView(BaseWizardView):
             business_registered_on_companies_house=cleaned_data["are_you_reporting_a_business_on_companies_house"][
                 "business_registered_on_companies_house"
             ],
-            do_you_know_the_registered_company_number=cleaned_data["do_you_know_the_registered_company_number"][
-                "do_you_know_the_registered_company_number"
-            ],
-            registered_company_number=cleaned_data["do_you_know_the_registered_company_number"]["registered_company_number"],
+            do_you_know_the_registered_company_number=do_you_know_the_registered_company_number,
+            registered_company_number=registered_company_number,
             were_there_other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
                 "were_there_other_addresses_in_the_supply_chain"
             ],
@@ -363,11 +387,11 @@ class ReportABreachWizardView(BaseWizardView):
             for sanction in declared_sanctions:
                 if sanction == "unknown_regime":
                     new_breach.unknown_sanctions_regime = True
-                elif sanction == "other_regime":
+                if sanction == "other_regime":
                     new_breach.other_sanctions_regime = True
-                else:
-                    sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
-                    new_breach.sanctions_regimes.set(sanctions_regimes)
+            sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
+            print(sanctions_regimes)
+            new_breach.sanctions_regimes.set(sanctions_regimes)
 
         new_reference = new_breach.assign_reference()
         new_breach.save()
