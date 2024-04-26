@@ -13,7 +13,8 @@ from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
 from utils.s3 import generate_presigned_url
 
-from .models import Breach, ReporterEmailVerification, SanctionsRegime
+from .choices import TypeOfRelationshipChoices
+from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
     OverviewOfTheSuspectedBreachTask,
@@ -354,6 +355,7 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_session_id=user_session, email_verification_code=cleaned_data["verify"]["email_verification_code"]
         )
 
+        # Save Breach to Database
         new_breach = Breach.objects.create(
             reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
             reporter_email_address=cleaned_data["email"]["reporter_email_address"],
@@ -391,6 +393,64 @@ class ReportABreachWizardView(BaseWizardView):
 
         new_reference = new_breach.assign_reference()
         new_breach.save()
+
+        # Save Breacher Address Details to Database
+        new_business_or_person_details_breacher = PersonOrCompany.objects.create(
+            person_or_company="",
+            name=cleaned_data["where_is_the_address_of_business_or_person"]["name"],
+            website=cleaned_data["where_is_the_address_of_business_or_person"]["website"],
+            address_line_1=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_1"],
+            address_line_2=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_2"],
+            address_line_3=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_3"],
+            address_line_4=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_4"],
+            town_or_city=cleaned_data["where_is_the_address_of_business_or_person"]["town_or_city"],
+            country=cleaned_data["where_is_the_address_of_business_or_person"]["country"],
+            county=cleaned_data["where_is_the_address_of_business_or_person"]["county"],
+            postal_code=cleaned_data["where_is_the_address_of_business_or_person"]["postal_code"],
+            breach=new_breach,
+            type_of_relationship=TypeOfRelationshipChoices.breacher,
+        )
+
+        new_business_or_person_details_breacher.save()
+
+        # Save Supplier Address Details to Database
+        new_business_or_person_details_supplier = PersonOrCompany.objects.create(
+            person_or_company="",
+            name=cleaned_data["about_the_supplier"]["name"],
+            website=cleaned_data["about_the_supplier"]["website"],
+            address_line_1=cleaned_data["about_the_supplier"]["address_line_1"],
+            address_line_2=cleaned_data["about_the_supplier"]["address_line_2"],
+            address_line_3=cleaned_data["about_the_supplier"]["address_line_3"],
+            address_line_4=cleaned_data["about_the_supplier"]["address_line_4"],
+            town_or_city=cleaned_data["about_the_supplier"]["town_or_city"],
+            country=cleaned_data["about_the_supplier"]["country"],
+            county=cleaned_data["about_the_supplier"]["county"],
+            postal_code=cleaned_data["about_the_supplier"]["postal_code"],
+            breach=new_breach,
+            type_of_relationship=TypeOfRelationshipChoices.supplier,
+        )
+
+        new_business_or_person_details_supplier.save()
+
+        # Save Recipient Address Details to Database
+        new_business_or_person_details_recipient = PersonOrCompany.objects.create(
+            person_or_company="",
+            name=cleaned_data["about_the_end_user"]["name"],
+            website=cleaned_data["about_the_end_user"]["website"],
+            address_line_1=cleaned_data["about_the_end_user"]["address_line_1"],
+            address_line_2=cleaned_data["about_the_end_user"]["address_line_2"],
+            address_line_3=cleaned_data["about_the_end_user"]["address_line_3"],
+            address_line_4=cleaned_data["about_the_end_user"]["address_line_4"],
+            town_or_city=cleaned_data["about_the_end_user"]["town_or_city"],
+            country=cleaned_data["about_the_end_user"]["country"],
+            county=cleaned_data["about_the_end_user"]["county"],
+            postal_code=cleaned_data["about_the_end_user"]["postal_code"],
+            breach=new_breach,
+            type_of_relationship=TypeOfRelationshipChoices.recipient,
+        )
+
+        new_business_or_person_details_recipient.save()
+
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)
         self.request.session.modified = True
