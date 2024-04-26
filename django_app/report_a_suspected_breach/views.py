@@ -321,31 +321,28 @@ class ReportABreachWizardView(BaseWizardView):
                 pass
 
     def done(self, form_list, **kwargs):
-        # we're importing these methods here to avoid circular imports
-        from .form_step_conditions import show_check_company_details_page_condition
-
         cleaned_data = self.get_all_cleaned_data()
-        print(cleaned_data)
         self.store_documents_in_s3()
-        if cleaned_data["start"]["reporter_professional_relationship"] in ["acting", "owner"]:
-            reporter_full_name = cleaned_data["name"]["reporter_full_name"]
-            if show_check_company_details_page_condition(self):
-                reporter_name_of_business_you_work_for = cleaned_data["do_you_know_the_registered_company_number"][
-                    "registered_company_name"
-                ]
-            else:
-                reporter_name_of_business_you_work_for = cleaned_data["business_or_person_details"]["name"]
-        else:
+
+        # we're importing these methods here to avoid circular imports
+        from .form_step_conditions import show_name_and_business_you_work_for_page
+
+        if show_name_and_business_you_work_for_page(self):
             reporter_full_name = cleaned_data["name_and_business_you_work_for"]["reporter_full_name"]
             reporter_name_of_business_you_work_for = cleaned_data["name_and_business_you_work_for"][
                 "reporter_name_of_business_you_work_for"
             ]
+        else:
+            reporter_full_name = cleaned_data["name"]["reporter_full_name"]
+            reporter_name_of_business_you_work_for = cleaned_data["business_or_person_details"]["name"]
+
         if cleaned_data["are_you_reporting_a_business_on_companies_house"]["business_registered_on_companies_house"] == "yes":
             do_you_know_the_registered_company_number = cleaned_data["do_you_know_the_registered_company_number"][
                 "do_you_know_the_registered_company_number"
             ]
             if do_you_know_the_registered_company_number == "yes":
                 registered_company_number = cleaned_data["do_you_know_the_registered_company_number"]["registered_company_number"]
+
             else:
                 registered_company_number = ""
         else:
@@ -390,12 +387,10 @@ class ReportABreachWizardView(BaseWizardView):
                 if sanction == "other_regime":
                     new_breach.other_sanctions_regime = True
             sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
-            print(sanctions_regimes)
             new_breach.sanctions_regimes.set(sanctions_regimes)
 
         new_reference = new_breach.assign_reference()
         new_breach.save()
-
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)
         self.request.session.modified = True
