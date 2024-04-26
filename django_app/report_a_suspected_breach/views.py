@@ -394,19 +394,20 @@ class ReportABreachWizardView(BaseWizardView):
         new_reference = new_breach.assign_reference()
         new_breach.save()
 
-        # Save Breacher Address Details to Database
+        # Save Breacher Details to Database
+        breacher_details = cleaned_data["business_or_person_details"]
         new_business_or_person_details_breacher = PersonOrCompany.objects.create(
             person_or_company="",
-            name=cleaned_data["where_is_the_address_of_business_or_person"]["name"],
-            website=cleaned_data["where_is_the_address_of_business_or_person"]["website"],
-            address_line_1=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_1"],
-            address_line_2=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_2"],
-            address_line_3=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_3"],
-            address_line_4=cleaned_data["where_is_the_address_of_business_or_person"]["address_line_4"],
-            town_or_city=cleaned_data["where_is_the_address_of_business_or_person"]["town_or_city"],
-            country=cleaned_data["where_is_the_address_of_business_or_person"]["country"],
-            county=cleaned_data["where_is_the_address_of_business_or_person"]["county"],
-            postal_code=cleaned_data["where_is_the_address_of_business_or_person"]["postal_code"],
+            name=breacher_details.get("name"),
+            website=breacher_details.get("website"),
+            address_line_1=breacher_details.get("address_line_1"),
+            address_line_2=breacher_details.get("address_line_2"),
+            address_line_3=breacher_details.get("address_line_3"),
+            address_line_4=breacher_details.get("address_line_4"),
+            town_or_city=breacher_details.get("town_or_city"),
+            country=breacher_details.get("country"),
+            county=breacher_details.get("county"),
+            postal_code=breacher_details.get("postal_code"),
             breach=new_breach,
             type_of_relationship=TypeOfRelationshipChoices.breacher,
         )
@@ -414,18 +415,19 @@ class ReportABreachWizardView(BaseWizardView):
         new_business_or_person_details_breacher.save()
 
         # Save Supplier Address Details to Database
+        supplier_details = cleaned_data["about_the_supplier"]
         new_business_or_person_details_supplier = PersonOrCompany.objects.create(
             person_or_company="",
-            name=cleaned_data["about_the_supplier"]["name"],
-            website=cleaned_data["about_the_supplier"]["website"],
-            address_line_1=cleaned_data["about_the_supplier"]["address_line_1"],
-            address_line_2=cleaned_data["about_the_supplier"]["address_line_2"],
-            address_line_3=cleaned_data["about_the_supplier"]["address_line_3"],
-            address_line_4=cleaned_data["about_the_supplier"]["address_line_4"],
-            town_or_city=cleaned_data["about_the_supplier"]["town_or_city"],
-            country=cleaned_data["about_the_supplier"]["country"],
-            county=cleaned_data["about_the_supplier"]["county"],
-            postal_code=cleaned_data["about_the_supplier"]["postal_code"],
+            name=supplier_details.get("name"),
+            website=supplier_details.get("website"),
+            address_line_1=supplier_details.get("address_line_1"),
+            address_line_2=supplier_details.get("address_line_2"),
+            address_line_3=supplier_details.get("address_line_3"),
+            address_line_4=supplier_details.get("address_line_4"),
+            town_or_city=supplier_details.get("town_or_city"),
+            country=supplier_details.get("country"),
+            county=supplier_details.get("county"),
+            postal_code=supplier_details.get("postal_code"),
             breach=new_breach,
             type_of_relationship=TypeOfRelationshipChoices.supplier,
         )
@@ -433,23 +435,25 @@ class ReportABreachWizardView(BaseWizardView):
         new_business_or_person_details_supplier.save()
 
         # Save Recipient Address Details to Database
-        new_business_or_person_details_recipient = PersonOrCompany.objects.create(
-            person_or_company="",
-            name=cleaned_data["about_the_end_user"]["name"],
-            website=cleaned_data["about_the_end_user"]["website"],
-            address_line_1=cleaned_data["about_the_end_user"]["address_line_1"],
-            address_line_2=cleaned_data["about_the_end_user"]["address_line_2"],
-            address_line_3=cleaned_data["about_the_end_user"]["address_line_3"],
-            address_line_4=cleaned_data["about_the_end_user"]["address_line_4"],
-            town_or_city=cleaned_data["about_the_end_user"]["town_or_city"],
-            country=cleaned_data["about_the_end_user"]["country"],
-            county=cleaned_data["about_the_end_user"]["county"],
-            postal_code=cleaned_data["about_the_end_user"]["postal_code"],
-            breach=new_breach,
-            type_of_relationship=TypeOfRelationshipChoices.recipient,
-        )
-
-        new_business_or_person_details_recipient.save()
+        if end_users := self.request.session.get("end_users", None):
+            for end_user in end_users:
+                end_user_details = end_users[end_user]["cleaned_data"]
+                new_business_or_person_details_recipient = PersonOrCompany.objects.create(
+                    person_or_company="",
+                    name=end_user_details.get("name_of_person"),
+                    website=end_user_details.get("website"),
+                    address_line_1=end_user_details.get("address_line_1"),
+                    address_line_2=end_user_details.get("address_line_2"),
+                    address_line_3=end_user_details.get("address_line_3"),
+                    address_line_4=end_user_details.get("address_line_4"),
+                    town_or_city=end_user_details.get("town_or_city"),
+                    country=end_user_details.get("country"),
+                    county=end_user_details.get("county"),
+                    postal_code=end_user_details.get("postal_code", ""),
+                    breach=new_breach,
+                    type_of_relationship=TypeOfRelationshipChoices.recipient,
+                )
+            new_business_or_person_details_recipient.save()
 
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)
