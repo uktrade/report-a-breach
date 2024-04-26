@@ -27,7 +27,7 @@ class Task:
     @cached_property
     def status(self) -> str:
         if self.complete:
-            return "Complete"
+            return "Completed"
         elif self.can_start:
             return "Not yet started"
         return "Cannot start yet"
