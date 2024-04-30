@@ -321,12 +321,36 @@ class ReportABreachWizardView(BaseWizardView):
                 # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
                 pass
 
+    def save_person_or_company_to_db(
+        self, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> None:
+        new_business_or_person_details = PersonOrCompany.objects.create(
+            person_or_company="",
+            name=person_or_company.get("name", ""),
+            website=person_or_company.get("website"),
+            address_line_1=person_or_company.get("address_line_1"),
+            address_line_2=person_or_company.get("address_line_2"),
+            address_line_3=person_or_company.get("address_line_3"),
+            address_line_4=person_or_company.get("address_line_4"),
+            town_or_city=person_or_company.get("town_or_city"),
+            country=person_or_company.get("country"),
+            county=person_or_company.get("county"),
+            postal_code=person_or_company.get("postal_code", ""),
+            breach=breach,
+            type_of_relationship=relationship,
+        )
+        new_business_or_person_details.save()
+
     def done(self, form_list, **kwargs):
         cleaned_data = self.get_all_cleaned_data()
         self.store_documents_in_s3()
 
         # we're importing these methods here to avoid circular imports
-        from .form_step_conditions import show_name_and_business_you_work_for_page
+        from .form_step_conditions import (
+            show_about_the_supplier_page,
+            show_check_company_details_page_condition,
+            show_name_and_business_you_work_for_page,
+        )
 
         if show_name_and_business_you_work_for_page(self):
             reporter_full_name = cleaned_data["name_and_business_you_work_for"]["reporter_full_name"]
@@ -335,25 +359,20 @@ class ReportABreachWizardView(BaseWizardView):
             ]
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
-            reporter_name_of_business_you_work_for = cleaned_data["business_or_person_details"]["name"]
+            business_or_person_details_step = cleaned_data.get("business_or_person_details", {})
+            reporter_name_of_business_you_work_for = business_or_person_details_step.get("name", "")
 
-        if cleaned_data["are_you_reporting_a_business_on_companies_house"]["business_registered_on_companies_house"] == "yes":
-            do_you_know_the_registered_company_number = cleaned_data["do_you_know_the_registered_company_number"][
-                "do_you_know_the_registered_company_number"
-            ]
-            if do_you_know_the_registered_company_number == "yes":
-                registered_company_number = cleaned_data["do_you_know_the_registered_company_number"]["registered_company_number"]
-
-            else:
-                registered_company_number = ""
-        else:
-            do_you_know_the_registered_company_number = ""
-            registered_company_number = ""
+        do_you_know_the_registered_company_number_step = cleaned_data.get("do_you_know_the_registered_company_number", {})
+        do_you_know_the_registered_company_number = do_you_know_the_registered_company_number_step.get(
+            "do_you_know_the_registered_company_number", ""
+        )
+        registered_company_number = do_you_know_the_registered_company_number_step.get("registered_company_number", "")
 
         user_session = Session.objects.get(session_key=self.request.session.session_key)
         reporter_email_verification = ReporterEmailVerification.objects.get(
             reporter_session_id=user_session, email_verification_code=cleaned_data["verify"]["email_verification_code"]
         )
+        print(cleaned_data)
 
         # Save Breach to Database
         new_breach = Breach.objects.create(
@@ -395,65 +414,22 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach.save()
 
         # Save Breacher Details to Database
-        breacher_details = cleaned_data["business_or_person_details"]
-        new_business_or_person_details_breacher = PersonOrCompany.objects.create(
-            person_or_company="",
-            name=breacher_details.get("name"),
-            website=breacher_details.get("website"),
-            address_line_1=breacher_details.get("address_line_1"),
-            address_line_2=breacher_details.get("address_line_2"),
-            address_line_3=breacher_details.get("address_line_3"),
-            address_line_4=breacher_details.get("address_line_4"),
-            town_or_city=breacher_details.get("town_or_city"),
-            country=breacher_details.get("country"),
-            county=breacher_details.get("county"),
-            postal_code=breacher_details.get("postal_code"),
-            breach=new_breach,
-            type_of_relationship=TypeOfRelationshipChoices.breacher,
-        )
-
-        new_business_or_person_details_breacher.save()
+        if not show_check_company_details_page_condition(self):
+            breacher_details = cleaned_data["business_or_person_details"]
+            self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
 
         # Save Supplier Address Details to Database
-        supplier_details = cleaned_data["about_the_supplier"]
-        new_business_or_person_details_supplier = PersonOrCompany.objects.create(
-            person_or_company="",
-            name=supplier_details.get("name"),
-            website=supplier_details.get("website"),
-            address_line_1=supplier_details.get("address_line_1"),
-            address_line_2=supplier_details.get("address_line_2"),
-            address_line_3=supplier_details.get("address_line_3"),
-            address_line_4=supplier_details.get("address_line_4"),
-            town_or_city=supplier_details.get("town_or_city"),
-            country=supplier_details.get("country"),
-            county=supplier_details.get("county"),
-            postal_code=supplier_details.get("postal_code"),
-            breach=new_breach,
-            type_of_relationship=TypeOfRelationshipChoices.supplier,
-        )
-
-        new_business_or_person_details_supplier.save()
+        if show_about_the_supplier_page(self):
+            supplier_details = cleaned_data["about_the_supplier"]
+            self.save_person_or_company_to_db(new_breach, supplier_details, TypeOfRelationshipChoices.supplier)
 
         # Save Recipient Address Details to Database
         if end_users := self.request.session.get("end_users", None):
             for end_user in end_users:
                 end_user_details = end_users[end_user]["cleaned_data"]
-                new_business_or_person_details_recipient = PersonOrCompany.objects.create(
-                    person_or_company="",
-                    name=end_user_details.get("name_of_person"),
-                    website=end_user_details.get("website"),
-                    address_line_1=end_user_details.get("address_line_1"),
-                    address_line_2=end_user_details.get("address_line_2"),
-                    address_line_3=end_user_details.get("address_line_3"),
-                    address_line_4=end_user_details.get("address_line_4"),
-                    town_or_city=end_user_details.get("town_or_city"),
-                    country=end_user_details.get("country"),
-                    county=end_user_details.get("county"),
-                    postal_code=end_user_details.get("postal_code", ""),
-                    breach=new_breach,
-                    type_of_relationship=TypeOfRelationshipChoices.recipient,
-                )
-            new_business_or_person_details_recipient.save()
+                self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
+
+        # Save Document Details to the Database
 
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)
