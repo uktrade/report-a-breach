@@ -122,7 +122,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
 
-    def clean_postal_code(self):
+    def clean_postal_code(self) -> dict[str, Any]:
         postal_code = self.cleaned_data.get("postal_code")
         if self.is_uk_address and postal_code:
             # we want to validate a UK postcode

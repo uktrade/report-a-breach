@@ -355,7 +355,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
         )
         self.fields["is_the_date_accurate"].choices.pop(0)
 
-    def clean(self):
+    def clean(self) -> dict[str, str]:
         cleaned_data = super().clean()
         if is_the_date_accurate := cleaned_data.get("is_the_date_accurate"):
             when_did_you_first_suspected = cleaned_data.get("when_did_you_first_suspect")
@@ -372,7 +372,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
         return cleaned_data
 
-    def clean_when_did_you_first_suspect(self):
+    def clean_when_did_you_first_suspect(self) -> str | None:
         when_did_you_first_suspect = self.cleaned_data["when_did_you_first_suspect"]
         if when_did_you_first_suspect:
             if when_did_you_first_suspect >= now().date():
