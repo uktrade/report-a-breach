@@ -55,16 +55,16 @@ AWS Secret Access Key : wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 Default region : eu-west-2
 ```
 
-Copy the static files to aws localstack s3 bucket
-
-```
-invoke collectstatic
-```
-
 ### 5. Run the backing services
 Use docker-compose to run the backing services
 ```
 docker-compose up -d
+```
+
+Collect the apps static files
+
+```
+invoke collectstatic
 ```
 
 ### 6. Setup local custom domains
@@ -129,6 +129,8 @@ We use:
 
 We use [pre-commit](https://pre-commit.com/) to run all of the above before every commit.
 
+Typing is used throughout the app. We have followed the best practices outlined in [Typing Best Practices](https://typing.readthedocs.io/en/latest/source/best_practices.html)
+
 ### Branches
 All branches should be created from the `main` branch and be named after the JIRA ticket they are related to. e.g. DST-1234
 
@@ -139,3 +141,20 @@ The commit message should contain a clear and concise description of the changes
 ### Pull Requests
 All pull requests should be made to `main` and should be named after the JIRA ticket they are related to and a short
 description of the functionality implemented. e.g. DST-1234 - Implementing S3 buckets
+
+### Local development tools
+We use python-invoke to run various commands in regard to django and linting/formatting. \
+These are maintained in tasks.py
+
+All methods in the file can be run by typing `invoke {command}`.\
+Note that any command with underscores needs to be called with a `-` instead. \
+For example, the following task in tasks.py;
+```
+@task
+def frontend_tests(context: Any) -> None:
+    context.run("pipenv run pytest tests/test_frontend")
+```
+Will be invoked by calling `invoke frontend-tests`
+
+MyPy is used to sanity check typing but is not currently enforced. \
+To run mypy against the django_app, call `invoke mypy`

@@ -1,11 +1,13 @@
+from typing import Any
+
 from django.utils.functional import classproperty
 
 
 class cached_classproperty(classproperty):
-    def get_result_field_name(self):
+    def get_result_field_name(self) -> str | None:
         return self.fget.__name__ + "_property_result" if self.fget else None
 
-    def __get__(self, instance, cls=None):
+    def __get__(self, instance: Any, cls: Any | None = None) -> Any:
         result_field_name = self.get_result_field_name()
 
         if hasattr(cls, result_field_name):

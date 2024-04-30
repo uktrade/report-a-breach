@@ -1,4 +1,5 @@
 import re
+from typing import Any
 
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import Layout, Size, Submit
@@ -29,7 +30,7 @@ class BaseForm(forms.Form):
             "all": ["form.css"],
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
         super().__init__(*args, **kwargs)
@@ -99,7 +100,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
 
     readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         self.is_uk_address = kwargs.pop("is_uk_address", False)
         super().__init__(*args, **kwargs)
         if self.is_uk_address:
@@ -116,12 +117,12 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
 
         self.helper.label_size = None
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
 
-    def clean_postal_code(self):
+    def clean_postal_code(self) -> dict[str, Any]:
         postal_code = self.cleaned_data.get("postal_code")
         if self.is_uk_address and postal_code:
             # we want to validate a UK postcode

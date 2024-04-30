@@ -1,11 +1,14 @@
 import datetime
 import uuid
+from typing import Any
 
 from core.decorators import cached_classproperty
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.views import BaseWizardView
 from django.conf import settings
 from django.contrib.sessions.models import Session
+from django.forms import Form
+from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -38,7 +41,7 @@ class ReportABreachWizardView(BaseWizardView):
     file_storage = TemporaryDocumentStorage()
 
     @cached_classproperty
-    def form_list(cls):
+    def form_list(cls) -> list[tuple[Any, Any]]:
         task_list = (
             YourDetailsTask,
             AboutThePersonOrBusinessTask,
@@ -54,7 +57,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return unpacked
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         if "reset" in self.request.GET:
             for step_name, _ in self.form_list.items():
                 # clearing the lru_cache for get_cleaned_data_for_step
@@ -104,7 +107,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return super().get(request, *args, **kwargs)
 
-    def get_step_url(self, step):
+    def get_step_url(self, step: str) -> str:
         if step == "about_the_end_user" and "end_user_uuid" in self.kwargs:
             return reverse(
                 "report_a_suspected_breach:about_the_end_user",
@@ -124,7 +127,7 @@ class ReportABreachWizardView(BaseWizardView):
             )
         return super().get_step_url(step)
 
-    def render_next_step(self, form, **kwargs):
+    def render_next_step(self, form: Form, **kwargs: object) -> HttpResponse:
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
             default_path = "where_were_the_goods_supplied_to"
             if self.request.session.get("made_available_journey"):
@@ -143,7 +146,7 @@ class ReportABreachWizardView(BaseWizardView):
                 return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
-    def get_summary_context_data(self, form, context):
+    def get_summary_context_data(self, form: Form, context: dict[str, Any]) -> dict[str, Any]:
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
         that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
@@ -178,7 +181,7 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
-    def process_are_you_reporting_a_business_on_companies_house_step(self, form):
+    def process_are_you_reporting_a_business_on_companies_house_step(self, form: Form) -> QueryDict:
         """We want to clear the company details from the session if the user selects anything but 'yes', if they do
         select 'yes' then we want to delete the step data for the next step(s) in the chain of conditionals."""
         if form.cleaned_data["business_registered_on_companies_house"] != "yes":
@@ -189,7 +192,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
-    def process_about_the_end_user_step(self, form):
+    def process_about_the_end_user_step(self, form: Form) -> QueryDict:
         current_end_users = self.request.session.get("end_users", {})
 
         end_user_uuid = self.kwargs.get("end_user_uuid", str(uuid.uuid4()))
@@ -203,7 +206,7 @@ class ReportABreachWizardView(BaseWizardView):
         self.request.session.modified = True
         return self.get_form_step_data(form)
 
-    def process_do_you_know_the_registered_company_number_step(self, form):
+    def process_do_you_know_the_registered_company_number_step(self, form: Form) -> QueryDict:
         self.request.session.pop("company_details", None)
         self.request.session.modified = True
 
@@ -212,7 +215,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
-    def process_email_step(self, form):
+    def process_email_step(self, form: Form) -> QueryDict:
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
         user_session = Session.objects.get(session_key=self.request.session.session_key)
@@ -228,14 +231,14 @@ class ReportABreachWizardView(BaseWizardView):
         )
         return self.get_form_step_data(form)
 
-    def process_upload_documents_form(self, form):
+    def process_upload_documents_form(self, form: Form) -> Any:
         """Overriding this method to store the file name in the session, so we can use it later."""
         if form.is_valid():
             self.request.session["uploaded_file_name"] = form.cleaned_data["file"].name
             self.request.session.modified = True
         return super().process_step(form)
 
-    def get_form_kwargs(self, step=None):
+    def get_form_kwargs(self, step: str | None) -> dict[str, Any]:
         kwargs = super().get_form_kwargs(step)
         kwargs["request"] = self.request
 
@@ -321,7 +324,7 @@ class ReportABreachWizardView(BaseWizardView):
                 # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
                 pass
 
-    def done(self, form_list, **kwargs):
+    def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         """all_cleaned_data = self.get_all_cleaned_data()
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],

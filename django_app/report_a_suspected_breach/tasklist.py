@@ -1,4 +1,5 @@
 from functools import cached_property
+from typing import Iterable
 
 from django.views import View
 
@@ -11,7 +12,7 @@ class Task:
     hint_text = ""
     show_on_tasklist = True
 
-    def __init__(self, wizard_view: View, task_list: list["Task"]):
+    def __init__(self, wizard_view: View, task_list: list["Task"]) -> None:
         super().__init__()
         self.wizard_view = wizard_view
         self.task_list = task_list
@@ -148,16 +149,16 @@ class SummaryAndDeclaration(Task):
 
 
 class TaskList:
-    def __init__(self, tasks, wizard_view):
+    def __init__(self, tasks: Iterable, wizard_view: View) -> None:
         super().__init__()
         self.wizard_view = wizard_view
         self.tasks = [task(wizard_view, self) for task in tasks]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Task]:
         return iter(self.tasks)
 
     @cached_property
-    def current_task(self) -> Task:
+    def current_task(self) -> Task | None:
         """Get the current task object based on the current step in the wizard."""
         return self.get_task_from_step_name(self.wizard_view.steps.current)
 
@@ -171,13 +172,14 @@ class TaskList:
 
         return False
 
-    def get_task_from_step_name(self, step_name: str) -> Task:
+    def get_task_from_step_name(self, step_name: str) -> Task | None:
         """Helper function to get the task object based on the step name."""
         for task in self.tasks:
             if step_name in task.form_steps:
                 return task
+        return None
 
-    def complete(self):
+    def complete(self) -> bool:
         """Check if all the tasks are complete."""
         return all(task.complete if task.show_on_tasklist else True for task in self.tasks)
 

@@ -1,9 +1,12 @@
+from typing import Any
+
 from django.conf import settings
+from django.http import HttpResponse
 from notifications_python_client.errors import HTTPError
 from notifications_python_client.notifications import NotificationsAPIClient
 
 
-def send_email(email, context, template_id, reference=None) -> dict | bool:
+def send_email(email: str, context: dict[str, Any], template_id: str, reference: str | None = None) -> HttpResponse | bool:
     """Send an email using the GOV.UK Notify API."""
     if is_whitelisted(email):
         client = NotificationsAPIClient(settings.GOV_NOTIFY_API_KEY)
@@ -22,7 +25,7 @@ def send_email(email, context, template_id, reference=None) -> dict | bool:
         return False
 
 
-def get_context(extra_context=None):
+def get_context(extra_context: dict | None = None) -> dict[str, Any]:
     extra_context = extra_context or {}
     footer = "Report a trade sanctions breach service"
     context = {
@@ -32,7 +35,7 @@ def get_context(extra_context=None):
     return context
 
 
-def is_whitelisted(email):
+def is_whitelisted(email: str) -> bool:
     """
     Temporary measure to restrict notify emails to certain domains.
     disabled on production.
