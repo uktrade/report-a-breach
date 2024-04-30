@@ -362,7 +362,8 @@ class CookiesConsentView(FormView):
     template_name = "report_a_suspected_breach/cookies_consent.html"
     form_class = CookiesConsentForm
 
-    def post(self, request: HttpRequest, form: Form, **kwargs: object) -> QueryDict:
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> QueryDict:
+        form = self.get_form()
         if form.is_valid():
             # cookie consent stuff lasts for 1 year
             cookie_max_age = 365 * 24 * 60 * 60
