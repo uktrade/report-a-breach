@@ -50,6 +50,7 @@ pytest-cov = "*"
 django-debug-toolbar = "*"
 pyinstrument = "*"
 factory-boy = "*"
+mypy = "~=1.9"
 
 [requires]
 python_version = "3.11"

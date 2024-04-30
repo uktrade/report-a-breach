@@ -9,7 +9,7 @@ from django import forms
 class DateInputField(forms.MultiValueField):
     widget = DateInputWidget
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         fields = (
             forms.CharField(
                 label="Day",
@@ -24,13 +24,13 @@ class DateInputField(forms.MultiValueField):
 
         super().__init__(fields=fields, **kwargs)
 
-    def clean(self, value: List[Any]):
+    def clean(self, value: List[Any]) -> date | None:
         if any(value) and not all(value):
             raise forms.ValidationError(self.error_messages["incomplete"], code="incomplete")
 
         return CrispyDateInputField.clean(self, value)
 
-    def compress(self, data_list: List[int]):
+    def compress(self, data_list: List[int]) -> date | None:
         day, month, year = data_list
         if day and month and year:
             if len(year) == 2:

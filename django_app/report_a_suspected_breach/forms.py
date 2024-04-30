@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Any
 
 from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
@@ -47,7 +48,7 @@ class StartForm(BaseModelForm):
             "the business or person suspected of breaching sanctions?",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["reporter_professional_relationship"].choices.pop(0)
 
@@ -80,7 +81,7 @@ class EmailVerifyForm(BaseForm):
         error_messages={"required": "Enter the 6 digit security code we sent to your email"},
     )
 
-    def clean_email_verification_code(self):
+    def clean_email_verification_code(self) -> str:
         email_verification_code = self.cleaned_data["email_verification_code"]
         email_verification_code = email_verification_code.replace(" ", "")
 
@@ -130,7 +131,7 @@ class NameAndBusinessYouWorkForForm(BaseModelForm):
             "reporter_name_of_business_you_work_for": {"required": "Enter the name of the business you work for"},
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper.label_size = None
         self.helper.layout = Layout(
@@ -153,7 +154,7 @@ class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
             }
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["business_registered_on_companies_house"].choices.pop(0)
 
@@ -181,7 +182,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             },
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
         # todo - abstract the following logic to apply to all ConditionalRadios forms
@@ -200,7 +201,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             )
         )
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
 
         do_you_know_the_registered_company_number = cleaned_data.get("do_you_know_the_registered_company_number")
@@ -274,7 +275,7 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
             "postal_code",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper.layout = Layout(
             Fieldset(
@@ -340,7 +341,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
             "is_the_date_accurate": {"required": "Select whether you know the exact date, or the approximate date"},
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper.label_size = None
         self.helper.layout = Layout(
@@ -354,7 +355,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
         )
         self.fields["is_the_date_accurate"].choices.pop(0)
 
-    def clean(self):
+    def clean(self) -> dict[str, str]:
         cleaned_data = super().clean()
         if is_the_date_accurate := cleaned_data.get("is_the_date_accurate"):
             when_did_you_first_suspected = cleaned_data.get("when_did_you_first_suspect")
@@ -371,7 +372,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
         return cleaned_data
 
-    def clean_when_did_you_first_suspect(self):
+    def clean_when_did_you_first_suspect(self) -> str | None:
         when_did_you_first_suspect = self.cleaned_data["when_did_you_first_suspect"]
         if when_did_you_first_suspect:
             if when_did_you_first_suspect >= now().date():
@@ -391,7 +392,7 @@ class WhichSanctionsRegimeForm(BaseForm):
         },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         checkbox_choices = []
         for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
@@ -423,7 +424,7 @@ class WhatWereTheGoodsForm(BaseModelForm):
             },
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["what_were_the_goods"].widget.attrs = {"rows": 5}
 
@@ -443,10 +444,10 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
         },
     )
 
-    def __init__(self, *args, address_string, **kwargs):
+    def __init__(self, *args: object, address_string: str | None, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
-        if address_string:
+        if address_string is not None:
             address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
@@ -469,7 +470,7 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         },
     )
 
-    def __init__(self, address_string=None, *args, **kwargs):
+    def __init__(self, address_string: str | None, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string is not None:
@@ -499,7 +500,7 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
@@ -522,7 +523,7 @@ class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
         },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
@@ -567,7 +568,7 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
         labels = BasePersonBusinessDetailsForm.Meta.labels
         error_messages = BasePersonBusinessDetailsForm.Meta.error_messages
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
         # all fields on this form are optional. Except if it's a non-UK user, then we need the country at least
@@ -606,7 +607,7 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
             Field.textarea("additional_contact_details", field_width=Fluid.FULL, label_tag="h2", label_size=Size.MEDIUM),
         )
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
@@ -626,7 +627,7 @@ class EndUserAddedForm(BaseForm):
         required=True,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper.legend_size = Size.MEDIUM
         self.helper.legend_tag = None
@@ -649,7 +650,7 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
             "other_addresses_in_the_supply_chain": {"required": "Enter other addresses in the supply chain"},
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["were_there_other_addresses_in_the_supply_chain"].empty_label = None
         # todo - abstract the following logic to apply to all ConditionalRadios forms
@@ -669,7 +670,7 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
             )
         )
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         if (
             cleaned_data.get("were_there_other_addresses_in_the_supply_chain") == "yes"
