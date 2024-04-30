@@ -682,6 +682,17 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
         return cleaned_data
 
 
+class CookiesConsentForm(BaseForm):
+    do_you_want_to_accept_analytics_cookies = BooleanChoiceField(
+        choices=(
+            Choice(True, "Yes"),
+            Choice(False, "No"),
+        ),
+        widget=forms.RadioSelect,
+        label="Do you want to accept analytics cookies?",
+    )
+
+
 class UploadDocumentsForm(BaseForm):
     # todo - add a custom crispy forms widget to make it render like the prototype
     documents = forms.FileField(

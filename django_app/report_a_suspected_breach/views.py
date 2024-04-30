@@ -12,11 +12,13 @@ from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import TemplateView
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.generic import FormView, TemplateView
 from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
 from utils.s3 import generate_presigned_url
 
+from .forms import CookiesConsentForm
 from .models import Breach, ReporterEmailVerification
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -354,6 +356,37 @@ class ReportABreachWizardView(BaseWizardView):
         self.storage.reset()
         self.storage.current_step = self.steps.first
         return redirect(reverse("report_a_suspected_breach:complete"))
+
+
+class CookiesConsentView(FormView):
+    template_name = "report_a_suspected_breach/cookies_consent.html"
+    form_class = CookiesConsentForm
+
+    def post(self, request: HttpRequest, form: Form, **kwargs: object) -> QueryDict:
+        if form.is_valid():
+            # cookie consent stuff lasts for 1 year
+            cookie_max_age = 365 * 24 * 60 * 60
+
+            referrer_url = self.request.GET.get("referrer_url", "/")
+
+            # TODO: might not be needed (lifted from icms)
+            if not url_has_allowed_host_and_scheme(referrer_url, settings.ALLOWED_HOSTS, require_https=self.request.is_secure()):
+                # if the referrer URL is not allowed, redirect to the home page
+                referrer_url = "/"
+            response = redirect(referrer_url)
+
+            # regardless of their choice, we set a cookie to say they've made a choice
+            response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
+
+            response.set_cookie(
+                "accepted_ga_cookies",
+                "true" if form.cleaned_data["accept_cookies"] else "false",
+                max_age=cookie_max_age,
+            )
+
+            return response
+        else:
+            return render(self.request, "report_a_suspected_breach/cookies_consent.html", context={"form": form})
 
 
 class CompleteView(TemplateView):
