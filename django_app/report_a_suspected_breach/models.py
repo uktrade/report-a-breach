@@ -62,6 +62,7 @@ class ReporterEmailVerification(BaseModel):
 
 class PersonOrCompany(BaseModel):
     name = models.TextField()
+    name_of_business = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     website = models.URLField(null=True, blank=True)
     address_line_1 = models.TextField()

@@ -326,6 +326,7 @@ class ReportABreachWizardView(BaseWizardView):
     ) -> None:
         new_business_or_person_details = PersonOrCompany.objects.create(
             name=person_or_company.get("name", ""),
+            name_of_business=person_or_company.get("name_of_business"),
             website=person_or_company.get("website"),
             email=person_or_company.get("email"),
             address_line_1=person_or_company.get("address_line_1"),
@@ -373,7 +374,6 @@ class ReportABreachWizardView(BaseWizardView):
         reporter_email_verification = ReporterEmailVerification.objects.get(
             reporter_session_id=user_session, email_verification_code=cleaned_data["verify"]["email_verification_code"]
         )
-        print(cleaned_data)
 
         # Save Breach to Database
         new_breach = Breach.objects.create(
@@ -427,9 +427,7 @@ class ReportABreachWizardView(BaseWizardView):
         if end_users := self.request.session.get("end_users", None):
             for end_user in end_users:
                 end_user_details = end_users[end_user]["cleaned_data"]
-                end_user_details["name"] = (
-                    end_user_details.get("name_of_person", "") + " " + end_user_details.get("name_of_business", "")
-                )
+                end_user_details["name"] = end_user_details.get("name_of_person", "")
                 self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
         self.request.session.pop("end_users", None)
