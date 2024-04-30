@@ -418,18 +418,16 @@ class ReportABreachWizardView(BaseWizardView):
             breacher_details = cleaned_data["business_or_person_details"]
             self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
 
-        # Save Supplier Address Details to Database
+        # Save Supplier Details to Database
         if show_about_the_supplier_page(self):
             supplier_details = cleaned_data["about_the_supplier"]
             self.save_person_or_company_to_db(new_breach, supplier_details, TypeOfRelationshipChoices.supplier)
 
-        # Save Recipient Address Details to Database
+        # Save Recipient(s) Details to Database
         if end_users := self.request.session.get("end_users", None):
             for end_user in end_users:
                 end_user_details = end_users[end_user]["cleaned_data"]
                 self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
-
-        # Save Document Details to the Database
 
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)
