@@ -325,9 +325,9 @@ class ReportABreachWizardView(BaseWizardView):
         self, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
     ) -> None:
         new_business_or_person_details = PersonOrCompany.objects.create(
-            person_or_company="",
             name=person_or_company.get("name", ""),
             website=person_or_company.get("website"),
+            email=person_or_company.get("email"),
             address_line_1=person_or_company.get("address_line_1"),
             address_line_2=person_or_company.get("address_line_2"),
             address_line_3=person_or_company.get("address_line_3"),
@@ -336,6 +336,7 @@ class ReportABreachWizardView(BaseWizardView):
             country=person_or_company.get("country"),
             county=person_or_company.get("county"),
             postal_code=person_or_company.get("postal_code", ""),
+            additional_contact_details=person_or_company.get("additional_contact_details"),
             breach=breach,
             type_of_relationship=relationship,
         )
@@ -383,7 +384,6 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_name_of_business_you_work_for=reporter_name_of_business_you_work_for,
             when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
             is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
-            # additional_information="",
             what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
             business_registered_on_companies_house=cleaned_data["are_you_reporting_a_business_on_companies_house"][
                 "business_registered_on_companies_house"
@@ -427,6 +427,9 @@ class ReportABreachWizardView(BaseWizardView):
         if end_users := self.request.session.get("end_users", None):
             for end_user in end_users:
                 end_user_details = end_users[end_user]["cleaned_data"]
+                end_user_details["name"] = (
+                    end_user_details.get("name_of_person", "") + " " + end_user_details.get("name_of_business", "")
+                )
                 self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
         self.request.session.pop("end_users", None)

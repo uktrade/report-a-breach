@@ -32,8 +32,3 @@ class TypeOfRelationshipChoices(models.TextChoices):
     breacher = "breacher", "Breacher"
     supplier = "supplier", "Supplier"
     recipient = "recipient", "Recipient"
-
-
-class PersonOrCompanyChoices(models.TextChoices):
-    person = "person", "Person"
-    company = "company", "Company"

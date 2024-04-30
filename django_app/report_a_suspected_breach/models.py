@@ -24,7 +24,6 @@ class Breach(BaseModel):
     sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True)
     unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
     other_sanctions_regime = models.BooleanField(blank=True, default=False)
-    additional_information = models.TextField()
     what_were_the_goods = models.TextField()
     business_registered_on_companies_house = models.CharField(
         choices=choices.YesNoDoNotKnowChoices.choices,
@@ -62,12 +61,8 @@ class ReporterEmailVerification(BaseModel):
 
 
 class PersonOrCompany(BaseModel):
-    person_or_company = models.CharField(
-        null=False,
-        choices=choices.PersonOrCompanyChoices.choices,
-        max_length=7,
-    )
     name = models.TextField()
+    email = models.EmailField(null=True, blank=True)
     website = models.URLField(null=True, blank=True)
     address_line_1 = models.TextField()
     address_line_2 = models.TextField(null=True, blank=True)
@@ -78,6 +73,7 @@ class PersonOrCompany(BaseModel):
     county = models.TextField(null=True, blank=True)
     postal_code = models.TextField()
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
+    additional_contact_details = models.TextField(null=True, blank=True)
     type_of_relationship = models.CharField(choices=choices.TypeOfRelationshipChoices.choices, max_length=9)
 
 
