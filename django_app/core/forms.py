@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from crispy_forms_gds.helper import FormHelper
@@ -89,6 +90,13 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             "county": "County",
             "postal_code": "Postcode",
         }
+        error_messages = {
+            "name": {"required": "Enter the name of the business or person"},
+            "address_line_1": {"required": "Enter address line 1, such as the building and street"},
+            "town_or_city": {"required": "Enter town or city"},
+            "postal_code": {"required": "Enter postcode", "invalid": "Enter a full UK postcode"},
+            "country": {"required": "Select country"},
+        }
 
     readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
 
@@ -105,6 +113,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             del self.fields["county"]
             self.fields["town_or_city"].required = False
             self.fields["address_line_1"].required = False
+            self.fields["country"].required = True
 
         self.helper.label_size = None
 
@@ -112,3 +121,12 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
         cleaned_data = super().clean()
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
+
+    def clean_postal_code(self):
+        postal_code = self.cleaned_data.get("postal_code")
+        if self.is_uk_address and postal_code:
+            # we want to validate a UK postcode
+            pattern = re.compile(r"^[A-Za-z]{1,2}\d[A-Za-z\d]? ?\d[A-Za-z]{2}$")
+            if not pattern.match(postal_code):
+                raise forms.ValidationError(code="invalid", message=self.fields["postal_code"].error_messages["invalid"])
+        return postal_code

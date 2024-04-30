@@ -1,7 +1,9 @@
 import pytest
 from core.sites import SiteName
 from django.contrib.sites.models import Site
+from django.test import Client, RequestFactory
 
+from tests.factories import BreachFactory
 from tests.helpers import get_test_client
 
 
@@ -23,3 +25,17 @@ def vasb_client(db):
     """
     vab_site = Site.objects.get(name=SiteName.view_a_suspected_breach)
     return get_test_client(vab_site.domain)
+
+
+@pytest.fixture()
+def breach_object(db):
+    """Fixture to create a breach object."""
+    return BreachFactory()
+
+
+@pytest.fixture()
+def request_object(rasb_client: Client):
+    """Fixture to create a request object."""
+    request_object = RequestFactory()
+    request_object.session = rasb_client.session
+    return request_object
