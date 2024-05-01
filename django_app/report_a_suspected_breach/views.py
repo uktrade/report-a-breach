@@ -362,9 +362,6 @@ class CookiesConsentView(FormView):
     template_name = "report_a_suspected_breach/cookies_consent.html"
     form_class = CookiesConsentForm
 
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
     def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         form = self.get_form()
         if form.is_valid():

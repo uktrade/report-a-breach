@@ -694,7 +694,7 @@ class CookiesConsentForm(BaseForm):
         label="Do you want to accept analytics cookies?",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.add_input(Submit("save cookie settings", "Save cookie settings", css_class="govuk-button"))
