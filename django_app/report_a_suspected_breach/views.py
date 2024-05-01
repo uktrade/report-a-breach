@@ -362,10 +362,10 @@ class CookiesConsentView(FormView):
     template_name = "report_a_suspected_breach/cookies_consent.html"
     form_class = CookiesConsentForm
 
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> QueryDict:
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         form = self.get_form()
         if form.is_valid():
-            # cookie consent stuff lasts for 1 year
+            # cookie consent lasts for 1 year
             cookie_max_age = 365 * 24 * 60 * 60
 
             referrer_url = self.request.GET.get("referrer_url", "/")
@@ -378,13 +378,11 @@ class CookiesConsentView(FormView):
 
             # regardless of their choice, we set a cookie to say they've made a choice
             response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
-
             response.set_cookie(
                 "accepted_ga_cookies",
-                "true" if form.cleaned_data["accept_cookies"] else "false",
+                "true" if form.cleaned_data["do_you_want_to_accept_analytics_cookies"] else "false",
                 max_age=cookie_max_age,
             )
-
             return response
         else:
             return render(self.request, "report_a_suspected_breach/cookies_consent.html", context={"form": form})

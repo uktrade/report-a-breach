@@ -3,6 +3,8 @@ from typing import Any
 
 from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.layout import (
     ConditionalQuestion,
@@ -691,6 +693,11 @@ class CookiesConsentForm(BaseForm):
         widget=forms.RadioSelect,
         label="Do you want to accept analytics cookies?",
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("save cookie settings", "Save cookie settings", css_class="govuk-button"))
 
 
 class UploadDocumentsForm(BaseForm):
