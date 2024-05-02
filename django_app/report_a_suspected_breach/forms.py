@@ -701,6 +701,16 @@ class CookiesConsentForm(BaseForm):
         self.helper = FormHelper()
         self.helper.add_input(Submit("save cookie settings", "Save cookie settings", css_class="govuk-button"))
 
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+        cleaned_data_choice = cleaned_data.get("do_you_want_to_accept_analytics_cookies")
+        if cleaned_data_choice not in ["True", "False"]:
+            self.add_error("do_you_want_to_accept_analytics_cookies", "")
+        if cleaned_data_choice is not None:
+            boolean_value = BooleanChoiceField.to_python(cleaned_data_choice)
+            cleaned_data["do_you_want_to_accept_analytics_cookies"] = boolean_value
+        return cleaned_data
+
 
 class UploadDocumentsForm(BaseForm):
     # todo - add a custom crispy forms widget to make it render like the prototype

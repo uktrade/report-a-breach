@@ -12,7 +12,6 @@ from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, TemplateView
 from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
@@ -369,11 +368,6 @@ class CookiesConsentView(FormView):
             cookie_max_age = 365 * 24 * 60 * 60
 
             referrer_url = self.request.GET.get("referrer_url", "/")
-
-            # TODO: might not be needed (lifted from icms)
-            if not url_has_allowed_host_and_scheme(referrer_url, settings.ALLOWED_HOSTS, require_https=self.request.is_secure()):
-                # if the referrer URL is not allowed, redirect to the home page
-                referrer_url = "/"
             response = redirect(referrer_url)
 
             # regardless of their choice, we set a cookie to say they've made a choice

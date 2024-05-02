@@ -28,7 +28,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="theme-color" content="#0b0c0c">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
         {% block cookie_banner %}
             {% if request.resolver_match.url_name != "cookies_consent" %}
                 {% if request.COOKIES.cookie_preferences_set != "true" %}
@@ -46,19 +45,18 @@
                                 </div>
                             </div>
                             <div class="govuk-button-group">
-                                <form method="POST" action="/report_a_suspected_breach/cookies_consent">
+                                <form method="post" action="/report_a_suspected_breach/cookies_consent">
                                     {% csrf_token %}
-                                    <button type="submit" class="govuk-button" data-module="govuk-button" value="True">
+                                    <button type="submit" class="govuk-button" data-module="govuk-button" name="do_you_want_to_accept_analytics_cookies" value="True">
                                         Accept analytics cookies
                                     </button>
-                                    <button type="submit" class="govuk-button" data-module="govuk-button" value="False">
+                                    <button type="submit" class="govuk-button" data-module="govuk-button" name="do_you_want_to_accept_analytics_cookies" value="False">
                                         Reject analytics cookies
                                     </button>
                                     <a class="govuk-link" href="/report_a_suspected_breach/cookies_consent">View cookies</a>
                                 </form>
                             </div>
                         </div>
-                    </div>
                 {% endif %}
             {% endif %}
         {% endblock cookie_banner %}
