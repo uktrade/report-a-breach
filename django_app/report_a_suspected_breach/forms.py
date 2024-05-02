@@ -17,6 +17,7 @@ from crispy_forms_gds.layout import (
 )
 from django import forms
 from django.conf import settings
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from utils.companies_house import (
@@ -685,13 +686,14 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
 
 
 class CookiesConsentForm(BaseForm):
-    do_you_want_to_accept_analytics_cookies = BooleanChoiceField(
+    do_you_want_to_accept_analytics_cookies = forms.ChoiceField(
         choices=(
             Choice(True, "Yes"),
             Choice(False, "No"),
         ),
         widget=forms.RadioSelect,
-        label="Do you want to accept analytics cookies?",
+        label=mark_safe("<b>Do you want to accept analytics cookies</b>"),
+        required=True,
     )
 
     def __init__(self, *args: object, **kwargs: object) -> None:

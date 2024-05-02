@@ -214,3 +214,20 @@ class TestAboutTheEndUserForm:
         assert not form.is_valid()
         assert "postal_code" in form.errors
         assert form.errors.as_data()["postal_code"][0].code == "invalid"
+
+
+class TestCookiesConsentForm:
+    def test_consent_choice_required(self):
+        form = forms.CookiesConsentForm(data={"do_you_want_to_accept_analytics_cookies": None})
+        assert not form.is_valid()
+        assert "do_you_want_to_accept_analytics_cookies" in form.errors
+
+    def test_consent_to_cookies_valid(self):
+        form = forms.CookiesConsentForm(data={"do_you_want_to_accept_analytics_cookies": True})
+        assert form.is_valid()
+        assert "do_you_want_to_accept_analytics_cookies" not in form.errors
+
+    def test_non_consent_cookies_valid(self):
+        form = forms.CookiesConsentForm(data={"do_you_want_to_accept_analytics_cookies": False})
+        assert form.is_valid()
+        assert "do_you_want_to_accept_analytics_cookies" not in form.errors
