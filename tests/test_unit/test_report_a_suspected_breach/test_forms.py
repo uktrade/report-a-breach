@@ -223,11 +223,11 @@ class TestCookiesConsentForm:
         assert "do_you_want_to_accept_analytics_cookies" in form.errors
 
     def test_consent_to_cookies_valid(self):
-        form = forms.CookiesConsentForm(data={"do_you_want_to_accept_analytics_cookies": True})
+        form = forms.CookiesConsentForm(data={"do_you_want_to_accept_analytics_cookies": "True"})
         assert form.is_valid()
         assert "do_you_want_to_accept_analytics_cookies" not in form.errors
 
     def test_non_consent_cookies_valid(self):
-        form = forms.CookiesConsentForm(data={"do_you_want_to_accept_analytics_cookies": False})
+        form = forms.CookiesConsentForm(data={"do_you_want_to_accept_analytics_cookies": "False"})
         assert form.is_valid()
         assert "do_you_want_to_accept_analytics_cookies" not in form.errors
