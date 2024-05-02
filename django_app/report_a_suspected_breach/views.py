@@ -361,6 +361,20 @@ class CookiesConsentView(FormView):
     template_name = "report_a_suspected_breach/cookies_consent.html"
     form_class = CookiesConsentForm
 
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+        initial_dict = {}
+
+        if current_cookies_policy := request.COOKIES.get("accepted_ga_cookies"):
+            initial_dict["accept_cookies"] = current_cookies_policy == "true"
+
+            return render(
+                request,
+                "report_a_suspected_breach/cookies_consent.html",
+                context={"form": CookiesConsentForm(initial=initial_dict)},
+            )
+
+        return super().get(request, args, kwargs)
+
     def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         form = self.get_form()
         if form.is_valid():

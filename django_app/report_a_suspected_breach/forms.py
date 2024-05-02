@@ -17,7 +17,6 @@ from crispy_forms_gds.layout import (
 )
 from django import forms
 from django.conf import settings
-from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from utils.companies_house import (
@@ -692,14 +691,18 @@ class CookiesConsentForm(BaseForm):
             Choice(False, "No"),
         ),
         widget=forms.RadioSelect,
-        label=mark_safe("<b>Do you want to accept analytics cookies</b>"),
+        label="Do you want to accept analytics cookies",
         required=True,
+        initial=None,
     )
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.add_input(Submit("save cookie settings", "Save cookie settings", css_class="govuk-button"))
+        self.helper.layout = Layout(
+            Field.radios("do_you_want_to_accept_analytics_cookies", legend_size=Size.MEDIUM, legend_tag="h2", inline=False)
+        )
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
