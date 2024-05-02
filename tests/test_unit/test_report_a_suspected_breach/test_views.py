@@ -1,31 +1,34 @@
-import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.http import HttpResponseRedirect
 from django.test import RequestFactory
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
-from report_a_suspected_breach.models import PersonOrCompany, ReporterEmailVerification
+from report_a_suspected_breach.models import (
+    Breach,
+    PersonOrCompany,
+    ReporterEmailVerification,
+    SanctionsRegime,
+)
 from report_a_suspected_breach.views import ReportABreachWizardView
+
+from . import data
 
 
 class TestReportABreachWizardView:
-    verify_code = "123456"
 
     @pytest.fixture(autouse=True)
     def reporter_email_verification_object(self, rasb_client):
         self.obj = ReporterEmailVerification.objects.create(
             reporter_session=rasb_client.session._get_session_from_db(),
-            email_verification_code=self.verify_code,
+            email_verification_code=data.verify_code,
         )
-        request_object = RequestFactory()
-        request_object.session = rasb_client.session._get_session_from_db()
+        request_object = RequestFactory().get("/")
         self.request_object = request_object
 
     def setup_view(self, view, request, *args, **kwargs):
         """
         Mimic ``as_view()``, but returns view instance.
-        Use this function to get view instances on which you can run unit tests,
-        by testing specific methods.
         """
 
         view.request = request
@@ -33,74 +36,81 @@ class TestReportABreachWizardView:
         view.kwargs = kwargs
         return view
 
-    @patch("report_a_suspected_breach.views.ReportABreachWizardView.get_all_cleaned_data")
+    @patch("report_a_suspected_breach.form_step_conditions.show_about_the_supplier_page")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.store_documents_in_s3")
-    def test_done(self, mocked_store_documents_in_s3, request_object, rasb_client):
-        verify_code = "123456"
+    @patch("report_a_suspected_breach.views.ReportABreachWizardView.get_all_cleaned_data")
+    def test_done(
+        self,
+        mocked_get_all_cleaned_data,
+        mocked_store_documents_in_s3,
+        mocked_show_about_the_supplier_page,
+        sanctions_regime_object,
+        request_object,
+        rasb_client,
+    ):
+
+        # Create Sanctions Regime Object
+        sanctions_regime_name = SanctionsRegime.objects.all()[0].full_name
+        data.cleaned_data["which_sanctions_regime"] = {"which_sanctions_regime": [sanctions_regime_name, "unknown_regime"]}
+
+        # Setup Mock return values
         view = ReportABreachWizardView()
         view.storage = MagicMock()
         view.steps = MagicMock()
-        view.get_all_cleaned_data.return_value = {
-            "start": {"reporter_professional_relationship": "third_party"},
-            "email": {"reporter_email_address": "morgan.rees@digital.trade.gov.uk"},
-            "verify": {"email_verification_code": verify_code},
-            "name": {"reporter_full_name": "a", "reporter_name_of_business_you_work_for": "a"},
-            "business_or_person_details": {
-                "name": "Test",
-                "website": "http://fdsa.com",
-                "country": "GB",
-                "address_line_1": "fdsa",
-                "address_line_2": "",
-                "town_or_city": "fdsa",
-                "county": "",
-                "postal_code": "NP8 8PD",
-                "readable_address": "fdsa,\n fdsa,\n NP8 8PD,\n GB",
-            },
-            "are_you_reporting_a_business_on_companies_house": {"business_registered_on_companies_house": "no"},
-            "do_you_know_the_registered_company_number": {"do_you_know_the_registered_company_number": "no"},
-            "when_did_you_first_suspect": {
-                "when_did_you_first_suspect": datetime.date(1994, 3, 12),
-                "is_the_date_accurate": "approximate",
-            },
-            "which_sanctions_regime": {"which_sanctions_regime": ["The Oscars", "The Tonys", "don't know"]},
-            "what_were_the_goods": {"what_were_the_goods": "sfda"},
-            "where_were_the_goods_supplied_from": {"where_were_the_goods_supplied_from": "outside_the_uk"},
-            "about_the_supplier": {
-                "name": "fsda",
-                "website": "http://fdas.com",
-                "country": "AX",
-                "address_line_1": "a",
-                "address_line_2": "a",
-                "address_line_3": "a",
-                "address_line_4": "a",
-                "town_or_city": "a",
-                "readable_address": "a,\n a,\n a,\n AX",
-            },
-            "where_were_the_goods_supplied_to": {"where_were_the_goods_supplied_to": "outside_the_uk"},
-            "were_there_other_addresses_in_the_supply_chain": {
-                "were_there_other_addresses_in_the_supply_chain": "yes",
-                "other_addresses_in_the_supply_chain": "sdfadfafasf",
-            },
-            "tell_us_about_the_suspected_breach": {"tell_us_about_the_suspected_breach": "sdfafad"},
-        }
-        form_list = ["start"]
+        mocked_get_all_cleaned_data.return_value = data.cleaned_data
+        mocked_show_about_the_supplier_page.return_value = True
+
+        # SetUp session values
+        form_list = []
+        request_object = RequestFactory().get("/")
+        request_object.session = rasb_client.session
+        session = rasb_client.session
+        session["end_users"] = data.end_users
+        session.save()
+
+        # SetUp View
         self.setup_view(view, rasb_client, request_object)
-        view.done(form_list)
+
+        # Call done method of view
+        response = view.done(form_list)
+
+        # Assert only one breach object created
+        breach = Breach.objects.all()
+        assert len(breach) == 1
+
+        breacher = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.breacher)
+        supplier = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.supplier)
+        end_user = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.recipient)
+
+        # Assert breacher, supplier and end_users objects created
+        assert len(breacher) == 1
+        assert len(supplier) == 1
+        assert len(end_user) == 3
+
+        # Assert breach object associated with breacher, supplier, end_users
+        assert breacher[0].breach == breach[0]
+        assert supplier[0].breach == breach[0]
+        assert end_user[1].breach == breach[0]
+
+        # Assert Sanctions Regimes set
+        assert breach[0].unknown_sanctions_regime is True
+        assert breach[0].other_sanctions_regime is False
+        assert breach[0].sanctions_regimes.all()[0].full_name == sanctions_regime_name
+
+        # Assert returns redirect
+        redirect = HttpResponseRedirect(
+            status=302, content_type="text/html; charset=utf-8", redirect_to="/report_a_suspected_breach/complete"
+        )
+
+        assert response.status_code == redirect.status_code
+        assert response["content-type"] == redirect["content-type"]
+        assert response.url == redirect.url
 
     def test_save_person_or_company_to_db(self, breach_object):
-        person_or_company = {
-            "name": "Test",
-            "website": "http://fdsa.com",
-            "country": "GB",
-            "address_line_1": "fdsa",
-            "address_line_2": "",
-            "town_or_city": "fdsa",
-            "county": "",
-            "postal_code": "NP8 8PD",
-            "readable_address": "fdsa,\n fdsa,\n NP8 8PD,\n GB",
-        }
+        person_or_company = data.person_or_company
         relationship = TypeOfRelationshipChoices.supplier
         view = ReportABreachWizardView()
         view.save_person_or_company_to_db(breach_object, person_or_company, relationship)
-        business_or_company_details = PersonOrCompany.objects.all()
-        assert len(business_or_company_details) == 1
+        person_or_company_details = PersonOrCompany.objects.all()
+        assert len(person_or_company_details) == 1
+        assert person_or_company_details[0].type_of_relationship == relationship
