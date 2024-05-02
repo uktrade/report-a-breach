@@ -1,3 +1,7 @@
+from typing import Any
+
+from django.forms import Form
+
 from .base import *  # noqa
 
 TEST_EMAIL_VERIFY_CODE = True
@@ -9,7 +13,7 @@ BASE_FRONTEND_TESTING_URL = "http://report-a-suspected-breach:8000"
 ENVIRONMENT = "test"
 
 
-def test_process_email_step(self, form):
+def test_process_email_step(self, form: Form) -> dict[str, Any]:
     """Monkey-patching the process_email_step of the wizard to always use the same verify code for testing."""
     from django.contrib.sessions.models import Session
     from report_a_suspected_breach.models import ReporterEmailVerification

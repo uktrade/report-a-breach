@@ -1,3 +1,6 @@
+import re
+from typing import Any
+
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import Layout, Size, Submit
 from django import forms
@@ -19,13 +22,15 @@ class BaseForm(forms.Form):
     labels = {}
     # same for help_texts
     help_texts = {}
+    # do we want this form to be revalidated when the user clicks Done
+    revalidate_on_done = True
 
     class Media:
         css = {
             "all": ["form.css"],
         }
 
-    def __init__(self, address_string=None, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
         super().__init__(*args, **kwargs)
@@ -85,10 +90,17 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             "county": "County",
             "postal_code": "Postcode",
         }
+        error_messages = {
+            "name": {"required": "Enter the name of the business or person"},
+            "address_line_1": {"required": "Enter address line 1, such as the building and street"},
+            "town_or_city": {"required": "Enter town or city"},
+            "postal_code": {"required": "Enter postcode", "invalid": "Enter a full UK postcode"},
+            "country": {"required": "Select country"},
+        }
 
     readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         self.is_uk_address = kwargs.pop("is_uk_address", False)
         super().__init__(*args, **kwargs)
         if self.is_uk_address:
@@ -101,10 +113,20 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             del self.fields["county"]
             self.fields["town_or_city"].required = False
             self.fields["address_line_1"].required = False
+            self.fields["country"].required = True
 
         self.helper.label_size = None
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
+
+    def clean_postal_code(self) -> dict[str, Any]:
+        postal_code = self.cleaned_data.get("postal_code")
+        if self.is_uk_address and postal_code:
+            # we want to validate a UK postcode
+            pattern = re.compile(r"^[A-Za-z]{1,2}\d[A-Za-z\d]? ?\d[A-Za-z]{2}$")
+            if not pattern.match(postal_code):
+                raise forms.ValidationError(code="invalid", message=self.fields["postal_code"].error_messages["invalid"])
+        return postal_code

@@ -24,9 +24,8 @@ class BaseSettings(PydanticBaseSettings):
 
     companies_house_api_key: str | None = None
 
-    gov_notify_api_key: str = None
+    gov_notify_api_key: str = ""
     email_verify_code_template_id: str = ""
-    email_verify_code_template_id: str
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
 
@@ -73,7 +72,7 @@ class BaseSettings(PydanticBaseSettings):
 
     @computed_field
     @property
-    def temporary_s3_bucket_configuration(self) -> dict:
+    def temporary_s3_bucket_configuration(self) -> dict[str, str]:
         return {
             "bucket_name": self.temporary_s3_bucket_name,
             "access_key_id": self.temporary_s3_bucket_access_key_id,
@@ -82,7 +81,7 @@ class BaseSettings(PydanticBaseSettings):
 
     @computed_field
     @property
-    def permanent_s3_bucket_configuration(self) -> dict:
+    def permanent_s3_bucket_configuration(self) -> dict[str, str]:
         return {
             "bucket_name": self.permanent_s3_bucket_name,
             "access_key_id": self.permanent_s3_bucket_access_key_id,
@@ -92,6 +91,7 @@ class BaseSettings(PydanticBaseSettings):
 
 class LocalSettings(BaseSettings):
     database_uri: str = Field(alias="DATABASE_URL")
+    profiling_enabled: bool = False
 
 
 class GovPaasSettings(BaseSettings):
@@ -105,20 +105,20 @@ class GovPaasSettings(BaseSettings):
 
     @computed_field
     @property
-    def database_uri(self) -> dict:
+    def database_uri(self) -> dict[str, str]:
         return self.vcap_services.postgres[0]["credentials"]["uri"]
 
     @property
-    def get_temporary_bucket_vcap(self) -> dict:
+    def get_temporary_bucket_vcap(self) -> dict[str, Any]:
         return next((each["credentials"] for each in self.vcap_services.aws_s3_bucket if "temporary" in each["name"]), {})
 
     @property
-    def get_permanent_bucket_vcap(self) -> dict:
+    def get_permanent_bucket_vcap(self) -> dict[str, Any]:
         return next((each["credentials"] for each in self.vcap_services.aws_s3_bucket if "permanent" in each["name"]), {})
 
     @computed_field
     @property
-    def temporary_s3_bucket_configuration(self) -> dict:
+    def temporary_s3_bucket_configuration(self) -> dict[str, str]:
         return {
             "bucket_name": self.get_temporary_bucket_vcap["bucket_name"],
             "access_key_id": self.get_temporary_bucket_vcap["aws_access_key_id"],
@@ -127,7 +127,7 @@ class GovPaasSettings(BaseSettings):
 
     @computed_field
     @property
-    def permanent_s3_bucket_configuration(self) -> dict:
+    def permanent_s3_bucket_configuration(self) -> dict[str, str]:
         return {
             "bucket_name": self.get_permanent_bucket_vcap["bucket_name"],
             "access_key_id": self.get_permanent_bucket_vcap["aws_access_key_id"],
@@ -148,7 +148,7 @@ class DBTPlatformSettings(BaseSettings):
 
     @computed_field
     @property
-    def database_uri(self) -> dict:
+    def database_uri(self) -> dict[str, str]:
         return database_url_from_env("DATABASE_CREDENTIALS")
 
 

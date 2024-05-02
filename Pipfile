@@ -28,6 +28,7 @@ pydantic-settings = "*"
 django-log-formatter-asim = "*"
 boto3 = "*"
 django-staff-sso-client = "~=4.2.2"
+ring = "~=0.10"
 
 [dev-packages]
 black = "~=24.3"
@@ -46,9 +47,10 @@ pytest-playwright = "~=0.4"
 coverage = "*"
 pytest-cov = "*"
 "awscli-local[ver1]" = "~=0.22"
+django-debug-toolbar = "*"
+pyinstrument = "*"
+factory-boy = "*"
+mypy = "~=1.9"
 
 [requires]
 python_version = "3.11"
-
-[scripts]
-wipe_database = "chmod +x wipe_database.sh && ./wipe_database.sh"

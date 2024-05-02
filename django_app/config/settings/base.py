@@ -135,6 +135,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.media",
                 "core.sites.context_processors.sites",
+                "core.context_processors.truncate_words_limit",
             ],
         },
     },
@@ -229,3 +230,5 @@ if ENFORCE_STAFF_SSO:
     LOGIN_REDIRECT_URL = reverse_lazy("view_a_suspected_breach:landing")
 else:
     LOGIN_URL = "/admin/login"
+
+TRUNCATE_WORDS_LIMIT = 30

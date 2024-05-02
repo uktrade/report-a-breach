@@ -1,10 +1,15 @@
+import datetime
 import uuid
+from typing import Any
 
+from core.decorators import cached_classproperty
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.views import BaseWizardView
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.shortcuts import redirect
+from django.forms import Form
+from django.http import HttpRequest, HttpResponse, QueryDict
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.generic import TemplateView
@@ -12,70 +17,19 @@ from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
 from utils.s3 import generate_presigned_url
 
-from .forms import (
-    AboutTheEndUserForm,
-    AboutTheSupplierForm,
-    AreYouReportingABusinessOnCompaniesHouseForm,
-    BusinessOrPersonDetailsForm,
-    DeclarationForm,
-    DoYouKnowTheRegisteredCompanyNumberForm,
-    EmailForm,
-    EmailVerifyForm,
-    EndUserAddedForm,
-    NameAndBusinessYouWorkForForm,
-    NameForm,
-    StartForm,
-    SummaryForm,
-    TellUsAboutTheSuspectedBreachForm,
-    UploadDocumentsForm,
-    WereThereOtherAddressesInTheSupplyChainForm,
-    WhatWereTheGoodsForm,
-    WhenDidYouFirstSuspectForm,
-    WhereIsTheAddressOfTheBusinessOrPersonForm,
-    WhereWereTheGoodsMadeAvailableForm,
-    WhereWereTheGoodsMadeAvailableToForm,
-    WhereWereTheGoodsSuppliedFromForm,
-    WhereWereTheGoodsSuppliedToForm,
-    WhichSanctionsRegimeForm,
-)
 from .models import Breach, ReporterEmailVerification
+from .tasklist import (
+    AboutThePersonOrBusinessTask,
+    OverviewOfTheSuspectedBreachTask,
+    SanctionsBreachDetailsTask,
+    SummaryAndDeclaration,
+    TheSupplyChainTask,
+    YourDetailsTask,
+    get_tasklist,
+)
 
 
 class ReportABreachWizardView(BaseWizardView):
-    form_list = [
-        ("start", StartForm),
-        ("email", EmailForm),
-        ("verify", EmailVerifyForm),
-        ("name", NameForm),
-        ("name_and_business_you_work_for", NameAndBusinessYouWorkForForm),
-        (
-            "are_you_reporting_a_business_on_companies_house",
-            AreYouReportingABusinessOnCompaniesHouseForm,
-        ),
-        ("do_you_know_the_registered_company_number", DoYouKnowTheRegisteredCompanyNumberForm),
-        ("check_company_details", SummaryForm),
-        (
-            "where_is_the_address_of_the_business_or_person",
-            WhereIsTheAddressOfTheBusinessOrPersonForm,
-        ),
-        ("business_or_person_details", BusinessOrPersonDetailsForm),
-        ("when_did_you_first_suspect", WhenDidYouFirstSuspectForm),
-        ("which_sanctions_regime", WhichSanctionsRegimeForm),
-        ("what_were_the_goods", WhatWereTheGoodsForm),
-        ("where_were_the_goods_supplied_from", WhereWereTheGoodsSuppliedFromForm),
-        ("about_the_supplier", AboutTheSupplierForm),
-        ("where_were_the_goods_made_available_from", WhereWereTheGoodsMadeAvailableForm),
-        ("where_were_the_goods_supplied_to", WhereWereTheGoodsSuppliedToForm),
-        ("where_were_the_goods_made_available_to", WhereWereTheGoodsMadeAvailableToForm),
-        ("about_the_end_user", AboutTheEndUserForm),
-        ("end_user_added", EndUserAddedForm),
-        ("were_there_other_addresses_in_the_supply_chain", WereThereOtherAddressesInTheSupplyChainForm),
-        ("upload_documents", UploadDocumentsForm),
-        ("tell_us_about_the_suspected_breach", TellUsAboutTheSuspectedBreachForm),
-        ("summary", SummaryForm),
-        ("declaration", DeclarationForm),
-    ]
-
     template_names_lookup = {
         "summary": "report_a_suspected_breach/form_steps/summary.html",
         "check_company_details": "report_a_suspected_breach/form_steps/check_company_details.html",
@@ -84,10 +38,34 @@ class ReportABreachWizardView(BaseWizardView):
     }
     template_name = "report_a_suspected_breach/generic_form_step.html"
     storage_name = "report_a_suspected_breach.session.SessionStorage"
-
     file_storage = TemporaryDocumentStorage()
 
-    def get(self, request, *args, **kwargs):
+    @cached_classproperty
+    def form_list(cls) -> list[tuple[Any, Any]]:
+        task_list = (
+            YourDetailsTask,
+            AboutThePersonOrBusinessTask,
+            OverviewOfTheSuspectedBreachTask,
+            TheSupplyChainTask,
+            SanctionsBreachDetailsTask,
+            SummaryAndDeclaration,
+        )
+        unpacked = []
+        for task in task_list:
+            for step_name, step_form in task.form_steps.items():
+                unpacked.append((step_name, step_form))
+
+        return unpacked
+
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+        if "reset" in self.request.GET:
+            for step_name, _ in self.form_list.items():
+                # clearing the lru_cache for get_cleaned_data_for_step
+                if self.get_cleaned_data_for_step.has(step_name):
+                    self.get_cleaned_data_for_step.delete(step_name)
+            self.storage.reset()
+            self.storage.current_step = self.steps.first
+
         if request.resolver_match.url_name == "about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
@@ -109,9 +87,27 @@ class ReportABreachWizardView(BaseWizardView):
         if request.resolver_match.url_name == "where_were_the_goods_made_available_to":
             self.storage.current_step = "where_were_the_goods_made_available_to"
             return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
+
+        # before we initialise the tasklit, we need to make sure the current_step is correct
+        if step_url := kwargs.get("step", None):
+            if step_url in self.get_form_list():
+                self.storage.current_step = step_url
+
+        # check if the user has completed a task, if so, redirect them to the tasklist
+        # the exception to this is if the user wants to explicitly start the next task, in which case we should let them
+        # or, if they're trying to change their answers from the summary page
+        self.tasklist = get_tasklist(self)
+        if (
+            not request.GET.get("start", "") == "true"
+            and not request.session.get("redirect") == "summary"
+            and not request.GET.get("redirect", "") == "summary"
+            and self.tasklist.should_show_task_list_page()
+        ):
+            return render(request, "report_a_suspected_breach/tasklist.html", context={"tasklist": self.tasklist, "view": self})
+
         return super().get(request, *args, **kwargs)
 
-    def get_step_url(self, step):
+    def get_step_url(self, step: str) -> str:
         if step == "about_the_end_user" and "end_user_uuid" in self.kwargs:
             return reverse(
                 "report_a_suspected_breach:about_the_end_user",
@@ -131,7 +127,7 @@ class ReportABreachWizardView(BaseWizardView):
             )
         return super().get_step_url(step)
 
-    def render_next_step(self, form, **kwargs):
+    def render_next_step(self, form: Form, **kwargs: object) -> HttpResponse:
         if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
             default_path = "where_were_the_goods_supplied_to"
             if self.request.session.get("made_available_journey"):
@@ -150,7 +146,7 @@ class ReportABreachWizardView(BaseWizardView):
                 return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
         return super().render_next_step(form, **kwargs)
 
-    def get_summary_context_data(self, form, context):
+    def get_summary_context_data(self, form: Form, context: dict[str, Any]) -> dict[str, Any]:
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
         that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
@@ -185,7 +181,7 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
-    def process_are_you_reporting_a_business_on_companies_house_step(self, form):
+    def process_are_you_reporting_a_business_on_companies_house_step(self, form: Form) -> QueryDict:
         """We want to clear the company details from the session if the user selects anything but 'yes', if they do
         select 'yes' then we want to delete the step data for the next step(s) in the chain of conditionals."""
         if form.cleaned_data["business_registered_on_companies_house"] != "yes":
@@ -196,7 +192,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
-    def process_about_the_end_user_step(self, form):
+    def process_about_the_end_user_step(self, form: Form) -> QueryDict:
         current_end_users = self.request.session.get("end_users", {})
 
         end_user_uuid = self.kwargs.get("end_user_uuid", str(uuid.uuid4()))
@@ -210,7 +206,7 @@ class ReportABreachWizardView(BaseWizardView):
         self.request.session.modified = True
         return self.get_form_step_data(form)
 
-    def process_do_you_know_the_registered_company_number_step(self, form):
+    def process_do_you_know_the_registered_company_number_step(self, form: Form) -> QueryDict:
         self.request.session.pop("company_details", None)
         self.request.session.modified = True
 
@@ -219,7 +215,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
-    def process_email_step(self, form):
+    def process_email_step(self, form: Form) -> QueryDict:
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         verify_code = get_random_string(6, allowed_chars="0123456789")
         user_session = Session.objects.get(session_key=self.request.session.session_key)
@@ -235,29 +231,14 @@ class ReportABreachWizardView(BaseWizardView):
         )
         return self.get_form_step_data(form)
 
-    def get_form(self, step=None, data=None, files=None):
-        if step is None:
-            step = self.steps.current
-        # we are overriding this method, so we call self.form_list rather than self.get_form_list(). The latter will
-        # apply the conditional logic to the form list, which we don't want to do here.
-        form_class = self.form_list[step]
-        # prepare the kwargs for the form instance.
-        kwargs = self.get_form_kwargs(step)
-        kwargs.update(
-            {
-                "data": data,
-                "files": files,
-                "prefix": self.get_form_prefix(step, form_class),
-                "initial": self.get_form_initial(step),
-            }
-        )
-        if data:
-            if uploaded_file_name := kwargs["data"].get("upload_documents-file", None):
-                self.request.session["uploaded_file_name"] = uploaded_file_name
-                self.request.session.modified = True
-        return form_class(**kwargs)
+    def process_upload_documents_form(self, form: Form) -> Any:
+        """Overriding this method to store the file name in the session, so we can use it later."""
+        if form.is_valid():
+            self.request.session["uploaded_file_name"] = form.cleaned_data["file"].name
+            self.request.session.modified = True
+        return super().process_step(form)
 
-    def get_form_kwargs(self, step=None):
+    def get_form_kwargs(self, step: str | None) -> dict[str, Any]:
         kwargs = super().get_form_kwargs(step)
         kwargs["request"] = self.request
 
@@ -322,23 +303,6 @@ class ReportABreachWizardView(BaseWizardView):
 
         return kwargs
 
-    def get_all_cleaned_data(self):
-        """Return a merged dictionary of all step cleaned_data dictionaries with the conditional logic applied.
-
-        e.g. The full name can be entered in 2 different steps depending on the answers to the previous questions,
-        this method will figure out where to get the correct name and return it in the dictionary under 1 unified key.
-        """
-        cleaned_data = {}
-        for form_key in self.get_form_list():
-            if form_key == "about_the_end_user" or form_key == "end_user_added":
-                continue
-            form_obj = self.get_form(
-                step=form_key, data=self.storage.get_step_data(form_key), files=self.storage.get_step_files(form_key)
-            )
-            if form_obj.is_valid():
-                cleaned_data[form_key] = form_obj.cleaned_data
-        return cleaned_data
-
     def store_documents_in_s3(self) -> None:
         """
         Copies documents from the default temporary storage to permanent storage on s3
@@ -360,7 +324,7 @@ class ReportABreachWizardView(BaseWizardView):
                 # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
                 pass
 
-    def done(self, form_list, **kwargs):
+    def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         """all_cleaned_data = self.get_all_cleaned_data()
         new_breach = Breach.objects.create(
             reporter_professional_relationship=all_cleaned_data["reporter_professional_relationship"],
@@ -381,7 +345,7 @@ class ReportABreachWizardView(BaseWizardView):
         new_breach.save()
         reference_id = str(new_breach.id).split("-")[0].upper()"""
         self.store_documents_in_s3()
-        new_breach = Breach.objects.create()
+        new_breach = Breach.objects.create(when_did_you_first_suspect=datetime.datetime.now())
         new_reference = new_breach.assign_reference()
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)

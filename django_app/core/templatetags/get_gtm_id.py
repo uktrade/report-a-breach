@@ -5,5 +5,5 @@ register = template.Library()
 
 
 @register.simple_tag
-def get_gtm_id():
+def get_gtm_id() -> str:
     return settings.GTM_ID

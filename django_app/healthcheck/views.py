@@ -1,5 +1,6 @@
 import time
 
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
 from healthcheck.checks import db_check, s3_check
@@ -11,7 +12,7 @@ class HealthCheckView(View):
     Returns an XML file containing the response time and the results of these checks, used by Pingdom to monitor
     the health of the service."""
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         start = time.time()
         is_db_good = db_check()
         is_s3_good = s3_check()

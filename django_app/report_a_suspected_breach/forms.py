@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Any
 
 from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
@@ -21,7 +22,9 @@ from utils.companies_house import (
     get_formatted_address,
 )
 
+from .choices import IsTheDateAccurateChoices
 from .exceptions import CompaniesHouseException
+from .fields import DateInputField
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 
 # TODO: check the wording of any error messages to match what the UCD team expect
@@ -34,13 +37,18 @@ class StartForm(BaseModelForm):
     class Meta:
         model = Breach
         fields = ["reporter_professional_relationship"]
+        error_messages = {
+            "reporter_professional_relationship": {
+                "required": "Select your professional relationship with the business or person suspected of breaching sanctions"
+            }
+        }
         widgets = {"reporter_professional_relationship": forms.RadioSelect}
         labels = {
             "reporter_professional_relationship": "What is your professional relationship with "
             "the business or person suspected of breaching sanctions?",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["reporter_professional_relationship"].choices.pop(0)
 
@@ -55,19 +63,28 @@ class EmailForm(BaseModelForm):
         labels = {
             "reporter_email_address": "What is your email address?",
         }
+        error_messages = {
+            "reporter_email_address": {
+                "required": "Enter your email address",
+                "invalid": "Enter an email in the correct format, for example name@example.com",
+            },
+        }
 
 
 class EmailVerifyForm(BaseForm):
     bold_labels = False
     form_h1_header = "We've sent you an email"
+    revalidate_on_done = False
 
     email_verification_code = forms.CharField(
         label="Enter the 6 digit security code",
         error_messages={"required": "Enter the 6 digit security code we sent to your email"},
     )
 
-    def clean_email_verification_code(self):
+    def clean_email_verification_code(self) -> str:
         email_verification_code = self.cleaned_data["email_verification_code"]
+        email_verification_code = email_verification_code.replace(" ", "")
+
         verify_timeout_seconds = settings.EMAIL_VERIFY_TIMEOUT_SECONDS
         verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
@@ -91,6 +108,9 @@ class NameForm(BaseModelForm):
         labels = {
             "reporter_full_name": "What is your full name?",
         }
+        error_messages = {
+            "reporter_full_name": {"required": "Enter your full name"},
+        }
 
 
 class NameAndBusinessYouWorkForForm(BaseModelForm):
@@ -106,8 +126,12 @@ class NameAndBusinessYouWorkForForm(BaseModelForm):
         help_texts = {
             "reporter_name_of_business_you_work_for": "This is the business that employs you, not the business you're reporting",
         }
+        error_messages = {
+            "reporter_full_name": {"required": "Enter your full name"},
+            "reporter_name_of_business_you_work_for": {"required": "Enter the name of the business you work for"},
+        }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper.label_size = None
         self.helper.layout = Layout(
@@ -124,8 +148,13 @@ class AreYouReportingABusinessOnCompaniesHouseForm(BaseModelForm):
         labels = {
             "business_registered_on_companies_house": "Are you reporting a business which is registered with UK Companies House?"
         }
+        error_messages = {
+            "business_registered_on_companies_house": {
+                "required": "Select yes if you are reporting a business which is registered with UK Companies House"
+            }
+        }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["business_registered_on_companies_house"].choices.pop(0)
 
@@ -144,8 +173,16 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             "do_you_know_the_registered_company_number": "Do you know the registered company number?",
             "registered_company_number": "Registered company number",
         }
+        error_messages = {
+            "do_you_know_the_registered_company_number": {"required": "Select yes if you know the registered company number"},
+            "registered_company_number": {
+                "required": "Enter the registered company number",
+                "invalid": "Number not recognised with Companies House. Enter the correct registered company number. "
+                "This is usually an 8-digit number.",
+            },
+        }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
         # todo - abstract the following logic to apply to all ConditionalRadios forms
@@ -164,14 +201,21 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             )
         )
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
 
         do_you_know_the_registered_company_number = cleaned_data.get("do_you_know_the_registered_company_number")
         registered_company_number = cleaned_data.get("registered_company_number")
         if do_you_know_the_registered_company_number == "yes":
             if not registered_company_number:
-                self.add_error("registered_company_number", "Enter the company number")
+                self.add_error(
+                    "registered_company_number",
+                    forms.ValidationError(
+                        code="required", message=self.Meta.error_messages["registered_company_number"]["required"]
+                    ),
+                )
+                # we don't need to continue if the company number is missing
+                return cleaned_data
 
             # now we need to get the company details from Companies House
             # and store them in the form. First we check the request session to see if
@@ -188,7 +232,12 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 cleaned_data["registered_company_name"] = company_details["company_name"]
                 cleaned_data["registered_office_address"] = get_formatted_address(company_details["registered_office_address"])
             except CompaniesHouseException:
-                self.add_error("registered_company_number", "The company number you entered is not valid")
+                self.add_error(
+                    "registered_company_number",
+                    forms.ValidationError(
+                        code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
+                    ),
+                )
 
         return cleaned_data
 
@@ -201,6 +250,10 @@ class WhereIsTheAddressOfTheBusinessOrPersonForm(BaseForm):
             ("outside_the_uk", "Outside the UK"),
         ),
         widget=forms.RadioSelect,
+        error_messages={
+            "required": "Select if the address of the business or person suspected of "
+            "breaching sanctions is in the UK, or outside the UK"
+        },
     )
 
 
@@ -222,7 +275,7 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
             "postal_code",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper.layout = Layout(
             Fieldset(
@@ -267,20 +320,67 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
     form_h1_header = "Date you first suspected the business or person had breached trade sanctions"
     bold_labels = False
 
+    when_did_you_first_suspect = DateInputField(
+        label="",
+        help_text="For example, 17 06 2024",
+        required=False,
+        require_all_fields=True,
+        error_messages={
+            "incomplete": "Enter a full date including day, month and year",
+            "invalid": "The date you first suspected the breach must be a real date",
+        },
+    )
+
     class Meta:
         model = Breach
-        fields = [
-            "when_did_you_first_suspect",
-        ]
+        fields = ["when_did_you_first_suspect", "is_the_date_accurate"]
         widgets = {
-            "when_did_you_first_suspect": forms.TextInput,
+            "is_the_date_accurate": forms.RadioSelect,
         }
-        help_texts = {
-            "when_did_you_first_suspect": "For example, 17 06 2024",
+        error_messages = {
+            "is_the_date_accurate": {"required": "Select whether you know the exact date, or the approximate date"},
         }
         labels = {
-            "when_did_you_first_suspect": "Enter the exact date or an approximate date",
+            "is_the_date_accurate": "Is the date you entered exact or approximate?",
         }
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper.label_size = None
+        self.helper.layout = Layout(
+            Fieldset(
+                Field("when_did_you_first_suspect", field_width=Fluid.ONE_HALF),
+                legend="Enter the exact date or an approximate date",
+                legend_size=Size.MEDIUM,
+                legend_tag="h2",
+            ),
+            Field.radios("is_the_date_accurate", legend_size=Size.MEDIUM, legend_tag="h2", inline=False),
+        )
+        self.fields["is_the_date_accurate"].choices.pop(0)
+
+    def clean(self) -> dict[str, str]:
+        cleaned_data = super().clean()
+        if is_the_date_accurate := cleaned_data.get("is_the_date_accurate"):
+            when_did_you_first_suspected = cleaned_data.get("when_did_you_first_suspect")
+            if not self["when_did_you_first_suspect"].errors:
+                # if the date has been entered but just isn't valid, we don't want to show the 'required' error.
+                # invalid dates are not part of cleaned_data, so we can't see them here
+
+                if is_the_date_accurate == IsTheDateAccurateChoices.exact and not when_did_you_first_suspected:
+                    self.add_error("when_did_you_first_suspect", "Enter the exact date")
+                    return cleaned_data
+                elif is_the_date_accurate == IsTheDateAccurateChoices.approximate and not when_did_you_first_suspected:
+                    self.add_error("when_did_you_first_suspect", "Enter the approximate date")
+                    return cleaned_data
+
+        return cleaned_data
+
+    def clean_when_did_you_first_suspect(self) -> str | None:
+        when_did_you_first_suspect = self.cleaned_data["when_did_you_first_suspect"]
+        if when_did_you_first_suspect:
+            if when_did_you_first_suspect >= now().date():
+                raise forms.ValidationError("The date you first suspected the breach must be in the past")
+        return when_did_you_first_suspect
 
 
 class WhichSanctionsRegimeForm(BaseForm):
@@ -290,9 +390,12 @@ class WhichSanctionsRegimeForm(BaseForm):
         choices=(()),
         required=True,
         label="Select all that apply",
+        error_messages={
+            "required": "Select the sanctions regime you suspect has been breached",
+        },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         checkbox_choices = []
         for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
@@ -318,8 +421,13 @@ class WhatWereTheGoodsForm(BaseModelForm):
         help_texts = {
             "what_were_the_goods": "Give a short description. For example: accountancy services",
         }
+        error_messages = {
+            "what_were_the_goods": {
+                "required": "Enter a short description of the goods, services, technological assistance or technology"
+            },
+        }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["what_were_the_goods"].widget.attrs = {"rows": 5}
 
@@ -333,12 +441,16 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
     where_were_the_goods_supplied_from = forms.ChoiceField(
         choices=(()),
         widget=forms.RadioSelect,
+        error_messages={
+            "required": "Select if the goods, services, technological assistance"
+            " or technology were supplied from the UK, or from outside the UK"
+        },
     )
 
-    def __init__(self, *args, address_string, **kwargs):
+    def __init__(self, *args: object, address_string: str | None, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
-        if address_string:
+        if address_string is not None:
             address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
@@ -355,9 +467,13 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         choices=(()),
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology made available from?",
+        error_messages={
+            "required": "Select if the goods, services, technological assistance or "
+            "technology were made available from the UK, or from outside the UK"
+        },
     )
 
-    def __init__(self, address_string=None, *args, **kwargs):
+    def __init__(self, address_string: str | None, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string is not None:
@@ -381,9 +497,13 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology supplied to?",
         help_text="This is the address of the end-user",
+        error_messages={
+            "required": "Select if the goods, services, technology or technical"
+            " assistance were supplied to the UK, or to outside the UK"
+        },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
@@ -400,9 +520,13 @@ class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology made available to?",
         help_text="This is the address of the end-user",
+        error_messages={
+            "required": "Select if the goods, services, technology or technical "
+            "assistance were made available to the UK, or to outside the UK"
+        },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes":
             # the user is trying to add another end-user, let's pop the "I do not know" option
@@ -414,15 +538,17 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
     labels = {
         "name_of_person": "Name of person",
         "name_of_business": "Name of business",
-        "email": "Email address",
     }
     help_texts = {
         "name_of_business": "If the end-user is a ship, enter the ship's name",
     }
+    revalidate_on_done = False
 
     name_of_person = forms.CharField()
     name_of_business = forms.CharField()
-    email = forms.CharField()
+    email = forms.EmailField(
+        error_messages={"invalid": "Enter an email address in the correct format, like name@example.com"}, label="Email address"
+    )
     additional_contact_details = forms.CharField(
         widget=forms.Textarea,
         label="Additional contact details",
@@ -443,18 +569,20 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
         )
         widgets = BasePersonBusinessDetailsForm.Meta.widgets
         labels = BasePersonBusinessDetailsForm.Meta.labels
+        error_messages = BasePersonBusinessDetailsForm.Meta.error_messages
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
+
+        # all fields on this form are optional. Except if it's a non-UK user, then we need the country at least
+        for _, field in self.fields.items():
+            field.required = False
 
         if not self.is_uk_address:
             self.fields["additional_contact_details"].help_text = (
                 "This could be a phone number, or details of a jurisdiction instead of a country"
             )
-
-        # all fields on this form are optional
-        for _, field in self.fields.items():
-            field.required = False
+            self.fields["country"].required = True
 
         self.helper.layout = Layout(
             Fieldset(
@@ -482,20 +610,15 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
             Field.textarea("additional_contact_details", field_width=Fluid.FULL, label_tag="h2", label_size=Size.MEDIUM),
         )
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
 
-    def is_valid(self):
-        # todo - we need to set this as True always for now, as the form really only gets validated
-        #  with a corresponding end_user_uuid, so we can't validate it here
-        #  we need to override render_done() in the WizardView so the resulting form_list
-        #  contains all instances of this form for each end_user
-        return super().is_valid() or True
-
 
 class EndUserAddedForm(BaseForm):
+    revalidate_on_done = False
+
     do_you_want_to_add_another_end_user = BooleanChoiceField(
         choices=(
             Choice(True, "Yes"),
@@ -503,19 +626,14 @@ class EndUserAddedForm(BaseForm):
         ),
         widget=forms.RadioSelect,
         label="Do you want to add another end-user?",
+        error_messages={"required": "Select yes if you want to add another end-user"},
+        required=True,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper.legend_size = Size.MEDIUM
         self.helper.legend_tag = None
-
-    def is_valid(self):
-        # todo - we need to set this as True always for now, as the form really only gets validated
-        #  with a corresponding end_user_uuid, so we can't validate it here
-        #  we need to override render_done() in the WizardView so the resulting form_list
-        #  contains all instances of this form for each end_user
-        return super().is_valid() or True
 
 
 class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
@@ -528,8 +646,14 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
             "were_there_other_addresses_in_the_supply_chain": "Were there any other addresses in the supply chain?",
             "other_addresses_in_the_supply_chain": "Give all addresses",
         }
+        error_messages = {
+            "were_there_other_addresses_in_the_supply_chain": {
+                "required": "Select yes if there were any other addresses in the supply chain"
+            },
+            "other_addresses_in_the_supply_chain": {"required": "Enter other addresses in the supply chain"},
+        }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.fields["were_there_other_addresses_in_the_supply_chain"].empty_label = None
         # todo - abstract the following logic to apply to all ConditionalRadios forms
@@ -549,13 +673,15 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
             )
         )
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         if (
-            cleaned_data["were_there_other_addresses_in_the_supply_chain"] == "yes"
+            cleaned_data.get("were_there_other_addresses_in_the_supply_chain") == "yes"
             and not cleaned_data["other_addresses_in_the_supply_chain"]
         ):
-            self.add_error("other_addresses_in_the_supply_chain", "required")
+            self.add_error(
+                "other_addresses_in_the_supply_chain", self.Meta.error_messages["other_addresses_in_the_supply_chain"]["required"]
+            )
         return cleaned_data
 
 
@@ -588,6 +714,9 @@ class TellUsAboutTheSuspectedBreachForm(BaseModelForm):
             "uploaded. You could add specific details, such as any "
             "licence numbers or shipping numbers.",
         }
+        error_messages = {
+            "tell_us_about_the_suspected_breach": {"required": "Enter a summary of the breach"},
+        }
 
 
 class SummaryForm(BaseForm):
@@ -595,4 +724,6 @@ class SummaryForm(BaseForm):
 
 
 class DeclarationForm(BaseForm):
-    declaration = forms.BooleanField(label="I agree and accept", required=True)
+    declaration = forms.BooleanField(
+        label="I agree and accept", required=True, error_messages={"required": "Confirm if you agree and accept the declaration"}
+    )
