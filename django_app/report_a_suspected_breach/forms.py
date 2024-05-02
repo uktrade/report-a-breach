@@ -342,6 +342,9 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
         error_messages = {
             "is_the_date_accurate": {"required": "Select whether you know the exact date, or the approximate date"},
         }
+        labels = {
+            "is_the_date_accurate": "Is the date you entered exact or approximate?",
+        }
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -349,7 +352,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
         self.helper.layout = Layout(
             Fieldset(
                 Field("when_did_you_first_suspect", field_width=Fluid.ONE_HALF),
-                legend="Is the date you entered exact or approximate?",
+                legend="Enter the exact date or an approximate date",
                 legend_size=Size.MEDIUM,
                 legend_tag="h2",
             ),
