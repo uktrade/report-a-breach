@@ -1,0 +1,25 @@
+{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+{% load get_wizard_step_url %}
+
+{% block form_content %}
+    <h1 class="govuk-heading-l">
+        Request a new code
+    </h1>
+    <p class="govuk-body">Emails may take a few minutes to arrive. Check your junk folder. <br>
+        If you still do not receive the email, you can request a new one.</p>
+    <button type="submit" name="wizard_goto_step" class="govuk-button" data-module="govuk-button">
+        Request a new code
+    </button>
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                Still having issues?
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            If you're still having problems, contact <a class="govuk-link" href="mailto:DBT-OTSI@businessandtrade.gov.uk">DBT-OTSI@businessandtrade.gov.uk</a>
+        </div>
+    </details>
+
+{% endblock form_content %}

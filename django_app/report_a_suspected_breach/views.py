@@ -6,18 +6,18 @@ from core.decorators import cached_classproperty
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.views import BaseWizardView
 from django.conf import settings
-from django.contrib.sessions.models import Session
 from django.forms import Form
 from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect, render
-from django.urls import reverse
-from django.utils.crypto import get_random_string
+from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
 from utils.companies_house import get_formatted_address
-from utils.notifier import send_email
+from utils.notifier import verify_email
 from utils.s3 import generate_presigned_url
 
-from .models import Breach, ReporterEmailVerification
+from .forms import SummaryForm
+from .models import Breach
 from .tasklist import (
     AboutThePersonOrBusinessTask,
     OverviewOfTheSuspectedBreachTask,
@@ -217,18 +217,7 @@ class ReportABreachWizardView(BaseWizardView):
 
     def process_email_step(self, form: Form) -> QueryDict:
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
-        verify_code = get_random_string(6, allowed_chars="0123456789")
-        user_session = Session.objects.get(session_key=self.request.session.session_key)
-        ReporterEmailVerification.objects.create(
-            reporter_session=user_session,
-            email_verification_code=verify_code,
-        )
-        print(verify_code)
-        send_email(
-            email=reporter_email_address,
-            context={"verification_code": verify_code},
-            template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
-        )
+        verify_email(reporter_email_address, self.request)
         return self.get_form_step_data(form)
 
     def process_upload_documents_form(self, form: Form) -> Any:
@@ -358,3 +347,14 @@ class ReportABreachWizardView(BaseWizardView):
 
 class CompleteView(TemplateView):
     template_name = "report_a_suspected_breach/complete.html"
+
+
+class RequestVerifyCode(FormView):
+    form_class = SummaryForm
+    template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
+    success_url = reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "verify"})
+
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        reporter_email_address = self.request.session.get("reporter_email_address")
+        verify_email(reporter_email_address, self.request)
+        return super().post(*args, **kwargs)

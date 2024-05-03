@@ -5,6 +5,7 @@ from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.layout import (
+    HTML,
     ConditionalQuestion,
     ConditionalRadios,
     Field,
@@ -15,6 +16,7 @@ from crispy_forms_gds.layout import (
 )
 from django import forms
 from django.conf import settings
+from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from utils.companies_house import (
@@ -99,6 +101,19 @@ class EmailVerifyForm(BaseForm):
             raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
 
         return email_verification_code
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        request_verify_code = reverse_lazy("report_a_suspected_breach:request_verify_code")
+        self.helper["email_verification_code"].wrap(
+            Field,
+            HTML(
+                f"""<p class=govuk-body>
+                <a class=govuk-link href={request_verify_code}>
+                Not received an email or code not working?
+                </a></p>"""
+            ),
+        )
 
 
 class NameForm(BaseModelForm):
