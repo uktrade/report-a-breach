@@ -688,15 +688,15 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
 
 
 class CookiesConsentForm(BaseForm):
-    do_you_want_to_accept_analytics_cookies = forms.ChoiceField(
+    do_you_want_to_accept_analytics_cookies = forms.TypedChoiceField(
         choices=(
             Choice(True, "Yes"),
             Choice(False, "No"),
         ),
+        coerce=lambda x: x == "True",
         widget=forms.RadioSelect,
         label="Do you want to accept analytics cookies",
         required=True,
-        initial=None,
     )
 
     def __init__(self, *args: object, **kwargs: object) -> None:
@@ -706,16 +706,6 @@ class CookiesConsentForm(BaseForm):
         self.helper.layout = Layout(
             Field.radios("do_you_want_to_accept_analytics_cookies", legend_size=Size.MEDIUM, legend_tag="h2", inline=False)
         )
-
-    def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
-        cleaned_data_choice = cleaned_data.get("do_you_want_to_accept_analytics_cookies")
-        if cleaned_data_choice not in ["True", "False"]:
-            self.add_error("do_you_want_to_accept_analytics_cookies", "")
-        if cleaned_data_choice is not None:
-            boolean_value = BooleanChoiceField.to_python(cleaned_data_choice)
-            cleaned_data["do_you_want_to_accept_analytics_cookies"] = boolean_value
-        return cleaned_data
 
 
 class UploadDocumentsForm(BaseForm):
