@@ -429,13 +429,10 @@ class ReportABreachWizardView(BaseWizardView):
 
             # Save Documents to S3 Permanent Bucket
             self.store_documents_in_s3()
-
-            self.request.session.pop("end_users", None)
-            self.request.session.pop("made_available_journey", None)
-            self.request.session.modified = True
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
+
         return redirect(reverse("report_a_suspected_breach:complete"))
 
 
