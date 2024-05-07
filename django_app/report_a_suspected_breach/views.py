@@ -17,11 +17,9 @@ from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
 from utils.s3 import generate_presigned_url
 
-
-from .forms import CookiesConsentForm
 from .choices import TypeOfRelationshipChoices
+from .forms import CookiesConsentForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
-
 from .tasklist import (
     AboutThePersonOrBusinessTask,
     OverviewOfTheSuspectedBreachTask,
