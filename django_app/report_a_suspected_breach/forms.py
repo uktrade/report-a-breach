@@ -706,6 +706,8 @@ class CookiesConsentForm(BaseForm):
         self.helper.layout = Layout(
             Field.radios("do_you_want_to_accept_analytics_cookies", legend_size=Size.MEDIUM, legend_tag="h2", inline=False)
         )
+        if cookies_choice := kwargs.get("initial", None).get("accept_cookies"):
+            self.fields["do_you_want_to_accept_analytics_cookies"].initial = cookies_choice
 
 
 class UploadDocumentsForm(BaseForm):

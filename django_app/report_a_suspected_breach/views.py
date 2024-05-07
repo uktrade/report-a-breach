@@ -441,38 +441,31 @@ class CookiesConsentView(FormView):
     template_name = "report_a_suspected_breach/cookies_consent.html"
     form_class = CookiesConsentForm
 
-    def get_form_kwargs(self) -> HttpResponse:
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
         initial_dict = {}
 
         if current_cookies_policy := self.request.COOKIES.get("accepted_ga_cookies"):
             initial_dict["accept_cookies"] = current_cookies_policy == "true"
+            kwargs["initial"] = initial_dict
 
-            return render(
-                self.request,
-                "report_a_suspected_breach/cookies_consent.html",
-                context={"form": CookiesConsentForm(initial=initial_dict)},
-            )
-
-        return super().get_form_kwargs()
+        return kwargs
 
     def form_valid(self, form: CookiesConsentForm) -> HttpResponse:
-        if form.is_valid():
-            # cookie consent lasts for 1 year
-            cookie_max_age = 365 * 24 * 60 * 60
+        # cookie consent lasts for 1 year
+        cookie_max_age = 365 * 24 * 60 * 60
 
-            referrer_url = self.request.GET.get("referrer_url", "/")
-            response = redirect(referrer_url)
+        referrer_url = self.request.GET.get("referrer_url", "/")
+        response = redirect(referrer_url)
 
-            # regardless of their choice, we set a cookie to say they've made a choice
-            response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
-            response.set_cookie(
-                "accepted_ga_cookies",
-                "true" if form.cleaned_data["do_you_want_to_accept_analytics_cookies"] else "false",
-                max_age=cookie_max_age,
-            )
-            return response
-        else:
-            return render(self.request, "report_a_suspected_breach/cookies_consent.html", context={"form": form})
+        # regardless of their choice, we set a cookie to say they've made a choice
+        response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
+        response.set_cookie(
+            "accepted_ga_cookies",
+            "true" if form.cleaned_data["do_you_want_to_accept_analytics_cookies"] else "false",
+            max_age=cookie_max_age,
+        )
+        return response
 
 
 class CompleteView(TemplateView):
