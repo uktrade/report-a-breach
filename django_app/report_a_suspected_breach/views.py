@@ -218,6 +218,9 @@ class ReportABreachWizardView(BaseWizardView):
 
     def process_email_step(self, form: Form) -> QueryDict:
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
+        self.request.session["reporter_email_address"] = reporter_email_address
+        self.request.session.modified = True
+
         verify_email(reporter_email_address, self.request)
         return self.get_form_step_data(form)
 
@@ -434,7 +437,7 @@ class RequestVerifyCodeView(FormView):
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
     success_url = reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "verify"})
 
-    def post(self, *args: object, **kwargs: object) -> HttpResponse:
+    def form_valid(self, form: SummaryForm) -> HttpResponse:
         reporter_email_address = self.request.session.get("reporter_email_address")
         verify_email(reporter_email_address, self.request)
-        return HttpResponse()
+        return super().form_valid(form)

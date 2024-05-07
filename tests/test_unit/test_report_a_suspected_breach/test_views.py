@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.test import RequestFactory
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import (
@@ -112,7 +112,7 @@ class TestReportABreachWizardView:
 class TestRequestVerifyCodeView:
 
     @patch("utils.notifier.send_email")
-    def test_post(self, send_email_patch, rasb_client):
+    def test_form_valid(self, send_email_mock, rasb_client):
         request_object = RequestFactory().get("/")
 
         request_object.session = rasb_client.session
@@ -122,12 +122,18 @@ class TestRequestVerifyCodeView:
         session.save()
         view = RequestVerifyCodeView()
         view.setup(request_object)
-        response = view.post(request_object)
+        response = view.form_valid(request_object)
         email_verifications = ReporterEmailVerification.objects.all()
         assert len(email_verifications) == 1
         assert str(email_verifications[0].reporter_session) == request_object.session.session_key
 
-        expected_response = HttpResponse(status=200, content_type="text/html; charset=utf-8")
-        send_email_patch.assert_called_once()
-        assert response.status_code == expected_response.status_code
-        assert response["content-type"] == expected_response["content-type"]
+        assert send_email_mock.call_count == 1
+
+        # Assert returns redirect
+        redirect = HttpResponseRedirect(
+            status=302, content_type="text/html; charset=utf-8", redirect_to="/report_a_suspected_breach/verify/"
+        )
+
+        assert response.status_code == redirect.status_code
+        assert response["content-type"] == redirect["content-type"]
+        assert response.url == redirect.url
