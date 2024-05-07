@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <div class="govuk-button-group">
-                                <form method="post" action="/report_a_suspected_breach/cookies_consent">
+                                <form method="post" action="{% url 'report_a_suspected_breach:cookies_consent' %}">
                                     {% csrf_token %}
                                     <button type="submit" class="govuk-button" data-module="govuk-button" name="do_you_want_to_accept_analytics_cookies" value="True">
                                         Accept analytics cookies
