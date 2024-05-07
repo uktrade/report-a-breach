@@ -429,7 +429,7 @@ class CompleteView(TemplateView):
     template_name = "report_a_suspected_breach/complete.html"
 
 
-class RequestVerifyCode(FormView):
+class RequestVerifyCodeView(FormView):
     form_class = SummaryForm
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
     success_url = reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "verify"})
@@ -437,4 +437,4 @@ class RequestVerifyCode(FormView):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         reporter_email_address = self.request.session.get("reporter_email_address")
         verify_email(reporter_email_address, self.request)
-        return super().post(*args, **kwargs)
+        return HttpResponse()

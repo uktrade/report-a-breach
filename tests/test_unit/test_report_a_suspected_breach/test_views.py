@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.test import RequestFactory
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import (
@@ -10,7 +10,10 @@ from report_a_suspected_breach.models import (
     ReporterEmailVerification,
     SanctionsRegime,
 )
-from report_a_suspected_breach.views import ReportABreachWizardView
+from report_a_suspected_breach.views import (
+    ReportABreachWizardView,
+    RequestVerifyCodeView,
+)
 
 from . import data
 
@@ -25,16 +28,6 @@ class TestReportABreachWizardView:
         )
         request_object = RequestFactory().get("/")
         self.request_object = request_object
-
-    def setup_view(self, view, request, *args, **kwargs):
-        """
-        Mimic ``as_view()``, but returns view instance.
-        """
-
-        view.request = request
-        view.args = args
-        view.kwargs = kwargs
-        return view
 
     @patch("report_a_suspected_breach.form_step_conditions.show_about_the_supplier_page")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.store_documents_in_s3")
@@ -69,7 +62,7 @@ class TestReportABreachWizardView:
         session.save()
 
         # SetUp View
-        self.setup_view(view, rasb_client, request_object)
+        view.setup(request_object)
 
         # Call done method of view
         response = view.done(form_list)
@@ -114,3 +107,27 @@ class TestReportABreachWizardView:
         person_or_company_details = PersonOrCompany.objects.all()
         assert len(person_or_company_details) == 1
         assert person_or_company_details[0].type_of_relationship == relationship
+
+
+class TestRequestVerifyCodeView:
+
+    @patch("utils.notifier.send_email")
+    def test_post(self, send_email_patch, rasb_client):
+        request_object = RequestFactory().get("/")
+
+        request_object.session = rasb_client.session
+        session = rasb_client.session
+        reporter_email_address = "test@testmail.com"
+        session["reporter_email_address"] = reporter_email_address
+        session.save()
+        view = RequestVerifyCodeView()
+        view.setup(request_object)
+        response = view.post(request_object)
+        email_verifications = ReporterEmailVerification.objects.all()
+        assert len(email_verifications) == 1
+        assert str(email_verifications[0].reporter_session) == request_object.session.session_key
+
+        expected_response = HttpResponse(status=200, content_type="text/html; charset=utf-8")
+        send_email_patch.assert_called_once()
+        assert response.status_code == expected_response.status_code
+        assert response["content-type"] == expected_response["content-type"]
