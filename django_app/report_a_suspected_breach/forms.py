@@ -712,7 +712,7 @@ class CookiesConsentForm(BaseForm):
         cleaned_data_choice = cleaned_data.get("do_you_want_to_accept_analytics_cookies")
         if cleaned_data_choice not in ["True", "False"]:
             self.add_error("do_you_want_to_accept_analytics_cookies", "")
-        elif cleaned_data_choice is not None:
+        if cleaned_data_choice is not None:
             boolean_value = BooleanChoiceField.to_python(cleaned_data_choice)
             cleaned_data["do_you_want_to_accept_analytics_cookies"] = boolean_value
         return cleaned_data
