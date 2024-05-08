@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.urls import path
 
 from . import views
@@ -7,8 +6,5 @@ app_name = "view_a_suspected_breach"
 
 urlpatterns = [
     path("", views.ViewABreachView.as_view(), name="landing"),
-    path("admin/", admin.site.urls),
+    path("user_admin/", views.AdminViewABreachView.as_view(), name="user_admin"),
 ]
-
-# admin.site.index_template = "admin/base.html"
-# admin.autodiscover()
