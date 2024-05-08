@@ -443,6 +443,7 @@ class CookiesConsentView(FormView):
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
         initial_dict = {}
 
         if current_cookies_policy := self.request.COOKIES.get("accepted_ga_cookies"):
