@@ -56,5 +56,6 @@ urlpatterns = [
     ),
     re_path(r"(?P<step>.+)/$", report_a_suspected_breach_wizard, name="step"),
     path("complete", views.CompleteView.as_view(), name="complete"),
+    path("email_verify", views.EmailVerifyView.as_view(), name="email_verify"),
     path("request_verify_code", views.RequestVerifyCodeView.as_view(), name="request_verify_code"),
 ]

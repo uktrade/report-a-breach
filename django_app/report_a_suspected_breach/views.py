@@ -17,7 +17,7 @@ from utils.notifier import verify_email
 from utils.s3 import generate_presigned_url
 
 from .choices import TypeOfRelationshipChoices
-from .forms import SummaryForm
+from .forms import EmailVerifyForm, SummaryForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -93,6 +93,9 @@ class ReportABreachWizardView(BaseWizardView):
         if step_url := kwargs.get("step", None):
             if step_url in self.get_form_list():
                 self.storage.current_step = step_url
+
+        if self.storage.current_step == "verify":
+            return redirect(reverse("report_a_suspected_breach:email_verify"))
 
         # check if the user has completed a task, if so, redirect them to the tasklist
         # the exception to this is if the user wants to explicitly start the next task, in which case we should let them
@@ -364,10 +367,9 @@ class ReportABreachWizardView(BaseWizardView):
         registered_company_number = do_you_know_the_registered_company_number_step.get("registered_company_number", "")
 
         with transaction.atomic():
-            reporter_email_verification = ReporterEmailVerification.objects.get(
-                reporter_session_id=self.request.session._get_session_from_db(),
-                email_verification_code=cleaned_data["verify"]["email_verification_code"],
-            )
+            reporter_email_verification = ReporterEmailVerification.objects.filter(
+                reporter_session=self.request.session.session_key
+            ).latest("date_created")
             # Save Breach to Database
             new_breach = Breach.objects.create(
                 reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
@@ -435,9 +437,20 @@ class CompleteView(TemplateView):
 class RequestVerifyCodeView(FormView):
     form_class = SummaryForm
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
-    success_url = reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "verify"})
+    success_url = reverse_lazy("report_a_suspected_breach:email_verify")
 
     def form_valid(self, form: SummaryForm) -> HttpResponse:
         reporter_email_address = self.request.session.get("reporter_email_address")
         verify_email(reporter_email_address, self.request)
         return super().form_valid(form)
+
+
+class EmailVerifyView(FormView):
+    form_class = EmailVerifyForm
+    template_name = "report_a_suspected_breach/form_steps/email_verify.html"
+    success_url = reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name"})
+
+    def get_form_kwargs(self):
+        kwargs = super(EmailVerifyView, self).get_form_kwargs()
+        kwargs.update({"request": self.request})
+        return kwargs

@@ -22,6 +22,10 @@ class Task:
         return set()
 
     @property
+    def non_wizard_steps(self) -> set:
+        return set()
+
+    @property
     def underscored_task_name(self) -> str:
         return self.name.lower().replace(" ", "_")
 
@@ -64,8 +68,8 @@ class Task:
             # don't bother with the rest of the logic
             return True
 
-        # figure out if these missing steps are compulsory or optional
-        compulsory_steps = {*self.wizard_view.get_form_list().keys()} - self.optional_steps
+        # figure out if these missing steps are compulsory or optional or not part of wizard
+        compulsory_steps = {*self.wizard_view.get_form_list().keys()} - self.optional_steps - self.non_wizard_steps
 
         # find the intersection between compulsory_steps and missing_steps. If it exists, the task is not complete
         if compulsory_steps.intersection(missing_steps):
@@ -83,6 +87,7 @@ class YourDetailsTask(Task):
         "name_and_business_you_work_for": forms.NameAndBusinessYouWorkForForm,
     }
     name = "Your details"
+    non_wizard_steps = {"verify"}
 
     @cached_property
     def can_start(self) -> bool:

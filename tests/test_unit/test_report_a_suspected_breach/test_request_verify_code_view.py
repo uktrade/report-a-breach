@@ -28,7 +28,7 @@ class TestRequestVerifyCodeView:
 
         # Assert returns redirect
         redirect = HttpResponseRedirect(
-            status=302, content_type="text/html; charset=utf-8", redirect_to="/report_a_suspected_breach/verify/"
+            status=302, content_type="text/html; charset=utf-8", redirect_to="/report_a_suspected_breach/email_verify"
         )
 
         assert response.status_code == redirect.status_code
