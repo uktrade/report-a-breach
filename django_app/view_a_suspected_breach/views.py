@@ -13,6 +13,18 @@ from .models import Users
 @method_decorator(require_view_a_breach(), name="dispatch")
 class ViewABreachView(TemplateView):
     template_name = "view_a_suspected_breach/landing.html"
+    model = Users
+
+    def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
+        # TODO: need to use sso to determine if the user exists in the DB
+        # If they exist, continue to render, if not display a message telling them they have to be approved
+        #
+        # If approval needed, create the user (if they don't exist)
+        # in the DB with is_pending=True and send email to OTSI admin
+        # self.model.objects.create(create user, set pending)
+        # send email to specified admin
+
+        return super().get(request, **kwargs)
 
 
 @method_decorator(login_required, name="dispatch")
