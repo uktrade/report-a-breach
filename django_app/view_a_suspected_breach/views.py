@@ -1,6 +1,7 @@
 from typing import Any
 
 from core.sites import require_view_a_breach
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.utils.decorators import method_decorator
@@ -16,10 +17,17 @@ class ViewABreachView(TemplateView):
     model = Users
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
+        user_email = settings.mock_sso_email
+        # user_objects = self.model.objects.all()
+
         # TODO: need to use sso to determine if the user exists in the DB
         # If they exist, continue to render, if not display a message telling them they have to be approved
-        #
+        if self.model.objects.filter(email=user_email):
+            # TODO need to check pending status
+            return super().get(request, **kwargs)
+
         # If approval needed, create the user (if they don't exist)
+
         # in the DB with is_pending=True and send email to OTSI admin
         # self.model.objects.create(create user, set pending)
         # send email to specified admin

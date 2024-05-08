@@ -62,6 +62,7 @@ class BaseSettings(PydanticBaseSettings):
     mock_sso_token: str = ""
     mock_sso_scope: str = "read"
     mock_sso_username: str = ""
+    mock_sso_email: str = ""
     mock_sso_email_user_id: str = ""
     oauthlib_insecure_transport: int = 0
 
