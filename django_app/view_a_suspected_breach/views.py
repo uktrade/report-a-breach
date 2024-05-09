@@ -32,7 +32,7 @@ class ViewABreachView(TemplateView):
                         email="",
                         template_id=settings.email_vasb_user_admin_template_id,
                         # TODO: hardcoded for testing
-                        context={"admin_url": "http://view-a-suspected-breach:8000/view_a_suspected_breach/user_admin/"},
+                        context={"admin_url": "view_a_suspected_breach/user_admin/"},
                     )
             return render(request, "view_a_suspected_breach/unauthorised.html")
         else:
