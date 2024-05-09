@@ -1,9 +1,12 @@
 from datetime import timedelta
 from typing import Any
 
+from core.document_storage import TemporaryDocumentStorage
 from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
+from core.utils import get_mime_type
 from crispy_forms_gds.choices import Choice
+from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
     HTML,
     ConditionalQuestion,
@@ -13,22 +16,30 @@ from crispy_forms_gds.layout import (
     Fluid,
     Layout,
     Size,
+    Submit,
 )
 from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.timezone import now
-from django_chunk_upload_handlers.clam_av import validate_virus_check_result
+from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
 from utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
 )
+from utils.s3 import get_all_session_files
 
 from .choices import IsTheDateAccurateChoices
 from .exceptions import CompaniesHouseException
-from .fields import DateInputField
-from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
+from .fields import DateInputField, MultipleFileField
+from .models import (
+    Breach,
+    PersonOrCompany,
+    ReporterEmailVerification,
+    SanctionsRegime,
+    UploadedDocument,
+)
 
 # TODO: check the wording of any error messages to match what the UCD team expect
 Field.template = "core/custom_fields/field.html"
@@ -703,17 +714,98 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
         return cleaned_data
 
 
-class UploadDocumentsForm(BaseForm):
-    # todo - add a custom crispy forms widget to make it render like the prototype
-    documents = forms.FileField(
-        label="Upload documents (optional)",
-        help_text="You can upload items such as your own compliance investigation report, "
-        "commercial invoices, terms of appointment or other contractual documents.",
-        required=False,
-        validators=[
-            validate_virus_check_result,
-        ],
+class CookiesConsentForm(BaseForm):
+    do_you_want_to_accept_analytics_cookies = forms.TypedChoiceField(
+        choices=(
+            Choice(True, "Yes"),
+            Choice(False, "No"),
+        ),
+        coerce=lambda x: x == "True",
+        widget=forms.RadioSelect,
+        label="Do you want to accept analytics cookies",
+        required=True,
     )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("save cookie settings", "Save cookie settings", css_class="govuk-button"))
+        self.helper.layout = Layout(
+            Field.radios("do_you_want_to_accept_analytics_cookies", legend_size=Size.MEDIUM, legend_tag="h2", inline=False)
+        )
+        # Allows us to display to the user their previously selected cookies choice in the radios
+        kwargs_initial = kwargs.get("initial")
+        if kwargs_initial:
+            self.fields["do_you_want_to_accept_analytics_cookies"].initial = str(kwargs_initial["accept_cookies"])
+
+
+class UploadDocumentsForm(forms.Form):
+    document = MultipleFileField(
+        label="Upload a file",
+        help_text="Maximum individual file size 100MB. Maximum number of uploads 10",
+        required=False,
+    )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+        self.fields["document"].widget.attrs["class"] = "govuk-file-upload moj-multi-file-upload__input"
+        self.fields["document"].widget.attrs["name"] = "document"
+        self.helper = FormHelper()
+        self.helper.layout = Layout("document")
+
+    def clean_document(self) -> list[UploadedDocument]:
+        documents = self.cleaned_data.get("document")
+        for document in documents:
+
+            # does the document contain a virus?
+            try:
+                document.readline()
+            except VirusFoundInFileException:
+                raise forms.ValidationError(
+                    "A virus was found in one of the files you uploaded.",
+                )
+
+            # is the document a valid file type?
+            mimetype = get_mime_type(document.file)
+            if mimetype not in [
+                # word documents
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+                # spreadsheets
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                # powerpoints
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                # pdf
+                "application/pdf",
+                # other
+                "text/plain",
+                "text/csv",
+                "application/zip",
+                "text/html",
+                # images
+                "image/jpeg",
+                "image/png",
+            ]:
+
+                raise forms.ValidationError(
+                    f"{document.name} cannot be uploaded, it is not a valid file type", code="invalid_file_type"
+                )
+
+            # has the user already uploaded 10 files?
+            if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
+                if len(session_files) + 1 > 10:
+                    raise forms.ValidationError("You can only select up to 10 files at the same time", code="too_many")
+
+            # is the document too large?
+            if document.size > 104857600:
+                raise forms.ValidationError(f"{document.name} must be smaller than 100 MB", code="too_large")
+
+        return documents
 
 
 class TellUsAboutTheSuspectedBreachForm(BaseModelForm):

@@ -96,7 +96,6 @@ STORAGES = {
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "core.custom_upload_handler.CustomFileUploadHandler",
-    "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 )  # Order is important
 
