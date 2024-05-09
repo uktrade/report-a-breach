@@ -12,12 +12,13 @@ from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
 from utils.s3 import generate_presigned_url
 
 from .choices import TypeOfRelationshipChoices
+from .forms import CookiesConsentForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -434,6 +435,38 @@ class ReportABreachWizardView(BaseWizardView):
             self.storage.current_step = self.steps.first
 
         return redirect(reverse("report_a_suspected_breach:complete"))
+
+
+class CookiesConsentView(FormView):
+    template_name = "report_a_suspected_breach/cookies_consent.html"
+    form_class = CookiesConsentForm
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        initial_dict = {}
+
+        if current_cookies_policy := self.request.COOKIES.get("accepted_ga_cookies"):
+            initial_dict["accept_cookies"] = current_cookies_policy == "true"
+            kwargs["initial"] = initial_dict
+
+        return kwargs
+
+    def form_valid(self, form: CookiesConsentForm) -> HttpResponse:
+        # cookie consent lasts for 1 year
+        cookie_max_age = 365 * 24 * 60 * 60
+
+        referrer_url = self.request.GET.get("referrer_url", "/")
+        response = redirect(referrer_url)
+
+        # regardless of their choice, we set a cookie to say they've made a choice
+        response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
+        response.set_cookie(
+            "accepted_ga_cookies",
+            "true" if form.cleaned_data["do_you_want_to_accept_analytics_cookies"] else "false",
+            max_age=cookie_max_age,
+        )
+        return response
 
 
 class CompleteView(TemplateView):
