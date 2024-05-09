@@ -148,8 +148,11 @@ class DBTPlatformSettings(BaseSettings):
 
     @computed_field
     @property
-    def database_uri(self) -> dict[str, str]:
-        return database_url_from_env("DATABASE_CREDENTIALS")
+    def database_uri(self) -> dict[str, str] | str:
+        if self.in_build_step:
+            return ""
+        else:
+            return database_url_from_env("DATABASE_CREDENTIALS")
 
 
 if "CIRCLECI" in os.environ:
