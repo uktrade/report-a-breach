@@ -216,7 +216,7 @@ ENFORCE_STAFF_SSO = env.enforce_staff_sso
 if ENFORCE_STAFF_SSO:
     AUTHENTICATION_BACKENDS = [
         "django.contrib.auth.backends.ModelBackend",
-        "authbroker_client.backends.AuthbrokerBackend",
+        "auth.breach_portal_auth.BreachPortalAuth",
     ]
     AUTHBROKER_URL = env.authbroker_url
     AUTHBROKER_CLIENT_ID = env.authbroker_client_id

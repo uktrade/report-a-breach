@@ -2,10 +2,14 @@ from typing import Any
 
 from core.sites import require_view_a_breach
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from utils.notifier import send_email
 
 from .models import Users
 
@@ -17,22 +21,22 @@ class ViewABreachView(TemplateView):
     model = Users
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
-        user_email = settings.mock_sso_email
-        # user_objects = self.model.objects.all()
+        user_objects = User.objects.all()
+        user_data = get_user_model()
 
-        # TODO: need to use sso to determine if the user exists in the DB
-        # If they exist, continue to render, if not display a message telling them they have to be approved
-        if self.model.objects.filter(email=user_email):
-            # TODO need to check pending status
+        if user_data.is_active:
+            for user in user_objects:
+                if user.is_staff:
+                    send_email(
+                        # TODO: need to test email receipt
+                        email="",
+                        template_id=settings.email_vasb_user_admin_template_id,
+                        # TODO: hardcoded for testing
+                        context={"admin_url": "http://view-a-suspected-breach:8000/view_a_suspected_breach/user_admin/"},
+                    )
+            return render(request, "view_a_suspected_breach/unauthorised.html")
+        else:
             return super().get(request, **kwargs)
-
-        # If approval needed, create the user (if they don't exist)
-
-        # in the DB with is_pending=True and send email to OTSI admin
-        # self.model.objects.create(create user, set pending)
-        # send email to specified admin
-
-        return super().get(request, **kwargs)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -43,35 +47,42 @@ class AdminViewABreachView(TemplateView):
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        user_data_object = self.get_model_data(**kwargs)
+        user_data_object = self.get_user_data(**kwargs)
         user_data_pending = []
         user_data_accepted = []
 
         for user in user_data_object:
             id = user.id
-            name = user.name
+            first_name = user.first_name
+            last_name = user.last_name
             email = user.email
-            is_pending = user.is_pending
-            if is_pending:
-                user_data_pending.append((id, name, email, is_pending))
+            is_active = user.is_active
+            if not is_active:
+                user_data_accepted.append((id, f"{first_name} {last_name}", email))
             else:
-                user_data_accepted.append((id, name, email))
+                user_data_pending.append((id, f"{first_name} {last_name}", email, is_active))
 
         context["pending_users"] = user_data_pending
         context["accepted_users"] = user_data_accepted
 
         return context
 
-    def get_model_data(self, **kwargs: object) -> Any:
-        return self.model.objects.all()
+    @staticmethod
+    def get_user_data(**kwargs: object) -> Any:
+        return User.objects.all()
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
-        user_data = self.get_model_data(**kwargs)
+        user_data = self.get_user_data(**kwargs)
+
         if update_user := self.request.GET.get("accept_user", None):
-            user_data.get(id=update_user).update(is_pending=False)
+            user_to_accept = user_data.get(id=update_user)
+            user_to_accept.is_active = False
+            user_to_accept.save()
+            self.get_context_data(**kwargs)
 
         if delete_user := self.request.GET.get("delete_user", None):
             denied_user = user_data.get(id=delete_user)
             denied_user.delete()
+            self.get_context_data(**kwargs)
 
         return super().get(request, **kwargs)
