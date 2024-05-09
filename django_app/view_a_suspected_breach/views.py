@@ -11,14 +11,11 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from utils.notifier import send_email
 
-from .models import Users
-
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(require_view_a_breach(), name="dispatch")
 class ViewABreachView(TemplateView):
     template_name = "view_a_suspected_breach/landing.html"
-    model = Users
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
         user_objects = User.objects.all()
@@ -43,7 +40,6 @@ class ViewABreachView(TemplateView):
 @method_decorator(require_view_a_breach(), name="dispatch")
 class AdminViewABreachView(TemplateView):
     template_name = "view_a_suspected_breach/user_admin.html"
-    model = Users
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
