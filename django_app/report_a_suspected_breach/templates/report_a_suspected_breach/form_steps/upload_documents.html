@@ -1,0 +1,106 @@
+{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static "core/stylesheets/moj-frontend.css" %}">
+{% endblock extra_css %}
+
+{% block extra_js %}
+    <script
+        src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous">
+    </script>
+    <script src="{% static "core/javascript/moj-multi-file-upload.js" %}"></script>
+    <script>
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        $(document).ready(function () {
+            const multi_file_upload = new $.MultiFileUpload({
+                container: document.querySelector(".moj-multi-file-upload"),
+                uploadUrl: "{% url 'report_a_suspected_breach:upload_documents' %}",
+                deleteUrl: "{% url 'report_a_suspected_breach:delete_documents' %}"
+            });
+
+
+            // add an event handler for the file upload inputs that are dynamically generated when an upload error occurs
+            $(document).on('change', '.file-upload-error-input', function (e) {
+                e.stopPropagation()
+                e.preventDefault()
+
+                // find out who triggered me
+                let file_upload_row = $(this).closest('.moj-multi-file-upload__row')
+                let row_id = file_upload_row.attr('id')
+
+                // delete the corresponding error summary list element
+                multi_file_upload.deleteErrorSummaryListElement(row_id)
+
+                // delete this row
+                file_upload_row.remove();
+
+                // upload the file
+                if (e.currentTarget.files.length > 1) {
+                    // you can only upload 1 file to replace 1 file
+                    return false;
+                } else {
+                    multi_file_upload.feedbackContainer.removeClass('moj-hidden');
+                    multi_file_upload.uploadFiles(e.currentTarget.files);
+                }
+            });
+        })
+
+
+    </script>
+{% endblock extra_js %}
+
+
+{% block column_content %}
+    {% error_summary form %}
+    <h1 class="govuk-heading-l">Upload documents (optional)</h1>
+    <div id="upload_documents_hint" class="govuk-hint">You can upload items such as your own due diligence report,
+        commercial invoices, terms of appointment or other contractual documents
+    </div>
+
+    <div class="moj-multi-file-upload">
+        <form id="main_file_upload_form" method="post" enctype='multipart/form-data' novalidate
+              action="{% url 'report_a_suspected_breach:upload_documents' %}">
+            {% csrf_token %}
+            {% crispy form %}
+        </form>
+
+        <div class="moj-multi-file__uploaded-files {% if not session_files %}moj-hidden{% endif %}">
+            <h2 class="govuk-heading-m">Files added</h2>
+            <div class="govuk-summary-list moj-multi-file-upload__list">
+                {% for document, url in session_files.items %}
+                    <div class="govuk-summary-list__row moj-multi-file-upload__row">
+                        <dd class="govuk-summary-list__value moj-multi-file-upload__message">
+                            <span class="moj-multi-file-upload__filename">
+                                {{ document }}
+                            </span>
+                        </dd>
+                        <dd class="govuk-summary-list__actions moj-multi-file-upload__actions">
+                            <form id="delete_documents_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
+                                  action="{% url 'report_a_suspected_breach:delete_documents' %}?file_name={{ document }}" class="show-on-js-disabled hide-on-js-enabled">
+                                {% csrf_token %}
+                                <button type="submit" class=" govuk-link button-that-looks-like-link" form="delete_documents_form_{{ forloop.counter }}">
+                                    Remove
+                                </button>
+                            </form>
+                            <a class="moj-multi-file-upload__delete govuk-!-margin-bottom-0 hide-on-js-disabled show-on-js-enabled"
+                               href="javascript:void(0)" data-file-name="{{ document }}">
+                                Remove <span class="govuk-visually-hidden">{{ document }}</span>
+                            </a>
+                        </dd>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="govuk-button" data-module="govuk-button" form="main_file_upload_form">
+        Continue
+    </button>
+
+{% endblock column_content %}
