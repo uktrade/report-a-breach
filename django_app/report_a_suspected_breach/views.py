@@ -185,6 +185,12 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
+    def process_start_step(self, form: Form) -> QueryDict:
+        self.request.session["reporter_professional_relationship"] = form.cleaned_data["reporter_professional_relationship"]
+        self.request.session.modified = True
+
+        return self.get_form_step_data(form)
+
     def process_are_you_reporting_a_business_on_companies_house_step(self, form: Form) -> QueryDict:
         """We want to clear the company details from the session if the user selects anything but 'yes', if they do
         select 'yes' then we want to delete the step data for the next step(s) in the chain of conditionals."""
@@ -440,17 +446,37 @@ class RequestVerifyCodeView(FormView):
     success_url = reverse_lazy("report_a_suspected_breach:email_verify")
 
     def form_valid(self, form: SummaryForm) -> HttpResponse:
-        reporter_email_address = self.request.session.get("reporter_email_address")
+        reporter_email_address = self.request.session["reporter_email_address"]
         verify_email(reporter_email_address, self.request)
         return super().form_valid(form)
 
 
 class EmailVerifyView(FormView):
     form_class = EmailVerifyForm
-    template_name = "report_a_suspected_breach/form_steps/email_verify.html"
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
     success_url = reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name"})
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super(EmailVerifyView, self).get_form_kwargs()
         kwargs.update({"request": self.request})
         return kwargs
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if form_h1_header := getattr(EmailVerifyForm, "form_h1_header"):
+            context["form_h1_header"] = form_h1_header
+        return context
+
+    def get_success_url(self) -> str:
+        # we're importing these methods here to avoid circular imports
+        from .form_step_conditions import (
+            show_name_and_business_you_work_for_page,
+            show_name_page,
+        )
+
+        if show_name_page(self):
+            return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name"})
+        elif show_name_and_business_you_work_for_page(self):
+            return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name_and_business_you_work_for"})
+        else:
+            return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "start"})

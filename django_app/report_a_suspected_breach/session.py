@@ -18,7 +18,7 @@ class SessionStorage(WizardSessionStorage):
             return None
         return super().get_step_data(step)
 
-    def reset(self):
+    def reset(self) -> None:
         # Store unused temporary file names in order to delete them
         # at the end of the response cycle through a callback attached in
         # `update_response`.

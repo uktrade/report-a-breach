@@ -2,14 +2,14 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.utils.crypto import get_random_string
 from notifications_python_client.errors import HTTPError
 from notifications_python_client.notifications import NotificationsAPIClient
 from report_a_suspected_breach.models import ReporterEmailVerification
 
 
-def verify_email(reporter_email_address, request):
+def verify_email(reporter_email_address: str, request: HttpRequest) -> None:
     verify_code = get_random_string(6, allowed_chars="0123456789")
     user_session = Session.objects.get(session_key=request.session.session_key)
     ReporterEmailVerification.objects.create(

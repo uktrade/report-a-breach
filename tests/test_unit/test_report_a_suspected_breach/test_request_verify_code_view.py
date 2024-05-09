@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from django.http import HttpResponseRedirect
 from django.test import RequestFactory
+from report_a_suspected_breach.forms import SummaryForm
 from report_a_suspected_breach.models import ReporterEmailVerification
 from report_a_suspected_breach.views import RequestVerifyCodeView
 
@@ -10,16 +11,22 @@ class TestRequestVerifyCodeView:
 
     @patch("utils.notifier.send_email")
     def test_form_valid(self, send_email_mock, rasb_client):
-        request_object = RequestFactory().get("/")
-
-        request_object.session = rasb_client.session
-        session = rasb_client.session
         reporter_email_address = "test@testmail.com"
-        session["reporter_email_address"] = reporter_email_address
-        session.save()
         view = RequestVerifyCodeView()
+
+        # Setup Session values
+        request_object = RequestFactory().get("/")
+        request_object.session = rasb_client.session
+        request_object.session["reporter_email_address"] = reporter_email_address
+        request_object.session.save()
+
+        # Setup View
         view.setup(request_object)
-        response = view.form_valid(request_object)
+
+        # Call form_valid method of view
+        response = view.form_valid(SummaryForm)
+
+        # Assert ReporterEmailVerification object created
         email_verifications = ReporterEmailVerification.objects.all()
         assert len(email_verifications) == 1
         assert str(email_verifications[0].reporter_session) == request_object.session.session_key

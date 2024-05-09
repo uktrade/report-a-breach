@@ -16,6 +16,7 @@ from crispy_forms_gds.layout import (
 )
 from django import forms
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
@@ -93,7 +94,6 @@ class EmailVerifyForm(BaseForm):
             "date_created"
         )
         verify_code = verification_objects.email_verification_code
-
         if email_verification_code != verify_code:
             raise forms.ValidationError("Code is incorrect. Enter the 6 digit security code we sent to your email")
 
@@ -111,10 +111,10 @@ class EmailVerifyForm(BaseForm):
         self.helper["email_verification_code"].wrap(
             Field,
             HTML(
-                f"""<p class=govuk-body>
-                <a class=govuk-link href={request_verify_code}>
-                Not received an email or code not working?
-                </a></p>"""
+                render_to_string(
+                    "report_a_suspected_breach/form_steps/partials/not_received_code_help_text.html",
+                    {"request_verify_code": request_verify_code},
+                )
             ),
         )
 
