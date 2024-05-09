@@ -13,3 +13,12 @@
 .mb-1 {
     margin-bottom: 1rem;
 }
+
+.button-that-looks-like-link {
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+    cursor: pointer;
+    color: #003078;
+    font-size: 19px;
+}

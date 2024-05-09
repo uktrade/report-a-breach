@@ -3,22 +3,25 @@ from typing import Any
 
 from core.decorators import cached_classproperty
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
+from core.templatetags.get_wizard_step_url import get_wizard_step_url
+from core.utils import is_ajax
 from core.views import BaseWizardView
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.db import transaction
 from django.forms import Form
-from django.http import HttpRequest, HttpResponse, QueryDict
+from django.http import HttpRequest, HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.views.generic import FormView, TemplateView
+from django.views.generic import TemplateView, View
+from django.views.generic.edit import FormView
 from utils.companies_house import get_formatted_address
 from utils.notifier import send_email
-from utils.s3 import generate_presigned_url
+from utils.s3 import delete_session_files, generate_presigned_url, get_all_session_files
 
 from .choices import TypeOfRelationshipChoices
-from .forms import CookiesConsentForm
+from .forms import CookiesConsentForm, UploadDocumentsForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -37,6 +40,7 @@ class ReportABreachWizardView(BaseWizardView):
         "check_company_details": "report_a_suspected_breach/form_steps/check_company_details.html",
         "end_user_added": "report_a_suspected_breach/form_steps/end_user_added.html",
         "declaration": "report_a_suspected_breach/form_steps/declaration.html",
+        "upload_documents": "report_a_suspected_breach/form_steps/upload_documents.html",
     }
     template_name = "report_a_suspected_breach/generic_form_step.html"
     storage_name = "report_a_suspected_breach.session.SessionStorage"
@@ -95,6 +99,9 @@ class ReportABreachWizardView(BaseWizardView):
             if step_url in self.get_form_list():
                 self.storage.current_step = step_url
 
+        if self.storage.current_step == "upload_documents":
+            return redirect(reverse("report_a_suspected_breach:upload_documents"))
+
         # check if the user has completed a task, if so, redirect them to the tasklist
         # the exception to this is if the user wants to explicitly start the next task, in which case we should let them
         # or, if they're trying to change their answers from the summary page
@@ -146,6 +153,7 @@ class ReportABreachWizardView(BaseWizardView):
                 return redirect(self.get_step_url("about_the_supplier"))
             elif form.cleaned_data["where_were_the_goods_made_available_from"] in ["same_address", "i_do_not_know"]:
                 return redirect(self.get_step_url("where_were_the_goods_made_available_to"))
+
         return super().render_next_step(form, **kwargs)
 
     def get_summary_context_data(self, form: Form, context: dict[str, Any]) -> dict[str, Any]:
@@ -164,9 +172,8 @@ class ReportABreachWizardView(BaseWizardView):
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
         context["is_made_available_journey"] = self.request.session.get("made_available_journey")
-        if uploaded_file := context["form_data"]["upload_documents"]["documents"]:
-            presigned_url = generate_presigned_url(TemporaryDocumentStorage().bucket.meta.client, uploaded_file.file.obj)
-            context["form_data"]["upload_documents"]["url"] = presigned_url
+        if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
+            context["form_data"]["session_files"] = session_files
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
 
@@ -232,13 +239,6 @@ class ReportABreachWizardView(BaseWizardView):
             template_id=settings.EMAIL_VERIFY_CODE_TEMPLATE_ID,
         )
         return self.get_form_step_data(form)
-
-    def process_upload_documents_form(self, form: Form) -> Any:
-        """Overriding this method to store the file name in the session, so we can use it later."""
-        if form.is_valid():
-            self.request.session["uploaded_file_name"] = form.cleaned_data["file"].name
-            self.request.session.modified = True
-        return super().process_step(form)
 
     def get_form_kwargs(self, step: str | None) -> dict[str, Any]:
         kwargs = super().get_form_kwargs(step)
@@ -307,24 +307,23 @@ class ReportABreachWizardView(BaseWizardView):
 
     def store_documents_in_s3(self) -> None:
         """
-        Copies documents from the default temporary storage to permanent storage on s3
+        Copies documents from the default temporary storage to permanent storage on s3, then deletes from temporary storage
         """
-        if uploaded_docs := self.storage.get_step_files("upload_documents"):
+        if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
             permanent_storage_bucket = PermanentDocumentStorage()
-            files = uploaded_docs["upload_documents-documents"]
-
-            object_key = f"{self.request.session.session_key}/{files.name}"
-
-            try:
-                permanent_storage_bucket.bucket.meta.client.copy(
-                    CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
-                    Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                    Key=object_key,
-                    SourceClient=self.file_storage.bucket.meta.client,
-                )
-            except Exception:
-                # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
-                pass
+            for object_key in session_files.keys():
+                try:
+                    permanent_storage_bucket.bucket.meta.client.copy(
+                        CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                        Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+                        Key=object_key,
+                        SourceClient=self.file_storage.bucket.meta.client,
+                    )
+                except Exception:
+                    # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
+                    pass
+                else:
+                    delete_session_files(TemporaryDocumentStorage(), self.request.session)
 
     def save_person_or_company_to_db(
         self, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
@@ -471,3 +470,86 @@ class CookiesConsentView(FormView):
 
 class CompleteView(TemplateView):
     template_name = "report_a_suspected_breach/complete.html"
+
+
+class UploadDocumentsView(FormView):
+    """View for uploading documents. This view is used in the wizard flow, but can also be accessed directly.
+
+    Accepts both Ajax and non-Ajax requests, to accommodate both JS and non-JS users respectively."""
+
+    form_class = UploadDocumentsForm
+    template_name = "report_a_suspected_breach/form_steps/upload_documents.html"
+    file_storage = TemporaryDocumentStorage()
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        """Retrieve the already uploaded files from the session storage and add them to the context."""
+        context = super().get_context_data(**kwargs)
+        if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
+            context["session_files"] = session_files
+        return context
+
+    def form_valid(self, form: Form) -> HttpResponse:
+        """Loop through the files and save them to the temporary storage. If the request is Ajax, return a JsonResponse.
+
+        If the request is not Ajax, redirect to the summary page (the next step in the form)."""
+        for temporary_file in form.cleaned_data["document"]:
+            session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
+            self.file_storage.save(session_keyed_file_name, temporary_file.file)
+
+            # adding the file name to the session, so we can retrieve it later
+            if "file_uploads" in self.request.session:
+                self.request.session["file_uploads"].append(temporary_file.name)
+            else:
+                self.request.session["file_uploads"] = [temporary_file.name]
+            self.request.session.modified = True
+
+            if is_ajax(self.request):
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "file_name": temporary_file.name,
+                        "file_url": generate_presigned_url(self.file_storage, session_keyed_file_name),
+                    },
+                    status=201,
+                )
+        if is_ajax(self.request):
+            return JsonResponse({"success": True}, status=200)
+        else:
+            return redirect(get_wizard_step_url("tell_us_about_the_suspected_breach"))
+
+    def form_invalid(self, form: Form) -> HttpResponse:
+        if is_ajax(self.request):
+            return JsonResponse(
+                {"success": False, "error": form.errors["document"][0], "file_name": self.request.FILES["document"].name},
+                status=200,
+            )
+        else:
+            return super().form_invalid(form)
+
+
+class DeleteDocumentsView(View):
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        if file_name := self.request.GET.get("file_name"):
+            full_file_path = f"{self.request.session.session_key}/{file_name}"
+            TemporaryDocumentStorage().delete(full_file_path)
+
+            # removing the file name from the session
+            if "file_uploads" in self.request.session:
+                if file_name in self.request.session["file_uploads"]:
+                    self.request.session["file_uploads"].remove(file_name)
+                    self.request.session.modified = True
+
+            if is_ajax(self.request):
+                return JsonResponse({"success": True}, status=200)
+            else:
+                return redirect(reverse("report_a_suspected_breach:upload_documents"))
+
+        if is_ajax(self.request):
+            return JsonResponse({"success": False}, status=400)
+        else:
+            return redirect(reverse("report_a_suspected_breach:upload_documents"))
