@@ -740,6 +740,7 @@ class CookiesConsentForm(BaseForm):
 
 
 class UploadDocumentsForm(forms.Form):
+    revalidate_on_done = False
     document = MultipleFileField(
         label="Upload a file",
         help_text="Maximum individual file size 100MB. Maximum number of uploads 10",
