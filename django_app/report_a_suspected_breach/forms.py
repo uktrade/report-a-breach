@@ -721,7 +721,8 @@ class CookiesConsentForm(BaseForm):
             self.fields["do_you_want_to_accept_analytics_cookies"].initial = str(kwargs_initial["accept_cookies"])
 
 
-class UploadDocumentsForm(forms.Form):
+class UploadDocumentsForm(BaseForm):
+    revalidate_on_done = False
     document = MultipleFileField(
         label="Upload a file",
         help_text="Maximum individual file size 100MB. Maximum number of uploads 10",
@@ -729,10 +730,10 @@ class UploadDocumentsForm(forms.Form):
     )
 
     def __init__(self, *args: object, **kwargs: object) -> None:
-        self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
         self.fields["document"].widget.attrs["class"] = "govuk-file-upload moj-multi-file-upload__input"
         self.fields["document"].widget.attrs["name"] = "document"
+        # redefining this to remove the 'Continue' button from the helper
         self.helper = FormHelper()
         self.helper.layout = Layout("document")
 
