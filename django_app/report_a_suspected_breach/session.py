@@ -19,13 +19,6 @@ class SessionStorage(WizardSessionStorage):
         return super().get_step_data(step)
 
     def reset(self) -> None:
-        # Store unused temporary file names in order to delete them
-        # at the end of the response cycle through a callback attached in
-        # `update_response`.
-        wizard_files = self.data[self.step_files_key]
-        for step_files in wizard_files.values():
-            for step_file in step_files.values():
-                self._tmp_files.append(step_file["tmp_name"])
         self.request.session.pop("end_users", None)
         self.request.session.pop("made_available_journey", None)
         self.request.session.pop("file_uploads", None)
