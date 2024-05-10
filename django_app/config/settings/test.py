@@ -12,6 +12,12 @@ BASE_FRONTEND_TESTING_URL = "http://report-a-suspected-breach:8000"
 
 ENVIRONMENT = "test"
 
+# we don't want to connect to ClamAV in testing, redefine and remove from list
+FILE_UPLOAD_HANDLERS = (
+    "core.custom_upload_handler.CustomFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+)  # Order is important
+
 
 def test_process_email_step(self, form: Form) -> dict[str, Any]:
     """Monkey-patching the process_email_step of the wizard to always use the same verify code for testing."""

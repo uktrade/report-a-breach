@@ -345,8 +345,11 @@
                 Upload supporting documents
             </dt>
             <dd class="govuk-summary-list__value">
-                <a href="{{ form_data.upload_documents.url }}"
-                   download>{{ form_data.upload_documents.documents.name }}</a>
+                {% for document, url in form_data.session_files.items %}
+
+                    <a href="{{url}}" download>{{document}}</a><br>
+                {% endfor %}
+
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"

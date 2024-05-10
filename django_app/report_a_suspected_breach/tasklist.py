@@ -133,11 +133,12 @@ class TheSupplyChainTask(Task):
 
 class SanctionsBreachDetailsTask(Task):
     form_steps = {
-        "tell_us_about_the_suspected_breach": forms.TellUsAboutTheSuspectedBreachForm,
         "upload_documents": forms.UploadDocumentsForm,
+        "tell_us_about_the_suspected_breach": forms.TellUsAboutTheSuspectedBreachForm,
     }
     name = "Sanctions breach details"
     hint_text = "Upload documents and give any additional information"
+    optional_steps = {"upload_documents"}
 
 
 class SummaryAndDeclaration(Task):

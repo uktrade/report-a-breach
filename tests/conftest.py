@@ -3,7 +3,7 @@ from core.sites import SiteName
 from django.contrib.sites.models import Site
 from django.test import Client, RequestFactory
 
-from tests.factories import BreachFactory
+from tests.factories import BreachFactory, SanctionsRegimeFactory
 from tests.helpers import get_test_client
 
 
@@ -31,6 +31,12 @@ def vasb_client(db):
 def breach_object(db):
     """Fixture to create a breach object."""
     return BreachFactory()
+
+
+@pytest.fixture()
+def sanctions_regime_object(db):
+    """Fixture to create a SanctionsRegime object."""
+    return SanctionsRegimeFactory()
 
 
 @pytest.fixture()
