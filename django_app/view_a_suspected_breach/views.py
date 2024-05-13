@@ -4,7 +4,7 @@ from core.sites import require_view_a_breach
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
@@ -72,11 +72,11 @@ class AdminViewABreachView(TemplateView):
             user_to_accept = user_data.get(id=update_user)
             user_to_accept.is_active = False
             user_to_accept.save()
-            self.get_context_data(**kwargs)
+            return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
         if delete_user := self.request.GET.get("delete_user", None):
             denied_user = user_data.get(id=delete_user)
             denied_user.delete()
-            self.get_context_data(**kwargs)
+            return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
         return super().get(request, **kwargs)
