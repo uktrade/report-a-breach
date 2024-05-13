@@ -27,7 +27,7 @@ class ViewABreachView(TemplateView):
                     send_email(
                         email=user.email,
                         template_id=settings.EMAIL_VASB_USER_ADMIN_TEMPLATE_ID,
-                        context={"admin_url": admin_url},
+                        context={"admin_url": f"{settings.VIEW_A_SUSPECTED_BREACH_DOMAIN}/{admin_url}"},
                     )
             return render(request, "view_a_suspected_breach/unauthorised.html")
 
