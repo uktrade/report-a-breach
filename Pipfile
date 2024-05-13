@@ -29,6 +29,8 @@ django-log-formatter-asim = "*"
 boto3 = "*"
 django-staff-sso-client = "~=4.2.2"
 ring = "~=0.10"
+python-magic = "~=0.4"
+boto3-stubs = "*"
 
 [dev-packages]
 black = "~=24.3"
