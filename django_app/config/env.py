@@ -29,6 +29,7 @@ class BaseSettings(PydanticBaseSettings):
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
     email_vasb_user_admin_template_id: str = ""
+    vasb_admin_user_email: str = ""
 
     sentry_dsn: str = ""
     sentry_environment: str = ""
@@ -63,7 +64,6 @@ class BaseSettings(PydanticBaseSettings):
     mock_sso_token: str = ""
     mock_sso_scope: str = "read"
     mock_sso_username: str = ""
-    mock_sso_email: str = ""
     mock_sso_email_user_id: str = ""
     oauthlib_insecure_transport: int = 0
 

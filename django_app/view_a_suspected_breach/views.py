@@ -2,11 +2,10 @@ from typing import Any
 
 from core.sites import require_view_a_breach
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from utils.notifier import send_email
@@ -19,21 +18,20 @@ class ViewABreachView(TemplateView):
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
         user_objects = User.objects.all()
-        user_data = get_user_model()
+        user_data = user_objects.get(pk=request.user.id)
+        admin_url = reverse("view_a_suspected_breach:user_admin")
 
         if user_data.is_active:
             for user in user_objects:
                 if user.is_staff:
                     send_email(
-                        # TODO: need to test email receipt
-                        email="",
-                        template_id=settings.email_vasb_user_admin_template_id,
-                        # TODO: hardcoded for testing
-                        context={"admin_url": "view_a_suspected_breach/user_admin/"},
+                        email=settings.VASB_ADMIN_USER_EMAIL,
+                        template_id=settings.EMAIL_VASB_USER_ADMIN_TEMPLATE_ID,
+                        context={"admin_url": admin_url},
                     )
             return render(request, "view_a_suspected_breach/unauthorised.html")
-        else:
-            return super().get(request, **kwargs)
+
+        return super().get(request, **kwargs)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -43,11 +41,11 @@ class AdminViewABreachView(TemplateView):
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        user_data_object = self.get_user_data(**kwargs)
+        user_data_objects = self.get_user_data(**kwargs)
         user_data_pending = []
         user_data_accepted = []
 
-        for user in user_data_object:
+        for user in user_data_objects:
             id = user.id
             first_name = user.first_name
             last_name = user.last_name
@@ -64,7 +62,7 @@ class AdminViewABreachView(TemplateView):
         return context
 
     @staticmethod
-    def get_user_data(**kwargs: object) -> Any:
+    def get_user_data(**kwargs: object) -> User:
         return User.objects.all()
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
