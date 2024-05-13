@@ -54,7 +54,7 @@ class AdminViewABreachView(TemplateView):
             if not is_active:
                 user_data_accepted.append((id, f"{first_name} {last_name}", email))
             else:
-                user_data_pending.append((id, f"{first_name} {last_name}", email, is_active))
+                user_data_pending.append((id, f"{first_name} {last_name}", email))
 
         context["pending_users"] = user_data_pending
         context["accepted_users"] = user_data_accepted
