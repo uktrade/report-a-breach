@@ -29,6 +29,7 @@ class BaseSettings(PydanticBaseSettings):
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
     email_vasb_user_admin_template_id: str = ""
+    view_a_suspected_breach_admin_domain_dev: str = ""
 
     sentry_dsn: str = ""
     sentry_environment: str = ""
