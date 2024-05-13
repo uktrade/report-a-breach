@@ -186,7 +186,6 @@ COMPANIES_HOUSE_API_KEY = env.companies_house_api_key
 GOV_NOTIFY_API_KEY = env.gov_notify_api_key
 EMAIL_VERIFY_CODE_TEMPLATE_ID = env.email_verify_code_template_id
 EMAIL_VASB_USER_ADMIN_TEMPLATE_ID = env.email_vasb_user_admin_template_id
-VASB_ADMIN_USER_EMAIL = env.vasb_admin_user_email
 RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
 
 # SENTRY

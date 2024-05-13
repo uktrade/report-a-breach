@@ -25,7 +25,7 @@ class ViewABreachView(TemplateView):
             for user in user_objects:
                 if user.is_staff:
                     send_email(
-                        email=settings.VASB_ADMIN_USER_EMAIL,
+                        email=user.email,
                         template_id=settings.EMAIL_VASB_USER_ADMIN_TEMPLATE_ID,
                         context={"admin_url": admin_url},
                     )
