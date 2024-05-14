@@ -5,5 +5,5 @@ from .views import HealthCheckView
 app_name = "healthcheck"
 
 urlpatterns = [
-    path("ping.xml", HealthCheckView.as_view(), name="healthcheck_ping"),
+    path("pingdom/ping.xml", HealthCheckView.as_view(), name="healthcheck_ping"),
 ]
