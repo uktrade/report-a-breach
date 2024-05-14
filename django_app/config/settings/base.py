@@ -117,7 +117,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
-    "django.contrib.sites.middleware.CurrentSiteMiddleware",
+    "core.middleware.ReportASuspectedBreachCurrentSiteMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
