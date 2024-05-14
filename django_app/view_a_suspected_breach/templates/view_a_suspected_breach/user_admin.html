@@ -32,9 +32,9 @@
         {% for data in accepted_users %}
           <tbody class="govuk-table__body">
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell">{{ data.1 }}</td>
-              <td class="govuk-table__cell">{{ data.2 }}</td>
-              <td class="govuk-table__cell"><a href="{% url 'view_a_suspected_breach:user_admin' %}?delete_user={{ data.0 }}">Delete</a></td>
+              <td class="govuk-table__cell">{{ user.first_name }} {{ user.last_name }}</td>
+              <td class="govuk-table__cell">{{ user.email }}</td>
+              <td class="govuk-table__cell"><a href="{% url 'view_a_suspected_breach:user_admin' %}?delete_user={{ user.id }}">Delete</a></td>
             </tr>
           </tbody>
         {% endfor %}
@@ -53,10 +53,10 @@
         {% for data in pending_users %}
           <tbody class="govuk-table__body">
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell">{{ data.1 }}</td>
-              <td class="govuk-table__cell">{{ data.2 }}</td>
-              <td class="govuk-table__cell"><a href="{% url 'view_a_suspected_breach:user_admin' %}?accept_user={{ data.0 }}">Accept</a>
-                <br><a href="{% url 'view_a_suspected_breach:user_admin' %}?delete_user={{ data.0 }}">Delete</a></td>
+              <td class="govuk-table__cell">{{ user.first_name }} {{ user.last_name }}</td>
+              <td class="govuk-table__cell">{{ user.email }}</td>
+              <td class="govuk-table__cell"><a href="{% url 'view_a_suspected_breach:user_admin' %}?accept_user={{ user.id }}">Accept</a>
+                <br><a href="{% url 'view_a_suspected_breach:user_admin' %}?delete_user={{ user.id }}">Delete</a></td>
             </tr>
           </tbody>
         {% endfor %}
