@@ -66,17 +66,22 @@ class AdminViewABreachView(TemplateView):
         return User.objects.all()
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
-        user_data = self.get_user_data(**kwargs)
+        user_objects = self.get_user_data(**kwargs)
+        request_user = user_objects.get(pk=request.user.id)
 
-        if update_user := self.request.GET.get("accept_user", None):
-            user_to_accept = user_data.get(id=update_user)
-            user_to_accept.is_active = False
-            user_to_accept.save()
-            return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
+        if not request_user.is_staff:
+            return HttpResponse("Not authorized", status=401)
 
-        if delete_user := self.request.GET.get("delete_user", None):
-            denied_user = user_data.get(id=delete_user)
-            denied_user.delete()
-            return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
+        else:
+            if update_user := self.request.GET.get("accept_user", None):
+                user_to_accept = user_objects.get(id=update_user)
+                user_to_accept.is_active = False
+                user_to_accept.save()
+                return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
-        return super().get(request, **kwargs)
+            if delete_user := self.request.GET.get("delete_user", None):
+                denied_user = user_objects.get(id=delete_user)
+                denied_user.delete()
+                return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
+
+            return super().get(request, **kwargs)

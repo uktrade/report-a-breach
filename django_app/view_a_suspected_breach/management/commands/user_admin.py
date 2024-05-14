@@ -14,14 +14,16 @@ class Command(BaseCommand):
         first_name, last_name, email = options["first_name"], options["last_name"], options["email"]
 
         user_objects = User.objects.all()
-        if existing_user := user_objects.get(email=email):
+        try:
+            existing_user = user_objects.get(email=email)
             existing_user.first_name = first_name
             existing_user.last_name = last_name
             existing_user.is_staff = True
             existing_user.is_active = False
             existing_user.save()
+            self.stdout.write(self.style.SUCCESS("User updated successfully"))
 
-        else:
+        except User.DoesNotExist:
             User.objects.create(
                 first_name=first_name,
                 last_name=last_name,
@@ -29,4 +31,4 @@ class Command(BaseCommand):
                 is_staff=True,
                 is_active=False,
             )
-        self.stdout.write(self.style.SUCCESS("User Added Successfully"))
+            self.stdout.write(self.style.SUCCESS("User added successfully"))

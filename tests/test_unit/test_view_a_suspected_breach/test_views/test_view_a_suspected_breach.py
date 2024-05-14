@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 from core.sites import SiteName
 from django.contrib.auth.models import User
 from django.test import RequestFactory
-from view_a_suspected_breach.views import ViewABreachView
+from view_a_suspected_breach.views import AdminViewABreachView, ViewABreachView
 
 
 class TestViewASuspectedBreach:
@@ -59,4 +59,42 @@ class TestViewASuspectedBreach:
 
 
 class TestAdminViewABreach:
-    pass
+
+    def test_admin_view_a_breach_unauthorised(self, vasb_client):
+        test_user = User.objects.create_user(
+            "Jane",
+            "test@example.com",
+        )
+
+        request_object = RequestFactory().get("/")
+        request_object.site = SiteName
+        request_object.site.name = SiteName.view_a_suspected_breach
+        request_object.user = test_user
+        view = AdminViewABreachView()
+        view.setup(request_object)
+        response = view.get(
+            request_object,
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+
+        assert response.status_code == 401
+
+    def test_successful_admin_view_a_breach(self, vasb_client):
+        test_user = User.objects.create_user(
+            "Joan",
+            "joan@example.com",
+            is_staff=True,
+        )
+
+        request_object = RequestFactory().get("/")
+        request_object.site = SiteName
+        request_object.site.name = SiteName.view_a_suspected_breach
+        request_object.user = test_user
+        view = AdminViewABreachView()
+        view.setup(request_object)
+        response = view.get(
+            request_object,
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+
+        assert response.status_code == 200
