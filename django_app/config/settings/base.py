@@ -16,6 +16,7 @@ from pathlib import Path
 import dj_database_url
 import sentry_sdk
 from config.env import env
+from django.conf.locale.en import formats as en_formats
 from django.urls import reverse_lazy
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -231,3 +232,5 @@ else:
     LOGIN_URL = "/admin/login"
 
 TRUNCATE_WORDS_LIMIT = 30
+
+en_formats.DATE_FORMAT = "d/m/Y"
