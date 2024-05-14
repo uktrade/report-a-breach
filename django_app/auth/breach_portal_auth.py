@@ -20,7 +20,7 @@ class BreachPortalAuth(AuthbrokerBackend):
 
         if created:
             user.set_unusable_password()
-            user.is_active = True
+            user.is_active = False
             user.is_staff = False
             user.save()
         return user

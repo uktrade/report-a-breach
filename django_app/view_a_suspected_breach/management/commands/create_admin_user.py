@@ -19,7 +19,7 @@ class Command(BaseCommand):
             existing_user.first_name = first_name
             existing_user.last_name = last_name
             existing_user.is_staff = True
-            existing_user.is_active = False
+            existing_user.is_active = True
             existing_user.save()
             self.stdout.write(self.style.SUCCESS("User updated successfully"))
 
@@ -29,6 +29,6 @@ class Command(BaseCommand):
                 last_name=last_name,
                 email=email,
                 is_staff=True,
-                is_active=False,
+                is_active=True,
             )
             self.stdout.write(self.style.SUCCESS("User added successfully"))
