@@ -6,7 +6,11 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, TemplateView
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
-from report_a_suspected_breach.models import Breach, PersonOrCompany
+from report_a_suspected_breach.models import (
+    Breach,
+    CompaniesHouseCompany,
+    PersonOrCompany,
+)
 from utils.companies_house import get_formatted_address
 from utils.s3 import get_breach_documents
 
@@ -33,25 +37,34 @@ class ViewASuspectedBreachView(DetailView):
             breacher_address = get_formatted_address(model_to_dict(breacher))
             context["breacher"] = breacher
             context["breacher_address"] = breacher_address
-            context["breacher_address"] = breacher_address
 
-        supplier = PersonOrCompany.objects.filter(
+        if companies_house_company := CompaniesHouseCompany.objects.filter(breach_id=self.breach.id).first():
+            context["companies_house_company"] = companies_house_company
+
+        if supplier := PersonOrCompany.objects.filter(
             breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.supplier
-        ).first()
+        ).first():
+            supplier_address = get_formatted_address(model_to_dict(supplier))
+            context["supplier"] = supplier
+            context["supplier_address"] = supplier_address
+
+        elif self.breach.where_were_the_goods_supplied_from == "same_address":
+            if breacher:
+                context["supplier"] = breacher
+                context["supplier_address"] = breacher_address
+            elif companies_house_company:
+                context["supplier"] = {"name": companies_house_company.registered_company_name, "country": "The UK"}
+                context["supplier_address"] = companies_house_company.registered_office_address
+
         recipients = PersonOrCompany.objects.filter(
             breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.recipient
         )
         sanctions = self.breach.sanctions_regimes.all()
-        supplier_address = get_formatted_address(model_to_dict(supplier))
 
         upload_documents = get_breach_documents(PermanentDocumentStorage(), str(self.breach.id))
         context["breach"] = self.breach
-        context["sanctions"] = "sanctions"
-
-        context["supplier"] = supplier
-        context["supplier_address"] = supplier_address
+        context["sanctions"] = sanctions
         context["recipients"] = recipients
         context["sanctions"] = sanctions
-        print(upload_documents)
         context["documents"] = upload_documents
         return context

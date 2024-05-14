@@ -20,7 +20,13 @@ from utils.s3 import delete_session_files, generate_presigned_url, get_all_sessi
 
 from .choices import TypeOfRelationshipChoices
 from .forms import CookiesConsentForm, EmailVerifyForm, SummaryForm, UploadDocumentsForm
-from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
+from .models import (
+    Breach,
+    CompaniesHouseCompany,
+    PersonOrCompany,
+    ReporterEmailVerification,
+    SanctionsRegime,
+)
 from .tasklist import (
     AboutThePersonOrBusinessTask,
     OverviewOfTheSuspectedBreachTask,
@@ -367,11 +373,6 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
             business_or_person_details_step = cleaned_data.get("business_or_person_details", {})
             reporter_name_of_business_you_work_for = business_or_person_details_step.get("name", "")
-        do_you_know_the_registered_company_number_step = cleaned_data.get("do_you_know_the_registered_company_number", {})
-        do_you_know_the_registered_company_number = do_you_know_the_registered_company_number_step.get(
-            "do_you_know_the_registered_company_number", ""
-        )
-        registered_company_number = do_you_know_the_registered_company_number_step.get("registered_company_number", "")
 
         with transaction.atomic():
             reporter_email_verification = ReporterEmailVerification.objects.filter(
@@ -387,11 +388,9 @@ class ReportABreachWizardView(BaseWizardView):
                 when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
                 is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
                 what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
-                business_registered_on_companies_house=cleaned_data["are_you_reporting_a_business_on_companies_house"][
-                    "business_registered_on_companies_house"
+                where_were_the_goods_supplied_from=cleaned_data["where_were_the_goods_supplied_from"][
+                    "where_were_the_goods_supplied_from"
                 ],
-                do_you_know_the_registered_company_number=do_you_know_the_registered_company_number,
-                registered_company_number=registered_company_number,
                 were_there_other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
                     "were_there_other_addresses_in_the_supply_chain"
                 ],
@@ -415,6 +414,15 @@ class ReportABreachWizardView(BaseWizardView):
             if not show_check_company_details_page_condition(self):
                 breacher_details = cleaned_data["business_or_person_details"]
                 self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
+            else:
+                do_you_know_the_registered_company_number_step = cleaned_data["do_you_know_the_registered_company_number"]
+                new_companies_house_company = CompaniesHouseCompany.objects.create(
+                    registered_company_number=do_you_know_the_registered_company_number_step["registered_company_number"],
+                    registered_company_name=do_you_know_the_registered_company_number_step["registered_company_name"],
+                    registered_office_address=do_you_know_the_registered_company_number_step["registered_office_address"],
+                    breach=new_breach,
+                )
+                new_companies_house_company.save()
 
             # Save Supplier Details to Database
             if show_about_the_supplier_page(self):

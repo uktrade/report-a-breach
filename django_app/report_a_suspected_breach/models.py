@@ -23,6 +23,7 @@ class Breach(BaseModel):
     is_the_date_accurate = models.CharField(choices=choices.IsTheDateAccurateChoices.choices, max_length=11)
     sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True)
     unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
+    where_were_the_goods_supplied_from = models.TextField()
     other_sanctions_regime = models.BooleanField(blank=True, default=False)
     what_were_the_goods = models.TextField()
     business_registered_on_companies_house = models.CharField(
@@ -30,12 +31,6 @@ class Breach(BaseModel):
         max_length=11,
         blank=False,
     )
-    do_you_know_the_registered_company_number = models.CharField(
-        choices=choices.YesNoChoices.choices,
-        max_length=3,
-        blank=False,
-    )
-    registered_company_number = models.CharField(max_length=20, null=True, blank=True)
     were_there_other_addresses_in_the_supply_chain = models.CharField(
         choices=choices.YesNoDoNotKnowChoices.choices,
         max_length=11,
@@ -76,6 +71,18 @@ class PersonOrCompany(BaseModel):
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
     additional_contact_details = models.TextField(null=True, blank=True)
     type_of_relationship = models.CharField(choices=choices.TypeOfRelationshipChoices.choices, max_length=9)
+
+
+class CompaniesHouseCompany(BaseModel):
+    do_you_know_the_registered_company_number = models.CharField(
+        choices=choices.YesNoChoices.choices,
+        max_length=3,
+        blank=False,
+    )
+    registered_company_number = models.CharField(max_length=20, null=True, blank=True)
+    registered_company_name = models.CharField()
+    registered_office_address = models.CharField()
+    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
 
 
 class SanctionsRegimeBreachThrough(BaseModel):
