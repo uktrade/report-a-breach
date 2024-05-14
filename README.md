@@ -17,6 +17,12 @@ Once installed, we need to install the requirements for the project:
 ```
 pipenv install
 ```
+
+If you're using homebrew, install libmagic:
+```
+brew install libmagic
+```
+
 Now we need to activate the virtual environment:
 ```
 pipenv shell
