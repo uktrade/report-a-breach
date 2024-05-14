@@ -167,8 +167,8 @@ class DBTPlatformSettings(BaseSettings):
         else:
             return {
                 "bucket_name": os.environ.get("TEMPORARY_S3_BUCKET_NAME", ""),
-                "access_key_id": "",
-                "secret_access_key": "",
+                "access_key_id": None,
+                "secret_access_key": None,
             }
 
     @computed_field
@@ -183,8 +183,8 @@ class DBTPlatformSettings(BaseSettings):
         else:
             return {
                 "bucket_name": os.environ.get("PERMANENT_S3_BUCKET_NAME", ""),
-                "access_key_id": "",
-                "secret_access_key": "",
+                "access_key_id": None,
+                "secret_access_key": None,
             }
 
 
