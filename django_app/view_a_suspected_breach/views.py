@@ -1,6 +1,9 @@
+from typing import Any
+
 from core.document_storage import PermanentDocumentStorage
 from core.sites import require_view_a_breach
 from django.contrib.auth.decorators import login_required
+from django.db.models import QuerySet
 from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -24,13 +27,17 @@ class ViewABreachView(TemplateView):
 class ViewASuspectedBreachView(DetailView):
     template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Breach]:
         self.breach = get_object_or_404(Breach, id=self.kwargs["pk"])
         return Breach.objects.filter(id=self.breach.id)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
+        # Breach
+        context["breach"] = self.breach
+
+        # Breacher
         if breacher := PersonOrCompany.objects.filter(
             breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first():
@@ -41,6 +48,7 @@ class ViewASuspectedBreachView(DetailView):
         if companies_house_company := CompaniesHouseCompany.objects.filter(breach_id=self.breach.id).first():
             context["companies_house_company"] = companies_house_company
 
+        # Supplier
         if supplier := PersonOrCompany.objects.filter(
             breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.supplier
         ).first():
@@ -56,15 +64,18 @@ class ViewASuspectedBreachView(DetailView):
                 context["supplier"] = {"name": companies_house_company.registered_company_name, "country": "The UK"}
                 context["supplier_address"] = companies_house_company.registered_office_address
 
+        # End Users (recipients)
         recipients = PersonOrCompany.objects.filter(
             breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.recipient
         )
-        sanctions = self.breach.sanctions_regimes.all()
-
-        upload_documents = get_breach_documents(PermanentDocumentStorage(), str(self.breach.id))
-        context["breach"] = self.breach
-        context["sanctions"] = sanctions
         context["recipients"] = recipients
+
+        # Sanctions Regimes
+        sanctions = self.breach.sanctions_regimes.all()
         context["sanctions"] = sanctions
+
+        # Documents
+        upload_documents = get_breach_documents(PermanentDocumentStorage(), str(self.breach.id))
         context["documents"] = upload_documents
+
         return context
