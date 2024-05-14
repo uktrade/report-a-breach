@@ -305,7 +305,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return kwargs
 
-    def store_documents_in_s3(self) -> None:
+    def store_documents_in_s3(self, breach_id: str) -> None:
         """
         Copies documents from the default temporary storage to permanent storage on s3, then deletes from temporary storage
         """
@@ -314,9 +314,12 @@ class ReportABreachWizardView(BaseWizardView):
             for object_key in session_files.keys():
                 try:
                     permanent_storage_bucket.bucket.meta.client.copy(
-                        CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                        CopySource={
+                            "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+                            "Key": f"{self.request.session.session_key}/{object_key}",
+                        },
                         Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                        Key=object_key,
+                        Key=f"{breach_id}/{object_key}",
                         SourceClient=self.file_storage.bucket.meta.client,
                     )
                 except Exception:
@@ -428,7 +431,7 @@ class ReportABreachWizardView(BaseWizardView):
                     self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
             # Save Documents to S3 Permanent Bucket
-            self.store_documents_in_s3()
+            self.store_documents_in_s3(new_breach.id)
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first

@@ -19,7 +19,7 @@ class Breach(BaseModel):
     reference = models.CharField(null=True, blank=True, max_length=6)
     reporter_full_name = models.CharField(max_length=255)
     reporter_name_of_business_you_work_for = models.CharField(max_length=300, verbose_name="Business you work for")
-    when_did_you_first_suspect = models.DateTimeField()
+    when_did_you_first_suspect = models.DateField()
     is_the_date_accurate = models.CharField(choices=choices.IsTheDateAccurateChoices.choices, max_length=11)
     sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True)
     unknown_sanctions_regime = models.BooleanField(blank=True, default=False)

@@ -24,7 +24,7 @@ def generate_presigned_url(s3_storage: Any, s3_file_object: Any) -> str:
     return presigned_url
 
 
-def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase):
+def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> dict[str, str]:
     """Gets all files that a user has uploaded in a session."""
     s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
     response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=session.session_key)
@@ -39,6 +39,20 @@ def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase):
                 s3_file_object=content["Key"],
             )
     return session_files
+
+
+def get_breach_documents(s3_storage: S3Boto3Storage, breach_id: str) -> dict[str, str]:
+    """Gets all files associated with a breach."""
+    s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
+    response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=breach_id)
+    breach_files = {}
+    for content in response.get("Contents", []):
+        file_name = content["Key"].rpartition("/")[2]
+        breach_files[file_name] = generate_presigned_url(
+            s3_storage=s3_storage,
+            s3_file_object=content["Key"],
+        )
+    return breach_files
 
 
 def delete_session_files(s3_storage: S3Boto3Storage, session: SessionBase):

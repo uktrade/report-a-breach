@@ -71,7 +71,7 @@
                 Address
             </dt>
             <dd class="govuk-summary-list__value">
-                {{ breacher.readable_address | linebreaksbr }}
+                {{ breacher_address | linebreaksbr }}
             </dd>
         </div>
     </dl>
@@ -91,8 +91,8 @@
                 Sanctions regimes breached
             </dt>
             <dd class="govuk-summary-list__value">
-                {% for regime in form_data.which_sanctions_regime.which_sanctions_regime %}
-                    {{ breach.sanctions_regime }}
+                {% for regime in sanctions %}
+                    {{ regime.full_name }}
                     <br>
                 {% endfor %}
                 {% if breach.unknown_sanctions_regime %}
@@ -130,7 +130,7 @@
             <dd class="govuk-summary-list__value">
                 {{ supplier.name }}
                 <br> <br>
-                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=supplier.readable_address|linebreaksbr %}
+                {{ supplier_address | linebreaksbr }}
             </dd>
         </div>
     </dl>
@@ -164,7 +164,7 @@
                     <dd class="govuk-summary-list__value">
                         {% if end_user.website %}
                             <a class="govuk-link"
-                               href="{{ value.cleaned_data.website }}">{{ end_user.website }}<span
+                               href="{{ end_user.website }}">{{ end_user.website }}<span
                                 class="govuk-visually-hidden"></span></a>
                         {% endif %}
                     </dd>
@@ -201,7 +201,7 @@
                 Upload supporting documents
             </dt>
             <dd class="govuk-summary-list__value">
-                {% for document, url in form_data.session_files.items %}
+                {% for document, url in documents.items %}
 
                     <a href="{{url}}" download>{{document}}</a><br>
                 {% endfor %}
