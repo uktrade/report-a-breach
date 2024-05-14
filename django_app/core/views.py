@@ -7,7 +7,7 @@ from core.sites import (
     is_view_a_suspected_breach_site,
 )
 from django.forms import Form
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import RedirectView
 from formtools.wizard.views import NamedUrlSessionWizardView
@@ -68,7 +68,13 @@ class BaseWizardView(NamedUrlSessionWizardView):
             if form is not None:
                 if form.is_valid():
                     self.request.session["redirect"] = None
-                    return self.render_goto_step(redirect_to)
+                    # redirect to summary rather than tasklist summary
+                    if redirect_to == "summary":
+                        return HttpResponseRedirect(
+                            reverse("report_a_suspected_breach:step", kwargs={"step": "summary"}) + "?start=true"
+                        )
+                    else:
+                        return self.render_goto_step(redirect_to)
         return super().render(form, **kwargs)
 
     def post(self, *args: object, **kwargs: object) -> HttpResponse:

@@ -69,9 +69,9 @@ class TestTasklist:
     def test_not_complete_partial(self, mock_get_step_data, rasb_client):
         """testing that if not all the compulsory steps are complete, the overall task is not complete."""
 
-        # mocking the first 3 steps done, 'verify' is still remaining
+        # mocking the first 2 steps done, 'verify' is still remaining
         def fake_step_data(step):
-            if step in ["start", "email"]:
+            if step == "start":
                 return {True: True}
             else:
                 return {}
