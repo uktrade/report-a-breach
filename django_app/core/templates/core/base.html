@@ -57,6 +57,7 @@
                                 </form>
                             </div>
                         </div>
+                    </div>
                 {% endif %}
             {% endif %}
         {% endblock cookie_banner %}
@@ -139,8 +140,14 @@
                 <a class="govuk-back-link govuk-link--no-visited-state show-on-js-enabled hide-on-js-disabled"
                    href="javascript: window.history.go(-1)">Back</a>
 
-                <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-enabled"
-                   href="{{ back_button_link|default_if_none:"/" }}">Back</a>
+                {% if "HTTP_REFERER" in request.META %}
+                    <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-enabled"
+                       href="{{ back_button_link|default_if_none:request.META.HTTP_REFERER|default_if_none:"/" }}?start=true">Back</a>
+                {% else %}
+                    <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-enabled"
+                       href="{{ back_button_link|default_if_none:"/" }}?start=true">Back</a>
+                {% endif %}
+
             {% endblock %}
             {% block main %}
                 <main class="govuk-main-wrapper" id="main-content" role="main">
