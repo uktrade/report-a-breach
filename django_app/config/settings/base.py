@@ -42,7 +42,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
 ]
 
-OUR_APPS = ["config", "core", "report_a_suspected_breach", "view_a_suspected_breach", "healthcheck"]
+OUR_APPS = ["config", "core", "report_a_suspected_breach", "view_a_suspected_breach", "healthcheck", "feedback"]
 
 THIRD_PARTY_APPS = [
     "crispy_forms",

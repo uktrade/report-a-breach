@@ -1,5 +1,6 @@
 import time
 
+from config.env import DBTPlatformSettings, env
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
@@ -13,6 +14,10 @@ class HealthCheckView(View):
     the health of the service."""
 
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+        # we want to disable the healthcheck if we're building on DBT Platform
+        if isinstance(env, DBTPlatformSettings) and env.in_build_step:
+            return HttpResponse(status=200)
+
         start = time.time()
         is_db_good = db_check()
         is_s3_good = s3_check()

@@ -1,8 +1,16 @@
 from unittest.mock import patch
 
+import pytest
 from django.urls import reverse
 
 from tests.helpers import get_response_content
+
+
+@pytest.fixture(autouse=True)
+def setup():
+    """Need to fix the Sites context processor as healthcheck views don't have a site."""
+    with patch("core.sites.context_processors.sites", return_value={}):
+        yield
 
 
 def test_successful_healthcheck(rasb_client):

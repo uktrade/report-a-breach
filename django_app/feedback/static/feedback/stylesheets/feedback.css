@@ -1,0 +1,44 @@
+/* FEEDBACK RATING  https://www.cssscript.com/star-rating-radio/ */
+.star-rating__stars {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: stretch;
+}
+
+.star-rating__label {
+    display: block;
+    height: 7em;
+    width: 7em;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto;
+    order: 0;
+    background: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 70 70'%3e%3cpath fill='white' stroke='grey' stroke-width='2' d='m25,1 6,17h18l-14,11 5,17-15-10-15,10 5-17-14-11h18z'/%3e%3c/svg%3e");
+    background-size: contain;
+}
+
+.star-rating__label:hover, .star-rating__selected {
+    background: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 70 70'%3e%3cpath fill='gold' stroke='grey' stroke-width='2' d='m25,1 6,17h18l-14,11 5,17-15-10-15,10 5-17-14-11h18z'/%3e%3c/svg%3e");
+    background-size: contain;
+}
+
+.star-rating__label:hover{
+    cursor: pointer;
+}
+
+.star-rating__input {
+    margin: 0;
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+}
+
+#js_selected_rating {
+    height: 2em;
+}
