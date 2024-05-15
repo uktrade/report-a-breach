@@ -7,6 +7,10 @@ class BreachFactory(factory.django.DjangoModelFactory):
         model = "report_a_suspected_breach.Breach"
 
     when_did_you_first_suspect = factory.Faker("date_time", tzinfo=timezone.get_current_timezone())
+    where_were_the_goods_supplied_from = factory.Faker(
+        "random_element",
+        elements=["same_address", "different_uk_address", "outside_the_uk", "they_have_not_been_supplied", "i_do_not_know"],
+    )
 
 
 class SanctionsRegimeFactory(factory.django.DjangoModelFactory):
@@ -48,6 +52,14 @@ class RecipientPersonOrCompanyFactory(factory.django.DjangoModelFactory):
     type_of_relationship = "recipient"
 
 
+class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.CompaniesHouseCompany"
+
+    registered_company_number = factory.Faker("random_int", min=11111111, max=99999999)
+    registered_company_name = factory.Faker("company")
+
+
 class BreachWith2SanctionsFactory(BreachFactory):
     sanctions1 = factory.RelatedFactory(
         SanctionsRegimeBreachThroughFactory,
@@ -72,9 +84,14 @@ class BreachWith2SanctionsFactory(BreachFactory):
     recipient3 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
 
 
-class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "report_a_suspected_breach.CompaniesHouseCompany"
+class BreachWithCompaniesHouseFactory(BreachFactory):
+    sanctions1 = factory.RelatedFactory(
+        SanctionsRegimeBreachThroughFactory,
+        factory_related_name="breach",
+    )
 
-    registered_company_number = factory.Faker("")
-    breach = factory.SubFactory(BreachWith2SanctionsFactory)
+    companies_house_company = factory.RelatedFactory(CompaniesHouseCompanyFactory, factory_related_name="breach")
+
+    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+
+    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")

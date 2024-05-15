@@ -6,6 +6,7 @@ from django.test import Client, RequestFactory
 from tests.factories import (
     BreachFactory,
     BreachWith2SanctionsFactory,
+    BreachWithCompaniesHouseFactory,
     SanctionsRegimeFactory,
 )
 from tests.helpers import get_test_client
@@ -55,3 +56,9 @@ def request_object(rasb_client: Client):
 def breach_with_sanctions_object(db):
     """Fixture to create a breach with sanctions object"""
     return BreachWith2SanctionsFactory()
+
+
+@pytest.fixture()
+def breach_with_companies_house_object(db):
+    """Fixture to create a breach with companies house object"""
+    return BreachWithCompaniesHouseFactory()
