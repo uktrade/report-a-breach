@@ -24,12 +24,57 @@ class SanctionsRegimeBreachThroughFactory(factory.django.DjangoModelFactory):
     sanctions_regime = factory.SubFactory(SanctionsRegimeFactory)
 
 
+class BreacherPersonOrCompanyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.PersonOrCompany"
+
+    name = factory.Faker("name")
+    type_of_relationship = "breacher"
+
+
+class SupplierPersonOrCompanyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.PersonOrCompany"
+
+    name = factory.Faker("name")
+    type_of_relationship = "supplier"
+
+
+class RecipientPersonOrCompanyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.PersonOrCompany"
+
+    name = factory.Faker("name")
+    type_of_relationship = "recipient"
+
+
 class BreachWith2SanctionsFactory(BreachFactory):
-    membership1 = factory.RelatedFactory(
+    sanctions1 = factory.RelatedFactory(
         SanctionsRegimeBreachThroughFactory,
         factory_related_name="breach",
     )
-    membership2 = factory.RelatedFactory(
+    sanctions2 = factory.RelatedFactory(
         SanctionsRegimeBreachThroughFactory,
         factory_related_name="breach",
     )
+
+    breacher = factory.RelatedFactory(
+        BreacherPersonOrCompanyFactory,
+        factory_related_name="breach",
+    )
+
+    supplier = factory.RelatedFactory(SupplierPersonOrCompanyFactory, factory_related_name="breach")
+
+    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+
+    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+
+    recipient3 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+
+
+class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.CompaniesHouseCompany"
+
+    registered_company_number = factory.Faker("")
+    breach = factory.SubFactory(BreachWith2SanctionsFactory)
