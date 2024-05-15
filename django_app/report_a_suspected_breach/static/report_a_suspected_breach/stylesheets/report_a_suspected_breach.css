@@ -1,17 +1,5 @@
-.hidden-element {
-    display: none;
-}
-
 .tasklist_no_hover:hover {
     background: none;
-}
-
-.mb-0 {
-    margin-bottom: 0;
-}
-
-.mb-1 {
-    margin-bottom: 1rem;
 }
 
 .button-that-looks-like-link {

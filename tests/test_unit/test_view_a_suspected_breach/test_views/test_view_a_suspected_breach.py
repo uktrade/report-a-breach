@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 from core.sites import SiteName
 from django.contrib.auth.models import User
 from django.test import RequestFactory
-from view_a_suspected_breach.views import AdminViewABreachView, ViewABreachView
+from view_a_suspected_breach.views import ManageUsersView, ViewABreachView
 
 
 class TestViewASuspectedBreach:
@@ -71,7 +71,7 @@ class TestAdminViewABreach:
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = test_user
-        view = AdminViewABreachView()
+        view = ManageUsersView()
         view.setup(request_object)
         response = view.dispatch(request_object)
 
@@ -88,7 +88,7 @@ class TestAdminViewABreach:
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = test_user
-        view = AdminViewABreachView()
+        view = ManageUsersView()
         view.setup(request_object)
         response = view.dispatch(request_object)
 

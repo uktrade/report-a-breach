@@ -17,7 +17,7 @@ class ViewABreachView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView)
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class AdminViewABreachView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
+class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
     template_name = "view_a_suspected_breach/user_admin.html"
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
@@ -27,16 +27,14 @@ class AdminViewABreachView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView)
         return context
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
-        user_objects = User.objects.all()
-
         if update_user := self.request.GET.get("accept_user", None):
-            user_to_accept = user_objects.get(id=update_user)
+            user_to_accept = User.objects.get(id=update_user)
             user_to_accept.is_active = True
             user_to_accept.save()
             return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
         if delete_user := self.request.GET.get("delete_user", None):
-            denied_user = user_objects.get(id=delete_user)
+            denied_user = User.objects.get(id=delete_user)
             denied_user.delete()
             return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
