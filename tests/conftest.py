@@ -3,7 +3,11 @@ from core.sites import SiteName
 from django.contrib.sites.models import Site
 from django.test import Client, RequestFactory
 
-from tests.factories import BreachFactory, SanctionsRegimeFactory
+from tests.factories import (
+    BreachFactory,
+    BreachWith2SanctionsFactory,
+    SanctionsRegimeFactory,
+)
 from tests.helpers import get_test_client
 
 
@@ -45,3 +49,9 @@ def request_object(rasb_client: Client):
     request_object = RequestFactory()
     request_object.session = rasb_client.session
     return request_object
+
+
+@pytest.fixture()
+def breach_with_sanctions_object(db):
+    """Fixture to create a breach with sanctions object"""
+    return BreachWith2SanctionsFactory()
