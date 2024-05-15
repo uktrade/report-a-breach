@@ -20,7 +20,7 @@ class ActiveUserRequiredMixin:
                         context={
                             "user_email": request.user.email,
                             "user_login_datetime": user_login_datetime,
-                            "admin_url": f"{settings.VIEW_A_SUSPECTED_BREACH_DOMAIN}{admin_url}",
+                            "admin_url": f"{settings.VIEW_A_SUSPECTED_BREACH_DOMAIN}{admin_url}#pending",
                         },
                     )
             return render(request, "view_a_suspected_breach/unauthorised.html")
