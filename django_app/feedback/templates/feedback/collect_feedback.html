@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+
+{% block extra_css %}
+    {{ form.media.css }}
+{% endblock extra_css %}
+
+{% block extra_js %}
+    {{ form.media.js }}
+{% endblock extra_js %}
+
+{% block column_content %}
+    <form method="post" enctype='multipart/form-data' novalidate>
+        <h1 class="govuk-heading-l">Give feedback on the Report a Suspected Breach of Trade Sanctions service</h1>
+        {% csrf_token %}
+        {% crispy form %}
+    </form>
+
+{% endblock column_content %}

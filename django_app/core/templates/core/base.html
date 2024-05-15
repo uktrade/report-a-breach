@@ -31,7 +31,8 @@
         {% block cookie_banner %}
             {% if request.resolver_match.url_name != "cookies_consent" %}
                 {% if request.COOKIES.cookie_preferences_set != "true" %}
-                    <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Report a suspected trade sanctions breach">
+                    <div class="govuk-cookie-banner" data-nosnippet role="region"
+                         aria-label="Cookies on Report a suspected trade sanctions breach">
                         <div class="govuk-cookie-banner__message govuk-width-container">
                             <div class="govuk-grid-row">
                                 <div class="govuk-grid-column-two-thirds">
@@ -39,21 +40,26 @@
                                         Cookies on Report a suspected breach of trade sanctions
                                     </h2>
                                     <div class="govuk-cookie-banner__content">
-                                        <p class="govuk-body">We use some essential cookies to make this service work.</p>
-                                        <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
+                                        <p class="govuk-body">We use some essential cookies to make this service
+                                            work.</p>
+                                        <p class="govuk-body">We’d also like to use analytics cookies so we can
+                                            understand how you use the service and make improvements.</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="govuk-button-group">
                                 <form method="post" action="{% url 'report_a_suspected_breach:cookies_consent' %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="govuk-button" data-module="govuk-button" name="do_you_want_to_accept_analytics_cookies" value="True">
+                                    <button type="submit" class="govuk-button" data-module="govuk-button"
+                                            name="do_you_want_to_accept_analytics_cookies" value="True">
                                         Accept analytics cookies
                                     </button>
-                                    <button type="submit" class="govuk-button" data-module="govuk-button" name="do_you_want_to_accept_analytics_cookies" value="False">
+                                    <button type="submit" class="govuk-button" data-module="govuk-button"
+                                            name="do_you_want_to_accept_analytics_cookies" value="False">
                                         Reject analytics cookies
                                     </button>
-                                    <a class="govuk-link" href="/report_a_suspected_breach/cookies_consent">View cookies</a>
+                                    <a class="govuk-link" href="/report_a_suspected_breach/cookies_consent">View
+                                        cookies</a>
                                 </form>
                             </div>
                         </div>
@@ -78,9 +84,15 @@
         <link rel="apple-touch-icon" href="{% static "govuk/images/govuk-apple-touch-icon.png" %}">
         <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
 
+		{# stylesheets #}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+              integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
         <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-5.3.0.min.css" %}">
         <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
-        <link rel="stylesheet" href="{% static "report_a_suspected_breach/stylesheets/report_a_suspected_breach.css" %}">
+        <link rel="stylesheet"
+              href="{% static "report_a_suspected_breach/stylesheets/report_a_suspected_breach.css" %}">
 
         {% block extra_css %}{% endblock extra_css %}
     </head>
@@ -136,6 +148,16 @@
             </div>
         </header>
         <div class="govuk-width-container">
+            <div class="govuk-phase-banner">
+                <p class="govuk-phase-banner__content">
+                    <strong class="govuk-tag govuk-phase-banner__content__tag">
+                        Alpha
+                    </strong>
+                    <span class="govuk-phase-banner__text">
+                        This is a new service – your <a class="govuk-link" href="{% url 'feedback:collect_full_feedback' %}">feedback</a> will help us to improve it.
+                    </span>
+                </p>
+            </div>
             {% block back_button %}
                 <a class="govuk-back-link govuk-link--no-visited-state show-on-js-enabled hide-on-js-disabled"
                    href="javascript: window.history.go(-1)">Back</a>
@@ -193,10 +215,11 @@
                     </div>
                 </div>
             </div>
-            <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+            <script src="{% static 'core/javascript/jquery-3.7.1.js' %}"></script>
             <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"></script>
             <script type="module">
                 import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"
+
                 initAll()
             </script>
             {% block extra_js %}{% endblock %}
