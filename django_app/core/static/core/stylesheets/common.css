@@ -33,3 +33,11 @@
     display: flex;
     justify-content: center;
 }
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-1 {
+    margin-bottom: 1rem;
+}
