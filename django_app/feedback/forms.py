@@ -53,6 +53,5 @@ class FeedbackForm(BaseModelForm):
                 max_characters=1200,
                 aria_describedby="how_we_could_improve_the_service-label",
             ),
-            # todo - @Morgan - update your other code to use this new HTMLTemplate class
             HTMLTemplate("feedback/feedback_disclaimer.html"),
         )
