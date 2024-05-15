@@ -14,6 +14,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView
+from feedback.forms import FeedbackForm
 from utils.companies_house import get_formatted_address
 from utils.notifier import verify_email
 from utils.s3 import delete_session_files, generate_presigned_url, get_all_session_files
@@ -473,6 +474,11 @@ class CookiesConsentView(FormView):
 
 class CompleteView(TemplateView):
     template_name = "report_a_suspected_breach/complete.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["feedback_form"] = FeedbackForm()
+        return context
 
 
 class UploadDocumentsView(FormView):

@@ -27,9 +27,7 @@ def makemigrations(context: Any, app: str = "report_a_suspected_breach") -> None
 @task
 def migrate(context: Any, app: str = "report_a_suspected_breach") -> None:
     print("Running manage.py migrate")
-    base_command = "pipenv run python django_app/manage.py migrate"
-    if app:
-        base_command += f" {app}"
+    base_command = f"pipenv run python django_app/manage.py migrate {app}"
     context.run(base_command)
 
 

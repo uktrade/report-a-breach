@@ -1,0 +1,43 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static "feedback/stylesheets/feedback.css" %}">
+<script src="{% static 'feedback/javascript/feedback.js' %}"></script>
+
+<form method="post" id="feedback_form" action="{% url 'feedback:collect_feedback' %}">
+    {% csrf_token %}
+    {% include "feedback/crispy_fields/feedback_stars.html" %}
+    <div class="flex-parent">
+        <button class="govuk-button govuk-button--secondary"
+                id="submit_rating_button"
+                data-module="govuk-button">
+            Continue
+        </button>
+    </div>
+    <input type="hidden" id="existing_feedback_id" name="existing_feedback_id">
+</form>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.star-rating__label').click(function (e) {
+            let rating = $(this).data("rating-value")
+            $.ajax({
+                type: "POST",
+                headers: {'X-CSRFToken': $('[name="csrfmiddlewaretoken"]').val()},
+                url: "{% url 'feedback:collect_feedback' %}",
+                data: {
+                    "rating": rating,
+                    "existing_feedback_id": $('#existing_feedback_id').val(),
+                },
+                success: function (data) {
+                    $('#submit_rating_button').data("second-step-url", data.second_step_url)
+                    $('#existing_feedback_id').val(data.feedback_id)
+                }
+            });
+        })
+
+        $('#submit_rating_button').click(function (e) {
+            e.preventDefault()
+            window.location.href = $(this).data("second-step-url")
+        })
+    }, false);
+</script>
