@@ -6,6 +6,7 @@ from django.test import RequestFactory
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import (
     Breach,
+    CompaniesHouseCompany,
     PersonOrCompany,
     ReporterEmailVerification,
     SanctionsRegime,
@@ -26,14 +27,18 @@ class TestReportABreachWizardView:
         request_object = RequestFactory().get("/")
         self.request_object = request_object
 
+    @pytest.mark.parametrize("cleaned_data_return", [data.cleaned_data, data.cleaned_companies_house_data])
     @patch("report_a_suspected_breach.form_step_conditions.show_about_the_supplier_page")
+    @patch("report_a_suspected_breach.form_step_conditions.show_check_company_details_page_condition")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.store_documents_in_s3")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.get_all_cleaned_data")
     def test_done(
         self,
         mocked_get_all_cleaned_data,
         mocked_store_documents_in_s3,
+        mocked_show_check_company_details_page_condition,
         mocked_show_about_the_supplier_page,
+        cleaned_data_return,
         sanctions_regime_object,
         request_object,
         rasb_client,
@@ -41,14 +46,17 @@ class TestReportABreachWizardView:
 
         # Create Sanctions Regime Object
         sanctions_regime_name = SanctionsRegime.objects.all()[0].full_name
-        data.cleaned_data["which_sanctions_regime"] = {"which_sanctions_regime": [sanctions_regime_name, "unknown_regime"]}
-
         # Setup Mock return values
         view = ReportABreachWizardView()
         view.storage = MagicMock()
         view.steps = MagicMock()
-        mocked_get_all_cleaned_data.return_value = data.cleaned_data
+        mocked_get_all_cleaned_data.return_value = cleaned_data_return
         mocked_show_about_the_supplier_page.return_value = True
+        if cleaned_data_return["do_you_know_the_registered_company_number"]["do_you_know_the_registered_company_number"] == "yes":
+            mocked_show_check_company_details_page_condition.return_value = True
+        else:
+            mocked_show_check_company_details_page_condition.return_value = False
+        cleaned_data_return["which_sanctions_regime"] = {"which_sanctions_regime": [sanctions_regime_name, "unknown_regime"]}
 
         # SetUp session values
         form_list = []
@@ -71,14 +79,20 @@ class TestReportABreachWizardView:
         breacher = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.breacher)
         supplier = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.supplier)
         end_user = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.recipient)
-
+        companies_house_company = CompaniesHouseCompany.objects.filter(breach=breach[0])
         # Assert breacher, supplier and end_users objects created
-        assert len(breacher) == 1
+
+        if mocked_show_check_company_details_page_condition.return_value is True:
+            assert len(companies_house_company) == 1
+            assert companies_house_company[0].breach == breach[0]
+        else:
+            assert len(breacher) == 1
+            assert breacher[0].breach == breach[0]
+
         assert len(supplier) == 1
         assert len(end_user) == 3
 
         # Assert breach object associated with breacher, supplier, end_users
-        assert breacher[0].breach == breach[0]
         assert supplier[0].breach == breach[0]
         assert end_user[1].breach == breach[0]
 
