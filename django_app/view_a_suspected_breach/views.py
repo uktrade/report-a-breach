@@ -1,6 +1,7 @@
 from typing import Any
 
 from core.sites import require_view_a_breach
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import reverse
@@ -11,12 +12,12 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class ViewABreachView(ActiveUserRequiredMixin, TemplateView):
+class ViewABreachView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView):
     template_name = "view_a_suspected_breach/landing.html"
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class AdminViewABreachView(StaffUserOnlyMixin, TemplateView):
+class AdminViewABreachView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
     template_name = "view_a_suspected_breach/user_admin.html"
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:

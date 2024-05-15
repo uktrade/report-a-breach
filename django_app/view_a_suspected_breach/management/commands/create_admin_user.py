@@ -1,16 +1,16 @@
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 
 
 class Command(BaseCommand):
     help = "Create the admin user for View a Suspected Breach"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--first_name", type=str)
         parser.add_argument("--last_name", type=str)
         parser.add_argument("--email", type=str)
 
-    def handle(self, *args, **options):
+    def handle(self, *args: object, **options: object) -> None:
         first_name, last_name, email = options["first_name"], options["last_name"], options["email"]
 
         user_objects = User.objects.all()

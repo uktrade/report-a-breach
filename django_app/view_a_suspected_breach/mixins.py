@@ -1,12 +1,11 @@
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, reverse
 from utils.notifier import send_email
 
 
-class ActiveUserRequiredMixin(LoginRequiredMixin):
+class ActiveUserRequiredMixin:
     def dispatch(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         if not request.user.is_active:
             for user in User.objects.filter(is_staff=True):
@@ -21,7 +20,7 @@ class ActiveUserRequiredMixin(LoginRequiredMixin):
         return super().dispatch(request, **kwargs)
 
 
-class StaffUserOnlyMixin(LoginRequiredMixin):
+class StaffUserOnlyMixin:
     def dispatch(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
         if not request.user.is_staff:
             return HttpResponse("Not authorized", status=401)

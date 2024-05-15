@@ -17,11 +17,15 @@ class TestViewASuspectedBreach:
         )
 
         request_object = RequestFactory().get("/")
-
         request_object.user = test_user
+        request_object.site = SiteName
+        request_object.site.name = SiteName.view_a_suspected_breach
+
+        vasb_client.force_login(test_user)
+
         view = ViewABreachView()
         view.setup(request_object)
-        response = view.get(request_object)
+        response = view.dispatch(request_object)
 
         assert response.status_code == 200
         mock_email.assert_not_called()
@@ -47,7 +51,8 @@ class TestViewASuspectedBreach:
         request_object.user = test_user
         view = ViewABreachView()
         view.setup(request_object)
-        response = view.get(request_object)
+        vasb_client.force_login(test_user)
+        response = view.dispatch(request_object)
 
         assert response.status_code == 200
         mock_email.assert_called_once()
@@ -68,7 +73,7 @@ class TestAdminViewABreach:
         request_object.user = test_user
         view = AdminViewABreachView()
         view.setup(request_object)
-        response = view.get(request_object)
+        response = view.dispatch(request_object)
 
         assert response.status_code == 401
 
@@ -85,6 +90,6 @@ class TestAdminViewABreach:
         request_object.user = test_user
         view = AdminViewABreachView()
         view.setup(request_object)
-        response = view.get(request_object)
+        response = view.dispatch(request_object)
 
         assert response.status_code == 200
