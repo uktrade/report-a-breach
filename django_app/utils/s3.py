@@ -24,7 +24,7 @@ def generate_presigned_url(s3_storage: Any, s3_file_object: Any) -> str:
     return presigned_url
 
 
-def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase):
+def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> dict[str, Any]:
     """Gets all files that a user has uploaded in a session."""
     s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
     response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=session.session_key)
@@ -41,7 +41,7 @@ def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase):
     return session_files
 
 
-def delete_session_files(s3_storage: S3Boto3Storage, session: SessionBase):
+def delete_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> None:
     s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
 
     response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=session.session_key)
