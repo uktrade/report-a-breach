@@ -26,16 +26,6 @@ class TestReportABreachWizardView:
         request_object = RequestFactory().get("/")
         self.request_object = request_object
 
-    def setup_view(self, view, request, *args, **kwargs):
-        """
-        Mimic ``as_view()``, but returns view instance.
-        """
-
-        view.request = request
-        view.args = args
-        view.kwargs = kwargs
-        return view
-
     @patch("report_a_suspected_breach.form_step_conditions.show_about_the_supplier_page")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.store_documents_in_s3")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.get_all_cleaned_data")
@@ -69,7 +59,7 @@ class TestReportABreachWizardView:
         session.save()
 
         # SetUp View
-        self.setup_view(view, rasb_client, request_object)
+        view.setup(request_object)
 
         # Call done method of view
         response = view.done(form_list)
