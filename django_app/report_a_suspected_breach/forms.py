@@ -8,7 +8,6 @@ from core.utils import get_mime_type
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
-    HTML,
     ConditionalQuestion,
     ConditionalRadios,
     Field,
@@ -20,10 +19,10 @@ from crispy_forms_gds.layout import (
 )
 from django import forms
 from django.conf import settings
-from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
+from feedback.crispy_fields import HTMLTemplate
 from utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
@@ -121,11 +120,9 @@ class EmailVerifyForm(BaseForm):
         request_verify_code = reverse_lazy("report_a_suspected_breach:request_verify_code")
         self.helper["email_verification_code"].wrap(
             Field,
-            HTML(
-                render_to_string(
-                    "report_a_suspected_breach/form_steps/partials/not_received_code_help_text.html",
-                    {"request_verify_code": request_verify_code},
-                )
+            HTMLTemplate(
+                "report_a_suspected_breach/form_steps/partials/not_received_code_help_text.html",
+                {"request_verify_code": request_verify_code},
             ),
         )
 

@@ -22,3 +22,15 @@
     color: #003078;
     font-size: 19px;
 }
+
+.js-disabled .govuk-radios__conditional--hidden {
+    display: block;
+}
+
+.wide-div {
+    width: 90vw;
+}
+
+.display-inline {
+    display: inline-block;
+}
