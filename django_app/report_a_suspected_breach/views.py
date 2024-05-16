@@ -462,13 +462,20 @@ class CookiesConsentView(FormView):
         referrer_url = self.request.GET.get("referrer_url", "/")
         response = redirect(referrer_url)
 
+        user_choice = form.cleaned_data["do_you_want_to_accept_analytics_cookies"]
+
         # regardless of their choice, we set a cookie to say they've made a choice
         response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
         response.set_cookie(
             "accepted_ga_cookies",
-            "true" if form.cleaned_data["do_you_want_to_accept_analytics_cookies"] else "false",
+            "true" if user_choice else "false",
             max_age=cookie_max_age,
         )
+
+        # if post_from_banner := self.request.GET.get("banner", None):
+        #     if user_choice:
+        #         return redirect()
+
         return response
 
 
