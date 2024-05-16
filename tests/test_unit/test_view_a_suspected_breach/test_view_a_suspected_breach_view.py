@@ -44,7 +44,7 @@ class TestViewASuspectedBreachView:
         assert response.context["breach"] == breach_with_companies_house_object
         assert response.context["breacher"] == breacher
         if breach_with_companies_house_object.where_were_the_goods_supplied_from == "same_address":
-            assert response.context["supplier"]["name"] == breacher.name
+            assert response.context["supplier"].name == breacher.name
         else:
             assert "supplier" not in response.context.keys()
         assert set(response.context["recipients"]) == set(recipients)
