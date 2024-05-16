@@ -71,17 +71,13 @@ class PersonOrCompany(BaseModel):
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
     additional_contact_details = models.TextField(null=True, blank=True)
     type_of_relationship = models.CharField(choices=choices.TypeOfRelationshipChoices.choices, max_length=9)
-
-
-class CompaniesHouseCompany(BaseModel):
     do_you_know_the_registered_company_number = models.CharField(
         choices=choices.YesNoChoices.choices,
         max_length=3,
         blank=False,
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
-    registered_company_name = models.CharField()
-    registered_office_address = models.CharField()
+    registered_office_address = models.CharField(null=True, blank=True)
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
 
 

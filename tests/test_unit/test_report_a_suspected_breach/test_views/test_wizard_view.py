@@ -6,7 +6,6 @@ from django.test import RequestFactory
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import (
     Breach,
-    CompaniesHouseCompany,
     PersonOrCompany,
     ReporterEmailVerification,
     SanctionsRegime,
@@ -79,15 +78,10 @@ class TestReportABreachWizardView:
         breacher = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.breacher)
         supplier = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.supplier)
         end_user = PersonOrCompany.objects.filter(breach=breach[0], type_of_relationship=TypeOfRelationshipChoices.recipient)
-        companies_house_company = CompaniesHouseCompany.objects.filter(breach=breach[0])
         # Assert breacher, supplier and end_users objects created
 
-        if mocked_show_check_company_details_page_condition.return_value is True:
-            assert len(companies_house_company) == 1
-            assert companies_house_company[0].breach == breach[0]
-        else:
-            assert len(breacher) == 1
-            assert breacher[0].breach == breach[0]
+        assert len(breacher) == 1
+        assert breacher[0].breach == breach[0]
 
         assert len(supplier) == 1
         assert len(end_user) == 3

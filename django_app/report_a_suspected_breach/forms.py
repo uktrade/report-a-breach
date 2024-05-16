@@ -34,7 +34,6 @@ from .exceptions import CompaniesHouseException
 from .fields import DateInputField, MultipleFileField
 from .models import (
     Breach,
-    CompaniesHouseCompany,
     PersonOrCompany,
     ReporterEmailVerification,
     SanctionsRegime,
@@ -193,7 +192,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
     registered_office_address = forms.CharField(required=False)
 
     class Meta:
-        model = CompaniesHouseCompany
+        model = PersonOrCompany
         fields = ["do_you_know_the_registered_company_number", "registered_company_number"]
         widgets = {"do_you_know_the_registered_company_number": forms.RadioSelect}
         labels = {

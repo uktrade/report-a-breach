@@ -21,13 +21,7 @@ from utils.s3 import delete_session_files, generate_presigned_url, get_all_sessi
 
 from .choices import TypeOfRelationshipChoices
 from .forms import CookiesConsentForm, EmailVerifyForm, SummaryForm, UploadDocumentsForm
-from .models import (
-    Breach,
-    CompaniesHouseCompany,
-    PersonOrCompany,
-    ReporterEmailVerification,
-    SanctionsRegime,
-)
+from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
     OverviewOfTheSuspectedBreachTask,
@@ -361,6 +355,19 @@ class ReportABreachWizardView(BaseWizardView):
         )
         new_business_or_person_details.save()
 
+    def save_companies_house_company_to_db(
+        self, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> None:
+        new_companies_house_company = PersonOrCompany.objects.create(
+            name=companies_house_company.get("registered_company_name"),
+            country="The UK",
+            registered_company_number=companies_house_company.get("registered_company_number"),
+            registered_office_address=companies_house_company.get("registered_office_address"),
+            breach=breach,
+            type_of_relationship=relationship,
+        )
+        new_companies_house_company.save()
+
     def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         cleaned_data = self.get_all_cleaned_data()
         # we're importing these methods here to avoid circular imports
@@ -421,14 +428,8 @@ class ReportABreachWizardView(BaseWizardView):
                 breacher_details = cleaned_data["business_or_person_details"]
                 self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
             else:
-                do_you_know_the_registered_company_number_step = cleaned_data["do_you_know_the_registered_company_number"]
-                new_companies_house_company = CompaniesHouseCompany.objects.create(
-                    registered_company_number=do_you_know_the_registered_company_number_step["registered_company_number"],
-                    registered_company_name=do_you_know_the_registered_company_number_step["registered_company_name"],
-                    registered_office_address=do_you_know_the_registered_company_number_step["registered_office_address"],
-                    breach=new_breach,
-                )
-                new_companies_house_company.save()
+                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
+                self.save_companies_house_company_to_db(new_breach, companies_house_details, TypeOfRelationshipChoices.breacher)
 
             # Save Supplier Details to Database
             if show_about_the_supplier_page(self):

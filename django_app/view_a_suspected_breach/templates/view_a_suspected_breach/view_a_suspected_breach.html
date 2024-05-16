@@ -26,11 +26,6 @@
                 <dd class="govuk-summary-list__value">
                     {{ breach.reporter_name_of_business_you_work_for }}
                 </dd>
-            {% elif companies_house_company %}
-                <dd class="govuk-summary-list__value">
-                    {{ companies_house_company.registered_company_name }}
-
-                </dd>
             {% else %}
                 <dd class="govuk-summary-list__value">
                     {{ breacher.name }}
@@ -41,32 +36,15 @@
     </dl>
     <h2 class="govuk-heading-m">Person or business suspected of breaching sanctions</h2>
     <dl class="govuk-summary-list">
-        {% if companies_house_company %}
+        {% if breacher.registered_company_number %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Registered business number
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ companies_house_company.registered_company_number }}
+                    {{ breacher.registered_company_number }}
                 </dd>
             </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Name
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ companies_house_company.registered_company_name }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Address
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ companies_house_company.registered_office_address | linebreaksbr }}
-                </dd>
-            </div>
-        {% else %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Name
@@ -75,18 +53,19 @@
                     {{ breacher.name }}
                 </dd>
             </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Website
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% if breacher.website %}
+            {% if breacher.website %}
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                        Website
+                    </dt>
+                    <dd class="govuk-summary-list__value">
                         <a class="govuk-link"
                            href="{{ form_data.about_the_supplier.website }}">{{ breacher.website }}<span
                             class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
-                    {% endif %}
-                </dd>
-            </div>
+                    </dd>
+                </div>
+            {% endif %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Address

@@ -4,18 +4,13 @@ from core.document_storage import PermanentDocumentStorage
 from core.sites import require_view_a_breach
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.db.models import QuerySet
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, TemplateView
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
-from report_a_suspected_breach.models import (
-    Breach,
-    CompaniesHouseCompany,
-    PersonOrCompany,
-)
+from report_a_suspected_breach.models import Breach, PersonOrCompany
 from utils.companies_house import get_formatted_address
 from utils.s3 import get_breach_documents
 
@@ -53,12 +48,12 @@ class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, DetailView):
+class ViewASuspectedBreachView(DetailView):
     template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
 
-    def get_queryset(self) -> QuerySet[Breach]:
+    def get_object(self) -> Breach:
         self.breach = get_object_or_404(Breach, id=self.kwargs["pk"])
-        return Breach.objects.filter(id=self.breach.id)
+        return self.breach
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -70,12 +65,12 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
         if breacher := PersonOrCompany.objects.filter(
             breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first():
-            breacher_address = get_formatted_address(model_to_dict(breacher))
+            if breacher.registered_company_number:
+                breacher_address = breacher.registered_office_address
+            else:
+                breacher_address = get_formatted_address(model_to_dict(breacher))
             context["breacher"] = breacher
             context["breacher_address"] = breacher_address
-
-        if companies_house_company := CompaniesHouseCompany.objects.filter(breach_id=self.breach.id).first():
-            context["companies_house_company"] = companies_house_company
 
         # Supplier
         if supplier := PersonOrCompany.objects.filter(
@@ -89,9 +84,6 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
             if breacher:
                 context["supplier"] = breacher
                 context["supplier_address"] = breacher_address
-            elif companies_house_company:
-                context["supplier"] = {"name": companies_house_company.registered_company_name, "country": "The UK"}
-                context["supplier_address"] = companies_house_company.registered_office_address
 
         # End Users (recipients)
         recipients = PersonOrCompany.objects.filter(

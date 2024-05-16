@@ -36,6 +36,15 @@ class BreacherPersonOrCompanyFactory(factory.django.DjangoModelFactory):
     type_of_relationship = "breacher"
 
 
+class BreacherCompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.PersonOrCompany"
+
+    registered_company_number = factory.Faker("random_int", min=11111111, max=99999999)
+    name = factory.Faker("company")
+    type_of_relationship = "breacher"
+
+
 class SupplierPersonOrCompanyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "report_a_suspected_breach.PersonOrCompany"
@@ -50,14 +59,6 @@ class RecipientPersonOrCompanyFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("name")
     type_of_relationship = "recipient"
-
-
-class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "report_a_suspected_breach.CompaniesHouseCompany"
-
-    registered_company_number = factory.Faker("random_int", min=11111111, max=99999999)
-    registered_company_name = factory.Faker("company")
 
 
 class BreachWith2SanctionsFactory(BreachFactory):
@@ -90,8 +91,10 @@ class BreachWithCompaniesHouseFactory(BreachFactory):
         factory_related_name="breach",
     )
 
-    companies_house_company = factory.RelatedFactory(CompaniesHouseCompanyFactory, factory_related_name="breach")
-
+    breacher = factory.RelatedFactory(
+        BreacherCompaniesHouseCompanyFactory,
+        factory_related_name="breach",
+    )
     recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
 
     recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
