@@ -472,9 +472,9 @@ class CookiesConsentView(FormView):
             max_age=cookie_max_age,
         )
 
-        # if post_from_banner := self.request.GET.get("banner", None):
-        #     if user_choice:
-        #         return redirect()
+        if self.request.GET.get("banner", None):
+            self.request.session["cookies_set_in_banner"] = True
+            self.request.session.modified = True
 
         return response
 
