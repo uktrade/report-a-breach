@@ -736,6 +736,13 @@ class CookiesConsentForm(BaseForm):
             self.fields["do_you_want_to_accept_analytics_cookies"].initial = str(kwargs_initial["accept_cookies"])
 
 
+class HideCookiesNoticeForm(BaseForm):
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("hide cookie message", "Hide cookie message", css_class="govuk-button"))
+
+
 class UploadDocumentsForm(BaseForm):
     revalidate_on_done = False
     document = MultipleFileField(

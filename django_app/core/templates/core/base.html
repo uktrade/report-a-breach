@@ -66,38 +66,41 @@
                     </div>
                 {% endif %}
                 {% if request.session.cookies_set_in_banner %}
-                    {% if request.COOKIES.accepted_ga_cookies == "true" %}
-                        <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
-                            <div class="govuk-grid-row">
-                                <div class="govuk-grid-column-two-thirds">
-                                    <div class="govuk-cookie-banner__content">
-                                        <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}">change your cookie settings</a> at any time.</p>
+                    <form method="post" action="{% url 'report_a_suspected_breach:cookies_consent_notice' %}?banner=True">
+                        {% csrf_token %}
+                        {% if request.COOKIES.accepted_ga_cookies == "true" %}
+                            <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
+                                <div class="govuk-grid-row">
+                                    <div class="govuk-grid-column-two-thirds">
+                                        <div class="govuk-cookie-banner__content">
+                                            <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}">change your cookie settings</a> at any time.</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="govuk-button-group">
-                                <button type="button" class="govuk-button" data-module="govuk-button">
-                                    Hide cookie message
-                                </button>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if request.COOKIES.accepted_ga_cookies == "false" %}
-                        <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
-                            <div class="govuk-grid-row">
-                                <div class="govuk-grid-column-two-thirds">
-                                    <div class="govuk-cookie-banner__content">
-                                        <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}">change your cookie settings</a> at any time.</p>
-                                    </div>
+                                <div class="govuk-button-group">
+                                    <button type="submit" class="govuk-button" data-module="govuk-button" value="True">
+                                        Hide cookie message
+                                    </button>
                                 </div>
                             </div>
-                            <div class="govuk-button-group">
-                                <button type="button" class="govuk-button" data-module="govuk-button">
-                                    Hide cookie message
-                                </button>
+                        {% endif %}
+                        {% if request.COOKIES.accepted_ga_cookies == "false" %}
+                            <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
+                                <div class="govuk-grid-row">
+                                    <div class="govuk-grid-column-two-thirds">
+                                        <div class="govuk-cookie-banner__content">
+                                            <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}">change your cookie settings</a> at any time.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="govuk-button-group">
+                                    <button type="button" class="govuk-button" data-module="govuk-button">
+                                        Hide cookie message
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </form>
                 {% endif %}
             {% endif %}
         {% endblock cookie_banner %}

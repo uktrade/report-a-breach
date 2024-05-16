@@ -20,7 +20,13 @@ from utils.notifier import verify_email
 from utils.s3 import delete_session_files, generate_presigned_url, get_all_session_files
 
 from .choices import TypeOfRelationshipChoices
-from .forms import CookiesConsentForm, EmailVerifyForm, SummaryForm, UploadDocumentsForm
+from .forms import (
+    CookiesConsentForm,
+    EmailVerifyForm,
+    HideCookiesNoticeForm,
+    SummaryForm,
+    UploadDocumentsForm,
+)
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -477,6 +483,16 @@ class CookiesConsentView(FormView):
             self.request.session.modified = True
 
         return response
+
+
+class HideCookiesNoticeView(FormView):
+    # TODO: needs to redirect to a partial template with the banner hidden
+    template_name = "report_a_suspected_breach/cookies_consent_notice.html"
+    form_class = HideCookiesNoticeForm
+
+    def form_valid(self, form: HideCookiesNoticeForm) -> HttpResponse:
+        referrer_url = self.request.GET.get("referrer_url", "/")
+        return redirect(referrer_url)
 
 
 class CompleteView(TemplateView):
