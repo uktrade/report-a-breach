@@ -15,7 +15,7 @@ class BreachPortalAuth(AuthbrokerBackend):
         id_key = self.get_profile_id_name()
 
         with transaction.atomic():
-            if existing_user := user_model.objects.filter(email=user_model.EMAIL_FIELD):
+            if existing_user := user_model.objects.filter(email=profile["email"]):
                 if existing_user.is_staff:
                     return existing_user
             else:
@@ -31,3 +31,12 @@ class BreachPortalAuth(AuthbrokerBackend):
                     user.save()
 
         return user
+
+    def user_create_mapping(self, profile: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "email": profile["email"],
+            "first_name": profile["first_name"],
+            "last_name": profile["last_name"],
+            "is_active": False,
+            "is_staff": False,
+        }
