@@ -46,9 +46,9 @@ cleaned_companies_house_data = {
     "are_you_reporting_a_business_on_companies_house": {"business_registered_on_companies_house": "yes"},
     "do_you_know_the_registered_company_number": {
         "do_you_know_the_registered_company_number": "yes",
-        "registered_company_number": "123455",
-        "registered_company_name": "Business LTD",
-        "registered_office_address": "Elton Grove, L11 3DS, England",
+        "registered_company_number": 12345678,
+        "registered_company_name": "LTD",
+        "registered_office_address": "Hello",
     },
     "when_did_you_first_suspect": {
         "when_did_you_first_suspect": datetime.date(1994, 3, 12),

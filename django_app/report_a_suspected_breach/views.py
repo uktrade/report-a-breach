@@ -360,7 +360,7 @@ class ReportABreachWizardView(BaseWizardView):
     ) -> None:
         new_companies_house_company = PersonOrCompany.objects.create(
             name=companies_house_company.get("registered_company_name"),
-            country="The UK",
+            country="GB",
             registered_company_number=companies_house_company.get("registered_company_number"),
             registered_office_address=companies_house_company.get("registered_office_address"),
             breach=breach,
