@@ -302,7 +302,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return kwargs
 
-    def store_documents_in_s3(self) -> None:
+    def store_documents_in_s3(self, breach_id: str) -> None:
         """
         Copies documents from the default temporary storage to permanent storage on s3, then deletes from temporary storage
         """
@@ -311,9 +311,12 @@ class ReportABreachWizardView(BaseWizardView):
             for object_key in session_files.keys():
                 try:
                     permanent_storage_bucket.bucket.meta.client.copy(
-                        CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                        CopySource={
+                            "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+                            "Key": f"{self.request.session.session_key}/{object_key}",
+                        },
                         Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                        Key=object_key,
+                        Key=f"{breach_id}/{object_key}",
                         SourceClient=self.file_storage.bucket.meta.client,
                     )
                 except Exception:
@@ -344,6 +347,19 @@ class ReportABreachWizardView(BaseWizardView):
         )
         new_business_or_person_details.save()
 
+    def save_companies_house_company_to_db(
+        self, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> None:
+        new_companies_house_company = PersonOrCompany.objects.create(
+            name=companies_house_company.get("registered_company_name"),
+            country="GB",
+            registered_company_number=companies_house_company.get("registered_company_number"),
+            registered_office_address=companies_house_company.get("registered_office_address"),
+            breach=breach,
+            type_of_relationship=relationship,
+        )
+        new_companies_house_company.save()
+
     def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         cleaned_data = self.get_all_cleaned_data()
         # we're importing these methods here to avoid circular imports
@@ -362,11 +378,6 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
             business_or_person_details_step = cleaned_data.get("business_or_person_details", {})
             reporter_name_of_business_you_work_for = business_or_person_details_step.get("name", "")
-        do_you_know_the_registered_company_number_step = cleaned_data.get("do_you_know_the_registered_company_number", {})
-        do_you_know_the_registered_company_number = do_you_know_the_registered_company_number_step.get(
-            "do_you_know_the_registered_company_number", ""
-        )
-        registered_company_number = do_you_know_the_registered_company_number_step.get("registered_company_number", "")
 
         with transaction.atomic():
             reporter_email_verification = ReporterEmailVerification.objects.filter(
@@ -382,11 +393,9 @@ class ReportABreachWizardView(BaseWizardView):
                 when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
                 is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
                 what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
-                business_registered_on_companies_house=cleaned_data["are_you_reporting_a_business_on_companies_house"][
-                    "business_registered_on_companies_house"
+                where_were_the_goods_supplied_from=cleaned_data["where_were_the_goods_supplied_from"][
+                    "where_were_the_goods_supplied_from"
                 ],
-                do_you_know_the_registered_company_number=do_you_know_the_registered_company_number,
-                registered_company_number=registered_company_number,
                 were_there_other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
                     "were_there_other_addresses_in_the_supply_chain"
                 ],
@@ -410,6 +419,9 @@ class ReportABreachWizardView(BaseWizardView):
             if not show_check_company_details_page_condition(self):
                 breacher_details = cleaned_data["business_or_person_details"]
                 self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
+            else:
+                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
+                self.save_companies_house_company_to_db(new_breach, companies_house_details, TypeOfRelationshipChoices.breacher)
 
             # Save Supplier Details to Database
             if show_about_the_supplier_page(self):
@@ -424,7 +436,7 @@ class ReportABreachWizardView(BaseWizardView):
                     self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
             # Save Documents to S3 Permanent Bucket
-            self.store_documents_in_s3()
+            self.store_documents_in_s3(new_breach.id)
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
