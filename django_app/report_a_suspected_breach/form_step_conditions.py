@@ -55,14 +55,16 @@ def show_where_were_the_goods_made_available_from_page(wizard: View) -> bool:
 
 def show_business_or_personal_details_page(wizard: View) -> bool:
     where_is_the_address_cleaned_data = wizard.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person")
-    do_you_know_the_registered_company_number_cleaned_data = wizard.get_cleaned_data_for_step(
-        "do_you_know_the_registered_company_number"
+    are_you_reporting_a_business_on_companies_house_cleaned_data = wizard.get_cleaned_data_for_step(
+        "are_you_reporting_a_business_on_companies_house"
     )
 
-    show_page = (
-        where_is_the_address_cleaned_data.get("where_is_the_address")
-        or do_you_know_the_registered_company_number_cleaned_data.get("do_you_know_the_registered_company_number", False) == "no"
-    )
+    show_page = where_is_the_address_cleaned_data.get(
+        "where_is_the_address"
+    ) and are_you_reporting_a_business_on_companies_house_cleaned_data.get("do_you_know_the_registered_company_number", "no") in [
+        "no",
+        "do_not_know",
+    ]
 
     return show_page
     # we just want to check that the user has filled out this form as a way of checking if they have filled out the
