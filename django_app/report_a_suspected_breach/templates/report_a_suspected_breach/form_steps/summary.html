@@ -85,19 +85,15 @@
                 {% endif %}
             </dd>
         </div>
-        {% if is_company_obtained_from_companies_house %}
-        {% else %}
+        {% if form_data.business_or_person_details.website %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Website
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% if form_data.business_or_person_details.website %}
-                        <a class="govuk-link"
-                           href="{{ form_data.about_the_supplier.website }}">{{ form_data.business_or_person_details.website }}<span
-                            class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
-                    {% endif %}
-
+                    <a class="govuk-link"
+                       href="{{ form_data.about_the_supplier.website }}">{{ form_data.business_or_person_details.website }}<span
+                        class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
