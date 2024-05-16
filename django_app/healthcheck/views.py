@@ -15,7 +15,7 @@ class HealthCheckView(View):
 
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         # we want to disable the healthcheck if we're building on DBT Platform
-        if isinstance(env, DBTPlatformSettings) and env.in_build_step:
+        if isinstance(env, DBTPlatformSettings):
             return HttpResponse(status=200)
 
         start = time.time()
