@@ -42,7 +42,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
 ]
 
-OUR_APPS = ["config", "core", "report_a_suspected_breach", "view_a_suspected_breach", "healthcheck"]
+OUR_APPS = ["config", "core", "report_a_suspected_breach", "view_a_suspected_breach", "healthcheck", "feedback"]
 
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -186,6 +186,7 @@ COMPANIES_HOUSE_API_KEY = env.companies_house_api_key
 # GOV NOTIFY
 GOV_NOTIFY_API_KEY = env.gov_notify_api_key
 EMAIL_VERIFY_CODE_TEMPLATE_ID = env.email_verify_code_template_id
+EMAIL_VASB_USER_ADMIN_TEMPLATE_ID = env.email_vasb_user_admin_template_id
 RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
 
 # SENTRY
@@ -215,8 +216,7 @@ ENFORCE_STAFF_SSO = env.enforce_staff_sso
 
 if ENFORCE_STAFF_SSO:
     AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.ModelBackend",
-        "authbroker_client.backends.AuthbrokerBackend",
+        "auth.breach_portal_auth.BreachPortalAuth",
     ]
     AUTHBROKER_URL = env.authbroker_url
     AUTHBROKER_CLIENT_ID = env.authbroker_client_id

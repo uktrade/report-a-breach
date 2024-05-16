@@ -6,4 +6,5 @@ app_name = "view_a_suspected_breach"
 
 urlpatterns = [
     path("", views.ViewABreachView.as_view(), name="landing"),
+    path("user_admin/", views.ManageUsersView.as_view(), name="user_admin"),
 ]

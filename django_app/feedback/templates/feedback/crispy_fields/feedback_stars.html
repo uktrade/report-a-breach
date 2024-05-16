@@ -1,0 +1,47 @@
+{% load crispy_forms_field crispy_forms_gds %}
+
+<div class="show-on-js-enabled hide-on-js-disabled">
+    <div class="govuk-form-group">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            <h2 class="govuk-fieldset__heading">
+                Overall, how would you rate your experience of the Report a Suspected Breach of Trade
+                Sanctions service?
+            </h2>
+        </legend>
+        <div class="govuk-radios star-rating__stars" data-module="govuk-radios">
+            {% for rating_value, rating_name in form.fields.rating.choices %}
+                <span
+                    class="star-rating__label {% if form.instance.rating >= rating_value %}star-rating__selected{% endif %}"
+                    data-rating-name="{{ rating_name }}"
+                    data-rating-value="{{ rating_value }}"></span>
+            {% endfor %}
+        </div>
+        <span id="js_selected_rating" class="govuk-label govuk-body text-centre">{% if form.instance %}
+            {{ form.instance.get_rating_display|default_if_none:"" }}{% endif %}</span>
+    </div>
+    <input type="hidden" id="chosen_rating" {% if form.instance %}value="{{ form.instance.rating }}"{% endif %}>
+</div>
+
+<div class="show-on-js-disabled hide-on-js-enabled">
+    <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="changedName-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                <h1 class="govuk-fieldset__heading">
+                    Overall, how would you rate your experience of the Report a Suspected Breach of Trade
+                    Sanctions service?
+                </h1>
+            </legend>
+            <div class="govuk-radios" data-module="govuk-radios">
+                {% for rating_value, rating_name in form.fields.rating.choices %}
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="non-js-rating-{{ rating_value }}" name="rating"
+                               type="radio" value="{{ rating_value }}" {% if form.instance.rating == rating_value %}checked{% endif %}>
+                        <label class="govuk-label govuk-radios__label" for="non-js-rating-{{ rating_value }}">
+                            {{ rating_name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </fieldset>
+    </div>
+</div>

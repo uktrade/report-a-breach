@@ -24,3 +24,20 @@
 .js-disabled .hide-on-js-disabled {
     display: none;
 }
+
+.text-centre {
+    text-align: center;
+}
+
+.flex-parent {
+    display: flex;
+    justify-content: center;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-1 {
+    margin-bottom: 1rem;
+}
