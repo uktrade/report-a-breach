@@ -15,15 +15,19 @@ class BreachPortalAuth(AuthbrokerBackend):
         id_key = self.get_profile_id_name()
 
         with transaction.atomic():
-            user, created = user_model.objects.get_or_create(
-                **{user_model.USERNAME_FIELD: profile[id_key]},
-                defaults=self.user_create_mapping(profile),
-            )
+            if existing_user := user_model.objects.filter(email=user_model.EMAIL_FIELD):
+                if existing_user.is_staff:
+                    return existing_user
+            else:
+                user, created = user_model.objects.get_or_create(
+                    **{user_model.USERNAME_FIELD: profile[id_key]},
+                    defaults=self.user_create_mapping(profile),
+                )
 
-            if created:
-                user.set_unusable_password()
-                user.is_active = False
-                user.is_staff = False
-                user.save()
+                if created:
+                    user.set_unusable_password()
+                    user.is_active = False
+                    user.is_staff = False
+                    user.save()
 
         return user
