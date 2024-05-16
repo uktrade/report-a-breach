@@ -32,27 +32,21 @@
                 {% endif %}
             </dd>
         </div>
-
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Business you work for
-            </dt>
-            {% if is_third_party_relationship %}
+        {% if is_third_party_relationship %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Business you work for
+                </dt>
                 <dd class="govuk-summary-list__value">
                     {{ form_data.name_and_business_you_work_for.reporter_name_of_business_you_work_for }}
                 </dd>
-            {% else %}
-                <dd class="govuk-summary-list__value">
-                    {{ form_data.business_or_person_details.name }}
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link"
+                       href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                        class="govuk-visually-hidden">Change business you work for</span></a>
                 </dd>
-            {% endif %}
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link"
-                   href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
-                    class="govuk-visually-hidden">Change business you work for</span></a>
-            </dd>
-        </div>
-
+            </div>
+        {% endif %}
     </dl>
     <h2 class="govuk-heading-m">Person or business you're reporting</h2>
     <dl class="govuk-summary-list">
@@ -230,7 +224,7 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_tog' %}?redirect=summary">Change<span
                             class="govuk-visually-hidden">Change location of supplier</span></a>
                     </dd>
                 </div>
@@ -257,52 +251,55 @@
                         </dd>
                     {% endif %}
                 </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Website
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% if value.cleaned_data.website %}
+                {% if value.cleaned_data.website %}
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Website
+                        </dt>
+                        <dd class="govuk-summary-list__value">
                             <a class="govuk-link"
                                href="{{ value.cleaned_data.website }}">{{ value.cleaned_data.website }}<span
                                 class="govuk-visually-hidden"></span></a>
+                        </dd>
+                        {% if is_made_available_journey %}
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link"
+                                   href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
+                                    class="govuk-visually-hidden">Change website of end-user {{forloop.counter}}</span></a>
+                            </dd>
+                        {% else %}
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link"
+                                   href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
+                                    class="govuk-visually-hidden">Change website of end-user {{forloop.counter}}</span></a>
+                            </dd>
                         {% endif %}
-                    </dd>
-                    {% if is_made_available_journey %}
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
-                                class="govuk-visually-hidden">Change website of end-user {{forloop.counter}}</span></a>
+                    </div>
+                {% endif %}
+                {% if value.cleaned_data.additional_contact_details %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Additional contact information
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.additional_contact_details|linebreaksbr %}
                         </dd>
-                    {% else %}
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
-                                class="govuk-visually-hidden">Change website of end-user {{forloop.counter}}</span></a>
-                        </dd>
-                    {% endif %}
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Additional contact information
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.additional_contact_details|linebreaksbr %}
-                    </dd>
-                    {% if is_made_available_journey %}
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
-                                class="govuk-visually-hidden">Change additional contact information of end-user {{forloop.counter}}</span></a>
-                        </dd>
-                    {% else %}
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
-                                class="govuk-visually-hidden">Change additional contact information of end-user {{forloop.counter}}</span></a>
-                        </dd>
-                    {% endif %}
-                </div>
+                        {% if is_made_available_journey %}
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link"
+                                   href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
+                                    class="govuk-visually-hidden">Change additional contact information of end-user {{forloop.counter}}</span></a>
+                            </dd>
+                        {% else %}
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link"
+                                   href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
+                                    class="govuk-visually-hidden">Change additional contact information of end-user {{forloop.counter}}</span></a>
+                            </dd>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </dl>
         {% endfor %}
     {% endif %}
@@ -340,23 +337,25 @@
     {% endif %}
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Upload supporting documents
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {% for document, url in form_data.session_files.items %}
+        {% if form_data.session_files.items %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Upload supporting documents
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {% for document, url in form_data.session_files.items %}
 
-                    <a href="{{url}}" download>{{document}}</a><br>
-                {% endfor %}
+                        <a href="{{url}}" download>{{document}}</a><br>
+                    {% endfor %}
 
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link"
-                   href="{% get_wizard_step_url 'upload_documents' %}?redirect=summary">Change<span
-                    class="govuk-visually-hidden">Change supporting documents</span></a>
-            </dd>
-        </div>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link"
+                       href="{% get_wizard_step_url 'upload_documents' %}?redirect=summary">Change<span
+                        class="govuk-visually-hidden">Change supporting documents</span></a>
+                </dd>
+            </div>
+        {% endif %}
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 Summary of the breach
