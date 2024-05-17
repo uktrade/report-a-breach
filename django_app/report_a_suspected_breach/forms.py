@@ -430,8 +430,8 @@ class WhichSanctionsRegimeForm(BaseForm):
             else:
                 checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
 
-        checkbox_choices.append(Choice("don't know", "I don't know"))
-        checkbox_choices.append(Choice("other_regime", "Other regime"))
+        checkbox_choices.append(Choice("Unknown Regime", "I don't know"))
+        checkbox_choices.append(Choice("Other Regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
         self.helper.label_size = None
         self.helper.label_tag = None

@@ -148,12 +148,6 @@
                     {{ regime }}
                     <br>
                 {% endfor %}
-                {% if form_data.which_sanctions_regime.unknown_regime %}
-                    Unknown regime<br>
-                {% endif %}
-                {% if form_data.which_sanctions_regime.other_regime %}
-                    Other regime
-                {% endif %}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
@@ -178,34 +172,49 @@
     <h2 class="govuk-heading-m">The supply chain</h2>
     <h3 class="govuk-heading-s">Supplier</h3>
     <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Location of supplier
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {{ form_data.about_the_supplier.country }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link"
-                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
-                    class="govuk-visually-hidden">Change location of supplier</span></a>
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Name and address of supplier
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {{ form_data.about_the_supplier.name }}
-                <br> <br>
-                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.about_the_supplier.readable_address|linebreaksbr %}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link"
-                   href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
-                    class="govuk-visually-hidden">Change name and address of supplier</span></a>
-            </dd>
-        </div>
+        {% if form_data.where_were_the_goods_supplied_from.where_were_the_goods_supplied_from == "i_do_not_know" %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Location of supplier
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    I do not know
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link"
+                       href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                        class="govuk-visually-hidden">Change location of supplier</span></a>
+                </dd>
+        {% else %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Location of supplier
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ form_data.about_the_supplier.country }}
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link"
+                       href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                        class="govuk-visually-hidden">Change location of supplier</span></a>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Name and address of supplier
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ form_data.about_the_supplier.name }}
+                    <br> <br>
+                    {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.about_the_supplier.readable_address|linebreaksbr %}
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link"
+                       href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                        class="govuk-visually-hidden">Change name and address of supplier</span></a>
+                </dd>
+            </div>
+        {% endif %}
     </dl>
     {% if form_data.end_users %}
         {% for end_user, value in form_data.end_users.items %}
@@ -220,7 +229,7 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_tog' %}?redirect=summary">Change<span
+                           href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?redirect=summary">Change<span
                             class="govuk-visually-hidden">Change location of supplier</span></a>
                     </dd>
                 </div>
