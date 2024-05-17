@@ -41,7 +41,7 @@ class TestReportABreachWizardView:
 
         # Create Sanctions Regime Object
         sanctions_regime_name = SanctionsRegime.objects.all()[0].full_name
-        data.cleaned_data["which_sanctions_regime"] = {"which_sanctions_regime": [sanctions_regime_name, "unknown_regime"]}
+        data.cleaned_data["which_sanctions_regime"] = {"which_sanctions_regime": [sanctions_regime_name, "Unknown Regime"]}
 
         # Setup Mock return values
         view = ReportABreachWizardView()
