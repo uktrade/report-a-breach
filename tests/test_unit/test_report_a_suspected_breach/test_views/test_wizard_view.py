@@ -56,7 +56,7 @@ class TestReportABreachWizardView:
             mocked_show_check_company_details_page_condition.return_value = True
         else:
             mocked_show_check_company_details_page_condition.return_value = False
-        cleaned_data_return["which_sanctions_regime"] = {"which_sanctions_regime": [sanctions_regime_name, "unknown_regime"]}
+        cleaned_data_return["which_sanctions_regime"] = {"which_sanctions_regime": [sanctions_regime_name, "Unknown Regime"]}
 
         # SetUp session values
         form_list = []
