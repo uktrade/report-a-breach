@@ -1,3 +1,7 @@
+from unittest.mock import patch
+
+from core.sites import SiteName
+from django.contrib.auth.models import User
 from django.test import RequestFactory
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import (
@@ -16,7 +20,21 @@ class TestViewASuspectedBreachView:
         breach = view.get_object()
         assert breach.id == breach_object.id
 
-    def test_get_context_data(self, vasb_client, breach_with_sanctions_object):
+    @patch("view_a_suspected_breach.mixins.send_email")
+    def test_get_context_data(self, mock_email, vasb_client, breach_with_sanctions_object):
+        test_user = User.objects.create_user(
+            "John",
+            "test@example.com",
+            is_active=True,
+        )
+
+        request_object = RequestFactory().get("/")
+        request_object.user = test_user
+        request_object.site = SiteName
+        request_object.site.name = SiteName.view_a_suspected_breach
+
+        vasb_client.force_login(test_user)
+
         breach_id = breach_with_sanctions_object.id
         response = vasb_client.get(f"/view_a_suspected_breach/{breach_id}/")
         sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
@@ -33,7 +51,20 @@ class TestViewASuspectedBreachView:
         assert set(response.context["recipients"]) == set(recipients)
         assert set(breach_with_sanctions_object.sanctions_regimes.through.objects.all()) == set(sanctions_regimes)
 
-    def test_get_context_data_companies_house(self, vasb_client, breach_with_companies_house_object):
+    @patch("view_a_suspected_breach.mixins.send_email")
+    def test_get_context_data_companies_house(self, mock_email, vasb_client, breach_with_companies_house_object):
+        test_user = User.objects.create_user(
+            "John",
+            "test@example.com",
+            is_active=True,
+        )
+
+        request_object = RequestFactory().get("/")
+        request_object.user = test_user
+        request_object.site = SiteName
+        request_object.site.name = SiteName.view_a_suspected_breach
+
+        vasb_client.force_login(test_user)
         breach_id = breach_with_companies_house_object.id
         response = vasb_client.get(f"/view_a_suspected_breach/{breach_id}/")
         sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
