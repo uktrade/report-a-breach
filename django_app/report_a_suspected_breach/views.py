@@ -478,6 +478,10 @@ class CompleteView(TemplateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["feedback_form"] = FeedbackForm()
+        print(ReportABreachWizardView.form_list[10])
+
+        context["wizard"] = ReportABreachWizardView()
+        context["summary_form"] = SummaryForm()
         return context
 
 
