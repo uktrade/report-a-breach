@@ -20,7 +20,7 @@ class BreachPortalAuth(AuthbrokerBackend):
                 if existing_user[0]:
                     if existing_user[0].is_staff:
                         user, created = user_model.objects.get_or_create(
-                            **{user_model.EMAIL_FIELD: profile["email"]},
+                            **{user_model.EMAIL_FIELD: profile[id_key]},
                             defaults=self.user_create_mapping(profile),
                         )
                         user.is_staff = True
@@ -30,7 +30,7 @@ class BreachPortalAuth(AuthbrokerBackend):
 
             else:
                 user, created = user_model.objects.get_or_create(
-                    **{user_model.EMAIL_FIELD: profile["email"]},
+                    **{user_model.EMAIL_FIELD: profile[id_key]},
                     defaults=self.user_create_mapping(profile),
                 )
 
