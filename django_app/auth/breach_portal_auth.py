@@ -13,13 +13,14 @@ class BreachPortalAuth(AuthbrokerBackend):
     def get_or_create_user(self, profile: dict[str, Any]) -> User:
         user_model = get_user_model()
         id_key = self.get_profile_id_name()
+        user = User.objects.get(email=profile[id_key])
 
         with transaction.atomic():
             if existing_user := user_model.objects.filter(email=profile["email"]):
                 if existing_user[0]:
                     if existing_user[0].is_staff:
-                        user, created = user_model.objects.update_or_create(
-                            **{user_model.EMAIL_FIELD: profile[id_key]},
+                        user, created = user_model.objects.get_or_create(
+                            **{user_model.EMAIL_FIELD: profile["email"]},
                             defaults=self.user_create_mapping(profile),
                         )
                         user.is_staff = True
@@ -29,7 +30,7 @@ class BreachPortalAuth(AuthbrokerBackend):
 
             else:
                 user, created = user_model.objects.get_or_create(
-                    **{user_model.EMAIL_FIELD: profile[id_key]},
+                    **{user_model.EMAIL_FIELD: profile["email"]},
                     defaults=self.user_create_mapping(profile),
                 )
 
