@@ -23,20 +23,18 @@ class TestProvideFullFeedbackView:
             data={"rating": 60},
         )
         assert not FeedbackItem.objects.exists()
-        assert response.status_code == 302
-        assert response.url == reverse("feedback:feedback_done")
+        assert response.status_code == 200
+        assert response.url == reverse("feedback:collect_full_feedback")
 
     def test_amend_feedback(self, rasb_client):
         feedback = FeedbackItem.objects.create(
             rating=2,
-            what_did_not_work_so_well=["process_not_clear"],
             how_we_could_improve_the_service="test",
         )
         rasb_client.post(
             reverse("feedback:amend_feedback", kwargs={"existing_feedback_id": feedback.pk}),
             data={
                 "rating": 1,
-                "what_did_not_work_so_well": ["process_not_clear"],
                 "how_we_could_improve_the_service": "try harder",
             },
         )
