@@ -13,7 +13,6 @@ class BreachPortalAuth(AuthbrokerBackend):
     def get_or_create_user(self, profile: dict[str, Any]) -> User:
         user_model = get_user_model()
         id_key = self.get_profile_id_name()
-        user = User.objects.get(email=profile[id_key])
 
         with transaction.atomic():
             if existing_user := user_model.objects.filter(email=profile["email"]):
