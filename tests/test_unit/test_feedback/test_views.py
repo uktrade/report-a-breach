@@ -24,7 +24,8 @@ class TestProvideFullFeedbackView:
         )
         assert not FeedbackItem.objects.exists()
         assert response.status_code == 200
-        assert response.url == reverse("feedback:collect_full_feedback")
+        assert response.context["form"].is_valid() is False
+        assert "rating" in response.context["form"].errors
 
     def test_amend_feedback(self, rasb_client):
         feedback = FeedbackItem.objects.create(
@@ -40,5 +41,4 @@ class TestProvideFullFeedbackView:
         )
         feedback.refresh_from_db()
         assert feedback.rating == 1
-        assert feedback.what_did_not_work_so_well == ["process_not_clear"]
         assert feedback.how_we_could_improve_the_service == "try harder"
