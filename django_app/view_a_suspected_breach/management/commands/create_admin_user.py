@@ -20,7 +20,7 @@ class Command(BaseCommand):
             existing_user.last_name = last_name
             existing_user.is_staff = True
             existing_user.is_active = True
-            existing_user.password = (existing_user.set_unusable_password(),)
+            existing_user.set_unusable_password()
             existing_user.save()
             self.stdout.write(self.style.SUCCESS("User updated successfully"))
 
