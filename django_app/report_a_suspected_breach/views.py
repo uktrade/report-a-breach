@@ -481,16 +481,20 @@ class CookiesConsentView(FormView):
         if self.request.GET.get("banner", None):
             self.request.session["cookies_set_in_banner"] = True
             self.request.session.modified = True
+        else:
+            self.request.session["cookies_referer"] = self.request.META["HTTP_REFERER"]
+            self.request.session.modified = True
 
         return response
 
 
-class HideCookiesNoticeView(FormView):
-    # TODO: needs to redirect to a partial template with the banner hidden
+class HideCookiesView(FormView):
     template_name = "report_a_suspected_breach/cookies_consent_notice.html"
     form_class = HideCookiesNoticeForm
 
     def form_valid(self, form: HideCookiesNoticeForm) -> HttpResponse:
+        self.request.session["hide_cookies_banner"] = True
+        self.request.session.modified = True
         referrer_url = self.request.GET.get("referrer_url", "/")
         return redirect(referrer_url)
 
