@@ -24,6 +24,8 @@ class BaseForm(forms.Form):
     help_texts = {}
     # do we want this form to be revalidated when the user clicks Done
     revalidate_on_done = True
+    # the submit button text
+    submit_button_text = "Continue"
 
     class Media:
         css = {
@@ -45,7 +47,7 @@ class BaseForm(forms.Form):
             self.fields[field_name].help_text = help_text
 
         self.helper = FormHelper()
-        self.helper.add_input(Submit("continue", "Continue", css_class="btn-primary"))
+        self.helper.add_input(Submit("continue", self.submit_button_text, css_class="btn-primary"))
 
         if self.single_question_form and not self.form_h1_header:
             self.helper.label_tag = "h1"

@@ -7,11 +7,6 @@ from django.template.loader import render_to_string
 from django.utils.safestring import SafeString
 
 
-class FeedbackStars(Field):
-    template = "feedback/crispy_fields/feedback_stars.html"
-    css_class = None
-
-
 class HTMLTemplate(HTML):
     """Renders an HTML template with a given context.
 
