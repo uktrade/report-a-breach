@@ -44,14 +44,7 @@ DJANGO_APPS = [
 
 OUR_APPS = ["config", "core", "report_a_suspected_breach", "view_a_suspected_breach", "healthcheck", "feedback"]
 
-THIRD_PARTY_APPS = [
-    "crispy_forms",
-    "crispy_forms_gds",
-    "django_chunk_upload_handlers",
-    "simple_history",
-    "storages",
-    "authbroker_client",
-]
+THIRD_PARTY_APPS = ["crispy_forms", "crispy_forms_gds", "django_chunk_upload_handlers", "simple_history", "storages"]
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
 
