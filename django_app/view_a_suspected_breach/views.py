@@ -23,7 +23,7 @@ class ViewABreachView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView)
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class ManageUsersView(StaffUserOnlyMixin, TemplateView):
+class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
     template_name = "view_a_suspected_breach/user_admin.html"
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
