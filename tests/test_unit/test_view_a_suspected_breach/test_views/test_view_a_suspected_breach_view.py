@@ -14,7 +14,7 @@ from view_a_suspected_breach.views import ViewASuspectedBreachView
 class TestViewASuspectedBreachView:
 
     def test_get_object(self, vasb_client, breach_object):
-        request_object = RequestFactory().get("/{pk}", kwargs={"pk": breach_object.id})
+        request_object = RequestFactory().get("/view/{pk}", kwargs={"pk": breach_object.id})
         view = ViewASuspectedBreachView()
         view.setup(request_object, pk=breach_object.id)
         breach = view.get_object()
