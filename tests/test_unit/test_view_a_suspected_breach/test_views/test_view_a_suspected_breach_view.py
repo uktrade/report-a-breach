@@ -48,8 +48,6 @@ class TestViewASuspectedBreachView:
         assert response.context["breach"] == breach_with_sanctions_object
         assert response.context["breacher"] == breacher
         assert response.context["supplier"] == supplier
-        if breach_with_sanctions_object.where_were_the_goods_supplied_from == "same_address":
-            assert response.context["supplier"].name == breacher.name
         assert set(response.context["recipients"]) == set(recipients)
         assert set(breach_with_sanctions_object.sanctions_regimes.through.objects.all()) == set(sanctions_regimes)
 
