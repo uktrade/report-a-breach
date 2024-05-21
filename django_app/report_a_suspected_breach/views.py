@@ -472,9 +472,16 @@ class CookiesConsentView(FormView):
             initial_dict["accept_cookies"] = current_cookies_policy == "true"
             kwargs["initial"] = initial_dict
 
+        # set the referer so the user can click the redirect link to get to their original page
+        if referer := self.request.META.get(
+            "HTTP_REFERER",
+        ):
+            self.request.session["cookies_referer"] = referer
+            self.request.session.modified = True
+
         return kwargs
 
-    def form_valid(self, form: CookiesConsentForm) -> HttpResponse:
+    def form_valid(self, form: CookiesConsentForm) -> HttpResponse | None:
         # cookie consent lasts for 1 year
         cookie_max_age = 365 * 24 * 60 * 60
 
@@ -494,11 +501,7 @@ class CookiesConsentView(FormView):
         if self.request.GET.get("banner", None):
             self.request.session["cookies_set_in_banner"] = True
             self.request.session.modified = True
-        else:
-            self.request.session["cookies_referer"] = self.request.META["HTTP_REFERER"]
-            self.request.session.modified = True
-
-        return response
+            return response
 
 
 class HideCookiesView(FormView):
