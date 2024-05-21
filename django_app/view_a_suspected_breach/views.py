@@ -48,7 +48,7 @@ class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class ViewASuspectedBreachView(DetailView):
+class ViewASuspectedBreachView(LoginRequiredMixin, DetailView):
     template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
 
     def get_object(self) -> Breach:
