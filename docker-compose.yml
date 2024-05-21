@@ -36,3 +36,8 @@ services:
           - MOCK_SSO_USERNAME=testuser
           - MOCK_SSO_EMAIL_USER_ID=testuser@example.com
           - MOCK_SSO_VALIDATE_TOKEN
+
+    redis:
+      image: redis
+      ports:
+        - "16379:6379"

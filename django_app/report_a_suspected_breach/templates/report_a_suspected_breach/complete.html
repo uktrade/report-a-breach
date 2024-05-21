@@ -26,5 +26,5 @@
     <p class="govuk-body">
         OTSI will contact you once they've reviewed your report.
     </p>
-    {% include "feedback/stars_partial.html" with form=feedback_form %}
+    <p class="govuk-body"> <a href="{% url 'feedback:collect_full_feedback' %}" class="govuk-link">What did you think of this service?</a> (takes 30 seconds)</p>
 {% endblock column_content %}
