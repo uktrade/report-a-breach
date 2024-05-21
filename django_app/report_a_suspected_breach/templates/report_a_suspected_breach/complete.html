@@ -4,8 +4,9 @@
 
 {% block column_content %}
     <div class="print-only">
-        {% include "report_a_suspected_breach/form_steps/summary.html" with wizard=wizard %}
+        {% include "report_a_suspected_breach/partials/summary_report.html" %}
     </div>
+    <div class="page-break"></div>
     <div class="govuk-panel govuk-panel--confirmation">
         <h1 class="govuk-panel__title">
             Submission complete

@@ -27,10 +27,17 @@
 .print-only {
   display: none;
 }
+
+.page-break {
+  display: none;
+}
+
+
 @media print {
   .print-only {
     display: inherit;
   }
+
   #save-for-later {
     .govuk-header,
     .govuk-footer,
@@ -46,4 +53,8 @@
     }
 
   }
+}
+
+@media print {
+  .page-break { display: block; page-break-before: always; }
 }
