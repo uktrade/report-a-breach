@@ -15,19 +15,10 @@ class BreachPortalAuth(AuthbrokerBackend):
         id_key = self.get_profile_id_name()
 
         with transaction.atomic():
-            if existing_user := User.objects.get(email=profile["email"], default=None):
-                if existing_user.is_staff:
-                    # admin_user = User.objects.get(email=profile["email"])
-                    # user, created = user_model.objects.get_or_create(
-                    #     **{user_model.EMAIL_FIELD: profile[id_key]},
-                    #     defaults=self.user_create_mapping(profile),
-                    # )
-                    # user.is_staff = True
-                    # user.is_active = True
-                    # user.save()
+            try:
+                if existing_user := User.objects.get(email=profile["email"]):
                     return existing_user
-
-            else:
+            except User.DoesNotExist:
                 user, created = user_model.objects.get_or_create(
                     **{user_model.EMAIL_FIELD: profile[id_key]},
                     defaults=self.user_create_mapping(profile),
