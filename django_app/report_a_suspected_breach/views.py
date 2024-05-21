@@ -17,6 +17,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView
 from feedback.forms import FeedbackForm
+from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
 from utils.notifier import verify_email
 from utils.s3 import (
@@ -490,49 +491,10 @@ class CompleteView(TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        self.breach = Breach.objects.filter(reference=self.request.session.get("reference_id")).first()
+        context = get_breach_context_data(context, self.breach)
         context["feedback_form"] = FeedbackForm()
 
-        self.breach = Breach.objects.filter(reference=self.request.session.get("reference_id")).first()
-        # Breach
-        context["breach"] = self.breach
-
-        # Breacher
-        if breacher := PersonOrCompany.objects.filter(
-            breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.breacher
-        ).first():
-            if breacher.registered_company_number:
-                breacher_address = breacher.registered_office_address
-            # else:
-            #     breacher_address = get_formatted_address(model_to_dict(breacher))
-            context["breacher"] = breacher
-            context["breacher_address"] = breacher_address
-
-        # Supplier
-        if supplier := PersonOrCompany.objects.filter(
-            breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.supplier
-        ).first():
-            # supplier_address = get_formatted_address(model_to_dict(supplier))
-            context["supplier"] = supplier
-            # context["supplier_address"] = supplier_address
-
-        elif self.breach.where_were_the_goods_supplied_from == "same_address":
-            if breacher:
-                context["supplier"] = breacher
-                context["supplier_address"] = breacher_address
-
-        # End Users (recipients)
-        recipients = PersonOrCompany.objects.filter(
-            breach_id=self.breach.id, type_of_relationship=TypeOfRelationshipChoices.recipient
-        )
-        context["recipients"] = recipients
-
-        # Sanctions Regimes
-        sanctions = self.breach.sanctions_regimes.all()
-        context["sanctions"] = sanctions
-
-        # Documents
-        # upload_documents = get_breach_documents(PermanentDocumentStorage(), str(self.breach.id))
-        # context["documents"] = upload_documents
         return context
 
 

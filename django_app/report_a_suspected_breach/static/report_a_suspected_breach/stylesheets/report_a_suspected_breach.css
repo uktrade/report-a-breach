@@ -28,33 +28,8 @@
   display: none;
 }
 
-.page-break {
-  display: none;
-}
-
-
 @media print {
   .print-only {
     display: inherit;
   }
-
-  #save-for-later {
-    .govuk-header,
-    .govuk-footer,
-    .govuk-back-link,
-    .govuk-phase-banner,
-    .print-hidden,
-    .govuk-summary-list__actions,
-    .summary h1 {
-      display: none;
-    }
-    .summary .govuk-grid-column-two-thirds {
-      width: 100%;
-    }
-
-  }
-}
-
-@media print {
-  .page-break { display: block; page-break-before: always; }
 }
