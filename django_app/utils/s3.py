@@ -1,7 +1,9 @@
-from typing import Any
+from typing import Any, List
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase
+from django.core.cache import cache
+from django.urls import reverse
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
@@ -29,16 +31,29 @@ def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> d
     s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
     response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=session.session_key)
     session_files = {}
+
+    user_uploaded_files = get_user_uploaded_files(session)
     for content in response.get("Contents", []):
         file_name = content["Key"].rpartition("/")[2]
 
         # checking that a file with this name was uploaded in the session
-        if file_name in session.get("file_uploads", []):
-            session_files[file_name] = generate_presigned_url(
-                s3_storage=s3_storage,
-                s3_file_object=content["Key"],
-            )
+        if file_name in user_uploaded_files:
+            session_files[file_name] = reverse("report_a_suspected_breach:download_document", kwargs={"file_name": file_name})
     return session_files
+
+
+def get_breach_documents(s3_storage: S3Boto3Storage, breach_id: str) -> dict[str, Any]:
+    """Gets all files associated with a breach."""
+    s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
+    response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=breach_id)
+    breach_files = {}
+    for content in response.get("Contents", []):
+        file_name = content["Key"].rpartition("/")[2]
+        breach_files[file_name] = generate_presigned_url(
+            s3_storage=s3_storage,
+            s3_file_object=content["Key"],
+        )
+    return breach_files
 
 
 def delete_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> None:
@@ -48,3 +63,13 @@ def delete_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> No
     delete_keys = {"Objects": []}
     delete_keys["Objects"] = [{"Key": k} for k in [obj["Key"] for obj in response.get("Contents", [])]]
     s3_client.delete_objects(Bucket=s3_storage.bucket.name, Delete=delete_keys)
+
+
+def get_user_uploaded_files(session: SessionBase) -> List[str]:
+    """Returns a list of file_names that a user has uploaded in a session.
+
+    Files are uploaded to the session's key in the cache, so we scan the entire redis cache for all keys that
+    start with the session key and return a list of the values."""
+    cache_keys = list(cache.iter_keys(f"{session.session_key}*"))
+    uploaded_files = [file_name for key, file_name in cache.get_many(cache_keys).items()]
+    return uploaded_files
