@@ -192,7 +192,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
     registered_office_address = forms.CharField(required=False)
 
     class Meta:
-        model = Breach
+        model = PersonOrCompany
         fields = ["do_you_know_the_registered_company_number", "registered_company_number"]
         widgets = {"do_you_know_the_registered_company_number": forms.RadioSelect}
         labels = {
@@ -430,8 +430,8 @@ class WhichSanctionsRegimeForm(BaseForm):
             else:
                 checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
 
-        checkbox_choices.append(Choice("don't know", "I don't know"))
-        checkbox_choices.append(Choice("other_regime", "Other regime"))
+        checkbox_choices.append(Choice("Unknown Regime", "I don't know"))
+        checkbox_choices.append(Choice("Other Regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
         self.helper.label_size = None
         self.helper.label_tag = None
@@ -531,9 +531,10 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
-        if self.request.GET.get("add_another_end_user") == "yes":
-            # the user is trying to add another end-user, let's pop the "I do not know" option
+        if self.request.GET.get("add_another_end_user") == "yes" and self.request.method == "GET":
+            # the user is trying to add another end-user, let's pop the "I do not know" option and clear their selection
             self.fields["where_were_the_goods_supplied_to"].choices.pop(-1)
+            self.is_bound = False
 
 
 class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
@@ -554,9 +555,10 @@ class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
-        if self.request.GET.get("add_another_end_user") == "yes":
+        if self.request.GET.get("add_another_end_user") == "yes" and self.request.method == "GET":
             # the user is trying to add another end-user, let's pop the "I do not know" option
             self.fields["where_were_the_goods_made_available_to"].choices.pop(-1)
+            self.is_bound = False
 
 
 class AboutTheEndUserForm(BasePersonBusinessDetailsForm):

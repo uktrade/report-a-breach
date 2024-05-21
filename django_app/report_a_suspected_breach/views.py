@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Any
 
@@ -7,9 +8,10 @@ from core.templatetags.get_wizard_step_url import get_wizard_step_url
 from core.utils import is_ajax
 from core.views import BaseWizardView
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
 from django.forms import Form
-from django.http import HttpRequest, HttpResponse, JsonResponse, QueryDict
+from django.http import Http404, HttpRequest, HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, View
@@ -17,7 +19,12 @@ from django.views.generic.edit import FormView
 from feedback.forms import FeedbackForm
 from utils.companies_house import get_formatted_address
 from utils.notifier import verify_email
-from utils.s3 import delete_session_files, generate_presigned_url, get_all_session_files
+from utils.s3 import (
+    delete_session_files,
+    generate_presigned_url,
+    get_all_session_files,
+    get_user_uploaded_files,
+)
 
 from .choices import TypeOfRelationshipChoices
 from .forms import (
@@ -37,6 +44,8 @@ from .tasklist import (
     YourDetailsTask,
     get_tasklist,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -96,15 +105,7 @@ class ReportABreachWizardView(BaseWizardView):
                 self.storage.current_step = "about_the_end_user"
                 return super().get(request, *args, step="about_the_end_user", **kwargs)
 
-        if request.resolver_match.url_name == "where_were_the_goods_supplied_to":
-            self.storage.current_step = "where_were_the_goods_supplied_to"
-            return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
-
-        if request.resolver_match.url_name == "where_were_the_goods_made_available_to":
-            self.storage.current_step = "where_were_the_goods_made_available_to"
-            return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
-
-        # before we initialise the tasklit, we need to make sure the current_step is correct
+        # before we initialise the tasklist, we need to make sure the current_step is correct
         if step_url := kwargs.get("step", None):
             if step_url in self.get_form_list():
                 self.storage.current_step = step_url
@@ -316,7 +317,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return kwargs
 
-    def store_documents_in_s3(self) -> None:
+    def store_documents_in_s3(self, breach_id: str) -> None:
         """
         Copies documents from the default temporary storage to permanent storage on s3, then deletes from temporary storage
         """
@@ -325,9 +326,12 @@ class ReportABreachWizardView(BaseWizardView):
             for object_key in session_files.keys():
                 try:
                     permanent_storage_bucket.bucket.meta.client.copy(
-                        CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                        CopySource={
+                            "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+                            "Key": f"{self.request.session.session_key}/{object_key}",
+                        },
                         Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                        Key=object_key,
+                        Key=f"{breach_id}/{object_key}",
                         SourceClient=self.file_storage.bucket.meta.client,
                     )
                 except Exception:
@@ -358,6 +362,19 @@ class ReportABreachWizardView(BaseWizardView):
         )
         new_business_or_person_details.save()
 
+    def save_companies_house_company_to_db(
+        self, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> None:
+        new_companies_house_company = PersonOrCompany.objects.create(
+            name=companies_house_company.get("registered_company_name"),
+            country="GB",
+            registered_company_number=companies_house_company.get("registered_company_number"),
+            registered_office_address=companies_house_company.get("registered_office_address"),
+            breach=breach,
+            type_of_relationship=relationship,
+        )
+        new_companies_house_company.save()
+
     def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         cleaned_data = self.get_all_cleaned_data()
         # we're importing these methods here to avoid circular imports
@@ -376,11 +393,6 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
             business_or_person_details_step = cleaned_data.get("business_or_person_details", {})
             reporter_name_of_business_you_work_for = business_or_person_details_step.get("name", "")
-        do_you_know_the_registered_company_number_step = cleaned_data.get("do_you_know_the_registered_company_number", {})
-        do_you_know_the_registered_company_number = do_you_know_the_registered_company_number_step.get(
-            "do_you_know_the_registered_company_number", ""
-        )
-        registered_company_number = do_you_know_the_registered_company_number_step.get("registered_company_number", "")
 
         with transaction.atomic():
             reporter_email_verification = ReporterEmailVerification.objects.filter(
@@ -396,11 +408,9 @@ class ReportABreachWizardView(BaseWizardView):
                 when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
                 is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
                 what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
-                business_registered_on_companies_house=cleaned_data["are_you_reporting_a_business_on_companies_house"][
-                    "business_registered_on_companies_house"
+                where_were_the_goods_supplied_from=cleaned_data["where_were_the_goods_supplied_from"][
+                    "where_were_the_goods_supplied_from"
                 ],
-                do_you_know_the_registered_company_number=do_you_know_the_registered_company_number,
-                registered_company_number=registered_company_number,
                 were_there_other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
                     "were_there_other_addresses_in_the_supply_chain"
                 ],
@@ -412,8 +422,8 @@ class ReportABreachWizardView(BaseWizardView):
                 ],
             )
             if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
-                new_breach.unknown_sanctions_regime = "unknown_regime" in declared_sanctions
-                new_breach.other_sanctions_regime = "other_regime" in declared_sanctions
+                new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
+                new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
                 sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
                 new_breach.sanctions_regimes.set(sanctions_regimes)
 
@@ -424,6 +434,9 @@ class ReportABreachWizardView(BaseWizardView):
             if not show_check_company_details_page_condition(self):
                 breacher_details = cleaned_data["business_or_person_details"]
                 self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
+            else:
+                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
+                self.save_companies_house_company_to_db(new_breach, companies_house_details, TypeOfRelationshipChoices.breacher)
 
             # Save Supplier Details to Database
             if show_about_the_supplier_page(self):
@@ -438,7 +451,7 @@ class ReportABreachWizardView(BaseWizardView):
                     self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
             # Save Documents to S3 Permanent Bucket
-            self.store_documents_in_s3()
+            self.store_documents_in_s3(new_breach.id)
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
@@ -537,19 +550,16 @@ class UploadDocumentsView(FormView):
             session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
             self.file_storage.save(session_keyed_file_name, temporary_file.file)
 
-            # adding the file name to the session, so we can retrieve it later
-            if "file_uploads" in self.request.session:
-                self.request.session["file_uploads"].append(temporary_file.name)
-            else:
-                self.request.session["file_uploads"] = [temporary_file.name]
-            self.request.session.modified = True
+            # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
+            # we add a unique identifier to the key, so we do not overwrite previous uploads
+            redis_cache_key = f"{self.request.session.session_key}{uuid.uuid4()}"
+            cache.set(redis_cache_key, temporary_file.name)
 
             if is_ajax(self.request):
                 return JsonResponse(
                     {
                         "success": True,
                         "file_name": temporary_file.name,
-                        "file_url": generate_presigned_url(self.file_storage, session_keyed_file_name),
                     },
                     status=201,
                 )
@@ -573,12 +583,6 @@ class DeleteDocumentsView(View):
         if file_name := self.request.GET.get("file_name"):
             full_file_path = f"{self.request.session.session_key}/{file_name}"
             TemporaryDocumentStorage().delete(full_file_path)
-
-            # removing the file name from the session
-            if "file_uploads" in self.request.session:
-                if file_name in self.request.session["file_uploads"]:
-                    self.request.session["file_uploads"].remove(file_name)
-                    self.request.session.modified = True
 
             if is_ajax(self.request):
                 return JsonResponse({"success": True}, status=200)
@@ -631,3 +635,18 @@ class EmailVerifyView(FormView):
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name_and_business_you_work_for"})
         else:
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "start"})
+
+
+class DownloadDocumentView(View):
+    http_method_names = ["get"]
+
+    def get(self, *args: object, file_name, **kwargs: object) -> HttpResponse:
+        user_uploaded_files = get_user_uploaded_files(self.request.session)
+
+        if file_name in user_uploaded_files:
+            logger.info(f"User is downloading file: {file_name}")
+            session_keyed_file_name = f"{self.request.session.session_key}/{file_name}"
+            file_url = generate_presigned_url(TemporaryDocumentStorage(), session_keyed_file_name)
+            return redirect(file_url)
+
+        raise Http404()
