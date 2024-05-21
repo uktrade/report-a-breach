@@ -738,7 +738,7 @@ class CookiesConsentForm(BaseForm):
             self.fields["do_you_want_to_accept_analytics_cookies"].initial = str(kwargs_initial["accept_cookies"])
 
 
-class HideCookiesNoticeForm(BaseForm):
+class HideCookiesForm(BaseForm):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()

@@ -30,7 +30,7 @@ from .choices import TypeOfRelationshipChoices
 from .forms import (
     CookiesConsentForm,
     EmailVerifyForm,
-    HideCookiesNoticeForm,
+    HideCookiesForm,
     SummaryForm,
     UploadDocumentsForm,
 )
@@ -509,9 +509,9 @@ class CookiesConsentView(FormView):
 
 class HideCookiesView(FormView):
     template_name = "report_a_suspected_breach/hide_cookies.html"
-    form_class = HideCookiesNoticeForm
+    form_class = HideCookiesForm
 
-    def form_valid(self, form: HideCookiesNoticeForm) -> HttpResponse:
+    def form_valid(self, form: HideCookiesForm) -> HttpResponse:
         self.request.session["hide_cookies_banner"] = True
         self.request.session.modified = True
         referrer_url = self.request.GET.get("referrer_url", "/")
