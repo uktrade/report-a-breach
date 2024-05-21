@@ -41,11 +41,11 @@ class BreachPortalAuth(AuthbrokerBackend):
 
                 return new_user
 
-    def user_create_mapping(self, profile: dict[str, Any]) -> dict[str, Any]:
-        return {
-            "email": profile["email"],
-            "first_name": profile["first_name"],
-            "last_name": profile["last_name"],
-            "is_active": False,
-            "is_staff": False,
-        }
+    # def user_create_mapping(self, profile: dict[str, Any]) -> dict[str, Any]:
+    #     return {
+    #         "email": profile["email"],
+    #         "first_name": profile["first_name"],
+    #         "last_name": profile["last_name"],
+    #         "is_active": False,
+    #         "is_staff": False,
+    #     }
