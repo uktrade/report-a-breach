@@ -424,8 +424,8 @@ class ReportABreachWizardView(BaseWizardView):
                 ],
             )
             if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
-                new_breach.unknown_sanctions_regime = "unknown_regime" in declared_sanctions
-                new_breach.other_sanctions_regime = "other_regime" in declared_sanctions
+                new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
+                new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
                 sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
                 new_breach.sanctions_regimes.set(sanctions_regimes)
 
