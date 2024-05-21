@@ -119,6 +119,8 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
+        if self.is_uk_address:
+            cleaned_data["country"] = "GB"
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         return cleaned_data
 
