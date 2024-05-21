@@ -481,12 +481,18 @@ class CookiesConsentView(FormView):
 
         return kwargs
 
-    def form_valid(self, form: CookiesConsentForm) -> HttpResponse | None:
+    def form_valid(self, form: CookiesConsentForm) -> HttpResponse:
         # cookie consent lasts for 1 year
         cookie_max_age = 365 * 24 * 60 * 60
+        response = redirect("/")
 
-        referrer_url = self.request.GET.get("referrer_url", "/")
-        response = redirect(referrer_url)
+        if self.request.GET.get("banner", ""):
+            self.request.session["cookies_set_in_banner"] = True
+            self.request.session.modified = True
+        else:
+            # the user submitted the form on the cookies_consent page
+            # we want to keep them there after the post
+            response = redirect(reverse("report_a_suspected_breach:cookies_consent"))
 
         user_choice = form.cleaned_data["do_you_want_to_accept_analytics_cookies"]
 
@@ -498,14 +504,11 @@ class CookiesConsentView(FormView):
             max_age=cookie_max_age,
         )
 
-        if self.request.GET.get("banner", None):
-            self.request.session["cookies_set_in_banner"] = True
-            self.request.session.modified = True
-            return response
+        return response
 
 
 class HideCookiesView(FormView):
-    template_name = "report_a_suspected_breach/cookies_consent_notice.html"
+    template_name = "report_a_suspected_breach/hide_cookies.html"
     form_class = HideCookiesNoticeForm
 
     def form_valid(self, form: HideCookiesNoticeForm) -> HttpResponse:

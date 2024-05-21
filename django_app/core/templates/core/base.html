@@ -67,7 +67,7 @@
                 {% endif %}
                 {% if request.session.cookies_set_in_banner %}
                     {% if not request.session.hide_cookies_banner %}
-                        <form method="post" action="{% url 'report_a_suspected_breach:cookies_consent_notice' %}?banner=True">
+                        <form method="post" action="{% url 'report_a_suspected_breach:hide_cookies' %}?banner=True">
                             {% csrf_token %}
                             {% if request.COOKIES.accepted_ga_cookies == "true" %}
                                 <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
