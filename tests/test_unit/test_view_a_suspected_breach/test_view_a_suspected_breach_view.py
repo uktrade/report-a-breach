@@ -35,7 +35,7 @@ class TestViewASuspectedBreachView:
 
     def test_get_context_data_companies_house(self, vasb_client, breach_with_companies_house_object):
         breach_id = breach_with_companies_house_object.id
-        response = vasb_client.get(f"/view_a_suspected_breach/{breach_id}/")
+        response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_id}/")
         sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
