@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Any
 
@@ -7,9 +8,10 @@ from core.templatetags.get_wizard_step_url import get_wizard_step_url
 from core.utils import is_ajax
 from core.views import BaseWizardView
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
 from django.forms import Form
-from django.http import HttpRequest, HttpResponse, JsonResponse, QueryDict
+from django.http import Http404, HttpRequest, HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, View
@@ -17,7 +19,12 @@ from django.views.generic.edit import FormView
 from feedback.forms import FeedbackForm
 from utils.companies_house import get_formatted_address
 from utils.notifier import verify_email
-from utils.s3 import delete_session_files, generate_presigned_url, get_all_session_files
+from utils.s3 import (
+    delete_session_files,
+    generate_presigned_url,
+    get_all_session_files,
+    get_user_uploaded_files,
+)
 
 from .choices import TypeOfRelationshipChoices
 from .forms import CookiesConsentForm, EmailVerifyForm, SummaryForm, UploadDocumentsForm
@@ -31,6 +38,8 @@ from .tasklist import (
     YourDetailsTask,
     get_tasklist,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class ReportABreachWizardView(BaseWizardView):
@@ -514,19 +523,16 @@ class UploadDocumentsView(FormView):
             session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
             self.file_storage.save(session_keyed_file_name, temporary_file.file)
 
-            # adding the file name to the session, so we can retrieve it later
-            if "file_uploads" in self.request.session:
-                self.request.session["file_uploads"].append(temporary_file.name)
-            else:
-                self.request.session["file_uploads"] = [temporary_file.name]
-            self.request.session.modified = True
+            # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
+            # we add a unique identifier to the key, so we do not overwrite previous uploads
+            redis_cache_key = f"{self.request.session.session_key}{uuid.uuid4()}"
+            cache.set(redis_cache_key, temporary_file.name)
 
             if is_ajax(self.request):
                 return JsonResponse(
                     {
                         "success": True,
                         "file_name": temporary_file.name,
-                        "file_url": generate_presigned_url(self.file_storage, session_keyed_file_name),
                     },
                     status=201,
                 )
@@ -550,12 +556,6 @@ class DeleteDocumentsView(View):
         if file_name := self.request.GET.get("file_name"):
             full_file_path = f"{self.request.session.session_key}/{file_name}"
             TemporaryDocumentStorage().delete(full_file_path)
-
-            # removing the file name from the session
-            if "file_uploads" in self.request.session:
-                if file_name in self.request.session["file_uploads"]:
-                    self.request.session["file_uploads"].remove(file_name)
-                    self.request.session.modified = True
 
             if is_ajax(self.request):
                 return JsonResponse({"success": True}, status=200)
@@ -608,3 +608,18 @@ class EmailVerifyView(FormView):
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name_and_business_you_work_for"})
         else:
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "start"})
+
+
+class DownloadDocumentView(View):
+    http_method_names = ["get"]
+
+    def get(self, *args: object, file_name, **kwargs: object) -> HttpResponse:
+        user_uploaded_files = get_user_uploaded_files(self.request.session)
+
+        if file_name in user_uploaded_files:
+            logger.info(f"User is downloading file: {file_name}")
+            session_keyed_file_name = f"{self.request.session.session_key}/{file_name}"
+            file_url = generate_presigned_url(TemporaryDocumentStorage(), session_keyed_file_name)
+            return redirect(file_url)
+
+        raise Http404()
