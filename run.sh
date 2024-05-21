@@ -1,10 +1,6 @@
 #!/bin/bash -e
 
-python django_app/manage.py flush --no-input || true
-python django_app/manage.py migrate report_a_suspected_breach zero --no-input
-python django_app/manage.py migrate core zero --no-input
 python django_app/manage.py migrate --no-input
-python django_app/manage.py loaddata django_app/report_a_suspected_breach/fixtures/*.json
 python django_app/manage.py collectstatic --no-input
 
 # Start webserver
