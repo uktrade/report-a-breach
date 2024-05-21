@@ -116,24 +116,35 @@
     <h2 class="govuk-heading-m">The supply chain</h2>
     <h3 class="govuk-heading-s">Supplier</h3>
     <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Location of supplier
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {{ supplier.country }}
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Name and address of supplier
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {{ supplier.name }}
-                <br> <br>
-                {{ supplier_address | linebreaksbr }}
-            </dd>
-        </div>
+        {% if supplier %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Location of supplier
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ supplier.country }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Name and address of supplier
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ supplier.name }}
+                    <br> <br>
+                    {{ supplier_address | linebreaksbr }}
+                </dd>
+            </div>
+        {% else %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Location of supplier
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    Unknown
+                </dd>
+            </div>
+        {% endif %}
     </dl>
     {% if recipients %}
         {% for end_user in recipients %}
@@ -158,26 +169,29 @@
                         {% include "report_a_suspected_breach/partials/truncated_text.html" with text=end_user.address|linebreaksbr %}
                     </dd>
                 </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Website
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% if end_user.website %}
+                {% if end_user.website %}
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Website
+                        </dt>
+                        <dd class="govuk-summary-list__value">
                             <a class="govuk-link"
                                href="{{ end_user.website }}">{{ end_user.website }}<span
                                 class="govuk-visually-hidden"></span></a>
-                        {% endif %}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Additional contact information
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% include "report_a_suspected_breach/partials/truncated_text.html" with text=end_user.additional_contact_details|linebreaksbr %}
-                    </dd>
-                </div>
+                        </dd>
+                    </div>
+                {% endif %}
+                {% if end_user.additional_contact_details %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Additional contact information
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% include "report_a_suspected_breach/partials/truncated_text.html" with text=end_user.additional_contact_details|linebreaksbr %}
+                        </dd>
+                    </div>
+                {% endif %}
             </dl>
         {% endfor %}
     {% endif %}
@@ -197,18 +211,20 @@
     {% endif %}
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Upload supporting documents
-            </dt>
-            <dd class="govuk-summary-list__value">
-                {% for document, url in documents.items %}
+        {% if documents.items %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Upload supporting documents
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {% for document, url in documents.items %}
 
-                    <a href="{{url}}" download>{{document}}</a><br>
-                {% endfor %}
+                        <a href="{{url}}" download>{{document}}</a><br>
+                    {% endfor %}
 
-            </dd>
-        </div>
+                </dd>
+            </div>
+        {% endif %}
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 Summary of the breach
