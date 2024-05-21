@@ -18,6 +18,7 @@ from feedback.forms import FeedbackForm
 from utils.companies_house import get_formatted_address
 from utils.notifier import verify_email
 from utils.s3 import delete_session_files, generate_presigned_url, get_all_session_files
+from view_a_suspected_breach.views import ViewASuspectedBreachView
 
 from .choices import TypeOfRelationshipChoices
 from .forms import CookiesConsentForm, EmailVerifyForm, SummaryForm, UploadDocumentsForm
@@ -493,7 +494,8 @@ class CompleteView(TemplateView):
         print(ReportABreachWizardView.form_list[10])
 
         context["wizard"] = ReportABreachWizardView()
-        context["summary_form"] = SummaryForm()
+        breach_id = Breach.objects.filter(reference_id=self.request.session.reference_id).first()
+        context["summary_form"] = ViewASuspectedBreachView.as_view()(self.request, pk=breach_id)
         return context
 
 
