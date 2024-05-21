@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.core.cache.backends.dummy import DummyCache
 from django.forms import Form
 
 from .base import *  # noqa
@@ -17,6 +18,32 @@ FILE_UPLOAD_HANDLERS = (
     "core.custom_upload_handler.CustomFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 )  # Order is important
+
+
+# don't use redis when testing
+class TestingCache(DummyCache):
+    """A dummy cache that implements the same interface as the django-redis cache."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dict_cache = {}
+
+    def get(self, key, *args, **kwargs):
+        return self.dict_cache.get(key)
+
+    def set(self, key, value, **kwargs):
+        self.dict_cache[key] = value
+
+    def iter_keys(self, *args, search="", **kwargs):
+        for key in self.dict_cache.keys():
+            if search in key:
+                yield key
+
+    def clear(self):
+        self.dict_cache = {}
+
+
+CACHES = {"default": {"BACKEND": "config.settings.test.TestingCache"}}
 
 
 def test_process_email_step(self, form: Form) -> dict[str, Any]:
