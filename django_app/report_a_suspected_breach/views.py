@@ -467,17 +467,27 @@ class CookiesConsentView(FormView):
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         initial_dict = {}
-
-        if current_cookies_policy := self.request.COOKIES.get("accepted_ga_cookies"):
-            initial_dict["accept_cookies"] = current_cookies_policy == "true"
-            kwargs["initial"] = initial_dict
+        self.request.session["show_cookies_form"] = True
 
         # set the referer so the user can click the redirect link to get to their original page
         if referer := self.request.META.get(
             "HTTP_REFERER",
         ):
-            self.request.session["cookies_referer"] = referer
+            if not reverse("report_a_suspected_breach:cookies_consent") in referer:
+                # send the user back to the tasklist
+                self.request.session["cookies_referer"] = referer
+                self.request.session.modified = True
+
+        if current_cookies_policy := self.request.COOKIES.get("accepted_ga_cookies"):
+            initial_dict["accept_cookies"] = current_cookies_policy == "true"
+            kwargs["initial"] = initial_dict
+
+        if self.request.GET.get("redirect"):
+            self.request.session["redirected_from_banner"] = True
             self.request.session.modified = True
+
+        if self.request.session.get("submitted_on_cookies_page"):
+            self.request.session.pop("show_cookies_form")
 
         return kwargs
 
@@ -486,12 +496,15 @@ class CookiesConsentView(FormView):
         cookie_max_age = 365 * 24 * 60 * 60
         response = redirect("/")
 
+        self.request.session.pop("redirected_from_banner", None)
+
         if self.request.GET.get("banner", ""):
             self.request.session["cookies_set_in_banner"] = True
             self.request.session.modified = True
         else:
             # the user submitted the form on the cookies_consent page
             # we want to keep them there after the post
+            self.request.session["submitted_on_cookies_page"] = True
             response = redirect(reverse("report_a_suspected_breach:cookies_consent"))
 
         # regardless of their choice, we set a cookie to say they've made a choice

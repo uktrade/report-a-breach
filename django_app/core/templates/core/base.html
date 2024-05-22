@@ -74,7 +74,7 @@
                                     <div class="govuk-grid-row">
                                         <div class="govuk-grid-column-two-thirds">
                                             <div class="govuk-cookie-banner__content">
-                                                <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}">change your cookie settings</a> at any time.</p>
+                                                <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -90,7 +90,7 @@
                                     <div class="govuk-grid-row">
                                         <div class="govuk-grid-column-two-thirds">
                                             <div class="govuk-cookie-banner__content">
-                                                <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}">change your cookie settings</a> at any time.</p>
+                                                <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -247,6 +247,10 @@
                         <a class="govuk-footer__link govuk-footer__copyright-logo"
                            href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">©
                             Crown copyright</a>
+                    </div>
+                    <div class="govuk-footer__meta-item">
+                        <a class="govuk-footer__link"
+                           href="{% url 'report_a_suspected_breach:cookies_consent' %}">Cookies</a>
                     </div>
                     <div class="govuk-footer__meta-item">
                         <a class="govuk-footer__link"

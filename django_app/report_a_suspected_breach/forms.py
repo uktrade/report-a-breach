@@ -735,7 +735,7 @@ class CookiesConsentForm(BaseForm):
         # Allows us to display to the user their previously selected cookies choice in the radios
         kwargs_initial = kwargs.get("initial")
         if kwargs_initial:
-            self.fields["do_you_want_to_accept_analytics_cookies"].initial = str(kwargs_initial["accept_cookies"])
+            self.fields["do_you_want_to_accept_analytics_cookies"].initial = str(self.kwargs_initial["accept_cookies"])
 
 
 class HideCookiesForm(BaseForm):
