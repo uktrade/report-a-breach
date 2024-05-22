@@ -70,34 +70,38 @@
                         <form method="post" action="{% url 'report_a_suspected_breach:hide_cookies' %}?banner=True">
                             {% csrf_token %}
                             {% if request.COOKIES.accepted_ga_cookies == "true" %}
-                                <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
-                                    <div class="govuk-grid-row">
-                                        <div class="govuk-grid-column-two-thirds">
-                                            <div class="govuk-cookie-banner__content">
-                                                <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
+                                    <div class="govuk-cookie-banner__message govuk-width-container">
+                                        <div class="govuk-grid-row">
+                                            <div class="govuk-grid-column-two-thirds">
+                                                <div class="govuk-cookie-banner__content">
+                                                    <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="govuk-button-group">
-                                        <button type="submit" class="govuk-button" data-module="govuk-button" name="hide_cookies" value="True">
-                                            Hide cookie message
-                                        </button>
+                                        <div class="govuk-button-group">
+                                            <button type="submit" class="govuk-button" data-module="govuk-button" name="hide_cookies" value="True">
+                                                Hide cookie message
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             {% endif %}
                             {% if request.COOKIES.accepted_ga_cookies == "false" %}
-                                <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
-                                    <div class="govuk-grid-row">
-                                        <div class="govuk-grid-column-two-thirds">
-                                            <div class="govuk-cookie-banner__content">
-                                                <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
+                                    <div class="govuk-cookie-banner__message govuk-width-container">
+                                        <div class="govuk-grid-row">
+                                            <div class="govuk-grid-column-two-thirds">
+                                                <div class="govuk-cookie-banner__content">
+                                                    <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'report_a_suspected_breach:cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="govuk-button-group">
-                                        <button type="button" class="govuk-button" data-module="govuk-button">
-                                            Hide cookie message
-                                        </button>
+                                        <div class="govuk-button-group">
+                                            <button type="submit" class="govuk-button" data-module="govuk-button" name="hide_cookies" value="True">
+                                                Hide cookie message
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             {% endif %}
