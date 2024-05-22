@@ -239,7 +239,7 @@ class TestCookiesConsentForm:
 
 
 class TestHideCookiesForm:
-    def test_hide_cookies_any_button_press_valid(self):
+    def test_hide_cookies_any_submit_valid(self):
         form = forms.HideCookiesForm(data={"hide_cookies": "True"})
         assert form.is_valid()
         assert "hide_cookies" not in form.errors
