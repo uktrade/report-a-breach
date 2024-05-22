@@ -238,6 +238,21 @@ class TestCookiesConsentForm:
         assert "do_you_want_to_accept_analytics_cookies" not in form.errors
 
 
+class TestHideCookiesForm:
+    def test_hide_cookies_any_button_press_valid(self):
+        form = forms.HideCookiesForm(data={"hide_cookies": "True"})
+        assert form.is_valid()
+        assert "hide_cookies" not in form.errors
+
+        form = forms.HideCookiesForm(data={"hide_cookies": ""})
+        assert form.is_valid()
+        assert "hide_cookies" not in form.errors
+
+        form = forms.HideCookiesForm(data={"hide_cookies": None})
+        assert form.is_valid()
+        assert "hide_cookies" not in form.errors
+
+
 class TestUploadDocumentsForm:
     class MockAllSessionFiles:
         def __init__(self, length: int = 0):
