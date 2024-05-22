@@ -194,6 +194,7 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = {}
                 context["form_data"]["about_the_supplier"]["name"] = registered_company["registered_company_name"]
                 context["form_data"]["about_the_supplier"]["readable_address"] = registered_company["registered_office_address"]
+                context["form_data"]["about_the_supplier"]["country"] = "GB"
             else:
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context

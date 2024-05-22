@@ -22,3 +22,8 @@
 .display-inline {
     display: inline-block;
 }
+
+.action-wrapper {
+    clear:both;
+    border-bottom: 1px solid transparent;
+}
