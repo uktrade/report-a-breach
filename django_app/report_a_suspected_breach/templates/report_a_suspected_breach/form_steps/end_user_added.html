@@ -3,7 +3,7 @@
 {% load get_wizard_step_url %}
 {% load countries %}
 
-{% block form_content %}
+{% block column_content %}
     <h1 class="govuk-heading-l">
         You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}
     </h1>
@@ -25,6 +25,16 @@
                     <a class="govuk-link" href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=id %}">Change<span
                         class="govuk-visually-hidden"> name</span></a>
                 </dd>
+                <dd class="govuk-summary-list__actions">
+                    <form id="delete_end_user_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
+                          action="{% url 'report_a_suspected_breach:delete_end_user' %}?end_user_uuid={{ id }}">
+                        {% csrf_token %}
+                        <button type="submit" class=" govuk-link button-that-looks-like-link" form="delete_end_user_form_{{ forloop.counter }}">
+                            Remove
+                        </button>
+                    </form>
+                </dd>
+
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -45,5 +55,10 @@
             </div>
         </dl>
     {% endfor %}
-    {% crispy wizard.form %}
-{% endblock form_content %}
+    {% error_summary form %}
+    <form method="post" enctype='multipart/form-data' novalidate>
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {% crispy wizard.form %}
+    </form>
+{% endblock column_content %}
