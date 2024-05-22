@@ -67,7 +67,7 @@ class BaseSettings(PydanticBaseSettings):
     oauthlib_insecure_transport: int = 0
 
     redis_host: str = ""
-    redis_port: int = 6379
+    redis_port: int = 16379
 
     @computed_field
     @property

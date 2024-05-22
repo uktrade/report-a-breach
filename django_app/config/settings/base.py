@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     "simple_history",
     "storages",
     "authbroker_client",
+    "django_countries",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS

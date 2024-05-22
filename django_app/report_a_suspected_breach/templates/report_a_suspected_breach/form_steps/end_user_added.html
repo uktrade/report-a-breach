@@ -1,6 +1,7 @@
 {% extends "report_a_suspected_breach/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load get_wizard_step_url %}
+{% load countries %}
 
 {% block form_content %}
     <h1 class="govuk-heading-l">
@@ -38,7 +39,8 @@
                     Country
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ end_user.cleaned_data.country }}
+                    {% get_country end_user.cleaned_data.country as country %}
+                    {{ country.name }}
                 </dd>
             </div>
         </dl>
