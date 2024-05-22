@@ -1,6 +1,6 @@
 [project]
-name = "Report a Suspected Trade Sanctions Breach"
-description = "Report a Suspected Trade Sanctions Breach"
+name = "Report a Suspected Breach of Trade Sanctions"
+description = "Report a Suspected Breach of Trade Sanctions"
 version = "0.0.1"
 authors = [
     "Chris Pettinga <chris.pettinga@digital.trade.gov.uk>",

@@ -470,11 +470,11 @@ class CookiesConsentView(FormView):
         self.request.session["show_cookies_form"] = True
 
         # set the referer so the user can click the redirect link to get to their original page
+        # if the referer is the cookies consent page, send the user back to the tasklist
         if referer := self.request.META.get(
             "HTTP_REFERER",
         ):
             if not reverse("report_a_suspected_breach:cookies_consent") in referer:
-                # send the user back to the tasklist
                 self.request.session["cookies_referer"] = referer
                 self.request.session.modified = True
 
