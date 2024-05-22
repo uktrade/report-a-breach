@@ -119,7 +119,7 @@
                     Location of supplier
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ supplier.country }}
+                    {{ supplier.country.name }}
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -152,7 +152,7 @@
                         Location of end-user {{ forloop.counter }}
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {{ end_user.country }}
+                        {{ end_user.country.name }}
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
