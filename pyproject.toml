@@ -1,14 +1,15 @@
 [project]
-name = "Report a Trade Sanctions Breach Prototype"
-description = "Report a Trade Sanctions Breach Prototype"
+name = "Report a Suspected Trade Sanctions Breach"
+description = "Report a Suspected Trade Sanctions Breach"
 version = "0.0.1"
 authors = [
     "Chris Pettinga <chris.pettinga@digital.trade.gov.uk>",
     "Jennifer Riordan <jennifer.riordan@digital.trade.gov.uk>",
     "Nawaz Ahmed <nawaz.ahmed@digital.trade.gov.uk>",
+    "Morgan Rees <morgan.rees@digital.trade.gov.uk>"
 ]
 readme = "README.md"
-repository = "https://github.com/uktrade/report-a-breach-prototype"
+repository = "https://github.com/uktrade/report-a-breach"
 
 [tool.coverage.run]
 branch = true
