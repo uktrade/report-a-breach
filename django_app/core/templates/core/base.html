@@ -31,7 +31,7 @@
         {% block cookie_banner %}
             {% if request.resolver_match.url_name != "cookies_consent" %}
                 {% if request.COOKIES.cookie_preferences_set != "true" %}
-                    <div class="govuk-cookie-banner" data-nosnippet role="region"
+                    <div class="govuk-cookie-banner hide-on-print" data-nosnippet role="region"
                          aria-label="Cookies on Report a suspected trade sanctions breach">
                         <div class="govuk-cookie-banner__message govuk-width-container">
                             <div class="govuk-grid-row">
@@ -175,7 +175,7 @@
             </div>
         </header>
         <div class="govuk-width-container">
-            <div class="govuk-phase-banner">
+            <div class="govuk-phase-banner hide-on-print">
                 <p class="govuk-phase-banner__content">
                     <strong class="govuk-tag govuk-phase-banner__content__tag">
                         Alpha
@@ -236,7 +236,7 @@
                            href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">©
                             Crown copyright</a>
                     </div>
-                    <div class="govuk-footer__meta-item">
+                    <div class="govuk-footer__meta-item hide-on-print">
                         <a class="govuk-footer__link"
                            href="{% url 'cookies_consent' %}">Cookies</a>
                     </div>
