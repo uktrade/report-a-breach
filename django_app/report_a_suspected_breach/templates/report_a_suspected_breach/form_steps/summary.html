@@ -298,12 +298,12 @@
             <a class="govuk-link"
                href="{% get_wizard_step_url 'where_were_the_goods_made_available_to' %}?add_another_end_user=yes&redirect=summary">Add another
                 end-user<span
-                    class="govuk-visually-hidden">Add another end-user</span></a>
+                    class="govuk-visually-hidden">end-user</span></a>
         {% else %}
             <a class="govuk-link"
                href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect=summary">Add another
                 end-user<span
-                    class="govuk-visually-hidden">Add another end-user</span></a>
+                    class="govuk-visually-hidden">end-user</span></a>
         {% endif %}
     </dl>
     {% if form_data.were_there_other_addresses_in_the_supply_chain.were_there_other_addresses_in_the_supply_chain  == "yes" %}
