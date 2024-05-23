@@ -15,7 +15,6 @@ from crispy_forms_gds.layout import (
     Fluid,
     Layout,
     Size,
-    Submit,
 )
 from django import forms
 from django.conf import settings
@@ -711,31 +710,6 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
                 "other_addresses_in_the_supply_chain", self.Meta.error_messages["other_addresses_in_the_supply_chain"]["required"]
             )
         return cleaned_data
-
-
-class CookiesConsentForm(BaseForm):
-    do_you_want_to_accept_analytics_cookies = forms.TypedChoiceField(
-        choices=(
-            Choice(True, "Yes"),
-            Choice(False, "No"),
-        ),
-        coerce=lambda x: x == "True",
-        widget=forms.RadioSelect,
-        label="Do you want to accept analytics cookies",
-        required=True,
-    )
-
-    def __init__(self, *args: object, **kwargs: object) -> None:
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.add_input(Submit("save cookie settings", "Save cookie settings", css_class="govuk-button"))
-        self.helper.layout = Layout(
-            Field.radios("do_you_want_to_accept_analytics_cookies", legend_size=Size.MEDIUM, legend_tag="h2", inline=False)
-        )
-        # Allows us to display to the user their previously selected cookies choice in the radios
-        kwargs_initial = kwargs.get("initial")
-        if kwargs_initial:
-            self.fields["do_you_want_to_accept_analytics_cookies"].initial = str(kwargs_initial["accept_cookies"])
 
 
 class UploadDocumentsForm(BaseForm):
