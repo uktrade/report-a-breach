@@ -13,6 +13,14 @@ class BreachFactory(factory.django.DjangoModelFactory):
     )
 
 
+class BreacherandSupplierFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.Breach"
+
+    when_did_you_first_suspect = factory.Faker("date_time", tzinfo=timezone.get_current_timezone())
+    where_were_the_goods_supplied_from = "same_address"
+
+
 class SanctionsRegimeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "report_a_suspected_breach.SanctionsRegime"
@@ -93,6 +101,21 @@ class BreachWithCompaniesHouseFactory(BreachFactory):
 
     breacher = factory.RelatedFactory(
         BreacherCompaniesHouseCompanyFactory,
+        factory_related_name="breach",
+    )
+    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+
+    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+
+
+class BreachBreacherAndSupplierFactory(BreacherandSupplierFactory):
+    sanctions1 = factory.RelatedFactory(
+        SanctionsRegimeBreachThroughFactory,
+        factory_related_name="breach",
+    )
+
+    breacher = factory.RelatedFactory(
+        BreacherPersonOrCompanyFactory,
         factory_related_name="breach",
     )
     recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
