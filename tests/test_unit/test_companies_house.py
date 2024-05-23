@@ -55,6 +55,15 @@ class TestCompaniesHouse(unittest.TestCase):
         formatted_address = get_formatted_address(address_dict)
         assert formatted_address == "123 Fake Street,\n AB12 3CD,\n United Kingdom"
 
+    def test_get_formatted_address_england(self):
+        address_dict = {
+            "address_line_1": "123 Fake Street",
+            "country": "England",
+            "postal_code": "AB12 3CD",
+        }
+        formatted_address = get_formatted_address(address_dict)
+        assert formatted_address == "123 Fake Street,\n AB12 3CD,\n United Kingdom"
+
     def test_get_formatted_address_no_country(self):
         address_dict = {
             "address_line_1": "123 Fake Street",
