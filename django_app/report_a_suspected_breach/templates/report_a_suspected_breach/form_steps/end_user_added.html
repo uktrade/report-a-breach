@@ -16,14 +16,15 @@
 
                         <a class="govuk-link" style="font-size: 19px; text-align:right"
                            href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=id %}">Change<span
-                            class="govuk-visually-hidden"> name</span></a>
+                            class="govuk-visually-hidden"> Change End-user {{forloop.counter}} details </span></a>
                     </dd>
                     <dd class="govuk-summary-list__action">
                         <form id="delete_end_user_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
                               action="{% url 'report_a_suspected_breach:delete_end_user' %}?end_user_uuid={{ id }}">
                             {% csrf_token %}
                             <button type="submit" class="govuk-link button-that-looks-like-link" form="delete_end_user_form_{{ forloop.counter }}">
-                                Remove
+                                Remove<span
+                                    class="govuk-visually-hidden"> Remove End-user {{forloop.counter}}</span>
                             </button>
                         </form>
                     </dd>
