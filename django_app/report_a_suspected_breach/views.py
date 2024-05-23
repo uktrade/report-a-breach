@@ -17,6 +17,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView
 from feedback.forms import FeedbackForm
+from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
 from utils.notifier import verify_email
 from utils.s3 import (
@@ -490,7 +491,10 @@ class CompleteView(TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        self.breach = Breach.objects.filter(reference=self.request.session.get("reference_id")).first()
+        context = get_breach_context_data(context, self.breach)
         context["feedback_form"] = FeedbackForm()
+
         return context
 
 

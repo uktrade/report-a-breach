@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from django.test import Client, RequestFactory
 
 from tests.factories import (
+    BreachBreacherAndSupplierFactory,
     BreachFactory,
     BreachWith2SanctionsFactory,
     BreachWithCompaniesHouseFactory,
@@ -62,3 +63,9 @@ def breach_with_sanctions_object(db):
 def breach_with_companies_house_object(db):
     """Fixture to create a breach with companies house object"""
     return BreachWithCompaniesHouseFactory()
+
+
+@pytest.fixture()
+def breacher_and_supplier_object(db):
+    """Fixture to create a breach object where the breacher is the supplier"""
+    return BreachBreacherAndSupplierFactory()
