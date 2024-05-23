@@ -60,7 +60,6 @@ urlpatterns = [
     path("upload_documents_view", UploadDocumentsView.as_view(), name="upload_documents"),
     path("delete_documents_view", DeleteDocumentsView.as_view(), name="delete_documents"),
     path("download_document_view/<str:file_name>", DownloadDocumentView.as_view(), name="download_document"),
-    path("cookies_consent", views.CookiesConsentView.as_view(), name="cookies_consent"),
     path("email_verify", views.EmailVerifyView.as_view(), name="email_verify"),
     path("request_verify_code", views.RequestVerifyCodeView.as_view(), name="request_verify_code"),
 ]

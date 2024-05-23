@@ -48,7 +48,7 @@
                                 </div>
                             </div>
                             <div class="govuk-button-group">
-                                <form method="post" action="{% url 'report_a_suspected_breach:cookies_consent' %}">
+                                <form method="post" action="{% url 'cookies_consent' %}?banner=True">
                                     {% csrf_token %}
                                     <button type="submit" class="govuk-button" data-module="govuk-button"
                                             name="do_you_want_to_accept_analytics_cookies" value="True">
@@ -58,12 +58,39 @@
                                             name="do_you_want_to_accept_analytics_cookies" value="False">
                                         Reject analytics cookies
                                     </button>
-                                    <a class="govuk-link" href="/report_a_suspected_breach/cookies_consent">View
+                                    <a class="govuk-link" href="{% url 'cookies_consent' %}">View
                                         cookies</a>
                                 </form>
                             </div>
                         </div>
                     </div>
+                {% endif %}
+                {% if request.session.cookies_set_in_banner %}
+                    {% if not request.session.hide_cookies_banner %}
+                        <form method="post" action="{% url 'hide_cookies' %}?banner=True">
+                            {% csrf_token %}
+                            <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
+                                <div class="govuk-cookie-banner__message govuk-width-container">
+                                    <div class="govuk-grid-row">
+                                        <div class="govuk-grid-column-two-thirds">
+                                            <div class="govuk-cookie-banner__content">
+                                                {% if request.COOKIES.accepted_ga_cookies == "true" %}
+                                                    <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                                {% elif request.COOKIES.accepted_ga_cookies == "false" %}
+                                                    <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="govuk-button-group">
+                                        <button type="submit" class="govuk-button" data-module="govuk-button" name="hide_cookies" value="True">
+                                            Hide cookie message
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endblock cookie_banner %}
@@ -210,6 +237,10 @@
                             Crown copyright</a>
                     </div>
                     <div class="govuk-footer__meta-item hide-on-print">
+                        <a class="govuk-footer__link"
+                           href="{% url 'cookies_consent' %}">Cookies</a>
+                    </div>
+                    <div class="govuk-footer__meta-item">
                         <a class="govuk-footer__link"
                            href="{{ request.site.domain }}?reset=yes">Reset session</a>
                     </div>
