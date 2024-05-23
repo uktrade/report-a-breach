@@ -111,7 +111,9 @@
                 {% if is_company_obtained_from_companies_house %}
                     {{ form_data.do_you_know_the_registered_company_number.registered_office_address | linebreaksbr }}
                 {% else %}
-                    {{ form_data.business_or_person_details.readable_address | linebreaksbr }}
+                    {{ form_data.business_or_person_details.readable_address | linebreaksbr }}, <br>
+                    {% get_country form_data.business_or_person_details.country as country %}
+                    {{ country.name }}
                 {% endif %}
             </dd>
             <dd class="govuk-summary-list__actions">

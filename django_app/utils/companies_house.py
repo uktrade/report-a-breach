@@ -3,7 +3,6 @@ from typing import Any
 
 import requests
 from django.conf import settings
-from django_countries import countries
 from report_a_suspected_breach.exceptions import CompaniesHouseException
 
 COMPANIES_HOUSE_BASE_DOMAIN = "https://api.companieshouse.gov.uk"
@@ -47,12 +46,5 @@ def get_formatted_address(address_dict: dict[str, Any]) -> str:
         address_string += f",\n {town_or_city}"
     if postal_code := address_dict.get("postal_code"):
         address_string += f",\n {postal_code}"
-
-    COUNTRY_DICT = dict(countries)
-    if country := address_dict.get("country"):
-        # Convert companies house company address into GB country code
-        if country in ["England", "Scotland", "Wales", "Northern Ireland", "United Kingdom"]:
-            country = "GB"
-        address_string += f",\n {COUNTRY_DICT[country]}"
 
     return address_string
