@@ -630,18 +630,8 @@ class DeleteEndUserView(View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         if end_user_uuid := self.request.GET.get("end_user_uuid"):
             end_users = self.request.session.pop("end_users", None)
-            print(end_users)
             end_users.pop(end_user_uuid, None)
-            print(end_users)
             self.request.session["end_users"] = end_users
             self.request.session.modified = True
 
-            if is_ajax(self.request):
-                return JsonResponse({"success": True}, status=200)
-            else:
-                return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
-
-        if is_ajax(self.request):
-            return JsonResponse({"success": False}, status=400)
-        else:
-            return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
+        return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
