@@ -103,7 +103,8 @@
             {% endif %}
         {% endblock cookie_banner %}
 
-        {% block title %}{% endblock title %}
+
+        <title>{% block title %}{% endblock title %} - Report a suspected breach of trade sanctions - GOV.UK</title>
 
         <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "core/assets/images/favicon.ico" %}"
               type="image/x-icon">
@@ -257,6 +258,14 @@
                     </div>
                 </div>
             </div>
+            <script src="{% static 'core/javascript/jquery-3.7.1.js' %}"></script>
+            <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"></script>
+            <script type="module">
+                import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"
+
+                initAll()
+            </script>
+            {% block extra_js %}{% endblock %}
         </footer>
     </body>
 </html>

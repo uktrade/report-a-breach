@@ -4,6 +4,10 @@
 {% block extra_css %}
     {{ wizard.form.media.css }}
 {% endblock extra_css %}
+{% block title %}{% if form_h1_header %}{{form_h1_header}}
+{% else %}{% for field in wizard.form %}{% if forloop.first %}{{ field.label }}{% endif %}{% endfor %}
+{% endif %}
+{% endblock title %}
 
 {% block column_content %}
     {% error_summary form %}
@@ -11,6 +15,7 @@
         {% if form_h1_header %}
             <h1 class="govuk-heading-l">{{ form_h1_header }}</h1>
         {% endif %}
+
         {% csrf_token %}
         {{ wizard.management_form }}
         {% block form_content %}
