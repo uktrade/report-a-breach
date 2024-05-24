@@ -6,13 +6,14 @@ from . import data
 
 class TestDeleteEndUserView:
     def test_successful_post(self, rasb_client):
-        request = RequestFactory().get("/")
+        request = RequestFactory().post("/")
         request.session = rasb_client.session
         request.session["end_users"] = data.end_users
         end_user_id = "end_user1"
         request.session.save()
         response = rasb_client.post(
-            reverse("report_a_suspected_breach:delete_end_user") + f"?end_user_uuid={end_user_id}",
+            reverse("report_a_suspected_breach:delete_end_user"),
+            data={"end_user_uuid": end_user_id},
         )
         assert "end_user1" not in rasb_client.session["end_users"].keys()
         assert rasb_client.session["end_users"] != data.end_users
