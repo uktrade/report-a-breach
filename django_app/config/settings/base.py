@@ -238,7 +238,7 @@ en_formats.DATE_FORMAT = "d/m/Y"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{env.redis_host}:{env.redis_port}",
+        "LOCATION": env.redis_url,
         "TIMEOUT": 60 * 60 * 24,  # in seconds: 60 * 60 * 24 (24 hours)
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
