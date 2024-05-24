@@ -1,7 +1,7 @@
 {% extends "report_a_suspected_breach/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load get_wizard_step_url %}
-{% block title %} You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}{% endblock title %}
+{% block title %}You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}{% endblock title %}
 {% block form_content %}
     <h1 class="govuk-heading-l">
         You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}
