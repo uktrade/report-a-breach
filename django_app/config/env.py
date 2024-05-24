@@ -153,6 +153,9 @@ class GovPaasSettings(BaseSettings):
 class DBTPlatformSettings(BaseSettings):
     in_build_step: bool = Field(alias="BUILD_STEP", default=False)
 
+    # Redis env vars
+    celery_broker_url: str = ""
+
     @computed_field
     @property
     def allowed_hosts(self) -> list[str]:
@@ -168,6 +171,14 @@ class DBTPlatformSettings(BaseSettings):
             return ""
         else:
             return database_url_from_env("DATABASE_CREDENTIALS")
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def redis_url(self) -> str:
+        if self.build_step:
+            return ""
+
+        return self.celery_broker_url
 
 
 if "CIRCLECI" in os.environ:
