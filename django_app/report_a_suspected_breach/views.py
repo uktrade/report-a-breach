@@ -600,7 +600,7 @@ class DownloadDocumentView(View):
 
 class DeleteEndUserView(View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
-        if end_user_uuid := self.request.GET.get("end_user_uuid"):
+        if end_user_uuid := self.request.POST.get("end_user_uuid"):
             end_users = self.request.session.pop("end_users", None)
             end_users.pop(end_user_uuid, None)
             self.request.session["end_users"] = end_users
