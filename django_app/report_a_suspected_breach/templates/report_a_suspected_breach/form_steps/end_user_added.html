@@ -3,6 +3,8 @@
 {% load get_wizard_step_url %}
 {% load countries %}
 
+{% block title %}You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}{% endblock title %}
+
 {% block column_content %}
     <h1 class="govuk-heading-l">
         You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}
