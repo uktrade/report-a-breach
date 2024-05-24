@@ -7,6 +7,8 @@
 {% block title %}
     {% if form_h1_header %}
         <title>{{form_h1_header}} - Report a suspected breach of trade sanctions - GOV.UK</title>
+    {% else %}
+        <title>{% for field in wizard.form %}{% if forloop.first %}{{ field.label }}{% endif %}{% endfor %} - Report a suspected breach of trade sanctions - GOV.UK</title>
     {% endif %}
 {% endblock title %}
 
@@ -16,6 +18,7 @@
         {% if form_h1_header %}
             <h1 class="govuk-heading-l">{{ form_h1_header }}</h1>
         {% endif %}
+
         {% csrf_token %}
         {{ wizard.management_form }}
         {% block form_content %}
