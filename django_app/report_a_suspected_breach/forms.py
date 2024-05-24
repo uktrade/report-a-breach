@@ -783,15 +783,13 @@ class UploadDocumentsForm(BaseForm):
 
 
 class TellUsAboutTheSuspectedBreachForm(BaseModelForm):
-    form_h1_header = "Give a summary of the breach"
-    bold_labels = False
 
     class Meta:
         model = Breach
         # todo - make all fields variables a tuple
         fields = ["tell_us_about_the_suspected_breach"]
         labels = {
-            "tell_us_about_the_suspected_breach": "Tell us about the suspected breach",
+            "tell_us_about_the_suspected_breach": "Give a summary of the breach",
         }
         help_texts = {
             "tell_us_about_the_suspected_breach": "You can also include anything you've not already told us or "
