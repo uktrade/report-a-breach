@@ -1,6 +1,5 @@
 from core.views import CookiesConsentView, HideCookiesView, RedirectBaseDomainView
 from django.conf import settings
-from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
@@ -12,15 +11,9 @@ urlpatterns = [
     path("feedback/", include("feedback.urls")),
     path("pingdom/", include("healthcheck.urls")),
     path("throw_error/", lambda x: 1 / 0),
-    path("admin/", admin.site.urls),
 ]
 
 if settings.ENFORCE_STAFF_SSO:
     urlpatterns.append(
         path("auth/", include("authbroker_client.urls")),
-    )
-
-if settings.ENVIRONMENT == "local":
-    urlpatterns.append(
-        path("__debug__/", include("debug_toolbar.urls")),
     )
