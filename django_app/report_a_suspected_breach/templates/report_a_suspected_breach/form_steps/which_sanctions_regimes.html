@@ -1,0 +1,17 @@
+{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+{% load get_wizard_step_url %}
+
+{% block column_content %}
+    {% error_summary form %}
+    <fieldset class="govuk-fieldset" aria-describedby="checkbox">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-heading-l">Which sanctions regimes do you suspect the company or
+                person has breached?</h1>
+        </legend>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% crispy wizard.form %}
+        </form>
+    </fieldset>
+{% endblock column_content %}

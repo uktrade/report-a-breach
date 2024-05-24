@@ -49,6 +49,7 @@ class ReportABreachWizardView(BaseWizardView):
         "check_company_details": "report_a_suspected_breach/form_steps/check_company_details.html",
         "end_user_added": "report_a_suspected_breach/form_steps/end_user_added.html",
         "declaration": "report_a_suspected_breach/form_steps/declaration.html",
+        "which_sanctions_regime": "report_a_suspected_breach/form_steps/which_sanctions_regimes.html",
         "upload_documents": "report_a_suspected_breach/form_steps/upload_documents.html",
     }
     template_name = "report_a_suspected_breach/generic_form_step.html"
