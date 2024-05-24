@@ -21,7 +21,7 @@
                     <dd class="govuk-summary-list__action">
                         <form id="delete_end_user_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
                               action="{% url 'report_a_suspected_breach:delete_end_user' %}?end_user_uuid={{ id }}">
- <input type="hidden" name="end_user_uuid" value="{{ id }}">
+                            <input type="hidden" name="end_user_uuid" value="{{ id }}">
                             {% csrf_token %}
                             <button type="submit" class="govuk-link button-that-looks-like-link" form="delete_end_user_form_{{ forloop.counter }}">
                                 Remove<span
