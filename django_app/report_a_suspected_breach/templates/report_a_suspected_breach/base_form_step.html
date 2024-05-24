@@ -4,12 +4,9 @@
 {% block extra_css %}
     {{ wizard.form.media.css }}
 {% endblock extra_css %}
-{% block title %}
-    {% if form_h1_header %}
-        <title>{{form_h1_header}} - Report a suspected breach of trade sanctions - GOV.UK</title>
-    {% else %}
-        <title>{% for field in wizard.form %}{% if forloop.first %}{{ field.label }}{% endif %}{% endfor %} - Report a suspected breach of trade sanctions - GOV.UK</title>
-    {% endif %}
+{% block title %}{% if form_h1_header %}{{form_h1_header}} -
+{% else %}{% for field in wizard.form %}{% if forloop.first %}{{ field.label }}{% endif %}{% endfor %} -
+{% endif %}
 {% endblock title %}
 
 {% block column_content %}
