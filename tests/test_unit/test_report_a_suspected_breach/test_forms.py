@@ -254,6 +254,21 @@ class TestUploadDocumentsForm:
         assert "document" in form.errors
         assert form.errors.as_data()["document"][0].code == "invalid_file_type"
 
+    def test_invalid_extension(self, request_object):
+        bad_file = SimpleUploadedFile("bad.gif", b"%PDF-test_pdf")
+
+        form = forms.UploadDocumentsForm(
+            files={
+                "document": [
+                    bad_file,
+                ]
+            },
+            request=request_object,
+        )
+        assert not form.is_valid()
+        assert "document" in form.errors
+        assert form.errors.as_data()["document"][0].code == "invalid_file_type"
+
     def test_too_large(self, request_object):
         large_file = SimpleUploadedFile("large.pdf", b"%PDF-test_pdf")
         large_file.size = 9999999999
