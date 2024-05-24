@@ -15,7 +15,12 @@ from .form_step_conditions import (
     show_where_were_the_goods_made_available_to_page,
     show_where_were_the_goods_supplied_to_page,
 )
-from .views import DeleteDocumentsView, DownloadDocumentView, UploadDocumentsView
+from .views import (
+    DeleteDocumentsView,
+    DeleteEndUserView,
+    DownloadDocumentView,
+    UploadDocumentsView,
+)
 
 report_a_suspected_breach_wizard = views.ReportABreachWizardView.as_view(
     url_name="report_a_suspected_breach:step",
@@ -62,4 +67,5 @@ urlpatterns = [
     path("download_document_view/<str:file_name>", DownloadDocumentView.as_view(), name="download_document"),
     path("email_verify", views.EmailVerifyView.as_view(), name="email_verify"),
     path("request_verify_code", views.RequestVerifyCodeView.as_view(), name="request_verify_code"),
+    path("delete_end_user_view", DeleteEndUserView.as_view(), name="delete_end_user"),
 ]

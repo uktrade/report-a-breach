@@ -47,8 +47,4 @@ def get_formatted_address(address_dict: dict[str, Any]) -> str:
     if postal_code := address_dict.get("postal_code"):
         address_string += f",\n {postal_code}"
 
-    # todo - get full country name from country code
-    if country := address_dict.get("country"):
-        address_string += f",\n {country}"
-
     return address_string

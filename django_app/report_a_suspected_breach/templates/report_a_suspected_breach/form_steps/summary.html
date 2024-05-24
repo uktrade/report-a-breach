@@ -2,6 +2,7 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load get_wizard_step_url %}
 {% load get_end_user_url %}
+{% load countries %}
 {% block form_content %}
     <div>
         <h1 class="govuk-heading-l">
@@ -110,7 +111,9 @@
                 {% if is_company_obtained_from_companies_house %}
                     {{ form_data.do_you_know_the_registered_company_number.registered_office_address | linebreaksbr }}
                 {% else %}
-                    {{ form_data.business_or_person_details.readable_address | linebreaksbr }}
+                    {{ form_data.business_or_person_details.readable_address | linebreaksbr }}, <br>
+                    {% get_country form_data.business_or_person_details.country as country %}
+                    {{ country.name }}
                 {% endif %}
             </dd>
             <dd class="govuk-summary-list__actions">
@@ -191,7 +194,8 @@
                     Location of supplier
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ form_data.about_the_supplier.country }}
+                    {% get_country form_data.about_the_supplier.country as country %}
+                    {{ country.name }}
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
@@ -225,7 +229,8 @@
                         Location of end-user {{ forloop.counter }}
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {{ value.cleaned_data.country }}
+                        {% get_country value.cleaned_data.country as country %}
+                        {{ country.name }}
                     </dd>
                     {% if is_made_available_journey %}
                         <dd class="govuk-summary-list__actions">
