@@ -195,6 +195,7 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = {}
                 context["form_data"]["about_the_supplier"]["name"] = registered_company["registered_company_name"]
                 context["form_data"]["about_the_supplier"]["readable_address"] = registered_company["registered_office_address"]
+                context["form_data"]["about_the_supplier"]["country"] = "GB"
             else:
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
@@ -595,3 +596,14 @@ class DownloadDocumentView(View):
             return redirect(file_url)
 
         raise Http404()
+
+
+class DeleteEndUserView(View):
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        if end_user_uuid := self.request.POST.get("end_user_uuid"):
+            end_users = self.request.session.pop("end_users", None)
+            end_users.pop(end_user_uuid, None)
+            self.request.session["end_users"] = end_users
+            self.request.session.modified = True
+
+        return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))

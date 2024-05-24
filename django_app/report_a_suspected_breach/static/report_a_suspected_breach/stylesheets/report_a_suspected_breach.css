@@ -1,35 +1,40 @@
 .tasklist_no_hover:hover {
-  background: none;
+    background: none;
 }
 
 .button-that-looks-like-link {
-  background: none !important;
-  border: none;
-  padding: 0 !important;
-  cursor: pointer;
-  color: #003078;
-  font-size: 19px;
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+    cursor: pointer;
+    color: #003078;
+    font-size: 19px;
 }
 
 .js-disabled .govuk-radios__conditional--hidden {
-  display: block;
+    display: block;
 }
 
 .wide-div {
-  width: 90vw;
+    width: 90vw;
 }
 
 .display-inline {
-  display: inline-block;
+    display: inline-block;
 }
 
 
 .print-only {
-  display: none;
+    display: none;
 }
 
 @media print {
-  .print-only {
-    display: inherit;
-  }
+    .print-only {
+        display: inherit;
+    }
+}
+
+.action-wrapper {
+    clear:both;
+    border-bottom: 1px solid transparent;
 }

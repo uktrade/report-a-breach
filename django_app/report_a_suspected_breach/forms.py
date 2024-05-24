@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from typing import Any
 
@@ -742,7 +743,7 @@ class UploadDocumentsForm(BaseForm):
 
             # is the document a valid file type?
             mimetype = get_mime_type(document.file)
-            if mimetype not in [
+            valid_mimetype = mimetype in [
                 # word documents
                 "application/msword",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -764,8 +765,39 @@ class UploadDocumentsForm(BaseForm):
                 # images
                 "image/jpeg",
                 "image/png",
-            ]:
+            ]
 
+            _, file_extension = os.path.splitext(document.name)
+            valid_extension = file_extension in [
+                # word documents
+                ".doc",
+                ".docx",
+                ".odt",
+                ".fodt",
+                # spreadsheets
+                ".xls",
+                ".xlsx",
+                ".ods",
+                ".fods",
+                # powerpoints
+                ".ppt",
+                ".pptx",
+                ".odp",
+                ".fodp",
+                # pdf
+                ".pdf",
+                # other
+                ".txt",
+                ".csv",
+                ".zip",
+                ".html",
+                # images
+                ".jpeg",
+                ".jpg",
+                ".png",
+            ]
+
+            if not valid_mimetype or not valid_extension:
                 raise forms.ValidationError(
                     f"{document.name} cannot be uploaded, it is not a valid file type", code="invalid_file_type"
                 )
@@ -783,15 +815,13 @@ class UploadDocumentsForm(BaseForm):
 
 
 class TellUsAboutTheSuspectedBreachForm(BaseModelForm):
-    form_h1_header = "Give a summary of the breach"
-    bold_labels = False
 
     class Meta:
         model = Breach
         # todo - make all fields variables a tuple
         fields = ["tell_us_about_the_suspected_breach"]
         labels = {
-            "tell_us_about_the_suspected_breach": "Tell us about the suspected breach",
+            "tell_us_about_the_suspected_breach": "Give a summary of the breach",
         }
         help_texts = {
             "tell_us_about_the_suspected_breach": "You can also include anything you've not already told us or "

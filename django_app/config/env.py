@@ -71,6 +71,11 @@ class BaseSettings(PydanticBaseSettings):
 
     @computed_field
     @property
+    def redis_url(self) -> str:
+        return f"redis://{self.redis_host}:{self.redis_port}"
+
+    @computed_field
+    @property
     def allowed_hosts(self) -> list[str]:
         return self.rab_allowed_hosts
 
@@ -104,6 +109,7 @@ class GovPaasSettings(BaseSettings):
 
         postgres: list[dict[str, Any]]
         aws_s3_bucket: list[dict[str, Any]] = Field(alias="aws-s3-bucket")
+        redis: list[dict[str, Any]]
 
     vcap_services: VCAPServices | None = VCAPServices
 
@@ -138,9 +144,17 @@ class GovPaasSettings(BaseSettings):
             "secret_access_key": self.get_permanent_bucket_vcap["aws_secret_access_key"],
         }
 
+    @computed_field
+    @property
+    def redis_url(self) -> str:
+        return self.vcap_services.redis[0]["credentials"]["uri"]
+
 
 class DBTPlatformSettings(BaseSettings):
     in_build_step: bool = Field(alias="BUILD_STEP", default=False)
+
+    # Redis env vars
+    celery_broker_url: str = ""
 
     @computed_field
     @property
@@ -157,6 +171,14 @@ class DBTPlatformSettings(BaseSettings):
             return ""
         else:
             return database_url_from_env("DATABASE_CREDENTIALS")
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def redis_url(self) -> str:
+        if self.build_step:
+            return ""
+
+        return self.celery_broker_url
 
 
 if "CIRCLECI" in os.environ:

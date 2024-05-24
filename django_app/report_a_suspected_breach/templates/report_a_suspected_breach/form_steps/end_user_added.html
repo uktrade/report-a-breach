@@ -1,13 +1,39 @@
 {% extends "report_a_suspected_breach/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load get_wizard_step_url %}
+{% load countries %}
+
 {% block title %}You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}{% endblock title %}
-{% block form_content %}
+
+{% block column_content %}
     <h1 class="govuk-heading-l">
         You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}
     </h1>
     {% for id, end_user in request.session.end_users.items %}
-        <h3 class="govuk-heading-m">End-user {{ forloop.counter }}</h3>
+        <div class="action-wrapper">
+            <div>
+                <h3 class="govuk-heading-m" style="float:left;">End-user {{ forloop.counter }} </h3>
+                <ul class="govuk-summary-card__actions">
+                    <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
+
+                        <a class="govuk-link" style="font-size: 19px; text-align:right"
+                           href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=id %}">Change<span
+                            class="govuk-visually-hidden"> End-user {{forloop.counter}} details </span></a>
+                    </dd>
+                    <dd class="govuk-summary-list__action">
+                        <form id="delete_end_user_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
+                              action="{% url 'report_a_suspected_breach:delete_end_user' %}?end_user_uuid={{ id }}">
+                            <input type="hidden" name="end_user_uuid" value="{{ id }}">
+                            {% csrf_token %}
+                            <button type="submit" class="govuk-link button-that-looks-like-link" form="delete_end_user_form_{{ forloop.counter }}">
+                                Remove<span
+                                    class="govuk-visually-hidden"> End-user {{forloop.counter}}</span>
+                            </button>
+                        </form>
+                    </dd>
+                </ul>
+            </div>
+        </div>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -20,10 +46,8 @@
                         {{ end_user.cleaned_data.name_of_business }}
                     {% endif %}
                 </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link" href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=id %}">Change<span
-                        class="govuk-visually-hidden"> name</span></a>
-                </dd>
+
+
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -38,10 +62,16 @@
                     Country
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ end_user.cleaned_data.country }}
+                    {% get_country end_user.cleaned_data.country as country %}
+                    {{ country.name }}
                 </dd>
             </div>
         </dl>
     {% endfor %}
-    {% crispy wizard.form %}
-{% endblock form_content %}
+    {% error_summary form %}
+    <form method="post" enctype='multipart/form-data' novalidate>
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {% crispy wizard.form %}
+    </form>
+{% endblock column_content %}
