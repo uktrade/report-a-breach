@@ -300,3 +300,20 @@ class TestUploadDocumentsForm:
         assert not form.is_valid()
         assert "document" in form.errors
         assert form.errors.as_data()["document"][0].code == "too_many"
+
+    def test_invalid_extension_file_name_escaped(self, request_object):
+        bad_file = SimpleUploadedFile("<img src=xonerror=alert(document.domain)>gif.gif", b"GIF8")
+
+        form = forms.UploadDocumentsForm(
+            files={
+                "document": [
+                    bad_file,
+                ]
+            },
+            request=request_object,
+        )
+        assert not form.is_valid()
+        assert "document" in form.errors
+        assert form.errors.as_data()["document"][0].message == (
+            "&lt;img src=xonerror=alert(document.domain)&gt;gif." "gif cannot be uploaded, it is not a valid file type"
+        )

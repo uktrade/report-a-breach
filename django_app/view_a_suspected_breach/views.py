@@ -47,7 +47,7 @@ class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
 class ViewASuspectedBreachView(LoginRequiredMixin, DetailView):
     template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
 
-    def get_object(self) -> Breach:
+    def get_object(self, queryset=None) -> Breach:
         self.breach = get_object_or_404(Breach, id=self.kwargs["pk"])
         return self.breach
 
