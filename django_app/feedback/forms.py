@@ -13,13 +13,15 @@ class FeedbackForm(BaseModelForm):
 
     class Meta:
         model = FeedbackItem
-        fields = ("rating", "how_we_could_improve_the_service")
+        fields = ("rating", "did_you_experience_any_issues", "how_we_could_improve_the_service")
         labels = {
             "how_we_could_improve_the_service": "How could we improve the service?",
+            "did_you_experience_any_issues": "Did you experience any of the following issues?",
             "rating": "Overall, how satisfied did you feel with using this service?",
         }
         widgets = {
             "rating": forms.RadioSelect,
+            "did_you_experience_any_issues": forms.RadioSelect,
         }
 
     class Media:
@@ -31,8 +33,12 @@ class FeedbackForm(BaseModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields["rating"].choices.pop(0)
+        self.fields["did_you_experience_any_issues"].choices.pop(0)
         self.helper.layout = Layout(
             Field.radios("rating", legend_size=Size.MEDIUM, legend_tag="h2"),
+            Field.radios(
+                "did_you_experience_any_issues", legend_size=Size.MEDIUM, legend_tag="h2", css_class="optional_question"
+            ),
             Fieldset(
                 get_textarea_field_with_label_id(
                     "how_we_could_improve_the_service",

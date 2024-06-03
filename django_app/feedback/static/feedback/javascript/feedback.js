@@ -1,13 +1,16 @@
 document.addEventListener("DOMContentLoaded", function() {
     // hide the optional question by default
     $('.optional_question').hide()
+    $('#div_id_did_you_experience_any_issues').hide()
 
     $(document).on("change", "input[name='rating']", function(){
         // on change of a rating
         let rating_value = $(this).val()
         if (rating_value <= 4) {
+            $('#div_id_did_you_experience_any_issues').show()
             $('.optional_question').show()
         } else {
+            $('#div_id_did_you_experience_any_issues').hide()
             $('.optional_question').hide()
         }
     })
