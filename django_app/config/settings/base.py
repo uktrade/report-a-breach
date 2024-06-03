@@ -68,8 +68,7 @@ AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
 PRESIGNED_URL_EXPIRY_SECONDS = env.presigned_url_expiry_seconds
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_DEFAULT_ACL = "private"
-AWS_STORAGE_BUCKET_NAME = env.aws_storage_bucket_name
-CHUNK_UPLOADER_AWS_REGION = env.chunk_uploader_aws_region
+CHUNK_UPLOADER_AWS_REGION = AWS_S3_REGION_NAME
 
 # Temporary document bucket
 TEMPORARY_S3_BUCKET_ACCESS_KEY_ID = env.temporary_s3_bucket_configuration["access_key_id"]
@@ -80,6 +79,8 @@ TEMPORARY_S3_BUCKET_NAME = env.temporary_s3_bucket_configuration["bucket_name"]
 PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_configuration["access_key_id"]
 PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_configuration["secret_access_key"]
 PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_configuration["bucket_name"]
+
+AWS_STORAGE_BUCKET_NAME = TEMPORARY_S3_BUCKET_NAME
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
