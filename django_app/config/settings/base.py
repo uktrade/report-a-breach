@@ -98,7 +98,7 @@ STORAGES = {
 
 # File storage
 FILE_UPLOAD_HANDLERS = (
-    "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
+    # "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "django_chunk_upload_handlers.s3.S3FileUploadHandler",
 )  # Order is important
 

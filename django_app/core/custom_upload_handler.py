@@ -6,7 +6,8 @@
 #     FileWithVirus,
 #     VirusFoundInFileException,
 # )
-#
+# from django_chunk_upload_handlers.s3 import S3FileUploadHandler
+
 #
 # class CustomFileUploadHandler(FileUploadHandler):
 #     def receive_data_chunk(self, raw_data: Any, start: Any) -> Any:
