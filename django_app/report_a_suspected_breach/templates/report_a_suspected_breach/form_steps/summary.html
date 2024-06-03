@@ -196,7 +196,11 @@
                 </dt>
                 <dd class="govuk-summary-list__value">
                     {% get_country form_data.about_the_supplier.country as country %}
-                    {{ country.name }}
+                    {% if country.name == "United Kingdom" %}
+                        The UK
+                    {% else %}
+                        {{ country.name }}
+                    {% endif %}
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
@@ -231,7 +235,11 @@
                     </dt>
                     <dd class="govuk-summary-list__value">
                         {% get_country value.cleaned_data.country as country %}
-                        {{ country.name }}
+                        {% if country.name == "United Kingdom" %}
+                            The UK
+                        {% else %}
+                            {{ country.name }}
+                        {% endif %}
                     </dd>
                     {% if is_made_available_journey %}
                         <dd class="govuk-summary-list__actions">
