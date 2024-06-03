@@ -412,7 +412,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 class WhichSanctionsRegimeForm(BaseForm):
     # form_h1_header = "Which sanctions regimes do you suspect the company or person has breached?"
     which_sanctions_regime = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple(attrs={"id": "checkbox"}),
+        widget=forms.CheckboxSelectMultiple,
         choices=(()),
         required=True,
         error_messages={

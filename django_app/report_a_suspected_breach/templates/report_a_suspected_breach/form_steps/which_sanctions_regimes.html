@@ -12,7 +12,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ wizard.management_form }}
-            <div class="govuk-fieldset__legend"> Select all that apply </div>
+            <div class="govuk-fieldset__legend" id="checkbox"> Select all that apply </div>
             {% crispy wizard.form %}
         </form>
     </fieldset>
