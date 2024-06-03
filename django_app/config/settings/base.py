@@ -68,6 +68,8 @@ AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
 PRESIGNED_URL_EXPIRY_SECONDS = env.presigned_url_expiry_seconds
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_DEFAULT_ACL = "private"
+AWS_STORAGE_BUCKET_NAME = env.aws_storage_bucket_name
+CHUNK_UPLOADER_AWS_REGION = env.chunk_uploader_aws_region
 
 # Temporary document bucket
 TEMPORARY_S3_BUCKET_ACCESS_KEY_ID = env.temporary_s3_bucket_configuration["access_key_id"]
@@ -97,8 +99,7 @@ STORAGES = {
 # File storage
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
-    "core.custom_upload_handler.CustomFileUploadHandler",
-    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+    "django_chunk_upload_handlers.s3.S3FileUploadHandler",
 )  # Order is important
 
 # CLAM AV

@@ -738,6 +738,7 @@ class UploadDocumentsForm(BaseForm):
             try:
                 document.readline()
             except VirusFoundInFileException:
+                documents.remove(document)
                 raise forms.ValidationError(
                     "A virus was found in one of the files you uploaded.",
                 )
