@@ -410,12 +410,11 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
 
 class WhichSanctionsRegimeForm(BaseForm):
-    form_h1_header = "Which sanctions regimes do you suspect the company or person has breached?"
+    # form_h1_header = "Which sanctions regimes do you suspect the company or person has breached?"
     which_sanctions_regime = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(attrs={"id": "checkbox"}),
         choices=(()),
         required=True,
-        label="Select all that apply",
         error_messages={
             "required": "Select the sanctions regime you suspect has been breached",
         },
@@ -433,8 +432,7 @@ class WhichSanctionsRegimeForm(BaseForm):
         checkbox_choices.append(Choice("Unknown Regime", "I don't know"))
         checkbox_choices.append(Choice("Other Regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
-        self.fields["which_sanctions_regime"].widget.attrs["id"] = "checkbox"
-
+        self.fields["which_sanctions_regime"].label = False
         self.helper.label_size = None
         self.helper.label_tag = None
 
