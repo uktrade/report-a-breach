@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("feedback", "0002_feedbackitem_did_you_experience_any_issues_and_more"),
+        ("feedback", "0001_initial"),
     ]
 
     operations = [
