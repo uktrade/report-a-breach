@@ -4,9 +4,16 @@
 {% block extra_css %}
     {{ wizard.form.media.css }}
 {% endblock extra_css %}
-{% block title %}{% if form_h1_header %}{{form_h1_header}}
-{% else %}{% for field in wizard.form %}{% if forloop.first %}{{ field.label }}{% endif %}{% endfor %}
-{% endif %}
+{% block title %}
+    {% if form_h1_header %}
+        {{form_h1_header}}
+    {% else %}
+        {% for field in wizard.form %}
+            {% if forloop.first %}
+                {{ field.label }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {% endblock title %}
 
 {% block column_content %}

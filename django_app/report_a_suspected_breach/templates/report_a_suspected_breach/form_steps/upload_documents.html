@@ -1,7 +1,8 @@
 {% extends "report_a_suspected_breach/base_form_step.html" %}
-{% load crispy_forms_tags crispy_forms_gds %}
+{% load crispy_forms_tags crispy_forms_gds static %}
 
-{% load static %}
+{% block title %}Upload documents{% endblock title %}
+
 {% block extra_css %}
     <link rel="stylesheet" href="{% static "core/stylesheets/moj-frontend.css" %}">
 {% endblock extra_css %}
@@ -54,7 +55,6 @@
 
     </script>
 {% endblock extra_js %}
-{% block title %}Upload documents (optional){% endblock title %}
 
 {% block column_content %}
     {% error_summary form %}
