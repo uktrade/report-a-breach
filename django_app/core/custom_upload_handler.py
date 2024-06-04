@@ -39,8 +39,8 @@ class CustomFileUploadHandler(S3FileUploadHandler):
 
         self.upload_id = self.multipart["UploadId"]
         self.executor = ThreadedS3ChunkUploader(
-            self.s3_client,
-            settings.AWS_STORAGE_BUCKET_NAME,
+            client=self.s3_client,
+            bucket=settings.AWS_STORAGE_BUCKET_NAME,
             key=self.s3_key,
             upload_id=self.upload_id,
         )
