@@ -1,4 +1,5 @@
-from feedback.crispy_fields import HTMLTemplate, get_textarea_field_with_label_id
+from crispy_forms_gds.layout import Field
+from feedback.crispy_fields import HTMLTemplate, get_field_with_label_id
 from feedback.forms import FeedbackForm
 
 
@@ -11,6 +12,6 @@ def test_html_template():
     assert "123456" in rendered
 
 
-def test_get_textarea_field_with_label_id():
-    field = get_textarea_field_with_label_id("test_field", label_id="test_id")
+def test_get_field_with_label_id():
+    field = get_field_with_label_id("test_field", field_method=Field.textarea, label_id="test_id")
     assert field.context["label_id"] == "test_id"
