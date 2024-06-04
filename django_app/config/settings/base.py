@@ -102,7 +102,7 @@ STORAGES = {
 
 # File storage
 FILE_UPLOAD_HANDLERS = (
-    # "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
+    "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "core.custom_upload_handler.CustomFileUploadHandler",
 )  # Order is important
 
