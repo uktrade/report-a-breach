@@ -51,6 +51,8 @@ class BaseSettings(PydanticBaseSettings):
     # required for the S3FileUploadHandler
     aws_storage_bucket_name: str = temporary_s3_bucket_name
     chunk_uploader_aws_region: str = aws_default_region
+    chunk_uploader_aws_access_key_id: str = temporary_s3_bucket_access_key_id
+    chunk_uploader_aws_secret_access_key: str = temporary_s3_bucket_secret_access_key
 
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
