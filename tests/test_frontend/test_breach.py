@@ -19,9 +19,11 @@ class TestChangeBreachDetails(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Your details").click()
         self.page.get_by_text("Full name", exact=True).click()
+        self.page.get_by_role("button", name="Continue").click()
         self.summary_and_declaration_page(self.page)
 
     def test_can_create_breach(self):
         self.page = self.create_test_breach()
         expect(self.page).to_have_url(re.compile(r".*/summary"))
+        self.page.get_by_role("button", name="Continue").click()
         self.summary_and_declaration_page(self.page)

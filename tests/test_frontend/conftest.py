@@ -91,18 +91,22 @@ class PlaywrightTestBase(TransactionTestCase):
     @classmethod
     def summary_and_declaration_page(cls, page):
         #
-        # Summary Page
+        # Declaration Page
         #
-        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Declaration").click()
         page.get_by_label("I agree and accept").check()
         page.get_by_role("button", name="Continue").click()
         #
-        # Declaration Page
+        # Complete Page
         #
         page.get_by_role("heading", name="Submission complete").click()
         page.get_by_text("Your reference number").click()
         page.get_by_role("heading", name="What happens next").click()
-        page.get_by_text("We've sent your report to the").click()
+        page.get_by_text("We have sent you a").click()
+        page.get_by_role("link", name="View and print your report").click()
+        page.get_by_text("What did you think of this service? (takes 30 seconds)").click()
+        page.get_by_role("link", name="What did you think of this").click()
+
         return page
 
     @classmethod
@@ -110,7 +114,10 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Upload Documents Page
         #
-        page.get_by_label("Upload documents (optional)").click()
+        page.get_by_role("heading", name="Upload documents (optional)").click()
+        page.get_by_text("You can upload items such as").click()
+        page.get_by_text("Drag and drop files here or").click()
+        page.get_by_text("Choose files").click()
         # page.get_by_label("Upload documents (optional)").set_input_files('test_file.txt')
         page.get_by_role("button", name="Continue").click()
         return page
@@ -123,39 +130,80 @@ class PlaywrightTestBase(TransactionTestCase):
         page.goto(cls.base_url)
 
         #
+        # Tasklist
+        #
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="Your details").click()
+
+        #
         # Start page
         #
+        page.get_by_role("heading", name="What is your professional").click()
         page.get_by_label("I'm an owner, officer or").check()
         page.get_by_role("button", name="Continue").click()
 
+        #
+        # Email Verify
+        #
         page = cls.verify_email_details(page)
 
+        #
+        # Name
+        #
         page.get_by_label("What is your full name?").click()
         page.get_by_label("What is your full name?").fill("John Smith")
         page.get_by_role("button", name="Continue").click()
+
+        #
+        # Tasklist
+        #
+        page.get_by_text("Your details").click()
+        page.get_by_text("Completed").click()
+        page.get_by_role("link", name="2. About the person or").click()
+
         #
         # Reporting Business on Companies House Page
         #
+        page.get_by_role("heading", name="Are you reporting a business").click()
         page.get_by_label("No", exact=True).check()
         page.get_by_role("button", name="Continue").click()
+
         #
         # Where is Address of Business Page
         #
         page.get_by_label("In the UK").check()
         page.get_by_role("button", name="Continue").click()
+
         #
         # Business or Person Details Page
         #
         page = cls.fill_uk_address_details(page)
+
+        #
+        # Tasklist
+        #
+        page.get_by_role("link", name="Overview of the suspected breach").click()
+
         #
         # When Did You First Suspect Page
         #
-        page.get_by_label("When did you first suspect").click()
-        page.get_by_label("When did you first suspect").fill("July")
+        page.get_by_role("heading", name="Date you first suspected the").click()
+        page.get_by_role("heading", name="Enter the exact date or an").click()
+        page.get_by_label("Day").click()
+        page.get_by_label("Day").fill("03")
+        page.get_by_label("Month").click()
+        page.get_by_label("Month").fill("05")
+        page.get_by_label("Year").click()
+        page.get_by_label("Year").fill("2024")
+        page.get_by_role("heading", name="Is the date you entered exact").click()
+        page.get_by_text("Exact date", exact=True).click()
         page.get_by_role("button", name="Continue").click()
+
         #
         # Which Sanctions Regime Page
         #
+        page.get_by_role("heading", name="Which sanctions regimes do").click()
+        page.get_by_text("Select all that apply").click()
         page.get_by_label("The test 3 full name").check()
         page.get_by_label("The test 2 full name").check()
         page.get_by_role("button", name="Continue").click()
@@ -165,23 +213,28 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("What were the goods or").click()
         page.get_by_label("What were the goods or").fill("goods")
         page.get_by_role("button", name="Continue").click()
+
+        #
+        # Tasklist
+        #
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="The supply chain").click()
+
         #
         # Where Were the Goods Supplied From Page
         #
-        page.get_by_label("A1, A2, Town, AA0 0AA, GB").check()
-        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_label("A1, A2, Town, AA0 0AA").check()
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
+
         #
         # About the Supplier Page
         #
-        page.get_by_label("Name of person").click()
-        page.get_by_label("Name of person").fill("Person 1")
-        page.get_by_label("Name of person").press("Tab")
-        page.get_by_label("Name of business").fill("Business 2")
-        page.get_by_label("Name of business").press("Tab")
-        page.get_by_label("Email").fill("business2@email.com")
-        page.get_by_label("Email").press("Tab")
+        page.get_by_role("heading", name="About the supplier").click()
+        page.get_by_label("Name of business or person").click()
+        page.get_by_label("Name of business or person").fill("Person 1")
+        page.get_by_label("Name of business or person").press("Tab")
         page.get_by_label("Website address").press("Tab")
         page.get_by_label("Address line 1").fill("AL1")
         page.get_by_label("Address line 1").press("Tab")
@@ -196,29 +249,65 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("County").press("Tab")
         page.get_by_label("Postcode").fill("AA0 0AA")
         page.get_by_label("Postcode").press("Tab")
-        page.get_by_label("Additional contact details").fill("contact")
-        page.get_by_label("Additional contact details").press("Tab")
-        page.get_by_role("button", name="Continue").press("Enter")
+        page.get_by_role("button", name="Continue").click()
+
         #
+        # Where were the goods supplied to (end user page)
         #
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_text("This is the address of the").click()
+        page.get_by_label("The UK", exact=True).check()
+        page.get_by_role("button", name="Continue").click()
+
+        #
+        # About the End User
+        #
+        page.get_by_role("heading", name="About the end-user").click()
+        page.get_by_role("heading", name="Name and digital contact").click()
+        page.get_by_label("Name of person (optional)").click()
+        page.get_by_label("Name of person (optional)").fill("End User")
+        page.get_by_label("Name of person (optional)").press("Tab")
+        page.get_by_label("Name of business (optional)").fill("Business End")
+        page.get_by_label("Address line 1 (optional)").click()
+        page.get_by_label("Address line 1 (optional)").fill("End ser addr")
+        page.get_by_label("Additional contact details (").click()
+        page.get_by_label("Additional contact details (").fill("additional details")
+        page.get_by_role("button", name="Continue").click()
+
+        #
+        # Add another End User
         #
         page.get_by_label("No").check()
         page.get_by_role("button", name="Continue").click()
+
         #
         # Were There Other Addresses in the Supply Chain Page
         #
-        page.get_by_label("No", exact=True).check()
+        page.get_by_role("heading", name="Were there any other").click()
+        page.get_by_label("Yes").check()
+        page.get_by_text("Give all addresses").click()
+        page.get_by_label("Give all addresses").fill("Addr supply chain")
         page.get_by_role("button", name="Continue").click()
+
         #
         # Upload Documents Page
         #
         page = cls.upload_documents_page(page)
+
         #
-        # Tell Us About Suspected Breach Page
+        # Give a Summary of the Suspected Breach Page
         #
-        page.get_by_label("Tell us about the suspected").click()
-        page.get_by_label("Tell us about the suspected").fill("hj")
+        page.get_by_text("Give a summary of the breach", exact=True).click()
+        page.get_by_text("You can also include anything").click()
+        page.get_by_label("Give a summary of the breach").click()
+        page.get_by_label("Give a summary of the breach").fill("summary")
         page.get_by_role("button", name="Continue").click()
+
+        #
+        # Tasklist
+        #
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="Continue").click()
 
         return page
 
