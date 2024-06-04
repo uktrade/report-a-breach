@@ -37,6 +37,7 @@ from .tasklist import (
     SummaryAndDeclaration,
     TheSupplyChainTask,
     YourDetailsTask,
+    get_blocked_tasks,
     get_tasklist,
 )
 
@@ -85,6 +86,12 @@ class ReportABreachWizardView(BaseWizardView):
                     self.get_cleaned_data_for_step.delete(step_name)
             self.storage.reset()
             self.storage.current_step = self.steps.first
+
+        blocked_tasks = get_blocked_tasks(self)
+        if blocked_tasks:
+            for task in blocked_tasks:
+                if self.storage.current_step in task.form_steps:
+                    raise Http404()
 
         if request.resolver_match.url_name == "about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not

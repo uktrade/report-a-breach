@@ -202,3 +202,14 @@ def get_tasklist(wizard_view: View) -> TaskList:
         ),
         wizard_view=wizard_view,
     )
+
+
+def get_blocked_tasks(wizard_view: View) -> list["Task"]:
+    tasks = get_tasklist(wizard_view=wizard_view)
+    current_task = tasks.current_task
+    task_list = tasks.tasks
+    current_index = task_list.index(current_task)
+    if current_task != len(task_list) - 1:
+        blocked_tasks = [task for task in tasks if task_list.index(task) > current_index and not task.can_start]
+        return blocked_tasks
+    return []
