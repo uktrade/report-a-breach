@@ -23,7 +23,7 @@ from django.urls import reverse_lazy
 from django.utils.html import escape
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
-from feedback.crispy_fields import HTMLTemplate
+from feedback.crispy_fields import HTMLTemplate, get_field_with_label_id
 from utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
@@ -435,6 +435,12 @@ class WhichSanctionsRegimeForm(BaseForm):
         self.fields["which_sanctions_regime"].label = False
         self.helper.label_size = None
         self.helper.label_tag = None
+        self.helper.layout = Layout(
+            Fieldset(
+                get_field_with_label_id("which_sanctions_regime", field_method=Field.checkboxes, label_id="checkbox"),
+                aria_describedby="checkbox",
+            )
+        )
 
 
 class WhatWereTheGoodsForm(BaseModelForm):
