@@ -7,7 +7,7 @@ from core.sites import (
     is_view_a_suspected_breach_site,
 )
 from django.forms import Form
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView, RedirectView
@@ -180,7 +180,12 @@ class RedirectBaseDomainView(RedirectView):
         if is_report_a_suspected_breach_site(self.request.site):
             return reverse("report_a_suspected_breach:landing")
         elif is_view_a_suspected_breach_site(self.request.site):
-            return reverse("view_a_suspected_breach:landing")
+            # if users are not accessing a specific page in view-a-suspected-breach - raise a 404
+            # unless they are staff, in which case take them to the manage users page
+            if self.request.user.is_staff:
+                return reverse("view_a_suspected_breach:user_admin")
+            else:
+                raise Http404()
         return ""
 
 

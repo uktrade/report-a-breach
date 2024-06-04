@@ -12,10 +12,7 @@ from utils.breach_report import get_breach_context_data
 
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
-
-@method_decorator(require_view_a_breach(), name="dispatch")
-class ViewABreachView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView):
-    template_name = "view_a_suspected_breach/landing.html"
+# ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
@@ -44,10 +41,10 @@ class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class ViewASuspectedBreachView(LoginRequiredMixin, DetailView):
+class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, DetailView):
     template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
 
-    def get_object(self) -> Breach:
+    def get_object(self, queryset=None) -> Breach:
         self.breach = get_object_or_404(Breach, id=self.kwargs["pk"])
         return self.breach
 

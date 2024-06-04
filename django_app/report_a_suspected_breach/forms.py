@@ -20,6 +20,7 @@ from crispy_forms_gds.layout import (
 from django import forms
 from django.conf import settings
 from django.urls import reverse_lazy
+from django.utils.html import escape
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
 from feedback.crispy_fields import HTMLTemplate
@@ -799,7 +800,7 @@ class UploadDocumentsForm(BaseForm):
 
             if not valid_mimetype or not valid_extension:
                 raise forms.ValidationError(
-                    f"{document.name} cannot be uploaded, it is not a valid file type", code="invalid_file_type"
+                    f"{escape(document.name)} cannot be uploaded, it is not a valid file type", code="invalid_file_type"
                 )
 
             # has the user already uploaded 10 files?
