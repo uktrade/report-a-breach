@@ -68,7 +68,6 @@ AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
 PRESIGNED_URL_EXPIRY_SECONDS = env.presigned_url_expiry_seconds
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_DEFAULT_ACL = "private"
-CHUNK_UPLOADER_AWS_REGION = AWS_S3_REGION_NAME
 
 # Temporary document bucket
 TEMPORARY_S3_BUCKET_ACCESS_KEY_ID = env.temporary_s3_bucket_configuration["access_key_id"]
@@ -80,6 +79,10 @@ PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_configuration["acces
 PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_configuration["secret_access_key"]
 PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_configuration["bucket_name"]
 
+# file uploader
+CHUNK_UPLOADER_AWS_ACCESS_KEY_ID = TEMPORARY_S3_BUCKET_ACCESS_KEY_ID
+CHUNK_UPLOADER_AWS_SECRET_ACCESS_KEY = TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY
+CHUNK_UPLOADER_AWS_REGION = AWS_S3_REGION_NAME
 AWS_STORAGE_BUCKET_NAME = TEMPORARY_S3_BUCKET_NAME
 
 # Static files (CSS, JavaScript, Images)
@@ -89,7 +92,7 @@ STATIC_ROOT = ROOT_DIR / "static"
 # Media Files Storage
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
         "OPTIONS": {"bucket_name": env.temporary_s3_bucket_configuration["bucket_name"], "location": "media"},
     },
     "staticfiles": {
@@ -99,7 +102,7 @@ STORAGES = {
 
 # File storage
 FILE_UPLOAD_HANDLERS = (
-    # "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
+    "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "django_chunk_upload_handlers.s3.S3FileUploadHandler",
 )  # Order is important
 
