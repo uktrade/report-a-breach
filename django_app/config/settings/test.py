@@ -14,7 +14,7 @@ BASE_FRONTEND_TESTING_URL = "http://report-a-suspected-breach:8000"
 ENVIRONMENT = "test"
 
 # we don't want to connect to ClamAV in testing, redefine and remove from list
-FILE_UPLOAD_HANDLERS = ("django_chunk_upload_handlers.s3.S3FileUploadHandler",)  # Order is important
+FILE_UPLOAD_HANDLERS = ("core.custom_upload_handler.CustomFileUploadHandler",)  # Order is important
 
 
 # don't use redis when testing
