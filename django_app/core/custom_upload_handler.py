@@ -15,7 +15,7 @@ class CustomFileUploadHandler(S3FileUploadHandler):
         self.new_file_name = self.file_name
 
         extra_kwargs = {}
-        if endpoint_url := settings.AWS_S3_ENDPOINT_URL:
+        if endpoint_url := getattr(settings, "AWS_S3_ENDPOINT_URL", None):
             extra_kwargs["endpoint_url"] = endpoint_url
 
         extra_kwargs["aws_access_key_id"] = settings.AWS_ACCESS_KEY_ID
