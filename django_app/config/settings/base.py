@@ -79,7 +79,7 @@ PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_configuration["acces
 PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_configuration["secret_access_key"]
 PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_configuration["bucket_name"]
 
-# file uploader
+# S3FileUploadHandler
 AWS_ACCESS_KEY_ID = TEMPORARY_S3_BUCKET_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY = TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY
 AWS_REGION = AWS_S3_REGION_NAME
