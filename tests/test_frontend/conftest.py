@@ -6,7 +6,7 @@ from django.test.testcases import TransactionTestCase
 from playwright.sync_api import sync_playwright
 
 EMAIL_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
-ADDRESS_DETAILS = {
+UK_ADDRESS_DETAILS = {
     "name": "business",
     "website": "example.com",
     "address_line_1": "A1",
@@ -15,6 +15,63 @@ ADDRESS_DETAILS = {
     "county": "County",
     "postcode": "AA0 0AA",
 }
+
+NON_UK_ADDRESS_DETAILS = {
+    "name": "business",
+    "website": "example.com",
+    "address_line_1": "A1",
+    "address_line_2": "A2",
+    "address_line_3": "A3",
+    "address_line_4": "A4",
+    "town": "Town",
+    "county": "County",
+    "country": "DE",
+}
+
+UK_BREACHER_ADDRESS_DETAILS = {
+    "name": "Breacher",
+    "website": "breacher.com",
+    "address_line_1": "Breach Lane",
+    "address_line_2": "Breach Avenue",
+    "town": "Breach Town",
+    "county": "Breach County",
+    "postcode": "BB0 0BB",
+}
+
+NON_UK_BREACHER_ADDRESS_DETAILS = {
+    "name": "German Breacher",
+    "website": "germanbreacher.com",
+    "address_line_1": "Germany Lane",
+    "address_line_2": "Germany Avenue",
+    "address_line_3": "Line 3 Germany",
+    "address_line_4": "Line 4 Germany",
+    "town": "Germany Town",
+    "country": "DE",
+}
+
+UK_SUPPLIER_ADDRESS_DETAILS = {
+    "name": "Supplier",
+    "website": "supplier.com",
+    "address_line_1": "Supply Street",
+    "address_line_2": "Supply Lane",
+    "town": "Supply Town",
+    "county": "Supply County",
+    "postcode": "SU0 0SU",
+}
+
+NON_UK_SUPPLIER_ADDRESS_DETAILS = {
+    "name": "supplier",
+    "website": "supplier.com",
+    "address_line_1": "Supply Street",
+    "address_line_2": "Supply Lane",
+    "address_line_3": "Supply A3",
+    "address_line_4": "Supply A4",
+    "town": "Town",
+    "county": "County",
+    "country": "DE",
+}
+
+SANCTIONS = ["The Oscars", "Fireplaces", "Other regime"]
 
 
 class PlaywrightTestBase(TransactionTestCase):
@@ -49,27 +106,35 @@ class PlaywrightTestBase(TransactionTestCase):
         return f"{cls.base_url}/report_a_suspected_breach/{form_step}/"
 
     @classmethod
+    def email_details(cls, page, details=EMAIL_DETAILS):
+        page.get_by_label("What is your email address?").click()
+        page.get_by_label("What is your email address?").fill(details["email"])
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def verify_email(cls, page, details=EMAIL_DETAILS):
+        page.get_by_role("heading", name="We've sent you an email").click()
+        page.get_by_label("Enter the 6 digit security").fill(details["verify_code"])
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
     def verify_email_details(cls, page, details=EMAIL_DETAILS):
         #
         # Email page
         #
-        page.get_by_label("What is your email address?").click()
-        page.get_by_label("What is your email address?").fill(details["email"])
-        page.get_by_role("button", name="Continue").click()
+        page = cls.email_details(page, details)
         #
-        # Verify Page
+        # Verify page
         #
-        page.get_by_role("heading", name="We've sent you an email").click()
-        page.get_by_label("Enter the 6 digit security").fill(details["verify_code"])
-        page.get_by_role("button", name="Continue").click()
+        page = cls.verify_email(page, details)
 
         return page
 
     @classmethod
-    def fill_uk_address_details(cls, page, details=ADDRESS_DETAILS):
-        #
-        # Business or Person Details Page
-        #
+    def fill_uk_address_details(cls, page, details=UK_ADDRESS_DETAILS):
+        # UK Address Details Page
         page.get_by_label("Name of business or person").click()
         page.get_by_label("Name of business or person").fill(details["name"])
         page.get_by_label("Name of business or person").press("Tab")
@@ -86,6 +151,29 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Postcode").fill(details["postcode"])
         page.get_by_role("button", name="Continue").click()
 
+        return page
+
+    @classmethod
+    def fill_non_uk_address_details(cls, page, details=NON_UK_ADDRESS_DETAILS):
+        # NON UK Address Details Page
+        page.get_by_label("Name of business or person").click()
+        page.get_by_label("Name of business or person").fill(details["name"])
+        page.get_by_label("Name of business or person").press("Tab")
+        page.get_by_label("Website address").fill(details["website"])
+        page.get_by_label("Website address").press("Tab")
+        page.get_by_label("Country").select_option(details["country"])
+        page.get_by_label("Country").press("Tab")
+        page.get_by_label("Address line 1").fill(details["address_line_1"])
+        page.get_by_label("Address line 1").press("Tab")
+        page.get_by_label("Address line 2").fill(details["address_line_2"])
+        page.get_by_label("Address line 2").press("Tab")
+        page.get_by_label("Address line 3").fill(details["address_line_3"])
+        page.get_by_label("Address line 3").press("Tab")
+        page.get_by_label("Address line 4").fill(details["address_line_4"])
+        page.get_by_label("Address line 4").press("Tab")
+        page.get_by_label("Town or city").fill(details["town"])
+        page.get_by_label("Town or city").press("Tab")
+        page.get_by_role("button", name="Continue").click()
         return page
 
     @classmethod
@@ -106,7 +194,6 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_role("link", name="View and print your report").click()
         page.get_by_text("What did you think of this service? (takes 30 seconds)").click()
         page.get_by_role("link", name="What did you think of this").click()
-
         return page
 
     @classmethod
@@ -123,70 +210,94 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def create_test_breach(cls):
-        new_browser = cls.playwright.chromium.launch(headless=True)
-        context = new_browser.new_context()
-        page = context.new_page()
-        page.goto(cls.base_url)
-
-        #
-        # Tasklist
-        #
-        page.get_by_role("heading", name="Task list").click()
-        page.get_by_role("link", name="Your details").click()
-
+    def reporter_professional_relationship(cls, page, reporter_professional_relationship):
         #
         # Start page
         #
         page.get_by_role("heading", name="What is your professional").click()
-        page.get_by_label("I'm an owner, officer or").check()
+        page.get_by_label(reporter_professional_relationship).check()
         page.get_by_role("button", name="Continue").click()
+        return page
 
-        #
+    @classmethod
+    def create_third_party_details(cls, page):
+        # Start page
+        page = cls.reporter_professional_relationship(page, "I work for a third party")
+
         # Email Verify
-        #
         page = cls.verify_email_details(page)
 
-        #
+        # Name and business you work for
+        page.get_by_role("heading", name="Your details").click()
+        page.get_by_label("Full name").click()
+        page.get_by_label("Full name").fill("John Smith")
+        page.get_by_label("Business you work for").click()
+        page.get_by_label("Business you work for").fill("DBT")
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_owner_details(cls, page):
+        # Start page
+        page = cls.reporter_professional_relationship(page, "I'm an owner, officer or")
+
+        # Email Verify
+        page = cls.verify_email_details(page)
+
         # Name
-        #
         page.get_by_label("What is your full name?").click()
         page.get_by_label("What is your full name?").fill("John Smith")
         page.get_by_role("button", name="Continue").click()
+        return page
 
-        #
-        # Tasklist
-        #
-        page.get_by_text("Your details").click()
-        page.get_by_text("Completed").click()
-        page.get_by_role("link", name="2. About the person or").click()
+    @classmethod
+    def create_companies_house_details(cls, page):
+        page.get_by_role("heading", name="Are you reporting a business").click()
+        page.get_by_label("Yes").check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Do you know the registered").click()
+        page.get_by_label("Yes").check()
+        page.get_by_label("Registered company number").click()
+        page.get_by_label("Registered company number").fill("12345678")
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Check company details").click()
+        page.get_by_text("Registered company number", exact=True).click()
+        page.get_by_text("12345678").click()
+        page.get_by_text("Registered company name").click()
+        page.get_by_text("BOCIOC M LIMITED").click()
+        page.get_by_text("Registered office address").click()
+        page.get_by_text("Avocet Close, CV23 0WU").click()
+        page.locator("dd").filter(has_text="Changeregistered company").click()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Task list").click()
+        return page
 
-        #
-        # Reporting Business on Companies House Page
-        #
+    @classmethod
+    def create_uk_breacher(cls, page):
         page.get_by_role("heading", name="Are you reporting a business").click()
         page.get_by_label("No", exact=True).check()
         page.get_by_role("button", name="Continue").click()
-
-        #
-        # Where is Address of Business Page
-        #
+        page.get_by_role("heading", name="Where is the address of the").click()
         page.get_by_label("In the UK").check()
         page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Business or person details").click()
+        page = cls.fill_uk_address_details(page, details=UK_BREACHER_ADDRESS_DETAILS)
+        return page
 
-        #
-        # Business or Person Details Page
-        #
-        page = cls.fill_uk_address_details(page)
+    @classmethod
+    def create_non_uk_breacher(cls, page):
+        page.get_by_role("heading", name="Are you reporting a business").click()
+        page.get_by_label("No", exact=True).check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Where is the address of the").click()
+        page.get_by_label("Outside the UK").check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="Business or person details").click()
+        page = cls.fill_non_uk_address_details(page, details=NON_UK_BREACHER_ADDRESS_DETAILS)
+        return page
 
-        #
-        # Tasklist
-        #
-        page.get_by_role("link", name="Overview of the suspected breach").click()
-
-        #
-        # When Did You First Suspect Page
-        #
+    @classmethod
+    def create_suspected_data(cls, page, exact):
         page.get_by_role("heading", name="Date you first suspected the").click()
         page.get_by_role("heading", name="Enter the exact date or an").click()
         page.get_by_label("Day").click()
@@ -196,72 +307,86 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Year").click()
         page.get_by_label("Year").fill("2024")
         page.get_by_role("heading", name="Is the date you entered exact").click()
-        page.get_by_text("Exact date", exact=True).click()
+        if exact:
+            page.get_by_text("Exact date", exact=True).click()
+        else:
+            page.get_by_text("Approximate date", exact=True).click()
         page.get_by_role("button", name="Continue").click()
+        return page
 
-        #
-        # Which Sanctions Regime Page
-        #
+    @classmethod
+    def create_sanctions(cls, page, sanctions):
         page.get_by_role("heading", name="Which sanctions regimes do").click()
         page.get_by_text("Select all that apply").click()
-        page.get_by_label("The test 3 full name").check()
-        page.get_by_label("The test 2 full name").check()
+        for sanction in sanctions:
+            page.get_by_label(sanction).check()
         page.get_by_role("button", name="Continue").click()
-        #
-        # What Were the Goods Page
-        #
+        return page
+
+    @classmethod
+    def overview_of_breach(cls, page, exact=True, sanctions=SANCTIONS):
+        page = cls.create_suspected_data(page, exact)
+        page = cls.create_sanctions(page, sanctions)
         page.get_by_label("What were the goods or").click()
-        page.get_by_label("What were the goods or").fill("goods")
+        page.get_by_label("What were the goods or").fill("Accountancy goods")
         page.get_by_role("button", name="Continue").click()
+        return page
 
-        #
-        # Tasklist
-        #
-        page.get_by_role("heading", name="Task list").click()
-        page.get_by_role("link", name="The supply chain").click()
-
-        #
+    @classmethod
+    def create_uk_supplier(cls, page, details=UK_SUPPLIER_ADDRESS_DETAILS):
         # Where Were the Goods Supplied From Page
-        #
         page.get_by_role("heading", name="Where were the goods,").click()
-        page.get_by_label("A1, A2, Town, AA0 0AA").check()
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
-
-        #
-        # About the Supplier Page
-        #
         page.get_by_role("heading", name="About the supplier").click()
-        page.get_by_label("Name of business or person").click()
-        page.get_by_label("Name of business or person").fill("Person 1")
-        page.get_by_label("Name of business or person").press("Tab")
-        page.get_by_label("Website address").press("Tab")
-        page.get_by_label("Address line 1").fill("AL1")
-        page.get_by_label("Address line 1").press("Tab")
-        page.get_by_label("Address line 2").fill("AL2")
-        page.get_by_label("Address line 2").press("Tab")
-        page.get_by_label("Town or city").fill("Town")
-        page.get_by_label("Town or city").press("Tab")
-        page.get_by_label("Town or city").click()
-        page.get_by_label("Town or city").fill("Town2")
-        page.get_by_label("County").click()
-        page.get_by_label("County").fill("County2")
-        page.get_by_label("County").press("Tab")
-        page.get_by_label("Postcode").fill("AA0 0AA")
-        page.get_by_label("Postcode").press("Tab")
+        page = cls.fill_uk_address_details(page, details=details)
         page.get_by_role("button", name="Continue").click()
+        return page
 
-        #
+    @classmethod
+    def create_non_uk_supplier(cls, page, details=NON_UK_SUPPLIER_ADDRESS_DETAILS):
+        # Where Were the Goods Supplied From Page
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_label("Outside the UK", exact=True).check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="About the supplier").click()
+        page = cls.fill_non_uk_address_details(page, details=details)
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_breacher_as_supplier(cls, page, breacher_address):
+        # Where Were the Goods Supplied From Page
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_label(breacher_address).check()
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_unknown_supplier(cls, page):
+        # Where Were the Goods Supplied From Page
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_label("I do not know", exact=True).check()
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_made_available_supplier(cls, page):
+        # Where Were the Goods Supplied From Page
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_label("They have not been supplied").check()
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_end_users(cls, page):
         # Where were the goods supplied to (end user page)
-        #
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_text("This is the address of the").click()
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
 
-        #
         # About the End User
-        #
         page.get_by_role("heading", name="About the end-user").click()
         page.get_by_role("heading", name="Name and digital contact").click()
         page.get_by_label("Name of person (optional)").click()
@@ -274,15 +399,47 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Additional contact details (").fill("additional details")
         page.get_by_role("button", name="Continue").click()
 
-        #
         # Add another End User
-        #
         page.get_by_label("No").check()
         page.get_by_role("button", name="Continue").click()
+        return page
 
-        #
+    @classmethod
+    def create_test_breach(cls):
+        new_browser = cls.playwright.chromium.launch(headless=True)
+        context = new_browser.new_context()
+        page = context.new_page()
+        page.goto(cls.base_url)
+
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="Your details").click()
+
+        # 1. Your Details
+        page = cls.create_owner_details(page)
+
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="2. About the person or").click()
+
+        # 2. About the person or business you're reporting
+        page = cls.create_non_uk_breacher(page)
+
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="Overview of the suspected breach").click()
+
+        # 3. Overview of the suspected breach
+        page = cls.overview_of_breach(page)
+
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="The supply chain").click()
+
+        page = cls.create_uk_supplier(page)
+        page = cls.create_end_users(page)
+
         # Were There Other Addresses in the Supply Chain Page
-        #
         page.get_by_role("heading", name="Were there any other").click()
         page.get_by_label("Yes").check()
         page.get_by_text("Give all addresses").click()
