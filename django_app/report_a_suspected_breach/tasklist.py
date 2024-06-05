@@ -144,6 +144,7 @@ class SanctionsBreachDetailsTask(Task):
     name = "Sanctions breach details"
     hint_text = "Upload documents and give any additional information"
     optional_steps = {"upload_documents"}
+    non_wizard_steps = {"upload_documents"}
 
 
 class SummaryAndDeclaration(Task):
@@ -204,12 +205,19 @@ def get_tasklist(wizard_view: View) -> TaskList:
     )
 
 
-def get_blocked_tasks(wizard_view: View) -> list["Task"]:
+def get_blocked_steps(wizard_view: View) -> tuple(list[str], bool):
     tasks = get_tasklist(wizard_view=wizard_view)
     current_task = tasks.current_task
     task_list = tasks.tasks
+    blocked_steps = []
     current_index = task_list.index(current_task)
-    if current_task != len(task_list) - 1:
-        blocked_tasks = [task for task in tasks if task_list.index(task) > current_index and not task.can_start]
-        return blocked_tasks
-    return []
+    if current_index != len(task_list) - 1:
+        outstanding_tasks = task_list[current_index:]
+        for task in outstanding_tasks:
+            if task.status == "Cannot start yet":
+                blocked_steps.extend(list(task.form_steps))
+    your_details_task_in_progress = False
+    if isinstance(current_task, YourDetailsTask):
+        if current_task.status != "Completed":
+            your_details_task_in_progress = True
+    return blocked_steps, your_details_task_in_progress

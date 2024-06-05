@@ -37,7 +37,7 @@ from .tasklist import (
     SummaryAndDeclaration,
     TheSupplyChainTask,
     YourDetailsTask,
-    get_blocked_tasks,
+    get_blocked_steps,
     get_tasklist,
 )
 
@@ -86,6 +86,10 @@ class ReportABreachWizardView(BaseWizardView):
                     self.get_cleaned_data_for_step.delete(step_name)
             self.storage.reset()
             self.storage.current_step = self.steps.first
+
+        if current_step := kwargs.get("step"):
+            if is_step_blocked(self, current_step):
+                raise Http404("This page is blocked")
 
         if request.resolver_match.url_name == "about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
@@ -477,12 +481,6 @@ class UploadDocumentsView(FormView):
     template_name = "report_a_suspected_breach/form_steps/upload_documents.html"
     file_storage = TemporaryDocumentStorage()
 
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
-        current_step = self.storage.current_step
-        if task_blocked(self, current_step):
-            raise Http404()
-        return super().get(request, *args, **kwargs)
-
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
@@ -616,10 +614,13 @@ class DeleteEndUserView(View):
         return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
 
 
-def task_blocked(view: View, current_step: str) -> bool:
-    blocked_tasks = get_blocked_tasks(view)
-    if blocked_tasks:
-        for task in blocked_tasks:
-            if current_step in task.form_steps:
+def is_step_blocked(view: View, current_step: str) -> bool:
+    blocked_steps, your_details_in_progress = get_blocked_steps(view)
+    if blocked_steps:
+        for step in blocked_steps:
+            if current_step == step:
                 return True
+    if your_details_in_progress:
+        pass
+    #     need to grab remaining step logic and ensure the user hasn't jumped ahead within this task.
     return False
