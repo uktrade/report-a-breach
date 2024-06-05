@@ -32,6 +32,7 @@ ring = "~=0.10"
 python-magic = "~=0.4"
 redis = "~=5.0"
 django-redis = "*"
+django-csp = "~=3.8"
 
 [dev-packages]
 black = "~=24.3"

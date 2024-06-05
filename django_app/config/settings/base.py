@@ -119,6 +119,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "core.middleware.ReportASuspectedBreachCurrentSiteMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "core.middleware.SetPermittedCrossDomainPolicyHeaderMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -246,3 +248,52 @@ CACHES = {
         },
     }
 }
+
+# CSP policies
+
+# The default policy is to only allow resources from the same origin (self)
+CSP_DEFAULT_SRC = ("'self'",)
+
+# JS tags with a src attribute can only be loaded from report-a-suspected-breach and other trusted sources
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "'unsafe-eval'",
+    "https://sentry.ci.uktrade.digital/",
+    "https://cdnjs.cloudflare.com",
+    "https://www.googletagmanager.com",
+    "https://*.google-analytics.com",
+)
+
+# JS scripts can import other scripts, following the same rules as above
+CSP_CONNECT_SRC = CSP_SCRIPT_SRC
+
+# CSS elements with a src attribute can only be loaded from report-a-suspected-breach itself,
+# inline, e.g. <style> tags, or from Cloudflare
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",
+    "https://cdnjs.cloudflare.com",
+)
+# Images can only be loaded from report-a-suspected-breach itself, data URIs, and Cloudflare
+CSP_FONT_SRC = (
+    "'self'",
+    "data:",
+    "https://cdnjs.cloudflare.com",
+)
+# Images can only be loaded from report-a-suspected-breach itself, data URIs, and Google Tag Manager
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+    "https://www.googletagmanager.com",
+)
+
+# CSP meta-settings
+
+# inline scripts without a src attribute must have a nonce attribute
+CSP_INCLUDE_NONCE_IN = ["script-src"]
+
+# if True, CSP violations are reported but not enforced
+CSP_REPORT_ONLY = env.csp_report_only
+
+# URL to send CSP violation reports to
+CSP_REPORT_URI = env.csp_report_uri

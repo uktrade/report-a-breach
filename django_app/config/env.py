@@ -60,14 +60,21 @@ class BaseSettings(PydanticBaseSettings):
     authbroker_token_session_key: str = ""
     authbroker_staff_sso_scope: str = "read"
 
+    # Mock SSO
+    # todo - can we delete this
     mock_sso_token: str = ""
     mock_sso_scope: str = "read"
     mock_sso_username: str = ""
     mock_sso_email_user_id: str = ""
     oauthlib_insecure_transport: int = 0
 
+    # Redis
     redis_host: str = ""
     redis_port: int = 6379
+
+    # CSP settings
+    csp_report_only: bool = True
+    csp_report_uri: list[str] | None = None
 
     @computed_field
     @property
