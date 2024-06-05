@@ -79,6 +79,12 @@ PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_configuration["acces
 PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_configuration["secret_access_key"]
 PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_configuration["bucket_name"]
 
+# S3FileUploadHandler
+AWS_ACCESS_KEY_ID = TEMPORARY_S3_BUCKET_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY
+AWS_REGION = AWS_S3_REGION_NAME
+AWS_STORAGE_BUCKET_NAME = TEMPORARY_S3_BUCKET_NAME
+
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
 STATIC_ROOT = ROOT_DIR / "static"
@@ -98,7 +104,6 @@ STORAGES = {
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "core.custom_upload_handler.CustomFileUploadHandler",
-    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 )  # Order is important
 
 # CLAM AV
