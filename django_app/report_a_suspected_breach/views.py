@@ -621,6 +621,7 @@ def is_step_blocked(view: View, current_step: str) -> bool:
             if current_step == step:
                 return True
     if your_details_in_progress:
-        pass
-    #     need to grab remaining step logic and ensure the user hasn't jumped ahead within this task.
+        steps_to_block_if_unverified_list = ["name", "name_and_business_you_work_for"]
+        if current_step in steps_to_block_if_unverified_list:
+            return True
     return False
