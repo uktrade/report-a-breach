@@ -46,7 +46,8 @@ class TestDocumentUploadView:
         assert response["file_name"] == "bad.gif"
         assert "file_uploads" not in rasb_client.session
 
-    def test_non_ajax_successful_post(self, mocked_temporary_document_storage, rasb_client):
+    @patch("report_a_suspected_breach.views.is_step_blocked", return_value=False)
+    def test_non_ajax_successful_post(self, mock_blocked_step, mocked_temporary_document_storage, rasb_client):
         response = rasb_client.post(
             reverse("report_a_suspected_breach:upload_documents"),
             data={"document": SimpleUploadedFile("test.png", b"file_content")},
