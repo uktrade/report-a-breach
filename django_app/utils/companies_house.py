@@ -3,7 +3,10 @@ from typing import Any
 
 import requests
 from django.conf import settings
-from report_a_suspected_breach.exceptions import CompaniesHouseException
+from report_a_suspected_breach.exceptions import (
+    CompaniesHouse500Error,
+    CompaniesHouseException,
+)
 
 COMPANIES_HOUSE_BASE_DOMAIN = "https://api.companieshouse.gov.uk"
 
@@ -28,6 +31,10 @@ def get_details_from_companies_house(registration_number: str) -> dict[str, Any]
     )
     if response.status_code == 200:
         return response.json()
+
+    if response.status_code == 500:
+        raise CompaniesHouse500Error
+
     else:
         raise CompaniesHouseException(f"Companies House API request failed: {response.status_code}")
 
