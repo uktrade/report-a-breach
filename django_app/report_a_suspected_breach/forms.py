@@ -3,7 +3,6 @@ from datetime import timedelta
 from typing import Any
 
 from core.document_storage import TemporaryDocumentStorage
-from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
 from core.utils import get_mime_type
 from crispy_forms_gds.choices import Choice
@@ -648,14 +647,14 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
 class EndUserAddedForm(BaseForm):
     revalidate_on_done = False
 
-    do_you_want_to_add_another_end_user = BooleanChoiceField(
+    do_you_want_to_add_another_end_user = forms.ChoiceField(
         choices=(
             Choice(True, "Yes"),
             Choice(False, "No"),
         ),
-        widget=forms.RadioSelect,
         label="Do you want to add another end-user?",
         error_messages={"required": "Select yes if you want to add another end-user"},
+        widget=forms.RadioSelect,
         required=True,
     )
 
