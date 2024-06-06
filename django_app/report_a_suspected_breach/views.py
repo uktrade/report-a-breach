@@ -88,7 +88,7 @@ class ReportABreachWizardView(BaseWizardView):
             self.storage.current_step = self.steps.first
 
         if current_step := kwargs.get("step"):
-            if is_step_blocked(self, current_step):
+            if is_step_blocked(self, request, current_step):
                 raise Http404("This page is blocked")
 
         if request.resolver_match.url_name == "about_the_end_user":
@@ -614,14 +614,13 @@ class DeleteEndUserView(View):
         return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
 
 
-def is_step_blocked(view: View, current_step: str) -> bool:
+def is_step_blocked(view: View, request: HttpRequest, current_step: str) -> bool:
     blocked_steps, your_details_in_progress = get_blocked_steps(view)
-    if blocked_steps:
-        for step in blocked_steps:
-            if current_step == step:
-                return True
+    if current_step in blocked_steps:
+        return True
     if your_details_in_progress:
-        steps_to_block_if_unverified_list = ["name", "name_and_business_you_work_for"]
-        if current_step in steps_to_block_if_unverified_list:
-            return True
+        steps_to_block_if_email_unverified = ["name", "name_and_business_you_work_for"]
+        if current_step in steps_to_block_if_email_unverified:
+            if not ReporterEmailVerification.objects.filter(reporter_session=request.session.session_key).latest("date_created"):
+                return True
     return False
