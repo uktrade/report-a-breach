@@ -621,6 +621,9 @@ def is_step_blocked(view: View, request: HttpRequest, current_step: str) -> bool
     if your_details_in_progress:
         steps_to_block_if_email_unverified = ["name", "name_and_business_you_work_for"]
         if current_step in steps_to_block_if_email_unverified:
-            if not ReporterEmailVerification.objects.filter(reporter_session=request.session.session_key).latest("date_created"):
+            try:
+                if ReporterEmailVerification.objects.filter(reporter_session=request.session.session_key).latest("date_created"):
+                    return False
+            except ReporterEmailVerification.DoesNotExist:
                 return True
     return False
