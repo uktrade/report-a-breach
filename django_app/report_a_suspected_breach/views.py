@@ -240,6 +240,12 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
+    def process_manual_companies_house_input_step(self, form: Form) -> QueryDict:
+        self.request.session["manual_companies_house_input"] = form.cleaned_data.get("manual_companies_house_input")
+        self.request.session.modified = True
+
+        return self.get_form_step_data(form)
+
     def process_email_step(self, form: Form) -> QueryDict:
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
         self.request.session["reporter_email_address"] = reporter_email_address
