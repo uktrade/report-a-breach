@@ -241,7 +241,7 @@ class ReportABreachWizardView(BaseWizardView):
         return self.get_form_step_data(form)
 
     def process_manual_companies_house_input_step(self, form: Form) -> QueryDict:
-        self.request.session["manual_companies_house_input"] = form.cleaned_data.get("manual_companies_house_input")
+        self.request.session["manual_companies_house_input"] = form.cleaned_data.get("manual_companies_house_number")
         self.request.session.modified = True
 
         return self.get_form_step_data(form)
