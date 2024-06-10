@@ -238,6 +238,9 @@ class ReportABreachWizardView(BaseWizardView):
         if form.cleaned_data.get("do_you_know_the_registered_company_number") == "yes":
             self.request.session["company_details"] = form.cleaned_data
 
+        # reverse if 500 to new form
+        #  update done step to grab details from that step
+
         return self.get_form_step_data(form)
 
     def process_email_step(self, form: Form) -> QueryDict:
@@ -359,13 +362,16 @@ class ReportABreachWizardView(BaseWizardView):
         new_business_or_person_details.save()
 
     def save_companies_house_company_to_db(
-        self, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
+        self, breach: Breach, cleaned_data: dict[str, str], relationship: TypeOfRelationshipChoices
     ) -> None:
+        companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
+        if self.request.session.get("company_details_500"):
+            companies_house_details["registered_company_number"] = cleaned_data["manual_companies_house_number"]
         new_companies_house_company = PersonOrCompany.objects.create(
-            name=companies_house_company.get("registered_company_name"),
+            name=companies_house_details.get("registered_company_name"),
             country="GB",
-            registered_company_number=companies_house_company.get("registered_company_number"),
-            registered_office_address=companies_house_company.get("registered_office_address"),
+            registered_company_number=companies_house_details.get("registered_company_number"),
+            registered_office_address=companies_house_details.get("registered_office_address"),
             breach=breach,
             type_of_relationship=relationship,
         )
@@ -431,8 +437,8 @@ class ReportABreachWizardView(BaseWizardView):
                 breacher_details = cleaned_data["business_or_person_details"]
                 self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
             else:
-                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
-                self.save_companies_house_company_to_db(new_breach, companies_house_details, TypeOfRelationshipChoices.breacher)
+
+                self.save_companies_house_company_to_db(new_breach, cleaned_data, TypeOfRelationshipChoices.breacher)
 
             # Save Supplier Details to Database
             if show_about_the_supplier_page(self):

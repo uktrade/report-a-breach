@@ -31,7 +31,7 @@ from utils.companies_house import (
 from utils.s3 import get_all_session_files
 
 from .choices import IsTheDateAccurateChoices
-from .exceptions import CompaniesHouseException
+from .exceptions import CompaniesHouse500Error, CompaniesHouseException
 from .fields import DateInputField, MultipleFileField
 from .models import (
     Breach,
@@ -258,15 +258,27 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 cleaned_data["registered_company_number"] = company_details["company_number"]
                 cleaned_data["registered_company_name"] = company_details["company_name"]
                 cleaned_data["registered_office_address"] = get_formatted_address(company_details["registered_office_address"])
-            except CompaniesHouseException:
-                self.add_error(
-                    "registered_company_number",
-                    forms.ValidationError(
-                        code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
-                    ),
-                )
+            except Exception as err:
+                if type(err) is CompaniesHouseException:
+                    self.add_error(
+                        "registered_company_number",
+                        forms.ValidationError(
+                            code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
+                        ),
+                    )
+                elif type(err) is CompaniesHouse500Error:
+                    self.request.session["company_details_500"] = True
+                    self.request.session.modified = True
 
         return cleaned_data
+
+
+class ManualCompaniesHouseInputForm(BaseForm):
+    manual_companies_house_number = forms.CharField(
+        label="Enter the companies house number",
+        help_text="We encountered an error accessing the Companies House API. Please enter the registered company number here.",
+        required=True,
+    )
 
 
 class WhereIsTheAddressOfTheBusinessOrPersonForm(BaseForm):
