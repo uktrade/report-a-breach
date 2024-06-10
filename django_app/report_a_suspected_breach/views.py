@@ -238,9 +238,6 @@ class ReportABreachWizardView(BaseWizardView):
         if form.cleaned_data.get("do_you_know_the_registered_company_number") == "yes":
             self.request.session["company_details"] = form.cleaned_data
 
-        # reverse if 500 to new form
-        #  update done step to grab details from that step
-
         return self.get_form_step_data(form)
 
     def process_email_step(self, form: Form) -> QueryDict:
@@ -362,7 +359,7 @@ class ReportABreachWizardView(BaseWizardView):
         new_business_or_person_details.save()
 
     def save_companies_house_company_to_db(
-        self, breach: Breach, cleaned_data: dict[str, str], relationship: TypeOfRelationshipChoices
+        self, breach: Breach, cleaned_data: dict[dict[str, str], str], relationship: TypeOfRelationshipChoices
     ) -> None:
         companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
         if self.request.session.get("company_details_500"):
