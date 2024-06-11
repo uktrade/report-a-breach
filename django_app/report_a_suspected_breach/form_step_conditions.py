@@ -66,6 +66,10 @@ def show_business_or_personal_details_page(wizard: View) -> bool:
         "do_not_know",
     ]
 
+    manual_input_data = wizard.get_cleaned_data_for_step("manual_companies_house_input")
+    if manual_input_data.get("manual_companies_house_input", False):
+        return True
+
     return show_page
     # we just want to check that the user has filled out this form as a way of checking if they have filled out the
     # previous form in the chain of conditionals. A -> B -> C. If B is filled out, then A must-have been filled out.

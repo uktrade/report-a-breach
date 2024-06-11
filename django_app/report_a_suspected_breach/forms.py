@@ -274,7 +274,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
 
 
 class ManualCompaniesHouseInputForm(BaseForm):
-    manual_companies_house_number = forms.CharField(
+    manual_companies_house_input = forms.CharField(
         label="Please re-enter the registered company number",
         help_text="We encountered an error accessing the Companies House API. Please provide the company number here",
         required=True,

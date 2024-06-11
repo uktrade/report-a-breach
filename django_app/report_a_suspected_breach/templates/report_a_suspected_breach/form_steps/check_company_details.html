@@ -15,8 +15,8 @@
                     Registered company number
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% if request.session.company_details.manual_companies_house_number %}
-                        {{ request.session.company_details.manual_companies_house_number }}
+                    {% if request.session.company_details.manual_companies_house_input %}
+                        {{ request.session.company_details.manual_companies_house_input }}
                     {% else %}
                         {{ request.session.company_details.registered_company_number }}
                     {% endif %}
