@@ -79,6 +79,12 @@ PERMANENT_S3_BUCKET_ACCESS_KEY_ID = env.permanent_s3_bucket_configuration["acces
 PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY = env.permanent_s3_bucket_configuration["secret_access_key"]
 PERMANENT_S3_BUCKET_NAME = env.permanent_s3_bucket_configuration["bucket_name"]
 
+# S3FileUploadHandler
+AWS_ACCESS_KEY_ID = TEMPORARY_S3_BUCKET_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY
+AWS_REGION = AWS_S3_REGION_NAME
+AWS_STORAGE_BUCKET_NAME = TEMPORARY_S3_BUCKET_NAME
+
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
 STATIC_ROOT = ROOT_DIR / "static"
@@ -98,7 +104,6 @@ STORAGES = {
 FILE_UPLOAD_HANDLERS = (
     "django_chunk_upload_handlers.clam_av.ClamAVFileUploadHandler",
     "core.custom_upload_handler.CustomFileUploadHandler",
-    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 )  # Order is important
 
 # CLAM AV
@@ -119,6 +124,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "core.middleware.ReportASuspectedBreachCurrentSiteMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "core.middleware.SetPermittedCrossDomainPolicyHeaderMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -246,3 +253,52 @@ CACHES = {
         },
     }
 }
+
+# CSP policies
+
+# The default policy is to only allow resources from the same origin (self)
+CSP_DEFAULT_SRC = ("'self'",)
+
+# JS tags with a src attribute can only be loaded from report-a-suspected-breach and other trusted sources
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "'unsafe-eval'",
+    "https://sentry.ci.uktrade.digital/",
+    "https://cdnjs.cloudflare.com",
+    "https://www.googletagmanager.com",
+    "https://*.google-analytics.com",
+)
+
+# JS scripts can import other scripts, following the same rules as above
+CSP_CONNECT_SRC = CSP_SCRIPT_SRC
+
+# CSS elements with a src attribute can only be loaded from report-a-suspected-breach itself,
+# inline, e.g. <style> tags, or from Cloudflare
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",
+    "https://cdnjs.cloudflare.com",
+)
+# Images can only be loaded from report-a-suspected-breach itself, data URIs, and Cloudflare
+CSP_FONT_SRC = (
+    "'self'",
+    "data:",
+    "https://cdnjs.cloudflare.com",
+)
+# Images can only be loaded from report-a-suspected-breach itself, data URIs, and Google Tag Manager
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+    "https://www.googletagmanager.com",
+)
+
+# CSP meta-settings
+
+# inline scripts without a src attribute must have a nonce attribute
+CSP_INCLUDE_NONCE_IN = ["script-src"]
+
+# if True, CSP violations are reported but not enforced
+CSP_REPORT_ONLY = env.csp_report_only
+
+# URL to send CSP violation reports to
+CSP_REPORT_URI = env.csp_report_uri

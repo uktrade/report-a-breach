@@ -9,7 +9,7 @@
 
 {% block extra_js %}
     {{ block.super }}
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
         $(document).ready(function () {
             $('body').on('click', '.read_more_button', function () {
                 $(this).closest('.text_truncator').find('.truncated_text').addClass('hidden');

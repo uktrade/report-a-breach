@@ -32,6 +32,7 @@ ring = "~=0.10"
 python-magic = "~=0.4"
 redis = "~=5.0"
 django-redis = "*"
+django-csp = "~=3.8"
 
 [dev-packages]
 black = "~=24.3"
@@ -54,6 +55,7 @@ django-debug-toolbar = "*"
 pyinstrument = "*"
 factory-boy = "*"
 mypy = "~=1.9"
+freezegun = "*"
 
 [requires]
 python_version = "3.11"
