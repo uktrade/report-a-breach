@@ -3,9 +3,8 @@ from datetime import timedelta
 from typing import Any
 
 from core.document_storage import TemporaryDocumentStorage
-from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
-from core.utils import get_mime_type
+from core.utils import get_mime_type, is_request_ratelimited
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
@@ -23,7 +22,7 @@ from django.urls import reverse_lazy
 from django.utils.html import escape
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
-from feedback.crispy_fields import HTMLTemplate
+from feedback.crispy_fields import HTMLTemplate, get_field_with_label_id
 from utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
@@ -96,6 +95,10 @@ class EmailVerifyForm(BaseForm):
     )
 
     def clean_email_verification_code(self) -> str:
+        # first we check if the request is rate-limited
+        if is_request_ratelimited(self.request):
+            raise forms.ValidationError("You've tried to verify your email too many times. Try again in 1 minute")
+
         email_verification_code = self.cleaned_data["email_verification_code"]
         email_verification_code = email_verification_code.replace(" ", "")
 
@@ -411,12 +414,10 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
 
 class WhichSanctionsRegimeForm(BaseForm):
-    form_h1_header = "Which sanctions regimes do you suspect the company or person has breached?"
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=(()),
         required=True,
-        label="Select all that apply",
         error_messages={
             "required": "Select the sanctions regime you suspect has been breached",
         },
@@ -434,8 +435,15 @@ class WhichSanctionsRegimeForm(BaseForm):
         checkbox_choices.append(Choice("Unknown Regime", "I don't know"))
         checkbox_choices.append(Choice("Other Regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
+        self.fields["which_sanctions_regime"].label = False
         self.helper.label_size = None
         self.helper.label_tag = None
+        self.helper.layout = Layout(
+            Fieldset(
+                get_field_with_label_id("which_sanctions_regime", field_method=Field.checkboxes, label_id="checkbox"),
+                aria_describedby="checkbox",
+            )
+        )
 
 
 class WhatWereTheGoodsForm(BaseModelForm):
@@ -648,14 +656,15 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
 class EndUserAddedForm(BaseForm):
     revalidate_on_done = False
 
-    do_you_want_to_add_another_end_user = BooleanChoiceField(
+    do_you_want_to_add_another_end_user = forms.TypedChoiceField(
         choices=(
             Choice(True, "Yes"),
             Choice(False, "No"),
         ),
-        widget=forms.RadioSelect,
+        coerce=lambda x: x == "True",
         label="Do you want to add another end-user?",
         error_messages={"required": "Select yes if you want to add another end-user"},
+        widget=forms.RadioSelect,
         required=True,
     )
 

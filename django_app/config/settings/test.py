@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache.backends.dummy import DummyCache
 from django.forms import Form
 
@@ -24,6 +25,12 @@ class TestingCache(DummyCache):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dict_cache = {}
+
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        if key in self.dict_cache:
+            return False
+        self.dict_cache[key] = value
+        return True
 
     def get(self, key, *args, **kwargs):
         return self.dict_cache.get(key)

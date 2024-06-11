@@ -5,7 +5,7 @@ from crispy_forms_gds.layout import Field, Fieldset, Layout, Size
 from django import forms
 
 from .choices import DidYouExperienceAnyIssues
-from .crispy_fields import HTMLTemplate, get_textarea_field_with_label_id
+from .crispy_fields import HTMLTemplate, get_field_with_label_id
 from .models import FeedbackItem
 
 
@@ -48,9 +48,10 @@ class FeedbackForm(BaseModelForm):
                 css_class="optional_question",
             ),
             Fieldset(
-                get_textarea_field_with_label_id(
+                get_field_with_label_id(
                     "how_we_could_improve_the_service",
                     label_id="how_we_could_improve_the_service-label",
+                    field_method=Field.textarea,
                     rows=5,
                     label_size=Size.MEDIUM,
                     label_tag="h2",
