@@ -4,7 +4,7 @@ from typing import Any
 
 from core.document_storage import TemporaryDocumentStorage
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
-from core.utils import get_mime_type
+from core.utils import get_mime_type, is_request_ratelimited
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
@@ -95,6 +95,10 @@ class EmailVerifyForm(BaseForm):
     )
 
     def clean_email_verification_code(self) -> str:
+        # first we check if the request is rate-limited
+        if is_request_ratelimited(self.request):
+            raise forms.ValidationError("You've tried to verify your email too many times. Try again in 1 minute")
+
         email_verification_code = self.cleaned_data["email_verification_code"]
         email_verification_code = email_verification_code.replace(" ", "")
 
