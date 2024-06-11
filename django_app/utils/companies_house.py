@@ -34,8 +34,8 @@ def get_details_from_companies_house(registration_number: str) -> dict[str, Any]
 
     if response.status_code == 500:
         raise CompaniesHouse500Error
-    else:
-        raise CompaniesHouseException(f"Companies House API request failed: {response.status_code}")
+
+    raise CompaniesHouseException(f"Companies House API request failed: {response.status_code}")
 
 
 def get_formatted_address(address_dict: dict[str, Any]) -> str:
