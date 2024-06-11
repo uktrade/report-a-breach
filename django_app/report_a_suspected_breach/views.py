@@ -14,8 +14,10 @@ from django.forms import Form
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView
+from django_ratelimit.decorators import ratelimit
 from feedback.forms import FeedbackForm
 from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
@@ -542,6 +544,7 @@ class DeleteDocumentsView(View):
             return redirect(reverse("report_a_suspected_breach:upload_documents"))
 
 
+@method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class RequestVerifyCodeView(FormView):
     form_class = SummaryForm
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
@@ -549,10 +552,14 @@ class RequestVerifyCodeView(FormView):
 
     def form_valid(self, form: SummaryForm) -> HttpResponse:
         reporter_email_address = self.request.session["reporter_email_address"]
+        if getattr(self.request, "limited", False):
+            logger.warning(f"User has been rate-limited: {reporter_email_address}")
+            return self.form_invalid(form)
         verify_email(reporter_email_address, self.request)
         return super().form_valid(form)
 
 
+@method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class EmailVerifyView(FormView):
     form_class = EmailVerifyForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"

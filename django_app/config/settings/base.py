@@ -126,6 +126,7 @@ MIDDLEWARE = [
     "core.middleware.ReportASuspectedBreachCurrentSiteMiddleware",
     "csp.middleware.CSPMiddleware",
     "core.middleware.SetPermittedCrossDomainPolicyHeaderMiddleware",
+    "django_ratelimit.middleware.RatelimitMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -302,3 +303,7 @@ CSP_REPORT_ONLY = env.csp_report_only
 
 # URL to send CSP violation reports to
 CSP_REPORT_URI = env.csp_report_uri
+
+# Django Ratelimit
+RATELIMIT_VIEW = "core.views.rate_limited_view"
+RATELIMIT = "10/m"
