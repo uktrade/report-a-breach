@@ -9,6 +9,12 @@ def show_check_company_details_page_condition(wizard: View) -> bool:
         "are_you_reporting_a_business_on_companies_house"
     )
 
+    business_or_person_details = wizard.get_cleaned_data_for_step("business_or_person_details")
+    manual_input_data = wizard.get_cleaned_data_for_step("manual_companies_house_input")
+    if manual_input_data.get("manual_companies_house_input", ""):
+        if not business_or_person_details.get("business_or_person_details"):
+            return False
+
     show_page = (
         do_you_know_the_registered_company_number_cleaned_data.get("do_you_know_the_registered_company_number", False) == "yes"
         and do_you_know_the_registered_company_number_cleaned_data.get("registered_company_number", False)
@@ -40,6 +46,9 @@ def show_about_the_supplier_page(wizard: View) -> bool:
     )
 
     return show_page
+
+
+# def show_manual_companies_house_input_page(wizard: View) -> bool:
 
 
 def show_where_were_the_goods_made_available_from_page(wizard: View) -> bool:
