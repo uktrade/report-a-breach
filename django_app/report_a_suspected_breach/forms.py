@@ -647,11 +647,12 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
 class EndUserAddedForm(BaseForm):
     revalidate_on_done = False
 
-    do_you_want_to_add_another_end_user = forms.ChoiceField(
+    do_you_want_to_add_another_end_user = forms.TypedChoiceField(
         choices=(
             Choice(True, "Yes"),
             Choice(False, "No"),
         ),
+        coerce=lambda x: x == "True",
         label="Do you want to add another end-user?",
         error_messages={"required": "Select yes if you want to add another end-user"},
         widget=forms.RadioSelect,

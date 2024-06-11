@@ -146,7 +146,7 @@ class ReportABreachWizardView(BaseWizardView):
         return super().get_step_url(step)
 
     def render_next_step(self, form: Form, **kwargs: object) -> HttpResponse:
-        if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"] == "True":
+        if self.steps.current == "end_user_added" and form.cleaned_data["do_you_want_to_add_another_end_user"]:
             default_path = "where_were_the_goods_supplied_to"
             if self.request.session.get("made_available_journey"):
                 default_path = "where_were_the_goods_made_available_to"
