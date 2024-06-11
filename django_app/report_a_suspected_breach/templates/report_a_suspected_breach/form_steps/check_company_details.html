@@ -15,11 +15,7 @@
                     Registered company number
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% if request.session.company_details.manual_companies_house_input %}
-                        {{ request.session.company_details.manual_companies_house_input }}
-                    {% else %}
-                        {{ request.session.company_details.registered_company_number }}
-                    {% endif %}
+                    {{ request.session.company_details.registered_company_number }}
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link" href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}">Change<span class="govuk-visually-hidden">registered company number</span></a>
