@@ -103,6 +103,15 @@ class ReportABreachWizardView(BaseWizardView):
                 self.storage.current_step = "about_the_end_user"
                 return super().get(request, *args, step="about_the_end_user", **kwargs)
 
+        # Used for check your answers change loop
+        if request.resolver_match.url_name == "where_were_the_goods_supplied_to":
+            self.storage.current_step = "where_were_the_goods_supplied_to"
+            return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
+
+        if request.resolver_match.url_name == "where_were_the_goods_made_available_to":
+            self.storage.current_step = "where_were_the_goods_made_available_to"
+            return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
+
         # before we initialise the tasklist, we need to make sure the current_step is correct
         if step_url := kwargs.get("step", None):
             if step_url in self.get_form_list():
