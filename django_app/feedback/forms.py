@@ -41,6 +41,13 @@ class FeedbackForm(BaseModelForm):
         self.helper.layout = Layout(
             Field.radios("rating", legend_size=Size.MEDIUM, legend_tag="h2"),
             Fieldset(
+                Field.checkboxes("did_you_experience_any_issues", legend=""),
+                legend="What did not work so well? (optional)",
+                legend_size=Size.MEDIUM,
+                legend_tag="h2",
+                css_class="optional_question",
+            ),
+            Fieldset(
                 get_field_with_label_id(
                     "how_we_could_improve_the_service",
                     label_id="how_we_could_improve_the_service-label",
