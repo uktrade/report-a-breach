@@ -48,7 +48,8 @@ def show_about_the_supplier_page(wizard: View) -> bool:
     return show_page
 
 
-# def show_manual_companies_house_input_page(wizard: View) -> bool:
+def show_manual_companies_house_input_page(wizard: View) -> bool:
+    return bool(wizard.request.session.get("company_details_500"))
 
 
 def show_where_were_the_goods_made_available_from_page(wizard: View) -> bool:
