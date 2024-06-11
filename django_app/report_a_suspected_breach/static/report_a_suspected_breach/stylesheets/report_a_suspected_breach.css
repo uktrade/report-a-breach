@@ -26,6 +26,10 @@
 
 .print-only {
     display: none;
+    .govuk-heading-m {
+        margin-top: 45px;
+
+    }
 }
 
 @media print {

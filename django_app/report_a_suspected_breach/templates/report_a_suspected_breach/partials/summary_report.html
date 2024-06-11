@@ -16,16 +16,12 @@
         </div>
 
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Business reporter works for
-            </dt>
             {% if breach.reporter_name_of_business_you_work_for %}
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Business reporter works for
+                </dt>
                 <dd class="govuk-summary-list__value">
                     {{ breach.reporter_name_of_business_you_work_for }}
-                </dd>
-            {% else %}
-                <dd class="govuk-summary-list__value">
-                    {{ breacher.name }}
                 </dd>
             {% endif %}
         </div>
