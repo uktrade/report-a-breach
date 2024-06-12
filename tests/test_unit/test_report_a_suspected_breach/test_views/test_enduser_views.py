@@ -38,7 +38,6 @@ class TestDeleteEndUserView:
             data={"end_user_uuid": "end_user3"},
         )
 
-        assert "end_user1" not in rasb_client.session["end_users"].keys()
         assert rasb_client.session["end_users"] == {}
         assert response.url == "/report_a_suspected_breach/zero_end_users"
         assert response.status_code == 302
