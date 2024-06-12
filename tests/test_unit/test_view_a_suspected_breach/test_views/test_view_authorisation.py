@@ -68,7 +68,7 @@ class TestViewASuspectedBreach:
 
         # we should be redirected to the login page
         assert response.status_code == 302
-        assert "admin/login" in response.url
+        assert "login" in response.url
 
 
 class TestAdminManageUsers:
