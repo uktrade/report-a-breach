@@ -9,11 +9,8 @@ def show_check_company_details_page_condition(wizard: View) -> bool:
         "are_you_reporting_a_business_on_companies_house"
     )
 
-    business_or_person_details = wizard.get_cleaned_data_for_step("business_or_person_details")
     manual_input_data = wizard.get_cleaned_data_for_step("manual_companies_house_input")
-    if manual_input_data.get("manual_companies_house_input", "") and not business_or_person_details.get(
-        "business_or_person_details"
-    ):
+    if manual_input_data.get("manual_companies_house_input", False):
         return False
 
     show_page = (
