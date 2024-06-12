@@ -235,6 +235,16 @@ class TestAboutTheEndUserForm:
         assert form.errors.as_data()["postal_code"][0].code == "invalid"
 
 
+class TestZeroEndUsersForm:
+    def test_do_you_want_to_add_an_end_user_validation(self):
+        form = forms.ZeroEndUsersForm(data={"do_you_want_to_add_an_end_user": True})
+        assert form.is_valid()
+        form = forms.ZeroEndUsersForm(data={})
+        assert not form.is_valid()
+        assert "do_you_want_to_add_an_end_user" in form.errors
+        assert form.errors.as_data()["do_you_want_to_add_an_end_user"][0].code == "required"
+
+
 class TestUploadDocumentsForm:
     class MockAllSessionFiles:
         def __init__(self, length: int = 0):

@@ -624,15 +624,15 @@ class DownloadDocumentView(View):
 
 class DeleteEndUserView(View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        redirect_to = redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
         if end_user_uuid := self.request.POST.get("end_user_uuid"):
             end_users = self.request.session.pop("end_users", None)
             end_users.pop(end_user_uuid, None)
             self.request.session["end_users"] = end_users
             self.request.session.modified = True
-        if len(end_users) == 0:
-            return redirect(reverse_lazy("report_a_suspected_breach:zero_end_users"))
-        else:
-            return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
+            if len(end_users) == 0:
+                redirect_to = redirect(reverse_lazy("report_a_suspected_breach:zero_end_users"))
+        return redirect_to
 
 
 class ZeroEndUsersView(FormView):
