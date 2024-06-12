@@ -77,7 +77,7 @@ class ReportABreachWizardView(BaseWizardView):
 
     def get_context_data(self, form: Form, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(form, **kwargs)
-        context["back_button_link"] = self.get_step_url(self.steps.prev)
+        context["back_button_link"] = self.request.META.get("HTTP_REFERER", None)
         return context
 
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
