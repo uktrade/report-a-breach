@@ -420,8 +420,12 @@ class WhichSanctionsRegimeForm(BaseForm):
         required=True,
         error_messages={
             "required": "Select the sanctions regime you suspect has been breached",
+            "invalid": "Select the sanctions regime you suspect has been breached or select I do not know",
         },
     )
+
+    class Media:
+        js = ["report_a_suspected_breach/javascript/which_sanctions_regime.js"]
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -432,7 +436,7 @@ class WhichSanctionsRegimeForm(BaseForm):
             else:
                 checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
 
-        checkbox_choices.append(Choice("Unknown Regime", "I don't know"))
+        checkbox_choices.append(Choice("Unknown Regime", "I do not know"))
         checkbox_choices.append(Choice("Other Regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
         self.fields["which_sanctions_regime"].label = False
@@ -444,6 +448,23 @@ class WhichSanctionsRegimeForm(BaseForm):
                 aria_describedby="checkbox",
             )
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if which_sanctions_regime := cleaned_data.get("which_sanctions_regime"):
+            if "Unknown Regime" in which_sanctions_regime and (
+                (len(which_sanctions_regime) == 2 and "Other Regime" not in cleaned_data["which_sanctions_regime"])
+                or len(which_sanctions_regime) >= 3
+            ):
+                # the user has selected "I do not know" and other regimes, this is an issue.
+                # note that the user can select both "I do not know" and "Other Regime"
+                self.add_error(
+                    "which_sanctions_regime",
+                    forms.ValidationError(
+                        code="invalid", message=self.fields["which_sanctions_regime"].error_messages["invalid"]
+                    ),
+                )
+        return cleaned_data
 
 
 class WhatWereTheGoodsForm(BaseModelForm):
