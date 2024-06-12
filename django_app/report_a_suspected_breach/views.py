@@ -619,8 +619,7 @@ def is_step_blocked(view: View, request: HttpRequest, current_step: str) -> bool
     if current_step in blocked_steps:
         return True
     if your_details_in_progress:
-        steps_to_block_if_email_unverified = ["name", "name_and_business_you_work_for"]
-        if current_step in steps_to_block_if_email_unverified:
+        if current_step in ["name", "name_and_business_you_work_for"]:
             try:
                 if ReporterEmailVerification.objects.filter(reporter_session=request.session.session_key).latest("date_created"):
                     return False

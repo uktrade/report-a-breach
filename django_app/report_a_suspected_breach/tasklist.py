@@ -215,9 +215,8 @@ def get_blocked_steps(wizard_view: View) -> tuple[list[str], bool]:
     if current_index != len(task_list) - 1:
         outstanding_tasks = task_list[current_index:]
         for task in outstanding_tasks:
-            if task.status == "Cannot start yet":
+            if not task.can_start:
                 blocked_steps.extend(list(task.form_steps))
     if isinstance(current_task, YourDetailsTask):
-        if current_task.status != "Completed":
-            your_details_in_progress = True
+        your_details_in_progress = current_task.complete
     return blocked_steps, your_details_in_progress
