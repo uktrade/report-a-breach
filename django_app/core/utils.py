@@ -16,3 +16,7 @@ def get_mime_type(file: UploadedFile) -> str:
 
 def is_ajax(request: HttpRequest) -> bool:
     return request.headers.get("x-requested-with") == "XMLHttpRequest"
+
+
+def is_request_ratelimited(request: HttpRequest) -> bool:
+    return getattr(request, "limited", False)

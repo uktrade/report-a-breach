@@ -16,16 +16,12 @@
         </div>
 
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                Business reporter works for
-            </dt>
             {% if breach.reporter_name_of_business_you_work_for %}
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Business reporter works for
+                </dt>
                 <dd class="govuk-summary-list__value">
                     {{ breach.reporter_name_of_business_you_work_for }}
-                </dd>
-            {% else %}
-                <dd class="govuk-summary-list__value">
-                    {{ breacher.name }}
                 </dd>
             {% endif %}
         </div>
@@ -119,7 +115,11 @@
                     Location of supplier
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ supplier.country.name }}
+                    {% if supplier.country.name == "United Kingdom" %}
+                        The UK
+                    {% else %}
+                        Outside the UK
+                    {% endif %}
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -152,7 +152,11 @@
                         Location of end-user {{ forloop.counter }}
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {{ end_user.country.name }}
+                        {% if end_user.country.name == "United Kingdom" %}
+                            The UK
+                        {% else %}
+                            Outside the UK
+                        {% endif %}
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">

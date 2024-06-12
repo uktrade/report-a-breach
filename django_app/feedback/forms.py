@@ -4,16 +4,23 @@ from core.forms import BaseModelForm
 from crispy_forms_gds.layout import Field, Fieldset, Layout, Size
 from django import forms
 
-from .crispy_fields import HTMLTemplate, get_textarea_field_with_label_id
+from .choices import DidYouExperienceAnyIssues
+from .crispy_fields import HTMLTemplate, get_field_with_label_id
 from .models import FeedbackItem
 
 
 class FeedbackForm(BaseModelForm):
     submit_button_text = "Submit"
 
+    did_you_experience_any_issues = forms.MultipleChoiceField(
+        choices=DidYouExperienceAnyIssues.choices,
+        widget=forms.CheckboxSelectMultiple,
+        label="Did you experience any of the following issues?",
+    )
+
     class Meta:
         model = FeedbackItem
-        fields = ("rating", "how_we_could_improve_the_service")
+        fields = ("rating", "did_you_experience_any_issues", "how_we_could_improve_the_service")
         labels = {
             "how_we_could_improve_the_service": "How could we improve the service?",
             "rating": "Overall, how satisfied did you feel with using this service?",
@@ -34,9 +41,17 @@ class FeedbackForm(BaseModelForm):
         self.helper.layout = Layout(
             Field.radios("rating", legend_size=Size.MEDIUM, legend_tag="h2"),
             Fieldset(
-                get_textarea_field_with_label_id(
+                Field.checkboxes("did_you_experience_any_issues", legend=""),
+                legend="What did not work so well? (optional)",
+                legend_size=Size.MEDIUM,
+                legend_tag="h2",
+                css_class="optional_question",
+            ),
+            Fieldset(
+                get_field_with_label_id(
                     "how_we_could_improve_the_service",
                     label_id="how_we_could_improve_the_service-label",
+                    field_method=Field.textarea,
                     rows=5,
                     label_size=Size.MEDIUM,
                     label_tag="h2",

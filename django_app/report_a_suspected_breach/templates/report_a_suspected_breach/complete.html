@@ -16,7 +16,11 @@
         </div>
     </div>
     <!--   We have not! The confirmation template needs to be created in GovNotify and the send_email method used in the associated view -->
-    <p class="govuk-body">We have sent you a confirmation email.</p>
+    {% if request.session.reporter_email_address %}
+        <p class="govuk-body">We've sent a confirmation email to {{ request.session.reporter_email_address }}</p>
+    {% else %}
+        <p class="govuk-body">We have sent you a confirmation email.</p>
+    {% endif %}
     <p class="govuk-body hide-on-js-disabled show-on-js-enabled hide-on-print"><a class="govuk-link" onclick="window.print()" href=#>View and print your report</a></p>
 
     <h2 class="govuk-heading-m">What happens next</h2>
