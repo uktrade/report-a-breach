@@ -199,7 +199,7 @@
                     {% if country.name == "United Kingdom" %}
                         The UK
                     {% else %}
-                        {{ country.name }}
+                        Outside the UK
                     {% endif %}
                 </dd>
                 <dd class="govuk-summary-list__actions">
@@ -238,7 +238,7 @@
                         {% if country.name == "United Kingdom" %}
                             The UK
                         {% else %}
-                            {{ country.name }}
+                            Outside the UK
                         {% endif %}
                     </dd>
                     {% if is_made_available_journey %}
@@ -379,7 +379,7 @@
 
 {% block extra_js %}
     {{ block.super }}
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
         $(document).ready(function () {
             $('body').on('click', '.read_more_button', function () {
                 $(this).closest('.text_truncator').find('.truncated_text').addClass('hidden');

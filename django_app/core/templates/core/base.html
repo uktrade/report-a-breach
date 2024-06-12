@@ -69,21 +69,29 @@
                     {% if not request.session.hide_cookies_banner %}
                         <form method="post" action="{% url 'hide_cookies' %}?banner=True">
                             {% csrf_token %}
-                            <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
+                            <div class="govuk-cookie-banner" data-nosnippet role="region"
+                                 aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
                                 <div class="govuk-cookie-banner__message govuk-width-container">
                                     <div class="govuk-grid-row">
                                         <div class="govuk-grid-column-two-thirds">
                                             <div class="govuk-cookie-banner__content">
                                                 {% if request.COOKIES.accepted_ga_cookies == "true" %}
-                                                    <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                                    <p class="govuk-body">You’ve accepted analytics cookies. You can <a
+                                                        class="govuk-link"
+                                                        href="{% url 'cookies_consent' %}?redirect=Yes">change your
+                                                        cookie settings</a> at any time.</p>
                                                 {% elif request.COOKIES.accepted_ga_cookies == "false" %}
-                                                    <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'cookies_consent' %}?redirect=Yes">change your cookie settings</a> at any time.</p>
+                                                    <p class="govuk-body">You’ve rejected analytics cookies. You can <a
+                                                        class="govuk-link"
+                                                        href="{% url 'cookies_consent' %}?redirect=Yes">change your
+                                                        cookie settings</a> at any time.</p>
                                                 {% endif %}
                                             </div>
                                         </div>
                                     </div>
                                     <div class="govuk-button-group">
-                                        <button type="submit" class="govuk-button" data-module="govuk-button" name="hide_cookies" value="True">
+                                        <button type="submit" class="govuk-button" data-module="govuk-button"
+                                                name="hide_cookies" value="True">
                                             Hide cookie message
                                         </button>
                                     </div>
@@ -98,24 +106,15 @@
 
         <title>{% block title %}{% endblock title %} - Report a suspected breach of trade sanctions - GOV.UK</title>
 
-        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "govuk/images/favicon.ico" %}"
+        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "core/assets/images/favicon.ico" %}"
               type="image/x-icon">
-        <link rel="mask-icon" href="{% static "govuk/images/govuk-mask-icon.svg" %}" color="#0b0c0c">
-		{#      TODO: The apple images referenced below do not exist in gds v5.2. Awaiting advice regarding removing/updating #}
+        <link rel="mask-icon" href="{% static "core/assets/images/govuk-icon-mask.svg" %}" color="#0b0c0c">
         <link rel="apple-touch-icon" sizes="180x180"
-              href="{% static "govuk/images/govuk-apple-touch-icon-180x180.png" %}">
-        <link rel="apple-touch-icon" sizes="167x167"
-              href="{% static "govuk/images/govuk-apple-touch-icon-167x167.png" %}">
-        <link rel="apple-touch-icon" sizes="152x152"
-              href="{% static "govuk/images/govuk-apple-touch-icon-152x152.png" %}">
-        <link rel="apple-touch-icon" href="{% static "govuk/images/govuk-apple-touch-icon.png" %}">
-        <meta property="og:image" content="{% static "govuk/images/govuk-opengraph-image.png" %}">
+              href="{% static "core/assets/images/govuk-icon-180.png" %}">
+        <meta property="og:image" content="{% static "core/assets/images/govuk-opengraph-image.png" %}">
 
 		{# stylesheets #}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-              integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-              crossorigin="anonymous" referrerpolicy="no-referrer"/>
-
+        <link rel="stylesheet" href="{% static 'core/stylesheets/font-awesome-6.5.2.css' %}">
         <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-5.3.0.min.css" %}">
         <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
         <link rel="stylesheet"
@@ -134,7 +133,7 @@
 			<!-- End Google Tag Manager (noscript) -->
         {% endif %}
 
-        <script>
+        <script type="text/javascript" nonce="{{ request.csp_nonce }}">
             document.body.classList.remove("js-disabled");
             document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
         </script>
@@ -181,7 +180,8 @@
                         Alpha
                     </strong>
                     <span class="govuk-phase-banner__text">
-                        This is a new service – your <a class="govuk-link" href="{% url 'feedback:collect_full_feedback' %}">feedback</a> will help us to improve it.
+                        This is a new service – your <a class="govuk-link"
+                                                        href="{% url 'feedback:collect_full_feedback' %}">feedback</a> will help us to improve it.
                     </span>
                 </p>
             </div>
@@ -214,43 +214,54 @@
                 </main>
             {% endblock main %}
         </div>
-        <footer class="govuk-footer " role="contentinfo">
-            <div class="govuk-width-container ">
+
+		{# footer #}
+        <footer class="govuk-footer">
+            <div class="govuk-width-container">
                 <div class="govuk-footer__meta">
                     <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
-                        <svg aria-hidden="true" focusable="false" class="govuk-footer__licence-logo"
-                             xmlns="http://www.w3.org/2000/svg" viewbox="0 0 483.2 195.7" height="17"
-                             width="41">
-                            <path fill="currentColor"
-                                  d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"/>
+                        <h2 class="govuk-visually-hidden">Support links</h2>
+                        <ul class="govuk-footer__inline-list">
+                            <li class="govuk-footer__inline-list-item hide-on-print">
+                                <a class="govuk-footer__link" href="{% url 'cookies_consent' %}">Cookies</a>
+                            </li>
+                            <li class="govuk-footer__inline-list-item hide-on-print">
+                                <a class="govuk-footer__link" href="{{ request.site.domain }}?reset=yes">Reset session</a>
+                            </li>
+                        </ul>
+                        <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            class="govuk-footer__licence-logo"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 483.2 195.7"
+                            height="17"
+                            width="41">
+                            <path
+                                fill="currentColor"
+                                d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"/>
                         </svg>
                         <span class="govuk-footer__licence-description">
                             All content is available under the
                             <a class="govuk-footer__link"
                                href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-                               rel="license">Open Government Licence v3.0</a>, except where otherwise stated
+                               rel="license">Open Government Licence v3.0
+                            </a>, except where otherwise stated
                         </span>
                     </div>
                     <div class="govuk-footer__meta-item">
-                        <a class="govuk-footer__link govuk-footer__copyright-logo"
-                           href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">©
-                            Crown copyright</a>
-                    </div>
-                    <div class="govuk-footer__meta-item hide-on-print">
-                        <a class="govuk-footer__link"
-                           href="{% url 'cookies_consent' %}">Cookies</a>
-                    </div>
-                    <div class="govuk-footer__meta-item">
-                        <a class="govuk-footer__link"
-                           href="{{ request.site.domain }}?reset=yes">Reset session</a>
+                        <a
+                            class="govuk-footer__link govuk-footer__copyright-logo"
+                            href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">
+                            © Crown copyright
+                        </a>
                     </div>
                 </div>
             </div>
             <script src="{% static 'core/javascript/jquery-3.7.1.js' %}"></script>
             <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"></script>
-            <script type="module">
+            <script type="module" nonce="{{ request.csp_nonce }}">
                 import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"
-
                 initAll()
             </script>
             {% block extra_js %}{% endblock %}

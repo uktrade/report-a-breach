@@ -3,12 +3,26 @@
 {% load get_wizard_step_url %}
 {% block title %}Request a new code{% endblock title %}
 {% block form_content %}
+    {% if request.limited %}
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
+             data-module="govuk-error-summary">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    <li><a href="#request_new_code_button">You've tried to request a new code too many times. Please try again in 1 minute</a></li>
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
     <h1 class="govuk-heading-l">
         Request a new code
     </h1>
     <p class="govuk-body">Emails may take a few minutes to arrive. Check your junk folder. <br>
         If you still do not receive the email, you can request a new one.</p>
-    <button type="submit" name="wizard_goto_step" class="govuk-button" data-module="govuk-button">
+    <button type="submit" name="wizard_goto_step" class="govuk-button" data-module="govuk-button" id="request_new_code_button">
         Request a new code
     </button>
     <details class="govuk-details">
@@ -18,8 +32,8 @@
             </span>
         </summary>
         <div class="govuk-details__text wide-div">
-            If you're still having problems, contact <a class="govuk-link display-inline" href="mailto:DBT-OTSI@businessandtrade.gov.uk">DBT-OTSI@businessandtrade.gov.uk</a>
+            If you're still having problems, contact <a class="govuk-link display-inline"
+                                                        href="mailto:DBT-OTSI@businessandtrade.gov.uk">DBT-OTSI@businessandtrade.gov.uk</a>
         </div>
     </details>
-
 {% endblock form_content %}

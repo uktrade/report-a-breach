@@ -11,6 +11,7 @@ from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView, RedirectView
+from django_ratelimit.exceptions import Ratelimited
 from formtools.wizard.views import NamedUrlSessionWizardView
 
 from .forms import CookiesConsentForm, HideCookiesForm
@@ -257,3 +258,7 @@ class HideCookiesView(FormView):
         self.request.session.modified = True
         referrer_url = self.request.GET.get("referrer_url", "/")
         return redirect(referrer_url)
+
+
+def rate_limited_view(request: HttpRequest, exception: Ratelimited) -> HttpResponse:
+    return HttpResponse("You have made too many", status=429)

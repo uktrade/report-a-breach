@@ -48,6 +48,12 @@ class BaseSettings(PydanticBaseSettings):
     permanent_s3_bucket_name: str = "permanent-document-bucket"
     presigned_url_expiry_seconds: int = 3600
 
+    # required for the S3FileUploadHandler
+    aws_storage_bucket_name: str = temporary_s3_bucket_name
+    aws_region: str = aws_default_region
+    aws_access_key_id: str = temporary_s3_bucket_access_key_id
+    aws_secret_access_key: str = temporary_s3_bucket_secret_access_key
+
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
@@ -60,14 +66,21 @@ class BaseSettings(PydanticBaseSettings):
     authbroker_token_session_key: str = ""
     authbroker_staff_sso_scope: str = "read"
 
+    # Mock SSO
+    # todo - can we delete this
     mock_sso_token: str = ""
     mock_sso_scope: str = "read"
     mock_sso_username: str = ""
     mock_sso_email_user_id: str = ""
     oauthlib_insecure_transport: int = 0
 
+    # Redis
     redis_host: str = ""
     redis_port: int = 6379
+
+    # CSP settings
+    csp_report_only: bool = True
+    csp_report_uri: list[str] | None = None
 
     @computed_field
     @property

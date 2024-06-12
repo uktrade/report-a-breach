@@ -6,7 +6,9 @@ from django import forms as django_forms
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory
 from report_a_suspected_breach import choices, forms
-from report_a_suspected_breach.models import ReporterEmailVerification
+from report_a_suspected_breach.models import ReporterEmailVerification, SanctionsRegime
+
+from tests.factories import SanctionsRegimeFactory
 
 
 class TestStartForm:
@@ -317,3 +319,34 @@ class TestUploadDocumentsForm:
         assert form.errors.as_data()["document"][0].message == (
             "&lt;img src=xonerror=alert(document.domain)&gt;gif." "gif cannot be uploaded, it is not a valid file type"
         )
+
+
+@pytest.mark.django_db
+class TestWhichSanctionsRegimeForm:
+    def test_required(self):
+        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": None})
+        assert not form.is_valid()
+        assert "which_sanctions_regime" in form.errors
+        assert form.errors.as_data()["which_sanctions_regime"][0].code == "required"
+
+    def test_choices_creation(self):
+        SanctionsRegimeFactory.create_batch(5)
+        form = forms.WhichSanctionsRegimeForm()
+        assert len(form.fields["which_sanctions_regime"].choices) == 7  # 5 + 2 default choices
+        flat_choices = [choice[0] for choice in form.fields["which_sanctions_regime"].choices]
+        for regime in SanctionsRegime.objects.all():
+            assert regime.full_name in flat_choices
+
+        assert flat_choices[-1] == "Other Regime"
+        assert flat_choices[-2] == "Unknown Regime"
+
+    def test_other_regime_selected_non_error(self):
+        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Other Regime", "Unknown Regime"]})
+        assert form.is_valid()
+
+    def test_assert_other_regime_selected_error(self):
+        SanctionsRegimeFactory.create(full_name="test regime")
+        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Unknown Regime", "test regime"]})
+        assert not form.is_valid()
+        assert "which_sanctions_regime" in form.errors
+        assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"
