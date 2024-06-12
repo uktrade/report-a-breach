@@ -11,7 +11,14 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.forms import Form
-from django.http import Http404, HttpRequest, HttpResponse, JsonResponse, QueryDict
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+    QueryDict,
+)
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -30,7 +37,7 @@ from utils.s3 import (
 )
 
 from .choices import TypeOfRelationshipChoices
-from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm
+from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm, ZeroEndUsersForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -622,5 +629,34 @@ class DeleteEndUserView(View):
             end_users.pop(end_user_uuid, None)
             self.request.session["end_users"] = end_users
             self.request.session.modified = True
+        if len(end_users) == 0:
+            return redirect(reverse_lazy("report_a_suspected_breach:zero_end_users"))
+        else:
+            return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
 
-        return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
+
+class ZeroEndUsersView(FormView):
+    form_class = ZeroEndUsersForm
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if form_h1_header := getattr(ZeroEndUsersForm, "form_h1_header"):
+            context["form_h1_header"] = form_h1_header
+        return context
+
+    def form_valid(self, form):
+        self.form = form
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        add_end_user = self.form.cleaned_data["do_you_want_to_add_an_end_user"]
+        if add_end_user:
+            if self.request.session.get("made_available_journey"):
+                return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "where_were_the_goods_made_available_to"})
+            else:
+                return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "where_were_the_goods_supplied_to"})
+        else:
+            return reverse_lazy(
+                "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
+            )
