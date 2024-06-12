@@ -46,10 +46,13 @@ def sanctions_regime_object(db):
 
 
 @pytest.fixture()
-def request_object(rasb_client: Client):
+def request_object(rasb_client: Client, method: str = "GET"):
     """Fixture to create a request object."""
     request_object = RequestFactory()
     request_object.session = rasb_client.session
+    request_object.method = method
+    request_object.GET = {}
+    request_object.POST = {}
     return request_object
 
 

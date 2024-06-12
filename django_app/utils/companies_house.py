@@ -56,6 +56,6 @@ def get_formatted_address(address_dict: dict[str, Any]) -> str:
     COUNTRY_DICT = dict(countries)
     if country := address_dict.get("country"):
         # Do not add country to UK address - this is captured by location
-        if country != "GB":
+        if country not in ["England", "Northern Ireland", "Scotland", "Wales", "United Kingdom", "GB"]:
             address_string += f",\n {COUNTRY_DICT[country]}"
     return address_string

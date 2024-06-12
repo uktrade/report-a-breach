@@ -215,6 +215,11 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
+        # emptying the form if the user has requested to change the details
+        if self.request.GET.get("change") == "yes" and self.request.method == "GET":
+            self.is_bound = False
+            self.data = {}
+
         # todo - abstract the following logic to apply to all ConditionalRadios forms
         self.helper.legend_tag = "h1"
         self.helper.legend_size = Size.LARGE
