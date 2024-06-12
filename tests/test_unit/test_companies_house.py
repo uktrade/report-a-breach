@@ -47,11 +47,21 @@ class TestCompaniesHouse(unittest.TestCase):
     def test_basic_auth_token(self):
         assert get_companies_house_basic_auth_token("1234") == "MTIzNDo="
 
-    def test_get_formatted_address(self):
+    def test_get_formatted_address_outside_uk(self):
         address_dict = {
             "address_line_1": "123 Fake Street",
             "address_line_2": "Fake Town",
             "country": "DE",
+            "postal_code": "AB12 3CD",
+        }
+        formatted_address = get_formatted_address(address_dict)
+        assert formatted_address == "123 Fake Street,\n Fake Town,\n AB12 3CD,\n Germany"
+
+    def test_get_formatted_address_uk(self):
+        address_dict = {
+            "address_line_1": "123 Fake Street",
+            "address_line_2": "Fake Town",
+            "country": "GB",
             "postal_code": "AB12 3CD",
         }
         formatted_address = get_formatted_address(address_dict)

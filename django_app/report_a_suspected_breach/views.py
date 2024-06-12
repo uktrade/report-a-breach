@@ -14,8 +14,10 @@ from django.forms import Form
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView
+from django_ratelimit.decorators import ratelimit
 from feedback.forms import FeedbackForm
 from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
@@ -49,6 +51,7 @@ class ReportABreachWizardView(BaseWizardView):
         "check_company_details": "report_a_suspected_breach/form_steps/check_company_details.html",
         "end_user_added": "report_a_suspected_breach/form_steps/end_user_added.html",
         "declaration": "report_a_suspected_breach/form_steps/declaration.html",
+        "which_sanctions_regime": "report_a_suspected_breach/form_steps/which_sanctions_regimes.html",
         "upload_documents": "report_a_suspected_breach/form_steps/upload_documents.html",
     }
     template_name = "report_a_suspected_breach/generic_form_step.html"
@@ -99,6 +102,15 @@ class ReportABreachWizardView(BaseWizardView):
                 # we're trying to edit an existing end-user, so we need to load the form with the existing data
                 self.storage.current_step = "about_the_end_user"
                 return super().get(request, *args, step="about_the_end_user", **kwargs)
+
+        # Used for check your answers change loop
+        if request.resolver_match.url_name == "where_were_the_goods_supplied_to":
+            self.storage.current_step = "where_were_the_goods_supplied_to"
+            return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
+
+        if request.resolver_match.url_name == "where_were_the_goods_made_available_to":
+            self.storage.current_step = "where_were_the_goods_made_available_to"
+            return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
 
         # before we initialise the tasklist, we need to make sure the current_step is correct
         if step_url := kwargs.get("step", None):
@@ -544,6 +556,7 @@ class DeleteDocumentsView(View):
             return redirect(reverse("report_a_suspected_breach:upload_documents"))
 
 
+@method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class RequestVerifyCodeView(FormView):
     form_class = SummaryForm
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
@@ -551,10 +564,14 @@ class RequestVerifyCodeView(FormView):
 
     def form_valid(self, form: SummaryForm) -> HttpResponse:
         reporter_email_address = self.request.session["reporter_email_address"]
+        if getattr(self.request, "limited", False):
+            logger.warning(f"User has been rate-limited: {reporter_email_address}")
+            return self.form_invalid(form)
         verify_email(reporter_email_address, self.request)
         return super().form_valid(form)
 
 
+@method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class EmailVerifyView(FormView):
     form_class = EmailVerifyForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"

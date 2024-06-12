@@ -3,6 +3,7 @@ from typing import Any
 
 import requests
 from django.conf import settings
+from django_countries import countries
 from report_a_suspected_breach.exceptions import (
     CompaniesHouse500Error,
     CompaniesHouseException,
@@ -52,5 +53,9 @@ def get_formatted_address(address_dict: dict[str, Any]) -> str:
         address_string += f",\n {town_or_city}"
     if postal_code := address_dict.get("postal_code"):
         address_string += f",\n {postal_code}"
-
+    COUNTRY_DICT = dict(countries)
+    if country := address_dict.get("country"):
+        # Do not add country to UK address - this is captured by location
+        if country != "GB":
+            address_string += f",\n {COUNTRY_DICT[country]}"
     return address_string
