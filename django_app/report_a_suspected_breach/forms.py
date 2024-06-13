@@ -700,6 +700,28 @@ class EndUserAddedForm(BaseForm):
         self.helper.legend_tag = None
 
 
+class ZeroEndUsersForm(BaseForm):
+    revalidate_on_done = False
+    form_h1_header = "You've removed all end-users"
+
+    do_you_want_to_add_an_end_user = forms.TypedChoiceField(
+        choices=(
+            Choice(True, "Yes"),
+            Choice(False, "No"),
+        ),
+        coerce=lambda x: x == "True",
+        label="Do you want to add an end-user?",
+        error_messages={"required": "Select yes if you want to add an end-user"},
+        widget=forms.RadioSelect,
+        required=True,
+    )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper.legend_size = Size.MEDIUM
+        self.helper.legend_tag = None
+
+
 class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
     hide_optional_label_fields = ["other_addresses_in_the_supply_chain"]
 
