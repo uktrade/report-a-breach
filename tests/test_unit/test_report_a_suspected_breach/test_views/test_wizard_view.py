@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from django.http import HttpResponseRedirect
 from django.test import RequestFactory
+from django.urls import reverse
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import (
     Breach,
@@ -113,3 +114,26 @@ class TestReportABreachWizardView:
         person_or_company_details = PersonOrCompany.objects.all()
         assert len(person_or_company_details) == 1
         assert person_or_company_details[0].type_of_relationship == relationship
+
+    def test_where_were_the_goods_supplied_to_url(self, rasb_client):
+        request = RequestFactory().get("/")
+        request.session = rasb_client.session
+        request.session["end_users"] = data.end_users
+        end_user_id = "end_user1"
+        request.session.save()
+
+        response = rasb_client.get(
+            reverse("report_a_suspected_breach:where_were_the_goods_supplied_to", args={"end_user_uuid": end_user_id}),
+        )
+        assert response.status_code == 200
+
+    def test_where_were_the_goods_made_available_to_url(self, rasb_client):
+        request = RequestFactory().get("/")
+        request.session = rasb_client.session
+        request.session["end_users"] = data.end_users
+        end_user_id = "end_user3"
+
+        response = rasb_client.get(
+            reverse("report_a_suspected_breach:where_were_the_goods_made_available_to", args={"end_user_uuid": end_user_id}),
+        )
+        assert response.status_code == 200
