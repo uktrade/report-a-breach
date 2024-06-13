@@ -184,14 +184,13 @@ class DBTPlatformSettings(BaseSettings):
             return ""
         else:
             return database_url_from_env("DATABASE_CREDENTIALS")
-        
-        
+
     @computed_field
     @property
     def temporary_s3_bucket_configuration(self) -> dict[str, str]:
         if self.in_build_step:
             return {
-                "bucket_name":  "",
+                "bucket_name": "",
                 "access_key_id": "",
                 "secret_access_key": "",
             }
@@ -207,7 +206,7 @@ class DBTPlatformSettings(BaseSettings):
     def permanent_s3_bucket_configuration(self) -> dict[str, str]:
         if self.in_build_step:
             return {
-                "bucket_name":  "",
+                "bucket_name": "",
                 "access_key_id": "",
                 "secret_access_key": "",
             }
