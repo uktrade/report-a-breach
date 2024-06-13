@@ -221,7 +221,7 @@ class DBTPlatformSettings(BaseSettings):
     @computed_field  # type: ignore[misc]
     @property
     def redis_url(self) -> str:
-        if self.build_step:
+        if self.in_build_step:
             return ""
 
         return self.celery_broker_url
