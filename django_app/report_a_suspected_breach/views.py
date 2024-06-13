@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Any
 
@@ -7,20 +8,36 @@ from core.templatetags.get_wizard_step_url import get_wizard_step_url
 from core.utils import is_ajax
 from core.views import BaseWizardView
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
 from django.forms import Form
-from django.http import HttpRequest, HttpResponse, JsonResponse, QueryDict
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+    QueryDict,
+)
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView
+from django_ratelimit.decorators import ratelimit
 from feedback.forms import FeedbackForm
+from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
 from utils.notifier import verify_email
-from utils.s3 import delete_session_files, generate_presigned_url, get_all_session_files
+from utils.s3 import (
+    delete_session_files,
+    generate_presigned_url,
+    get_all_session_files,
+    get_user_uploaded_files,
+)
 
 from .choices import TypeOfRelationshipChoices
-from .forms import CookiesConsentForm, EmailVerifyForm, SummaryForm, UploadDocumentsForm
+from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm, ZeroEndUsersForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -32,6 +49,8 @@ from .tasklist import (
     get_tasklist,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class ReportABreachWizardView(BaseWizardView):
     template_names_lookup = {
@@ -39,6 +58,7 @@ class ReportABreachWizardView(BaseWizardView):
         "check_company_details": "report_a_suspected_breach/form_steps/check_company_details.html",
         "end_user_added": "report_a_suspected_breach/form_steps/end_user_added.html",
         "declaration": "report_a_suspected_breach/form_steps/declaration.html",
+        "which_sanctions_regime": "report_a_suspected_breach/form_steps/which_sanctions_regimes.html",
         "upload_documents": "report_a_suspected_breach/form_steps/upload_documents.html",
     }
     template_name = "report_a_suspected_breach/generic_form_step.html"
@@ -64,7 +84,7 @@ class ReportABreachWizardView(BaseWizardView):
 
     def get_context_data(self, form: Form, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(form, **kwargs)
-        context["back_button_link"] = self.get_step_url(self.steps.prev)
+        context["back_button_link"] = self.request.META.get("HTTP_REFERER", None)
         return context
 
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
@@ -90,6 +110,7 @@ class ReportABreachWizardView(BaseWizardView):
                 self.storage.current_step = "about_the_end_user"
                 return super().get(request, *args, step="about_the_end_user", **kwargs)
 
+        # Used for check your answers change loop
         if request.resolver_match.url_name == "where_were_the_goods_supplied_to":
             self.storage.current_step = "where_were_the_goods_supplied_to"
             return super().get(request, *args, step="where_were_the_goods_supplied_to", **kwargs)
@@ -98,7 +119,7 @@ class ReportABreachWizardView(BaseWizardView):
             self.storage.current_step = "where_were_the_goods_made_available_to"
             return super().get(request, *args, step="where_were_the_goods_made_available_to", **kwargs)
 
-        # before we initialise the tasklit, we need to make sure the current_step is correct
+        # before we initialise the tasklist, we need to make sure the current_step is correct
         if step_url := kwargs.get("step", None):
             if step_url in self.get_form_list():
                 self.storage.current_step = step_url
@@ -193,6 +214,7 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = {}
                 context["form_data"]["about_the_supplier"]["name"] = registered_company["registered_company_name"]
                 context["form_data"]["about_the_supplier"]["readable_address"] = registered_company["registered_office_address"]
+                context["form_data"]["about_the_supplier"]["country"] = "GB"
             else:
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
@@ -310,7 +332,7 @@ class ReportABreachWizardView(BaseWizardView):
 
         return kwargs
 
-    def store_documents_in_s3(self) -> None:
+    def store_documents_in_s3(self, breach_id: str) -> None:
         """
         Copies documents from the default temporary storage to permanent storage on s3, then deletes from temporary storage
         """
@@ -319,9 +341,12 @@ class ReportABreachWizardView(BaseWizardView):
             for object_key in session_files.keys():
                 try:
                     permanent_storage_bucket.bucket.meta.client.copy(
-                        CopySource={"Bucket": settings.TEMPORARY_S3_BUCKET_NAME, "Key": object_key},
+                        CopySource={
+                            "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+                            "Key": f"{self.request.session.session_key}/{object_key}",
+                        },
                         Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                        Key=object_key,
+                        Key=f"{breach_id}/{object_key}",
                         SourceClient=self.file_storage.bucket.meta.client,
                     )
                 except Exception:
@@ -352,6 +377,19 @@ class ReportABreachWizardView(BaseWizardView):
         )
         new_business_or_person_details.save()
 
+    def save_companies_house_company_to_db(
+        self, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> None:
+        new_companies_house_company = PersonOrCompany.objects.create(
+            name=companies_house_company.get("registered_company_name"),
+            country="GB",
+            registered_company_number=companies_house_company.get("registered_company_number"),
+            registered_office_address=companies_house_company.get("registered_office_address"),
+            breach=breach,
+            type_of_relationship=relationship,
+        )
+        new_companies_house_company.save()
+
     def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         cleaned_data = self.get_all_cleaned_data()
         # we're importing these methods here to avoid circular imports
@@ -370,11 +408,6 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
             business_or_person_details_step = cleaned_data.get("business_or_person_details", {})
             reporter_name_of_business_you_work_for = business_or_person_details_step.get("name", "")
-        do_you_know_the_registered_company_number_step = cleaned_data.get("do_you_know_the_registered_company_number", {})
-        do_you_know_the_registered_company_number = do_you_know_the_registered_company_number_step.get(
-            "do_you_know_the_registered_company_number", ""
-        )
-        registered_company_number = do_you_know_the_registered_company_number_step.get("registered_company_number", "")
 
         with transaction.atomic():
             reporter_email_verification = ReporterEmailVerification.objects.filter(
@@ -390,11 +423,9 @@ class ReportABreachWizardView(BaseWizardView):
                 when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
                 is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
                 what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
-                business_registered_on_companies_house=cleaned_data["are_you_reporting_a_business_on_companies_house"][
-                    "business_registered_on_companies_house"
+                where_were_the_goods_supplied_from=cleaned_data["where_were_the_goods_supplied_from"][
+                    "where_were_the_goods_supplied_from"
                 ],
-                do_you_know_the_registered_company_number=do_you_know_the_registered_company_number,
-                registered_company_number=registered_company_number,
                 were_there_other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
                     "were_there_other_addresses_in_the_supply_chain"
                 ],
@@ -406,8 +437,8 @@ class ReportABreachWizardView(BaseWizardView):
                 ],
             )
             if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
-                new_breach.unknown_sanctions_regime = "unknown_regime" in declared_sanctions
-                new_breach.other_sanctions_regime = "other_regime" in declared_sanctions
+                new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
+                new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
                 sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
                 new_breach.sanctions_regimes.set(sanctions_regimes)
 
@@ -418,6 +449,9 @@ class ReportABreachWizardView(BaseWizardView):
             if not show_check_company_details_page_condition(self):
                 breacher_details = cleaned_data["business_or_person_details"]
                 self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
+            else:
+                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
+                self.save_companies_house_company_to_db(new_breach, companies_house_details, TypeOfRelationshipChoices.breacher)
 
             # Save Supplier Details to Database
             if show_about_the_supplier_page(self):
@@ -432,7 +466,7 @@ class ReportABreachWizardView(BaseWizardView):
                     self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
             # Save Documents to S3 Permanent Bucket
-            self.store_documents_in_s3()
+            self.store_documents_in_s3(new_breach.id)
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
@@ -440,44 +474,15 @@ class ReportABreachWizardView(BaseWizardView):
         return redirect(reverse("report_a_suspected_breach:complete"))
 
 
-class CookiesConsentView(FormView):
-    template_name = "report_a_suspected_breach/cookies_consent.html"
-    form_class = CookiesConsentForm
-
-    def get_form_kwargs(self) -> dict[str, Any]:
-        kwargs = super().get_form_kwargs()
-        kwargs["request"] = self.request
-        initial_dict = {}
-
-        if current_cookies_policy := self.request.COOKIES.get("accepted_ga_cookies"):
-            initial_dict["accept_cookies"] = current_cookies_policy == "true"
-            kwargs["initial"] = initial_dict
-
-        return kwargs
-
-    def form_valid(self, form: CookiesConsentForm) -> HttpResponse:
-        # cookie consent lasts for 1 year
-        cookie_max_age = 365 * 24 * 60 * 60
-
-        referrer_url = self.request.GET.get("referrer_url", "/")
-        response = redirect(referrer_url)
-
-        # regardless of their choice, we set a cookie to say they've made a choice
-        response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
-        response.set_cookie(
-            "accepted_ga_cookies",
-            "true" if form.cleaned_data["do_you_want_to_accept_analytics_cookies"] else "false",
-            max_age=cookie_max_age,
-        )
-        return response
-
-
 class CompleteView(TemplateView):
     template_name = "report_a_suspected_breach/complete.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        self.breach = Breach.objects.filter(reference=self.request.session.get("reference_id")).first()
+        context = get_breach_context_data(context, self.breach)
         context["feedback_form"] = FeedbackForm()
+
         return context
 
 
@@ -510,19 +515,16 @@ class UploadDocumentsView(FormView):
             session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
             self.file_storage.save(session_keyed_file_name, temporary_file.file)
 
-            # adding the file name to the session, so we can retrieve it later
-            if "file_uploads" in self.request.session:
-                self.request.session["file_uploads"].append(temporary_file.name)
-            else:
-                self.request.session["file_uploads"] = [temporary_file.name]
-            self.request.session.modified = True
+            # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
+            # we add a unique identifier to the key, so we do not overwrite previous uploads
+            redis_cache_key = f"{self.request.session.session_key}{uuid.uuid4()}"
+            cache.set(redis_cache_key, temporary_file.name)
 
             if is_ajax(self.request):
                 return JsonResponse(
                     {
                         "success": True,
                         "file_name": temporary_file.name,
-                        "file_url": generate_presigned_url(self.file_storage, session_keyed_file_name),
                     },
                     status=201,
                 )
@@ -547,12 +549,6 @@ class DeleteDocumentsView(View):
             full_file_path = f"{self.request.session.session_key}/{file_name}"
             TemporaryDocumentStorage().delete(full_file_path)
 
-            # removing the file name from the session
-            if "file_uploads" in self.request.session:
-                if file_name in self.request.session["file_uploads"]:
-                    self.request.session["file_uploads"].remove(file_name)
-                    self.request.session.modified = True
-
             if is_ajax(self.request):
                 return JsonResponse({"success": True}, status=200)
             else:
@@ -564,6 +560,7 @@ class DeleteDocumentsView(View):
             return redirect(reverse("report_a_suspected_breach:upload_documents"))
 
 
+@method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class RequestVerifyCodeView(FormView):
     form_class = SummaryForm
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
@@ -571,10 +568,14 @@ class RequestVerifyCodeView(FormView):
 
     def form_valid(self, form: SummaryForm) -> HttpResponse:
         reporter_email_address = self.request.session["reporter_email_address"]
+        if getattr(self.request, "limited", False):
+            logger.warning(f"User has been rate-limited: {reporter_email_address}")
+            return self.form_invalid(form)
         verify_email(reporter_email_address, self.request)
         return super().form_valid(form)
 
 
+@method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class EmailVerifyView(FormView):
     form_class = EmailVerifyForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
@@ -604,3 +605,58 @@ class EmailVerifyView(FormView):
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name_and_business_you_work_for"})
         else:
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "start"})
+
+
+class DownloadDocumentView(View):
+    http_method_names = ["get"]
+
+    def get(self, *args: object, file_name, **kwargs: object) -> HttpResponse:
+        user_uploaded_files = get_user_uploaded_files(self.request.session)
+
+        if file_name in user_uploaded_files:
+            logger.info(f"User is downloading file: {file_name}")
+            session_keyed_file_name = f"{self.request.session.session_key}/{file_name}"
+            file_url = generate_presigned_url(TemporaryDocumentStorage(), session_keyed_file_name)
+            return redirect(file_url)
+
+        raise Http404()
+
+
+class DeleteEndUserView(View):
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        redirect_to = redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
+        if end_user_uuid := self.request.POST.get("end_user_uuid"):
+            end_users = self.request.session.pop("end_users", None)
+            end_users.pop(end_user_uuid, None)
+            self.request.session["end_users"] = end_users
+            self.request.session.modified = True
+            if len(end_users) == 0:
+                redirect_to = redirect(reverse_lazy("report_a_suspected_breach:zero_end_users"))
+        return redirect_to
+
+
+class ZeroEndUsersView(FormView):
+    form_class = ZeroEndUsersForm
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if form_h1_header := getattr(ZeroEndUsersForm, "form_h1_header"):
+            context["form_h1_header"] = form_h1_header
+        return context
+
+    def form_valid(self, form):
+        self.form = form
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        add_end_user = self.form.cleaned_data["do_you_want_to_add_an_end_user"]
+        if add_end_user:
+            if self.request.session.get("made_available_journey"):
+                return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "where_were_the_goods_made_available_to"})
+            else:
+                return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "where_were_the_goods_supplied_to"})
+        else:
+            return reverse_lazy(
+                "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
+            )

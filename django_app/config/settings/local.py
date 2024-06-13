@@ -23,3 +23,5 @@ if env.profiling_enabled:
     ]
 
 TEST_SSO_PROVIDER_SET_RETURNED_ACCESS_TOKEN = env.mock_sso_token
+
+ROOT_URLCONF = "core.debug_urls"

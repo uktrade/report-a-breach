@@ -11,19 +11,21 @@ class BreachPortalAuth(AuthbrokerBackend):
         super(BreachPortalAuth, self).__init__()
 
     def get_or_create_user(self, profile: dict[str, Any]) -> User:
-        user_model = get_user_model()
-        id_key = self.get_profile_id_name()
-
         with transaction.atomic():
-            user, created = user_model.objects.get_or_create(
-                **{user_model.USERNAME_FIELD: profile[id_key]},
-                defaults=self.user_create_mapping(profile),
-            )
+            try:
+                if existing_user := User.objects.get(email=profile["email"]):
+                    return existing_user
+            except User.DoesNotExist:
+                user_model = get_user_model()
+                new_user = user_model.objects.create(
+                    email=profile["email"],
+                    first_name=profile["first_name"],
+                    last_name=profile["last_name"],
+                    username=profile["email_user_id"],
+                    is_active=False,
+                    is_staff=False,
+                )
+                new_user.set_unusable_password()
+                new_user.save()
 
-            if created:
-                user.set_unusable_password()
-                user.is_active = False
-                user.is_staff = False
-                user.save()
-
-        return user
+                return new_user

@@ -41,3 +41,9 @@
 .mb-1 {
     margin-bottom: 1rem;
 }
+
+@media print {
+    .hide-on-print {
+        display: none !important;
+      }
+}

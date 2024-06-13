@@ -27,7 +27,7 @@ class ActiveUserRequiredMixin:
         return super().dispatch(request, **kwargs)
 
 
-class StaffUserOnlyMixin:
+class StaffUserOnlyMixin(ActiveUserRequiredMixin):
     def dispatch(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
         if not request.user.is_staff:
             return HttpResponse("Not authorized", status=401)

@@ -1,15 +1,10 @@
-from typing import Any
+from typing import Any, Callable
 
 from crispy_forms.layout import HTML
 from crispy_forms_gds.layout import Field
 from django.forms import Form
 from django.template.loader import render_to_string
 from django.utils.safestring import SafeString
-
-
-class FeedbackStars(Field):
-    template = "feedback/crispy_fields/feedback_stars.html"
-    css_class = None
 
 
 class HTMLTemplate(HTML):
@@ -28,9 +23,8 @@ class HTMLTemplate(HTML):
         return render_to_string(self.html_template_path, self.html_context)
 
 
-def get_textarea_field_with_label_id(*args: Any, label_id: str, **kwargs: Any) -> Field:
-    """Returns a TextArea field with a label ID in the context - needed as the character count demands an
-    aria-describedby attribute, which should be the ID of the label."""
-    field = Field.textarea(*args, **kwargs)
+def get_field_with_label_id(*args: Any, field_method: Callable, label_id: str, **kwargs: Any) -> Field:
+    """Returns a field with a label ID in the context"""
+    field = field_method(*args, **kwargs)
     field.context.update({"label_id": label_id})
     return field

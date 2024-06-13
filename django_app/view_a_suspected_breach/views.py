@@ -4,16 +4,15 @@ from core.sites import require_view_a_breach
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import reverse
+from django.shortcuts import get_object_or_404, reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
+from django.views.generic import DetailView, TemplateView
+from report_a_suspected_breach.models import Breach
+from utils.breach_report import get_breach_context_data
 
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
-
-@method_decorator(require_view_a_breach(), name="dispatch")
-class ViewABreachView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView):
-    template_name = "view_a_suspected_breach/landing.html"
+# ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
@@ -39,3 +38,16 @@ class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
             return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
         return super().get(request, **kwargs)
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, DetailView):
+    template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
+
+    def get_object(self, queryset=None) -> Breach:
+        self.breach = get_object_or_404(Breach, id=self.kwargs["pk"])
+        return self.breach
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        return get_breach_context_data(context, self.breach)

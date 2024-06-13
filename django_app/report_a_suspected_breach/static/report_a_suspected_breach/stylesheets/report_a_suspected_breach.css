@@ -22,3 +22,31 @@
 .display-inline {
     display: inline-block;
 }
+
+@page
+{
+    size: auto;   /* auto is the initial value */
+    /* this affects the margin in the printer settings */
+    margin: 25mm 25mm 25mm 25mm;
+}
+
+.print-only {
+    display: none;
+}
+
+@media print {
+    .print-only {
+        display: inherit;
+    }
+    .govuk-grid-column-two-thirds {
+        width: 100%;
+    }
+    .govuk-summary-list__key {
+        width: 50%;
+    }
+}
+
+.action-wrapper {
+    clear:both;
+    border-bottom: 1px solid transparent;
+}
