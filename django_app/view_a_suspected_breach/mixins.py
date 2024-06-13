@@ -23,6 +23,7 @@ class ActiveUserRequiredMixin:
                     },
                 )
             return render(request, "view_a_suspected_breach/unauthorised.html")
+
         return super().dispatch(request, **kwargs)
 
 
