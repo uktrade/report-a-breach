@@ -62,7 +62,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary">Change<span
+                       href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary&change=yes">Change<span
                         class="govuk-visually-hidden">registered company number</span></a>
                 </dd>
             </div>
@@ -199,7 +199,7 @@
                     {% if country.name == "United Kingdom" %}
                         The UK
                     {% else %}
-                        {{ country.name }}
+                        Outside the UK
                     {% endif %}
                 </dd>
                 <dd class="govuk-summary-list__actions">
@@ -238,7 +238,7 @@
                         {% if country.name == "United Kingdom" %}
                             The UK
                         {% else %}
-                            {{ country.name }}
+                            Outside the UK
                         {% endif %}
                     </dd>
                     {% if is_made_available_journey %}
@@ -379,7 +379,7 @@
 
 {% block extra_js %}
     {{ block.super }}
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
         $(document).ready(function () {
             $('body').on('click', '.read_more_button', function () {
                 $(this).closest('.text_truncator').find('.truncated_text').addClass('hidden');

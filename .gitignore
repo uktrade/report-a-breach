@@ -99,3 +99,4 @@ __pycache__/
 /django_app/core/templates/core/report-a-breach-gds/
 /coverage.json
 /django_app/profiles/
+/test-results/unit-test-results.xml

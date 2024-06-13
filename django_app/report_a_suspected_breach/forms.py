@@ -3,9 +3,8 @@ from datetime import timedelta
 from typing import Any
 
 from core.document_storage import TemporaryDocumentStorage
-from core.form_fields import BooleanChoiceField
 from core.forms import BaseForm, BaseModelForm, BasePersonBusinessDetailsForm
-from core.utils import get_mime_type
+from core.utils import get_mime_type, is_request_ratelimited
 from crispy_forms_gds.choices import Choice
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import (
@@ -23,7 +22,7 @@ from django.urls import reverse_lazy
 from django.utils.html import escape
 from django.utils.timezone import now
 from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
-from feedback.crispy_fields import HTMLTemplate
+from feedback.crispy_fields import HTMLTemplate, get_field_with_label_id
 from utils.companies_house import (
     get_details_from_companies_house,
     get_formatted_address,
@@ -96,6 +95,10 @@ class EmailVerifyForm(BaseForm):
     )
 
     def clean_email_verification_code(self) -> str:
+        # first we check if the request is rate-limited
+        if is_request_ratelimited(self.request):
+            raise forms.ValidationError("You've tried to verify your email too many times. Try again in 1 minute")
+
         email_verification_code = self.cleaned_data["email_verification_code"]
         email_verification_code = email_verification_code.replace(" ", "")
 
@@ -211,6 +214,11 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
+
+        # emptying the form if the user has requested to change the details
+        if self.request.GET.get("change") == "yes" and self.request.method == "GET":
+            self.is_bound = False
+            self.data = {}
 
         # todo - abstract the following logic to apply to all ConditionalRadios forms
         self.helper.legend_tag = "h1"
@@ -411,16 +419,18 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
 
 class WhichSanctionsRegimeForm(BaseForm):
-    form_h1_header = "Which sanctions regimes do you suspect the company or person has breached?"
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=(()),
         required=True,
-        label="Select all that apply",
         error_messages={
             "required": "Select the sanctions regime you suspect has been breached",
+            "invalid": "Select the sanctions regime you suspect has been breached or select I do not know",
         },
     )
+
+    class Media:
+        js = ["report_a_suspected_breach/javascript/which_sanctions_regime.js"]
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -431,11 +441,35 @@ class WhichSanctionsRegimeForm(BaseForm):
             else:
                 checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
 
-        checkbox_choices.append(Choice("Unknown Regime", "I don't know"))
+        checkbox_choices.append(Choice("Unknown Regime", "I do not know"))
         checkbox_choices.append(Choice("Other Regime", "Other regime"))
         self.fields["which_sanctions_regime"].choices = checkbox_choices
+        self.fields["which_sanctions_regime"].label = False
         self.helper.label_size = None
         self.helper.label_tag = None
+        self.helper.layout = Layout(
+            Fieldset(
+                get_field_with_label_id("which_sanctions_regime", field_method=Field.checkboxes, label_id="checkbox"),
+                aria_describedby="checkbox",
+            )
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if which_sanctions_regime := cleaned_data.get("which_sanctions_regime"):
+            if "Unknown Regime" in which_sanctions_regime and (
+                (len(which_sanctions_regime) == 2 and "Other Regime" not in cleaned_data["which_sanctions_regime"])
+                or len(which_sanctions_regime) >= 3
+            ):
+                # the user has selected "I do not know" and other regimes, this is an issue.
+                # note that the user can select both "I do not know" and "Other Regime"
+                self.add_error(
+                    "which_sanctions_regime",
+                    forms.ValidationError(
+                        code="invalid", message=self.fields["which_sanctions_regime"].error_messages["invalid"]
+                    ),
+                )
+        return cleaned_data
 
 
 class WhatWereTheGoodsForm(BaseModelForm):
@@ -648,14 +682,37 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
 class EndUserAddedForm(BaseForm):
     revalidate_on_done = False
 
-    do_you_want_to_add_another_end_user = BooleanChoiceField(
+    do_you_want_to_add_another_end_user = forms.TypedChoiceField(
         choices=(
             Choice(True, "Yes"),
             Choice(False, "No"),
         ),
-        widget=forms.RadioSelect,
+        coerce=lambda x: x == "True",
         label="Do you want to add another end-user?",
         error_messages={"required": "Select yes if you want to add another end-user"},
+        widget=forms.RadioSelect,
+        required=True,
+    )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper.legend_size = Size.MEDIUM
+        self.helper.legend_tag = None
+
+
+class ZeroEndUsersForm(BaseForm):
+    revalidate_on_done = False
+    form_h1_header = "You've removed all end-users"
+
+    do_you_want_to_add_an_end_user = forms.TypedChoiceField(
+        choices=(
+            Choice(True, "Yes"),
+            Choice(False, "No"),
+        ),
+        coerce=lambda x: x == "True",
+        label="Do you want to add an end-user?",
+        error_messages={"required": "Select yes if you want to add an end-user"},
+        widget=forms.RadioSelect,
         required=True,
     )
 
@@ -738,6 +795,7 @@ class UploadDocumentsForm(BaseForm):
             try:
                 document.readline()
             except VirusFoundInFileException:
+                documents.remove(document)
                 raise forms.ValidationError(
                     "A virus was found in one of the files you uploaded.",
                 )

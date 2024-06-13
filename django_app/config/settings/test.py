@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache.backends.dummy import DummyCache
 from django.forms import Form
 from django.http import HttpResponse
@@ -15,10 +16,7 @@ BASE_FRONTEND_TESTING_URL = "http://report-a-suspected-breach:8000"
 ENVIRONMENT = "test"
 
 # we don't want to connect to ClamAV in testing, redefine and remove from list
-FILE_UPLOAD_HANDLERS = (
-    "core.custom_upload_handler.CustomFileUploadHandler",
-    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
-)  # Order is important
+FILE_UPLOAD_HANDLERS = ("core.custom_upload_handler.CustomFileUploadHandler",)  # Order is important
 
 
 # don't use redis when testing
@@ -28,6 +26,12 @@ class TestingCache(DummyCache):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dict_cache = {}
+
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        if key in self.dict_cache:
+            return False
+        self.dict_cache[key] = value
+        return True
 
     def get(self, key, *args, **kwargs):
         return self.dict_cache.get(key)

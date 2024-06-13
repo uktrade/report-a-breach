@@ -2,13 +2,13 @@ from unittest.mock import patch
 
 from django.http import HttpResponseRedirect
 from django.test import RequestFactory
+from django.urls import reverse
 from report_a_suspected_breach.forms import SummaryForm
 from report_a_suspected_breach.models import ReporterEmailVerification
 from report_a_suspected_breach.views import RequestVerifyCodeView
 
 
 class TestRequestVerifyCodeView:
-
     @patch("utils.notifier.send_email")
     def test_form_valid(self, send_email_mock, rasb_client):
         reporter_email_address = "test@testmail.com"
@@ -41,3 +41,13 @@ class TestRequestVerifyCodeView:
         assert response.status_code == redirect.status_code
         assert response["content-type"] == redirect["content-type"]
         assert response.url == redirect.url
+
+    @patch("django_ratelimit.decorators.is_ratelimited", return_value=True)
+    def test_ratelimit(self, mocked_is_ratelimited, rasb_client):
+        session = rasb_client.session
+        session.update({"reporter_email_address": "test@example.com"})
+        session.save()
+
+        response = rasb_client.post(reverse("report_a_suspected_breach:request_verify_code"))
+        assert response.status_code == 200
+        assert "You've tried to request a new code too many times. Please try again in 1 minute" in response.content.decode()
