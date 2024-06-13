@@ -6,10 +6,11 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import DetailView, FormView, TemplateView
 from report_a_suspected_breach.models import Breach
 from utils.breach_report import get_breach_context_data
 
+from .forms import WhichBreachReportForm
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
@@ -41,11 +42,28 @@ class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
+class WhichBreachReportView(LoginRequiredMixin, StaffUserOnlyMixin, FormView):
+    template_name = "view_a_suspected_breach/landing.html"
+    form_class = WhichBreachReportForm
+
+    def form_valid(self, form: WhichBreachReportForm) -> HttpResponse:
+        cleaned_data = form.cleaned_data
+        breach_reference_id = cleaned_data["which_breach_report"]
+        self.request.session["breach_reference_id"] = breach_reference_id
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "view_a_suspected_breach:breach_report", kwargs={"breach_reference_id": self.request.session["breach_reference_id"]}
+        )
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
 class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, DetailView):
     template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
 
     def get_object(self, queryset=None) -> Breach:
-        self.breach = get_object_or_404(Breach, id=self.kwargs["pk"])
+        self.breach = get_object_or_404(Breach, reference=self.kwargs["breach_reference_id"])
         return self.breach
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
