@@ -5,73 +5,7 @@ from django.conf import settings
 from django.test.testcases import TransactionTestCase
 from playwright.sync_api import sync_playwright
 
-EMAIL_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
-UK_ADDRESS_DETAILS = {
-    "name": "business",
-    "website": "example.com",
-    "address_line_1": "A1",
-    "address_line_2": "A2",
-    "town": "Town",
-    "county": "County",
-    "postcode": "AA0 0AA",
-}
-
-NON_UK_ADDRESS_DETAILS = {
-    "name": "business",
-    "website": "example.com",
-    "address_line_1": "A1",
-    "address_line_2": "A2",
-    "address_line_3": "A3",
-    "address_line_4": "A4",
-    "town": "Town",
-    "county": "County",
-    "country": "DE",
-}
-
-UK_BREACHER_ADDRESS_DETAILS = {
-    "name": "Breacher",
-    "website": "breacher.com",
-    "address_line_1": "Breach Lane",
-    "address_line_2": "Breach Avenue",
-    "town": "Breach Town",
-    "county": "Breach County",
-    "postcode": "BB0 0BB",
-}
-
-NON_UK_BREACHER_ADDRESS_DETAILS = {
-    "name": "German Breacher",
-    "website": "germanbreacher.com",
-    "address_line_1": "Germany Lane",
-    "address_line_2": "Germany Avenue",
-    "address_line_3": "Line 3 Germany",
-    "address_line_4": "Line 4 Germany",
-    "town": "Germany Town",
-    "country": "DE",
-}
-
-UK_SUPPLIER_ADDRESS_DETAILS = {
-    "name": "Supplier",
-    "website": "supplier.com",
-    "address_line_1": "Supply Street",
-    "address_line_2": "Supply Lane",
-    "town": "Supply Town",
-    "county": "Supply County",
-    "postcode": "SU0 0SU",
-}
-
-NON_UK_SUPPLIER_ADDRESS_DETAILS = {
-    "name": "supplier",
-    "website": "supplier.com",
-    "address_line_1": "Supply Street",
-    "address_line_2": "Supply Lane",
-    "address_line_3": "Supply A3",
-    "address_line_4": "Supply A4",
-    "town": "Town",
-    "county": "County",
-    "country": "DE",
-}
-
-SANCTIONS = ["The Oscars", "Fireplaces", "Other regime"]
+from . import data
 
 
 class PlaywrightTestBase(TransactionTestCase):
@@ -106,21 +40,21 @@ class PlaywrightTestBase(TransactionTestCase):
         return f"{cls.base_url}/report_a_suspected_breach/{form_step}/"
 
     @classmethod
-    def email_details(cls, page, details=EMAIL_DETAILS):
+    def email_details(cls, page, details=data.EMAIL_DETAILS):
         page.get_by_label("What is your email address?").click()
         page.get_by_label("What is your email address?").fill(details["email"])
         page.get_by_role("button", name="Continue").click()
         return page
 
     @classmethod
-    def verify_email(cls, page, details=EMAIL_DETAILS):
+    def verify_email(cls, page, details=data.EMAIL_DETAILS):
         page.get_by_role("heading", name="We've sent you an email").click()
         page.get_by_label("Enter the 6 digit security").fill(details["verify_code"])
         page.get_by_role("button", name="Continue").click()
         return page
 
     @classmethod
-    def verify_email_details(cls, page, details=EMAIL_DETAILS):
+    def verify_email_details(cls, page, details=data.EMAIL_DETAILS):
         #
         # Email page
         #
@@ -133,7 +67,7 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def fill_uk_address_details(cls, page, details=UK_ADDRESS_DETAILS):
+    def fill_uk_address_details(cls, page, details=data.UK_ADDRESS_DETAILS):
         # UK Address Details Page
         page.get_by_label("Name of business or person").click()
         page.get_by_label("Name of business or person").fill(details["name"])
@@ -154,7 +88,7 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def fill_non_uk_address_details(cls, page, details=NON_UK_ADDRESS_DETAILS):
+    def fill_non_uk_address_details(cls, page, details=data.NON_UK_ADDRESS_DETAILS):
         # NON UK Address Details Page
         page.get_by_label("Name of business or person").click()
         page.get_by_label("Name of business or person").fill(details["name"])
@@ -281,7 +215,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("In the UK").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="Business or person details").click()
-        page = cls.fill_uk_address_details(page, details=UK_BREACHER_ADDRESS_DETAILS)
+        page = cls.fill_uk_address_details(page, details=data.UK_BREACHER_ADDRESS_DETAILS)
         return page
 
     @classmethod
@@ -293,7 +227,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Outside the UK").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="Business or person details").click()
-        page = cls.fill_non_uk_address_details(page, details=NON_UK_BREACHER_ADDRESS_DETAILS)
+        page = cls.fill_non_uk_address_details(page, details=data.NON_UK_BREACHER_ADDRESS_DETAILS)
         return page
 
     @classmethod
@@ -324,7 +258,7 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def overview_of_breach(cls, page, exact=True, sanctions=SANCTIONS):
+    def overview_of_breach(cls, page, exact=True, sanctions=data.SANCTIONS):
         page = cls.create_suspected_data(page, exact)
         page = cls.create_sanctions(page, sanctions)
         page.get_by_label("What were the goods or").click()
@@ -333,7 +267,7 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def create_uk_supplier(cls, page, details=UK_SUPPLIER_ADDRESS_DETAILS):
+    def create_uk_supplier(cls, page, details=data.UK_SUPPLIER_ADDRESS_DETAILS):
         # Where Were the Goods Supplied From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("The UK", exact=True).check()
@@ -344,7 +278,7 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def create_non_uk_supplier(cls, page, details=NON_UK_SUPPLIER_ADDRESS_DETAILS):
+    def create_non_uk_supplier(cls, page, details=data.NON_UK_SUPPLIER_ADDRESS_DETAILS):
         # Where Were the Goods Supplied From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("Outside the UK", exact=True).check()

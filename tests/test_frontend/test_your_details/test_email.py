@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from . import conftest
+from .. import conftest
 
 
 class TestVerify(conftest.PlaywrightTestBase):
