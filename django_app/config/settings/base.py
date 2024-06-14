@@ -61,7 +61,6 @@ CRISPY_TEMPLATE_PACK = "gds"
 
 # AWS
 AWS_S3_REGION_NAME = env.aws_default_region
-AWS_ENDPOINT_URL = env.aws_endpoint_url
 
 # General S3
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
