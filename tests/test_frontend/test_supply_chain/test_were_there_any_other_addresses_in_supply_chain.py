@@ -5,7 +5,7 @@ from playwright.sync_api import expect
 from .. import conftest
 
 
-class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
+class TestWhereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase):
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
@@ -16,16 +16,15 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
         self.page.get_by_role("link", name="The supply chain").click()
-        self.page.get_by_role("heading", name="Where were the goods,").click()
+        self.create_uk_supplier(self.page)
+        self.create_end_users(self.page)
+        self.page.get_by_role("heading", name="Were there any other").click()
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role(
-            "link",
-            name="Select if the goods, services, technological assistance or technology were supplied from",
-        ).click()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_from"))
+        self.page.get_by_role("link", name="Select yes if there were any").click()
+        expect(self.page).to_have_url(re.compile(r".*/were_there_other_addresses_in_the_supply_chain"))
 
-    def test_uk_options_returns_uk_address_capture(self):
+    def test_yes_and_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
@@ -35,14 +34,17 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
         self.page.get_by_role("link", name="The supply chain").click()
-        self.page.get_by_role("heading", name="Where were the goods,").click()
-        self.page.get_by_label("The UK", exact=True).check()
+        self.create_uk_supplier(self.page)
+        self.create_end_users(self.page)
+        self.page.get_by_role("heading", name="Were there any other").click()
+        self.page.get_by_label("Yes").check()
+        self.page.get_by_label("Give all addresses").click()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/about_the_supplier"))
-        expect(self.page.get_by_label("Postcode")).to_be_visible()
-        expect(self.page.get_by_label("County (optional)")).to_be_visible()
+        self.page.get_by_role("heading", name="There is a problem").click()
+        self.page.get_by_role("link", name="Enter other addresses in the supply chain").click()
+        expect(self.page).to_have_url(re.compile(r".*/were_there_other_addresses_in_the_supply_chain"))
 
-    def test_non_uk_options_returns_non_uk_address_capture(self):
+    def test_yes_and_correct_input_returns_upload_documents(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
@@ -52,15 +54,16 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
         self.page.get_by_role("link", name="The supply chain").click()
-        self.page.get_by_role("heading", name="Where were the goods,").click()
-        self.page.get_by_label("Outside the UK").check()
+        self.create_uk_supplier(self.page)
+        self.create_end_users(self.page)
+        self.page.get_by_role("heading", name="Were there any other").click()
+        self.page.get_by_label("Yes").check()
+        self.page.get_by_label("Give all addresses").click()
+        self.page.get_by_label("Give all addresses").fill("Address 3 in Supply chain")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/about_the_supplier"))
-        expect(self.page.get_by_label("Address line 3 (optional)")).to_be_visible()
-        expect(self.page.get_by_label("Address line 4 (optional)")).to_be_visible()
-        expect(self.page.get_by_label("Country")).to_be_visible()
+        expect(self.page).to_have_url(re.compile(r".*/upload_documents_view"))
 
-    def test_i_do_not_know_returns_supplied_to(self):
+    def test_no_returns_upload_documents(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
@@ -70,37 +73,26 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
         self.page.get_by_role("link", name="The supply chain").click()
-        self.page.get_by_role("heading", name="Where were the goods,").click()
+        self.create_uk_supplier(self.page)
+        self.create_end_users(self.page)
+        self.page.get_by_role("heading", name="Were there any other").click()
+        self.page.get_by_label("No", exact=True).check()
+        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/upload_documents_view"))
+
+    def test_i_do_not_know_returns_upload_documents(self):
+        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
+        self.page.get_by_role("link", name="Your details").click()
+        self.create_owner_details(self.page)
+        self.page.get_by_role("link", name="2. About the person or").click()
+        self.create_non_uk_breacher(self.page)
+        self.page.get_by_role("link", name="Overview of the suspected breach").click()
+        self.overview_of_breach(self.page)
+        self.page.get_by_role("link", name="The supply chain").click()
+        self.create_uk_supplier(self.page)
+        self.create_end_users(self.page)
+        self.page.get_by_role("heading", name="Were there any other").click()
         self.page.get_by_label("I do not know").check()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to"))
-
-    def test_not_supplied_yet_returns_made_available_to(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
-        self.page.get_by_role("link", name="Reset session").click()
-        self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
-        self.page.get_by_role("link", name="2. About the person or").click()
-        self.create_non_uk_breacher(self.page)
-        self.page.get_by_role("link", name="Overview of the suspected breach").click()
-        self.overview_of_breach(self.page)
-        self.page.get_by_role("link", name="The supply chain").click()
-        self.page.get_by_role("heading", name="Where were the goods,").click()
-        self.page.get_by_label("They have not been supplied yet").check()
-        self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_made_available_from"))
-
-    def test_breacher_is_supplier_returns_supplied_to(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
-        self.page.get_by_role("link", name="Reset session").click()
-        self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
-        self.page.get_by_role("link", name="2. About the person or").click()
-        self.create_non_uk_breacher(self.page)
-        self.page.get_by_role("link", name="Overview of the suspected breach").click()
-        self.overview_of_breach(self.page)
-        self.page.get_by_role("link", name="The supply chain").click()
-        self.page.get_by_role("heading", name="Where were the goods,").click()
-        self.page.get_by_label("Germany Lane, Germany Avenue, Germany Town, Germany").check()
-        self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to"))
+        expect(self.page).to_have_url(re.compile(r".*/upload_documents_view"))

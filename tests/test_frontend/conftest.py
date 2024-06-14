@@ -305,10 +305,28 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def create_made_available_supplier(cls, page):
-        # Where Were the Goods Supplied From Page
+    def create_uk_made_available_supplier(cls, page, details=data.UK_SUPPLIER_ADDRESS_DETAILS):
+        # Where Were the Goods Made Available From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("They have not been supplied").check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_label("The UK", exact=True).check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="About the supplier").click()
+        page = cls.fill_uk_address_details(page, details=details)
+        page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_non_uk_made_available_supplier(cls, page, details=data.NON_UK_SUPPLIER_ADDRESS_DETAILS):
+        # Where Were the Goods Made Available From Page
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_label("They have not been supplied").check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_label("Outside the UK").check()
+        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("heading", name="About the supplier").click()
+        page = cls.fill_non_uk_address_details(page, details=details)
         page.get_by_role("button", name="Continue").click()
         return page
 
