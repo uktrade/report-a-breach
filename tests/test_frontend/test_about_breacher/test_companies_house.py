@@ -8,6 +8,7 @@ from .. import conftest
 class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -21,6 +22,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
 
     def test_select_yes_returns_do_you_know_registered_company_number(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -31,6 +33,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
 
     def test_no_returns_business_or_person_details(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -41,6 +44,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
 
     def test_i_do_not_know_returns_business_or_person_details(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -53,6 +57,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
 class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -68,6 +73,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
 
     def test_yes_and_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -83,6 +89,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
 
     def test_yes_and_wrong_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -101,6 +108,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
 
     def test_yes_and_correct_input_returns_check_company_details(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -116,6 +124,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
 
     def test_no_returns_address_details_page(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()

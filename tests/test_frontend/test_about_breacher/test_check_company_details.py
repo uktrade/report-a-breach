@@ -8,6 +8,7 @@ from .. import conftest
 class TestCheckCompanyDetails(conftest.PlaywrightTestBase):
     def test_details_match(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -32,6 +33,7 @@ class TestCheckCompanyDetails(conftest.PlaywrightTestBase):
 
     def test_can_change_details(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_owner_details(self.page)
         self.page.get_by_role("link", name="2. About the person or").click()
