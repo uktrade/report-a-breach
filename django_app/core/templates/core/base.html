@@ -164,26 +164,29 @@
             <div class="govuk-phase-banner hide-on-print">
                 <p class="govuk-phase-banner__content">
                     <strong class="govuk-tag govuk-phase-banner__content__tag">
-                        Alpha
+                        Beta
                     </strong>
                     <span class="govuk-phase-banner__text">
-                        This is a new service – your <a class="govuk-link" target="_blank"
-                                                        href="{% url 'feedback:collect_full_feedback' %}">feedback</a> will help us to improve it.
+                        This is a new service – Help us improve it and
+                        <a class="govuk-link" target="_blank" href="{% url 'feedback:collect_full_feedback' %}?url={{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}">
+                            give your feedback (opens in a new tab).
+                        </a>
                     </span>
                 </p>
             </div>
             {% block back_button %}
+	            {# JS-enabled back link #}
                 <a class="govuk-back-link govuk-link--no-visited-state show-on-js-enabled hide-on-js-disabled"
                    href="javascript: window.history.go(-1)">Back</a>
 
+	            {# JS-disabled back link #}
                 {% if "HTTP_REFERER" in request.META %}
-                    <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-enabled"
+                    <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-disabled"
                        href="{{ back_button_link|default_if_none:request.META.HTTP_REFERER|default_if_none:"/" }}?start=true">Back</a>
                 {% else %}
-                    <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-enabled"
+                    <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-disabled"
                        href="{{ back_button_link|default_if_none:"/" }}?start=true">Back</a>
                 {% endif %}
-
             {% endblock %}
             {% block main %}
                 <main class="govuk-main-wrapper" id="main-content" role="main">
