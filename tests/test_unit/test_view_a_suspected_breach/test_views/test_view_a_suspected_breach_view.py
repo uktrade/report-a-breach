@@ -14,9 +14,9 @@ from view_a_suspected_breach.views import ViewASuspectedBreachView
 class TestViewASuspectedBreachView:
 
     def test_get_object(self, vasb_client, breach_object):
-        request_object = RequestFactory().get("/view/{pk}", kwargs={"pk": breach_object.id})
+        request_object = RequestFactory().get("/view/{pk}", kwargs={"pk": breach_object.reference})
         view = ViewASuspectedBreachView()
-        view.setup(request_object, pk=breach_object.id)
+        view.setup(request_object, pk=breach_object.reference)
         breach = view.get_object()
         assert breach.id == breach_object.id
 
@@ -35,8 +35,9 @@ class TestViewASuspectedBreachView:
 
         vasb_client.force_login(test_user)
 
+        breach_reference = breach_with_sanctions_object.reference
         breach_id = breach_with_sanctions_object.id
-        response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_id}/")
+        response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_reference}/")
         sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
@@ -65,8 +66,9 @@ class TestViewASuspectedBreachView:
         request_object.site.name = SiteName.view_a_suspected_breach
 
         vasb_client.force_login(test_user)
+        breach_reference = breach_with_companies_house_object.reference
         breach_id = breach_with_companies_house_object.id
-        response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_id}/")
+        response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_reference}/")
         sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
@@ -96,8 +98,9 @@ class TestViewASuspectedBreachView:
 
         vasb_client.force_login(test_user)
 
+        breach_reference = breacher_and_supplier_object.reference
         breach_id = breacher_and_supplier_object.id
-        response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_id}/")
+        response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_reference}/")
         sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher

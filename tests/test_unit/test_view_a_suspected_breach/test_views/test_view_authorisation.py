@@ -9,14 +9,16 @@ from view_a_suspected_breach.views import ManageUsersView, ViewASuspectedBreachV
 
 class TestViewASuspectedBreach:
     @patch("view_a_suspected_breach.mixins.send_email")
-    def test_successful_view_a_suspected_breach(self, mock_email, vasb_client, breach_object):
+    def test_successful_view_a_suspected_breach(self, mock_email, vasb_client, breacher_and_supplier_object):
         test_user = User.objects.create_user(
             "John",
             "test@example.com",
             is_active=True,
         )
 
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(
+            reverse("view_a_suspected_breach:breach_report", args=[breacher_and_supplier_object.reference])
+        )
         request_object.user = test_user
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
@@ -24,14 +26,14 @@ class TestViewASuspectedBreach:
         vasb_client.force_login(test_user)
 
         view = ViewASuspectedBreachView()
-        view.setup(request_object, pk=breach_object.id)
+        view.setup(request_object, pk=breacher_and_supplier_object.reference)
         response = view.dispatch(request_object)
 
         assert response.status_code == 200
         mock_email.assert_not_called()
 
     @patch("view_a_suspected_breach.mixins.send_email")
-    def test_get_unauthorised_view(self, mock_email, vasb_client, breach_object):
+    def test_get_unauthorised_view(self, mock_email, vasb_client, breacher_and_supplier_object):
         mock_email.send_email = MagicMock()
         test_user = User.objects.create_user(
             "Jane",
@@ -45,25 +47,29 @@ class TestViewASuspectedBreach:
             is_staff=True,
         )
 
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(
+            reverse("view_a_suspected_breach:breach_report", args=[breacher_and_supplier_object.reference])
+        )
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = test_user
         view = ViewASuspectedBreachView()
-        view.setup(request_object, pk=breach_object.id)
+        view.setup(request_object, pk=breacher_and_supplier_object.reference)
         vasb_client.force_login(test_user)
         response = view.dispatch(request_object)
 
         assert response.status_code == 200
         mock_email.assert_called_once()
 
-    def test_anonymous_user(self, vasb_client, breach_object):
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+    def test_anonymous_user(self, vasb_client, breacher_and_supplier_object):
+        request_object = RequestFactory().get(
+            reverse("view_a_suspected_breach:breach_report", args=[breacher_and_supplier_object.reference])
+        )
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = AnonymousUser()
         view = ViewASuspectedBreachView()
-        view.setup(request_object, pk=breach_object.id)
+        view.setup(request_object, pk=breacher_and_supplier_object.reference)
         response = view.dispatch(request_object)
 
         # we should be redirected to the login page

@@ -19,6 +19,7 @@ class BreacherandSupplierFactory(factory.django.DjangoModelFactory):
 
     when_did_you_first_suspect = factory.Faker("date_time", tzinfo=timezone.get_current_timezone())
     where_were_the_goods_supplied_from = "same_address"
+    reference = "ABC123"
 
 
 class SanctionsRegimeFactory(factory.django.DjangoModelFactory):
@@ -84,6 +85,8 @@ class BreachWith2SanctionsFactory(BreachFactory):
         factory_related_name="breach",
     )
 
+    reference = "ABC123"
+
     supplier = factory.RelatedFactory(SupplierPersonOrCompanyFactory, factory_related_name="breach")
 
     recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
@@ -98,6 +101,8 @@ class BreachWithCompaniesHouseFactory(BreachFactory):
         SanctionsRegimeBreachThroughFactory,
         factory_related_name="breach",
     )
+
+    reference = "ABC123"
 
     breacher = factory.RelatedFactory(
         BreacherCompaniesHouseCompanyFactory,
