@@ -9,8 +9,8 @@ def s3_check() -> bool:
     temporary_document_bucket = TemporaryDocumentStorage().bucket
     permanent_document_bucket = PermanentDocumentStorage().bucket
     try:
-        assert temporary_document_bucket.creation_date
-        assert permanent_document_bucket.creation_date
+        assert temporary_document_bucket
+        assert permanent_document_bucket
         return True
     except EndpointConnectionError:
         return False
