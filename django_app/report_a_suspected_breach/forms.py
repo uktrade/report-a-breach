@@ -457,10 +457,9 @@ class WhichSanctionsRegimeForm(BaseForm):
     def clean(self):
         cleaned_data = super().clean()
         if which_sanctions_regime := cleaned_data.get("which_sanctions_regime"):
-            if "Unknown Regime" in which_sanctions_regime and (
-                (len(which_sanctions_regime) == 2 and "Other Regime" not in cleaned_data["which_sanctions_regime"])
-                or len(which_sanctions_regime) >= 3
-            ):
+            if ("Unknown Regime" in which_sanctions_regime or "Other Regime" in which_sanctions_regime) and len(
+                which_sanctions_regime
+            ) >= 2:
                 # the user has selected "I do not know" and other regimes, this is an issue.
                 # note that the user can select both "I do not know" and "Other Regime"
                 self.add_error(

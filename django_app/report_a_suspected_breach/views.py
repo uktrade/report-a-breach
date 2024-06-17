@@ -28,7 +28,7 @@ from django_ratelimit.decorators import ratelimit
 from feedback.forms import FeedbackForm
 from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
-from utils.notifier import verify_email
+from utils.notifier import send_email, verify_email
 from utils.s3 import (
     delete_session_files,
     generate_presigned_url,
@@ -470,6 +470,13 @@ class ReportABreachWizardView(BaseWizardView):
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
+
+            # Send confirmation email to the user
+            send_email(
+                email=cleaned_data["email"]["reporter_email_address"],
+                template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
+                context={"user name": reporter_full_name, "reference number": new_reference},
+            )
 
         return redirect(reverse("report_a_suspected_breach:complete"))
 
