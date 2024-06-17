@@ -43,17 +43,10 @@ class BaseSettings(PydanticBaseSettings):
     permanent_s3_bucket_access_key_id: str = "test"
     permanent_s3_bucket_secret_access_key: str = "test"
 
-    aws_endpoint_url: str = ""
     aws_default_region: str = "eu-west-2"
     temporary_s3_bucket_name: str = "temporary-document-bucket"
     permanent_s3_bucket_name: str = "permanent-document-bucket"
     presigned_url_expiry_seconds: int = 3600
-
-    # required for the S3FileUploadHandler
-    aws_storage_bucket_name: str = temporary_s3_bucket_name
-    aws_region: str = aws_default_region
-    aws_access_key_id: str = temporary_s3_bucket_access_key_id
-    aws_secret_access_key: str = temporary_s3_bucket_secret_access_key
 
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
@@ -115,6 +108,7 @@ class BaseSettings(PydanticBaseSettings):
 class LocalSettings(BaseSettings):
     database_uri: str = Field(alias="DATABASE_URL")
     profiling_enabled: bool = False
+    localstack_port: int = 14566
 
 
 class GovPaasSettings(BaseSettings):
