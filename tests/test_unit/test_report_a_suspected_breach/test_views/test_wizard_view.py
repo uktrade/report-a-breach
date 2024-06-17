@@ -32,8 +32,10 @@ class TestReportABreachWizardView:
     @patch("report_a_suspected_breach.form_step_conditions.show_check_company_details_page_condition")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.store_documents_in_s3")
     @patch("report_a_suspected_breach.views.ReportABreachWizardView.get_all_cleaned_data")
+    @patch("report_a_suspected_breach.views.send_email")
     def test_done(
         self,
+        mock_send_email,
         mocked_get_all_cleaned_data,
         mocked_store_documents_in_s3,
         mocked_show_check_company_details_page_condition,
@@ -72,6 +74,8 @@ class TestReportABreachWizardView:
 
         # Call done method of view
         response = view.done(form_list)
+
+        assert mock_send_email.call_count == 1
 
         # Assert only one breach object created
         breach = Breach.objects.all()
