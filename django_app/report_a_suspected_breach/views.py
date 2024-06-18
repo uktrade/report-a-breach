@@ -556,7 +556,7 @@ class UploadDocumentsView(EmailVerifiedRequiredMixin, FormView):
             return super().form_invalid(form)
 
 
-class DeleteDocumentsView(View, EmailVerifiedRequiredMixin):
+class DeleteDocumentsView(EmailVerifiedRequiredMixin, View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         if file_name := self.request.GET.get("file_name"):
             full_file_path = f"{self.request.session.session_key}/{file_name}"
@@ -625,7 +625,7 @@ class EmailVerifyView(FormView):
         return super().form_valid(form)
 
 
-class DownloadDocumentView(View, EmailVerifiedRequiredMixin):
+class DownloadDocumentView(EmailVerifiedRequiredMixin, View):
     http_method_names = ["get"]
 
     def get(self, *args: object, file_name, **kwargs: object) -> HttpResponse:
@@ -640,7 +640,7 @@ class DownloadDocumentView(View, EmailVerifiedRequiredMixin):
         raise Http404()
 
 
-class DeleteEndUserView(View, EmailVerifiedRequiredMixin):
+class DeleteEndUserView(EmailVerifiedRequiredMixin, View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         redirect_to = redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
         if end_user_uuid := self.request.POST.get("end_user_uuid"):
@@ -653,7 +653,7 @@ class DeleteEndUserView(View, EmailVerifiedRequiredMixin):
         return redirect_to
 
 
-class ZeroEndUsersView(FormView, EmailVerifiedRequiredMixin):
+class ZeroEndUsersView(EmailVerifiedRequiredMixin, FormView):
     form_class = ZeroEndUsersForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
 
