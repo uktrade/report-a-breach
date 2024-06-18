@@ -53,6 +53,7 @@ class ReporterEmailVerification(BaseModel):
     reporter_session = models.ForeignKey(Session, on_delete=models.CASCADE)
     email_verification_code = models.CharField(max_length=6)
     date_created = models.DateTimeField(auto_now_add=True)
+    verified = models.BooleanField(default=False)
 
 
 class PersonOrCompany(BaseModel):

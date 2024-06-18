@@ -104,15 +104,16 @@ class EmailVerifyForm(BaseForm):
 
         verify_timeout_seconds = settings.EMAIL_VERIFY_TIMEOUT_SECONDS
 
-        verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
+        verification_object = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
         )
-        verify_code = verification_objects.email_verification_code
+        self.verification_object = verification_object
+        verify_code = verification_object.email_verification_code
         if email_verification_code != verify_code:
             raise forms.ValidationError("Code is incorrect. Enter the 6 digit security code we sent to your email")
 
         # check if the user has submitted the verify code within the specified timeframe
-        allowed_lapse = verification_objects.date_created + timedelta(seconds=verify_timeout_seconds)
+        allowed_lapse = verification_object.date_created + timedelta(seconds=verify_timeout_seconds)
         if allowed_lapse < now():
             raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
 

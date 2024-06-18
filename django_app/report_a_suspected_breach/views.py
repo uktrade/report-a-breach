@@ -38,6 +38,7 @@ from utils.s3 import (
 
 from .choices import TypeOfRelationshipChoices
 from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm, ZeroEndUsersForm
+from .mixins import EmailVerifiedRequiredMixin
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -46,7 +47,6 @@ from .tasklist import (
     SummaryAndDeclaration,
     TheSupplyChainTask,
     YourDetailsTask,
-    get_blocked_steps,
     get_tasklist,
 )
 
@@ -97,10 +97,6 @@ class ReportABreachWizardView(BaseWizardView):
             self.storage.reset()
             self.storage.current_step = self.steps.first
 
-        if current_step := kwargs.get("step"):
-            if is_step_blocked(self, request, current_step):
-                raise Http404("This page is blocked")
-
         if request.resolver_match.url_name == "about_the_end_user":
             # we want to add another end-user, we need to ask the user if the new end-user is in the UK or not
             if "end_user_uuid" not in self.request.resolver_match.kwargs:
@@ -139,6 +135,11 @@ class ReportABreachWizardView(BaseWizardView):
         # the exception to this is if the user wants to explicitly start the next task, in which case we should let them
         # or, if they're trying to change their answers from the summary page
         self.tasklist = get_tasklist(self)
+
+        if not self.tasklist.current_task.can_start:
+            # checking if the user can actually start the step they're trying to access
+            raise Http404()
+
         if (
             not request.GET.get("start", "") == "true"
             and not request.session.get("redirect") == "summary"
@@ -498,7 +499,7 @@ class CompleteView(TemplateView):
         return context
 
 
-class UploadDocumentsView(FormView):
+class UploadDocumentsView(EmailVerifiedRequiredMixin, FormView):
     """View for uploading documents. This view is used in the wizard flow, but can also be accessed directly.
 
     Accepts both Ajax and non-Ajax requests, to accommodate both JS and non-JS users respectively."""
@@ -555,7 +556,7 @@ class UploadDocumentsView(FormView):
             return super().form_invalid(form)
 
 
-class DeleteDocumentsView(View):
+class DeleteDocumentsView(View, EmailVerifiedRequiredMixin):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         if file_name := self.request.GET.get("file_name"):
             full_file_path = f"{self.request.session.session_key}/{file_name}"
@@ -618,8 +619,13 @@ class EmailVerifyView(FormView):
         else:
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "start"})
 
+    def form_valid(self, form):
+        form.verification_object.verified = True
+        form.verification_object.save()
+        return super().form_valid(form)
 
-class DownloadDocumentView(View):
+
+class DownloadDocumentView(View, EmailVerifiedRequiredMixin):
     http_method_names = ["get"]
 
     def get(self, *args: object, file_name, **kwargs: object) -> HttpResponse:
@@ -634,7 +640,7 @@ class DownloadDocumentView(View):
         raise Http404()
 
 
-class DeleteEndUserView(View):
+class DeleteEndUserView(View, EmailVerifiedRequiredMixin):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         redirect_to = redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
         if end_user_uuid := self.request.POST.get("end_user_uuid"):
@@ -647,7 +653,7 @@ class DeleteEndUserView(View):
         return redirect_to
 
 
-class ZeroEndUsersView(FormView):
+class ZeroEndUsersView(FormView, EmailVerifiedRequiredMixin):
     form_class = ZeroEndUsersForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
 
@@ -672,17 +678,3 @@ class ZeroEndUsersView(FormView):
             return reverse_lazy(
                 "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
             )
-
-
-def is_step_blocked(view: View, request: HttpRequest, current_step: str) -> bool:
-    blocked_steps, your_details_in_progress = get_blocked_steps(view)
-    if current_step in blocked_steps:
-        return True
-    if your_details_in_progress:
-        if current_step in ["name", "name_and_business_you_work_for"]:
-            try:
-                if ReporterEmailVerification.objects.filter(reporter_session=request.session.session_key).latest("date_created"):
-                    return False
-            except ReporterEmailVerification.DoesNotExist:
-                return True
-    return False
