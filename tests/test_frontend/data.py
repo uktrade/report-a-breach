@@ -65,3 +65,5 @@ NON_UK_SUPPLIER_ADDRESS_DETAILS = {
 }
 
 SANCTIONS = ["The Oscars", "Fireplaces", "Other regime"]
+
+FILES = ["./tests/test_frontend/testfiles/testfile.pdf"]

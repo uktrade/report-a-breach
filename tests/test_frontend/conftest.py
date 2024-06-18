@@ -131,7 +131,7 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def upload_documents_page(cls, page):
+    def upload_documents_page(cls, page, files=data.FILES):
         #
         # Upload Documents Page
         #
@@ -139,8 +139,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_text("You can upload items such as").click()
         page.get_by_text("Drag and drop files here or").click()
         page.get_by_text("Choose files").click()
-        # page.get_by_label("Upload documents (optional)").set_input_files('test_file.txt')
-        page.get_by_role("button", name="Continue").click()
+        page.get_by_label("Upload a file").set_input_files(files)
         return page
 
     @classmethod
@@ -402,6 +401,7 @@ class PlaywrightTestBase(TransactionTestCase):
         # Upload Documents Page
         #
         page = cls.upload_documents_page(page)
+        page.get_by_role("button", name="Continue").click()
 
         #
         # Give a Summary of the Suspected Breach Page
