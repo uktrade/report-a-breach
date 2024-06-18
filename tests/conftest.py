@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from core.sites import SiteName
 from django.contrib.sites.models import Site
@@ -72,3 +74,11 @@ def breach_with_companies_house_object(db):
 def breacher_and_supplier_object(db):
     """Fixture to create a breach object where the breacher is the supplier"""
     return BreachBreacherAndSupplierFactory()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def remove_email_verify_requirement_tasklist():
+    """Remove the email verification requirement for all tests."""
+    with mock.patch("report_a_suspected_breach.views.is_step_blocked") as _fixture:
+        _fixture.return_value = True
+        yield _fixture

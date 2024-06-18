@@ -2,3 +2,9 @@ class CompaniesHouseException(Exception):
     """Exception raised when issue encountered with Companies House API"""
 
     pass
+
+
+class EmailNotVerifiedException(Exception):
+    """Exception raised when user tries to save a breach object without verifying their email address."""
+
+    pass

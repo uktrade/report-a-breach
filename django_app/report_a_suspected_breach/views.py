@@ -37,8 +37,8 @@ from utils.s3 import (
 )
 
 from .choices import TypeOfRelationshipChoices
+from .exceptions import EmailNotVerifiedException
 from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm, ZeroEndUsersForm
-from .mixins import EmailVerifiedRequiredMixin
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -48,6 +48,7 @@ from .tasklist import (
     TheSupplyChainTask,
     YourDetailsTask,
     get_tasklist,
+    is_step_blocked,
 )
 
 logger = logging.getLogger(__name__)
@@ -136,7 +137,8 @@ class ReportABreachWizardView(BaseWizardView):
         # or, if they're trying to change their answers from the summary page
         self.tasklist = get_tasklist(self)
 
-        if not self.tasklist.current_task.can_start:
+        current_task = self.tasklist.current_task
+        if is_step_blocked(current_task):
             # checking if the user can actually start the step they're trying to access
             raise Http404()
 
@@ -419,6 +421,10 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_email_verification = ReporterEmailVerification.objects.filter(
                 reporter_session=self.request.session.session_key
             ).latest("date_created")
+
+            if not reporter_email_verification.is_verified:
+                raise EmailNotVerifiedException()
+
             # Save Breach to Database
             new_breach = Breach.objects.create(
                 reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
@@ -499,7 +505,7 @@ class CompleteView(TemplateView):
         return context
 
 
-class UploadDocumentsView(EmailVerifiedRequiredMixin, FormView):
+class UploadDocumentsView(FormView):
     """View for uploading documents. This view is used in the wizard flow, but can also be accessed directly.
 
     Accepts both Ajax and non-Ajax requests, to accommodate both JS and non-JS users respectively."""
@@ -556,7 +562,7 @@ class UploadDocumentsView(EmailVerifiedRequiredMixin, FormView):
             return super().form_invalid(form)
 
 
-class DeleteDocumentsView(EmailVerifiedRequiredMixin, View):
+class DeleteDocumentsView(View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         if file_name := self.request.GET.get("file_name"):
             full_file_path = f"{self.request.session.session_key}/{file_name}"
@@ -625,7 +631,7 @@ class EmailVerifyView(FormView):
         return super().form_valid(form)
 
 
-class DownloadDocumentView(EmailVerifiedRequiredMixin, View):
+class DownloadDocumentView(View):
     http_method_names = ["get"]
 
     def get(self, *args: object, file_name, **kwargs: object) -> HttpResponse:
@@ -640,7 +646,7 @@ class DownloadDocumentView(EmailVerifiedRequiredMixin, View):
         raise Http404()
 
 
-class DeleteEndUserView(EmailVerifiedRequiredMixin, View):
+class DeleteEndUserView(View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
         redirect_to = redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
         if end_user_uuid := self.request.POST.get("end_user_uuid"):
@@ -653,7 +659,7 @@ class DeleteEndUserView(EmailVerifiedRequiredMixin, View):
         return redirect_to
 
 
-class ZeroEndUsersView(EmailVerifiedRequiredMixin, FormView):
+class ZeroEndUsersView(FormView):
     form_class = ZeroEndUsersForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
 

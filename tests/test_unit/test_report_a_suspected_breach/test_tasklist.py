@@ -6,8 +6,7 @@ from report_a_suspected_breach import tasklist
 
 class TestTasklist:
 
-    @patch("report_a_suspected_breach.views.is_step_blocked", return_value=False)
-    def test_current_task(self, mock_blocked_step, rasb_client):
+    def test_current_task(self, rasb_client):
         response = rasb_client.get(reverse("report_a_suspected_breach:landing"))
         assert isinstance(response.tasklist.current_task, tasklist.YourDetailsTask)
 
@@ -45,8 +44,7 @@ class TestTasklist:
         response = rasb_client.get(reverse("report_a_suspected_breach:landing"))
         assert response.tasklist.current_task.underscored_task_name == "your_details"
 
-    @patch("report_a_suspected_breach.views.is_step_blocked", return_value=False)
-    def test_can_start(self, mock_blocked_steps, rasb_client):
+    def test_can_start(self, rasb_client):
         response = rasb_client.get(reverse("report_a_suspected_breach:landing"))
         assert response.tasklist.tasks[0].can_start
         assert all(not task.can_start for task in response.tasklist.tasks[1:])

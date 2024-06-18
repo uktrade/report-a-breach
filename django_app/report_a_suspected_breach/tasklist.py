@@ -203,3 +203,8 @@ def get_tasklist(wizard_view: View) -> TaskList:
         ),
         wizard_view=wizard_view,
     )
+
+
+def is_step_blocked(task: Task) -> bool:
+    """Check if the current step is blocked and should not be accessed."""
+    return task.can_start and not task.complete
