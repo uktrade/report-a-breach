@@ -8,7 +8,7 @@ from report_a_suspected_breach.models import Breach
 class WhichBreachReportForm(BaseForm):
     which_breach_report = forms.CharField(
         label="Which Sanctions Breach Report would you like to view?",
-        help_text="Please enter the reference id obtained in the email",
+        help_text="Please enter the reference ID obtained in the email",
         error_messages={"required": "Check your email or contact an administrator if you do not have the reports reference id"},
     )
 
