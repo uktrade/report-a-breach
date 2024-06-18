@@ -420,6 +420,101 @@ class PlaywrightTestBase(TransactionTestCase):
 
         return page
 
+    @classmethod
+    def create_reporter_details(cls, page, relationship):
+        # Start page
+        page = cls.reporter_professional_relationship(page, relationship)
+        # Email Verify
+        page = cls.verify_email_details(page)
+        # Name
+        if relationship in ["I'm an owner", "I'm acting"]:
+            page.get_by_label("What is your full name?").click()
+            page.get_by_label("What is your full name?").fill("John Smith")
+            page.get_by_role("button", name="Continue").click()
+        elif relationship in ["I work for a third party", "No professional relationship"]:
+            page.get_by_role("heading", name="Your details").click()
+            page.get_by_label("Full name").click()
+            page.get_by_label("Full name").fill("John Smith")
+            page.get_by_label("Business you work for").click()
+            page.get_by_label("Business you work for").fill("DBT")
+            page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_breach(cls, breach_details):
+        new_browser = cls.playwright.chromium.launch(headless=True)
+        context = new_browser.new_context()
+        page = context.new_page()
+        page.goto(cls.base_url)
+        page.get_by_role("link", name="Reset session").click()
+
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="Your details").click()
+
+        # 1. Your Details
+        page = cls.create_reporter_details(page, breach_details["reporter_relationship"])
+
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="2. About the person or").click()
+
+        # 2. About the person or business you're reporting
+
+        if breach_details["breacher_location"] == "uk":
+            page = cls.create_uk_breacher(page)
+        elif breach_details["breacher_location"] == "non_uk":
+            page = cls.create_non_uk_breacher(page)
+        elif breach_details["breacher_location"] == "companies_house":
+            page = cls.create_companies_house_details(page)
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="Overview of the suspected breach").click()
+
+        # 3. Overview of the suspected breach
+        page = cls.overview_of_breach(page, breach_details["exact_date"], breach_details["sanctions"])
+
+        # Tasklist
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="The supply chain").click()
+
+        if breach_details["supplier_location"] == "uk":
+            page = cls.create_uk_supplier(page)
+        elif breach_details["supplier_location"] == "non_uk":
+            page = cls.create_non_uk_supplier(page)
+
+        page = cls.create_end_users(page)
+
+        # Were There Other Addresses in the Supply Chain Page
+        page.get_by_role("heading", name="Were there any other").click()
+        page.get_by_label("Yes").check()
+        page.get_by_text("Give all addresses").click()
+        page.get_by_label("Give all addresses").fill("Addr supply chain")
+        page.get_by_role("button", name="Continue").click()
+
+        #
+        # Upload Documents Page
+        #
+        page = cls.upload_documents_page(page)
+        page.get_by_role("button", name="Continue").click()
+
+        #
+        # Give a Summary of the Suspected Breach Page
+        #
+        page.get_by_text("Give a summary of the breach", exact=True).click()
+        page.get_by_text("You can also include anything").click()
+        page.get_by_label("Give a summary of the breach").click()
+        page.get_by_label("Give a summary of the breach").fill("summary")
+        page.get_by_role("button", name="Continue").click()
+
+        #
+        # Tasklist
+        #
+        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("link", name="Continue").click()
+
+        return page
+
 
 @pytest.fixture()
 def sample_upload_file():
