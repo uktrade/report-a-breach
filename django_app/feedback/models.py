@@ -11,3 +11,4 @@ class FeedbackItem(BaseModel):
         base_field=models.CharField(max_length=32, choices=DidYouExperienceAnyIssues.choices), blank=True, null=True
     )
     how_we_could_improve_the_service = models.TextField(null=True, blank=True)
+    url = models.URLField(null=True, blank=True)

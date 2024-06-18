@@ -108,23 +108,25 @@ class TestAreYouReportingABusinessOnCompaniesHouseForm:
 
 
 class TestDoYouKnowTheRegisteredCompanyNumberForm:
-    def test_do_you_know_the_registered_company_number_required(self):
-        form = forms.DoYouKnowTheRegisteredCompanyNumberForm(data={"do_you_know_the_registered_company_number": None})
+    def test_do_you_know_the_registered_company_number_required(self, request_object):
+        form = forms.DoYouKnowTheRegisteredCompanyNumberForm(
+            data={"do_you_know_the_registered_company_number": None}, request=request_object
+        )
         assert not form.is_valid()
         assert "do_you_know_the_registered_company_number" in form.errors
         assert form.errors.as_data()["do_you_know_the_registered_company_number"][0].code == "required"
 
-    def test_registered_company_number_required(self):
+    def test_registered_company_number_required(self, request_object):
         form = forms.DoYouKnowTheRegisteredCompanyNumberForm(
-            data={"do_you_know_the_registered_company_number": "yes", "registered_company_number": None}
+            data={"do_you_know_the_registered_company_number": "yes", "registered_company_number": None}, request=request_object
         )
         assert not form.is_valid()
         assert "registered_company_number" in form.errors
         assert form.errors.as_data()["registered_company_number"][0].code == "required"
 
-    def test_registered_company_number_not_required(self):
+    def test_registered_company_number_not_required(self, request_object):
         form = forms.DoYouKnowTheRegisteredCompanyNumberForm(
-            data={"do_you_know_the_registered_company_number": "no", "registered_company_number": None}
+            data={"do_you_know_the_registered_company_number": "no", "registered_company_number": None}, request=request_object
         )
         assert form.is_valid()
 
@@ -165,6 +167,20 @@ class TestDoYouKnowTheRegisteredCompanyNumberForm:
         assert cleaned_data["registered_company_name"] == "Test Company"
         assert cleaned_data["registered_office_address"] == "12 road, London"
         assert cleaned_data["registered_company_number"] == "12345678"
+
+    def test_form_is_unbound(self, request_object):
+        form = forms.DoYouKnowTheRegisteredCompanyNumberForm(
+            data={"do_you_know_the_registered_company_number": "yes", "registered_company_number": "12345678"},
+            request=request_object,
+        )
+        assert form.is_bound
+
+        request_object.GET = {"change": "yes"}
+        form = forms.DoYouKnowTheRegisteredCompanyNumberForm(
+            data={"do_you_know_the_registered_company_number": "yes", "registered_company_number": "12345678"},
+            request=request_object,
+        )
+        assert not form.is_bound
 
 
 class TestWhenDidYouFirstSuspectForm:
@@ -217,6 +233,16 @@ class TestAboutTheEndUserForm:
         assert not form.is_valid()
         assert "postal_code" in form.errors
         assert form.errors.as_data()["postal_code"][0].code == "invalid"
+
+
+class TestZeroEndUsersForm:
+    def test_do_you_want_to_add_an_end_user_validation(self):
+        form = forms.ZeroEndUsersForm(data={"do_you_want_to_add_an_end_user": True})
+        assert form.is_valid()
+        form = forms.ZeroEndUsersForm(data={})
+        assert not form.is_valid()
+        assert "do_you_want_to_add_an_end_user" in form.errors
+        assert form.errors.as_data()["do_you_want_to_add_an_end_user"][0].code == "required"
 
 
 class TestUploadDocumentsForm:
@@ -340,13 +366,16 @@ class TestWhichSanctionsRegimeForm:
         assert flat_choices[-1] == "Other Regime"
         assert flat_choices[-2] == "Unknown Regime"
 
-    def test_other_regime_selected_non_error(self):
-        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Other Regime", "Unknown Regime"]})
-        assert form.is_valid()
+    def test_assert_unknown_regime_selected_error(self):
+        SanctionsRegimeFactory.create(full_name="test regime")
+        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Unknown Regime", "test regime"]})
+        assert not form.is_valid()
+        assert "which_sanctions_regime" in form.errors
+        assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"
 
     def test_assert_other_regime_selected_error(self):
         SanctionsRegimeFactory.create(full_name="test regime")
-        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Unknown Regime", "test regime"]})
+        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Other Regime", "test regime"]})
         assert not form.is_valid()
         assert "which_sanctions_regime" in form.errors
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"

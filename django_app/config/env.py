@@ -29,6 +29,7 @@ class BaseSettings(PydanticBaseSettings):
     restrict_sending: bool = True
     email_verify_timeout_seconds: int = 3600
     email_vasb_user_admin_template_id: str = ""
+    email_user_report_confirmation_template_id: str = ""
 
     sentry_dsn: str = ""
     sentry_environment: str = ""
@@ -42,17 +43,10 @@ class BaseSettings(PydanticBaseSettings):
     permanent_s3_bucket_access_key_id: str = "test"
     permanent_s3_bucket_secret_access_key: str = "test"
 
-    aws_endpoint_url: str = ""
     aws_default_region: str = "eu-west-2"
     temporary_s3_bucket_name: str = "temporary-document-bucket"
     permanent_s3_bucket_name: str = "permanent-document-bucket"
     presigned_url_expiry_seconds: int = 3600
-
-    # required for the S3FileUploadHandler
-    aws_storage_bucket_name: str = temporary_s3_bucket_name
-    aws_region: str = aws_default_region
-    aws_access_key_id: str = temporary_s3_bucket_access_key_id
-    aws_secret_access_key: str = temporary_s3_bucket_secret_access_key
 
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
@@ -114,6 +108,7 @@ class BaseSettings(PydanticBaseSettings):
 class LocalSettings(BaseSettings):
     database_uri: str = Field(alias="DATABASE_URL")
     profiling_enabled: bool = False
+    localstack_port: int = 14566
 
 
 class GovPaasSettings(BaseSettings):
@@ -185,10 +180,42 @@ class DBTPlatformSettings(BaseSettings):
         else:
             return database_url_from_env("DATABASE_CREDENTIALS")
 
+    @computed_field
+    @property
+    def temporary_s3_bucket_configuration(self) -> dict[str, str]:
+        if self.in_build_step:
+            return {
+                "bucket_name": "",
+                "access_key_id": "",
+                "secret_access_key": "",
+            }
+        else:
+            return {
+                "bucket_name": os.environ.get("TEMPORARY_S3_BUCKET_NAME", ""),
+                "access_key_id": None,
+                "secret_access_key": None,
+            }
+
+    @computed_field
+    @property
+    def permanent_s3_bucket_configuration(self) -> dict[str, str]:
+        if self.in_build_step:
+            return {
+                "bucket_name": "",
+                "access_key_id": "",
+                "secret_access_key": "",
+            }
+        else:
+            return {
+                "bucket_name": os.environ.get("PERMANENT_S3_BUCKET_NAME", ""),
+                "access_key_id": None,
+                "secret_access_key": None,
+            }
+
     @computed_field  # type: ignore[misc]
     @property
     def redis_url(self) -> str:
-        if self.build_step:
+        if self.in_build_step:
             return ""
 
         return self.celery_broker_url

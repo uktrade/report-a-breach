@@ -215,6 +215,11 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
+        # emptying the form if the user has requested to change the details
+        if self.request.GET.get("change") == "yes" and self.request.method == "GET":
+            self.is_bound = False
+            self.data = {}
+
         # todo - abstract the following logic to apply to all ConditionalRadios forms
         self.helper.legend_tag = "h1"
         self.helper.legend_size = Size.LARGE
@@ -452,10 +457,9 @@ class WhichSanctionsRegimeForm(BaseForm):
     def clean(self):
         cleaned_data = super().clean()
         if which_sanctions_regime := cleaned_data.get("which_sanctions_regime"):
-            if "Unknown Regime" in which_sanctions_regime and (
-                (len(which_sanctions_regime) == 2 and "Other Regime" not in cleaned_data["which_sanctions_regime"])
-                or len(which_sanctions_regime) >= 3
-            ):
+            if ("Unknown Regime" in which_sanctions_regime or "Other Regime" in which_sanctions_regime) and len(
+                which_sanctions_regime
+            ) >= 2:
                 # the user has selected "I do not know" and other regimes, this is an issue.
                 # note that the user can select both "I do not know" and "Other Regime"
                 self.add_error(
@@ -685,6 +689,28 @@ class EndUserAddedForm(BaseForm):
         coerce=lambda x: x == "True",
         label="Do you want to add another end-user?",
         error_messages={"required": "Select yes if you want to add another end-user"},
+        widget=forms.RadioSelect,
+        required=True,
+    )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper.legend_size = Size.MEDIUM
+        self.helper.legend_tag = None
+
+
+class ZeroEndUsersForm(BaseForm):
+    revalidate_on_done = False
+    form_h1_header = "You've removed all end-users"
+
+    do_you_want_to_add_an_end_user = forms.TypedChoiceField(
+        choices=(
+            Choice(True, "Yes"),
+            Choice(False, "No"),
+        ),
+        coerce=lambda x: x == "True",
+        label="Do you want to add an end-user?",
+        error_messages={"required": "Select yes if you want to add an end-user"},
         widget=forms.RadioSelect,
         required=True,
     )
