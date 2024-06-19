@@ -67,3 +67,48 @@ NON_UK_SUPPLIER_ADDRESS_DETAILS = {
 SANCTIONS = ["The Oscars", "Fireplaces", "Other regime"]
 
 FILES = ["./tests/test_frontend/testfiles/testfile.pdf"]
+
+
+END_USERS = {
+    "end_user1": {
+        "location": "The UK",
+        "name": "End User1",
+        "business": "",
+        "email": "",
+        "website": "",
+        "address_line_1": "AL1",
+        "address_line_2": "AL2",
+        "town_or_city": "Town",
+        "county": "Lothian",
+        "postcode": "EU1 2EU",
+        "additional_contact_details": "",
+    },
+    "end_user2": {
+        "location": "Outside the UK",
+        "name": "End User1",
+        "business": "",
+        "email": "",
+        "website": "",
+        "address_line_1": "AL1",
+        "address_line_2": "AL2",
+        "address_line_3": "AL3",
+        "address_line_4": "AL4",
+        "town_or_city": "Town",
+        "country": "UG",
+        "additional_contact_details": "",
+    },
+    "end_user3": {
+        "location": "Outside the UK",
+        "name": "End User3",
+        "business": "Business 3",
+        "email": "email3@gmail.com",
+        "website": "web.3.com",
+        "address_line_1": "High St",
+        "address_line_2": "Shoreham",
+        "address_line_3": "Winder",
+        "address_line_4": "",
+        "town_or_city": "Usser",
+        "country": "HU",
+        "additional_contact_details": "",
+    },
+}

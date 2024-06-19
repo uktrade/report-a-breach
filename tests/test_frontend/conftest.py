@@ -1,9 +1,10 @@
 import os
+import re
 
 import pytest
 from django.conf import settings
 from django.test.testcases import TransactionTestCase
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 from . import data
 
@@ -332,6 +333,8 @@ class PlaywrightTestBase(TransactionTestCase):
     @classmethod
     def create_end_users(cls, page):
         # Where were the goods supplied to (end user page)
+        expect(page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
+
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_text("This is the address of the").click()
         page.get_by_label("The UK", exact=True).check()
@@ -351,8 +354,38 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_role("button", name="Continue").click()
 
         # Add another End User
-        page.get_by_label("No").check()
+        page.get_by_label("Yes").check()
         page.get_by_role("button", name="Continue").click()
+        return page
+
+    @classmethod
+    def create_end_user(cls, page, end_user_details):
+        # Where were the goods supplied to (end user page)
+        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_text("This is the address of the").click()
+        page.get_by_label(end_user_details["location"], exact=True).check()
+        page.get_by_role("button", name="Continue").click()
+
+        # About the End User
+        page.get_by_role("heading", name="About the end-user").click()
+        page.get_by_role("heading", name="Name and digital contact").click()
+        page.get_by_label("Name of person (optional)").fill(end_user_details["name"])
+        page.get_by_label("Name of business (optional)").fill(end_user_details["business"])
+        page.get_by_label("Email address (optional)").fill(end_user_details["email"])
+        page.get_by_label("Website address (optional)").fill(end_user_details["website"])
+        page.get_by_label("Address line 1 (optional)").fill(end_user_details["address_line_1"])
+        page.get_by_label("Address line 2 (optional)").fill(end_user_details["address_line_2"])
+        if end_user_details["location"] == "The UK":
+            page.get_by_label("County (optional)").fill(end_user_details["county"])
+            page.get_by_label("Postcode (optional)").fill(end_user_details["postcode"])
+        else:
+            page.get_by_label("Country").select_option(end_user_details["country"])
+            page.get_by_label("Address line 1 (optional)").fill(end_user_details["address_line_3"])
+            page.get_by_label("Address line 2 (optional)").fill(end_user_details["address_line_4"])
+        page.get_by_label("Town or city (optional)").fill(end_user_details["town_or_city"])
+        page.get_by_label("Additional contact details (").fill(end_user_details["additional_contact_details"])
+        page.get_by_role("button", name="Continue").click()
+
         return page
 
     @classmethod
@@ -483,7 +516,18 @@ class PlaywrightTestBase(TransactionTestCase):
         elif breach_details["supplier_location"] == "non_uk":
             page = cls.create_non_uk_supplier(page)
 
-        page = cls.create_end_users(page)
+        expect(page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
+
+        for end_user in breach_details["end_users"][:-1]:
+            page = cls.create_end_user(page, end_user_details=data.END_USERS[end_user])
+            # Add more End User
+            page.get_by_label("Yes").check()
+            page.get_by_role("button", name="Continue").click()
+        page = cls.create_end_user(page, end_user_details=data.END_USERS[breach_details["end_users"][-1]])
+
+        # Do not add another End User
+        page.get_by_label("No").check()
+        page.get_by_role("button", name="Continue").click()
 
         # Were There Other Addresses in the Supply Chain Page
         page.get_by_role("heading", name="Were there any other").click()
