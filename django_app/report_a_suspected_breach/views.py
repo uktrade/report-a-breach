@@ -663,7 +663,7 @@ class ZeroEndUsersView(FormView):
                 return f"{get_wizard_step_url('where_were_the_goods_made_available_to')}?add_another_end_user=yes"
 
             else:
-                return f"{get_wizard_step_url('where_were_the_goods_made_supplied_to')}?add_another_end_user=yes"
+                return f"{get_wizard_step_url('where_were_the_goods_supplied_to')}?add_another_end_user=yes"
 
         else:
             return reverse_lazy(
