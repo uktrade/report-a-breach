@@ -53,3 +53,15 @@ class TestProvideFullFeedbackView:
         feedback.refresh_from_db()
         assert feedback.rating == 1
         assert feedback.how_we_could_improve_the_service == "try harder"
+
+    def test_adding_url_to_feedback(self, rasb_client):
+        rasb_client.post(
+            reverse("feedback:collect_full_feedback") + "?url=https://example.com",
+            data={
+                "rating": 1,
+                "how_we_could_improve_the_service": "try harder",
+                "did_you_experience_any_issues": ["not_found", "lacks_features"],
+            },
+        )
+        feedback_object = FeedbackItem.objects.get()
+        assert feedback_object.url == "https://example.com"

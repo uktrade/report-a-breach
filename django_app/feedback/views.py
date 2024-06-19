@@ -24,7 +24,12 @@ class ProvideFullFeedbackView(FormView):
         return kwargs
 
     def form_valid(self, form: FeedbackForm) -> HttpResponseRedirect:
-        form.save()
+        feedback_item = form.save()
+
+        # adding the URL to the new feedback item
+        if url := self.request.GET.get("url"):
+            feedback_item.url = url
+            feedback_item.save()
         return redirect("feedback:feedback_done")
 
 

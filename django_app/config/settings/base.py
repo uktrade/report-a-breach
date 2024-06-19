@@ -61,7 +61,6 @@ CRISPY_TEMPLATE_PACK = "gds"
 
 # AWS
 AWS_S3_REGION_NAME = env.aws_default_region
-AWS_ENDPOINT_URL = env.aws_endpoint_url
 
 # General S3
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
@@ -197,6 +196,7 @@ GOV_NOTIFY_API_KEY = env.gov_notify_api_key
 EMAIL_VERIFY_CODE_TEMPLATE_ID = env.email_verify_code_template_id
 EMAIL_VASB_USER_ADMIN_TEMPLATE_ID = env.email_vasb_user_admin_template_id
 RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
+EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID = env.email_user_report_confirmation_template_id
 
 # SENTRY
 SENTRY_DSN = env.sentry_dsn
