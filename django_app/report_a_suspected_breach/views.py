@@ -660,9 +660,11 @@ class ZeroEndUsersView(FormView):
         add_end_user = self.form.cleaned_data["do_you_want_to_add_an_end_user"]
         if add_end_user:
             if self.request.session.get("made_available_journey"):
-                return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "where_were_the_goods_made_available_to"})
+                return f"{get_wizard_step_url('where_were_the_goods_made_available_to')}?add_another_end_user=yes"
+
             else:
-                return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "where_were_the_goods_supplied_to"})
+                return f"{get_wizard_step_url('where_were_the_goods_made_supplied_to')}?add_another_end_user=yes"
+
         else:
             return reverse_lazy(
                 "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
