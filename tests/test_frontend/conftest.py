@@ -154,37 +154,6 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def create_third_party_details(cls, page):
-        # Start page
-        page = cls.reporter_professional_relationship(page, "I work for a third party")
-
-        # Email Verify
-        page = cls.verify_email_details(page)
-
-        # Name and business you work for
-        page.get_by_role("heading", name="Your details").click()
-        page.get_by_label("Full name").click()
-        page.get_by_label("Full name").fill("John Smith")
-        page.get_by_label("Business you work for").click()
-        page.get_by_label("Business you work for").fill("DBT")
-        page.get_by_role("button", name="Continue").click()
-        return page
-
-    @classmethod
-    def create_owner_details(cls, page):
-        # Start page
-        page = cls.reporter_professional_relationship(page, "I'm an owner, officer or")
-
-        # Email Verify
-        page = cls.verify_email_details(page)
-
-        # Name
-        page.get_by_label("What is your full name?").click()
-        page.get_by_label("What is your full name?").fill("John Smith")
-        page.get_by_role("button", name="Continue").click()
-        return page
-
-    @classmethod
     def create_companies_house_details(cls, page):
         page.get_by_role("heading", name="Are you reporting a business").click()
         page.get_by_label("Yes").check()

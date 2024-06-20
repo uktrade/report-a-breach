@@ -9,7 +9,7 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
+        self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
@@ -26,7 +26,7 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
     def test_correct_input_goes_to_where_were_the_goods_supplied_from(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
+        self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()

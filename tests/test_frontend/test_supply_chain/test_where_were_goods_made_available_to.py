@@ -10,7 +10,7 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
+        self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
@@ -22,7 +22,7 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="There is a problem").click()
         self.page.get_by_role(
             "link",
-            name="Select if the goods, services, technology or technical assistance were supplied to the UK",
+            name="Select if the goods, services, technology or technical assistance were made available to the UK",
         ).click()
         expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_made_available_to"))
 
@@ -30,7 +30,7 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
+        self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
@@ -48,7 +48,7 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
+        self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
@@ -67,7 +67,7 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
-        self.create_owner_details(self.page)
+        self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
