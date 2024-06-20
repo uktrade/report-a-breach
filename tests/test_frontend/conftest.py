@@ -517,13 +517,13 @@ class PlaywrightTestBase(TransactionTestCase):
             page = cls.create_non_uk_supplier(page)
 
         expect(page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
-
-        for end_user in breach_details["end_users"][:-1]:
-            page = cls.create_end_user(page, end_user_details=data.END_USERS[end_user])
-            # Add more End User
-            page.get_by_label("Yes").check()
-            page.get_by_role("button", name="Continue").click()
-        page = cls.create_end_user(page, end_user_details=data.END_USERS[breach_details["end_users"][-1]])
+        if breach_details.get("end_users", False):
+            for end_user in breach_details["end_users"][:-1]:
+                page = cls.create_end_user(page, end_user_details=data.END_USERS[end_user])
+                # Add more End User
+                page.get_by_label("Yes").check()
+                page.get_by_role("button", name="Continue").click()
+            page = cls.create_end_user(page, end_user_details=data.END_USERS[breach_details["end_users"][-1]])
 
         # Do not add another End User
         page.get_by_label("No").check()
@@ -548,7 +548,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_text("Give a summary of the breach", exact=True).click()
         page.get_by_text("You can also include anything").click()
         page.get_by_label("Give a summary of the breach").click()
-        page.get_by_label("Give a summary of the breach").fill("summary")
+        page.get_by_label("Give a summary of the breach").fill("Happened a month ago")
         page.get_by_role("button", name="Continue").click()
 
         #

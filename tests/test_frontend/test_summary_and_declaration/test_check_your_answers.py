@@ -2,14 +2,15 @@ import re
 
 from playwright.sync_api import expect
 
-from .. import conftest
+from .. import conftest, data
 
 breach_details_owner = {
     "reporter_relationship": "I'm an owner",
     "breacher_location": "uk",
     "supplier_location": "uk",
     "exact_date": True,
-    "sanctions": ["The Oscars", "Fireplaces", "Other regime"],
+    "sanctions": ["The Oscars", "Fireplaces"],
+    "end_users": [],
 }
 
 breach_details_third_party = {
@@ -213,18 +214,17 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
     def test_can_change_sanctions_regimes_breached(self):
         self.page = self.create_breach(breach_details_owner)
         self.page.get_by_text("Sanctions regimes breached").click()
-        expect(self.page.get_by_text("The Oscars Fireplaces Other Regime")).to_be_visible()
+        expect(self.page.get_by_text("The Oscars Fireplaces")).to_be_visible()
         self.page.get_by_role("link", name="Change sanctions regime").click()
         expect(self.page).to_have_url(re.compile(r".*/which_sanctions_regime/.*"))
 
         self.page.get_by_label("The Oscars").uncheck()
         self.page.get_by_label("Fireplaces").uncheck()
-        self.page.get_by_label("Other regime").uncheck()
         self.page.get_by_label("The Tonys").check()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/summary"))
         self.page.get_by_text("Sanctions regimes breached").click()
-        expect(self.page.get_by_text("The Oscars Fireplaces Other Regime")).not_to_be_visible()
+        expect(self.page.get_by_text("The Oscars Fireplaces")).not_to_be_visible()
         expect(self.page.get_by_text("The Tonys")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
         self.summary_and_declaration_page(self.page)
@@ -246,7 +246,7 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
 
 
 class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
-    # can change to breach locaiton, uk location, non-uk location, i do not know, they have not been supplied yet
+    # todo - can change all options: breach location, uk location, non-uk location, I do not know, they have not been supplied yet
     def test_can_change_location_of_supplier(self):
         self.page = self.create_breach(breach_details_owner)
         self.page.get_by_role("heading", name="Check your answers").click()
@@ -254,6 +254,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Supplier").click()
         self.page.get_by_text("Location of supplier", exact=True).click()
         expect(self.page.get_by_text("The UK", exact=True)).to_have_count(2)
+        expect(self.page.get_by_text("Outside the UK")).to_have_count(2)
         self.page.get_by_role("link", name="Change location of supplier").click()
         expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_from/.*"))
         self.page.get_by_label("Outside the UK").check()
@@ -263,7 +264,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/summary"))
         expect(self.page.get_by_text("The UK", exact=True)).to_have_count(1)
-        expect(self.page.get_by_text("Outside the UK")).to_be_visible()
+        expect(self.page.get_by_text("Outside the UK")).to_have_count(3)
         expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, Venezuela")).to_be_visible()
 
         self.page.get_by_role("button", name="Continue").click()
@@ -339,69 +340,67 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         self.summary_and_declaration_page(self.page)
 
+    def test_can_change_name_and_address_of_end_user(self):
+        breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.page = self.create_breach(breach_details_owner)
+        self.page.get_by_role("heading", name="Check your answers").click()
+        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
+        self.page.get_by_role("heading", name="End-user 1").click()
+        self.page.get_by_role("heading", name="End-user 2").click()
+        self.page.get_by_role("heading", name="End-user 3").click()
+        expect(self.page.get_by_text("End User2")).to_be_visible()
+        expect(self.page.get_by_text("The UK", exact=True)).to_have_count(2)
+        expect(self.page.get_by_text("Outside the UK", exact=True)).to_have_count(2)
+        self.page.get_by_role("link", name="Change name and address of end-user 2").click()
+        expect(self.page).to_have_url(re.compile(r".*/about_the_end_user/.*"))
+        self.page.get_by_label("Name of person (optional)").fill("Alex Good")
+        self.page.get_by_label("Country").select_option("AS")
+        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/end_user_added/*"))
+        self.page.get_by_label("No").check()
+        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/summary/*"))
+        expect(self.page.get_by_text("The UK", exact=True)).to_have_count(2)
+        expect(self.page.get_by_text("Outside the UK", exact=True)).to_have_count(2)
+        expect(self.page.get_by_text("End User2")).not_to_be_visible()
+        expect(self.page.get_by_text("Alex Good")).to_be_visible()
+        self.page.get_by_role("button", name="Continue").click()
+        self.summary_and_declaration_page(self.page)
 
-#     def test_can_change_name_and_address_of_end_user(self):
-#         self.page = self.create_test_breach()
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.locator("form div").filter(has_text="Full name John smith Change").get_by_role("link").click()
-#         expect(self.page).to_have_url(re.compile(r".*/name/.*"))
-#         self.page.get_by_label("What is your full name?").fill("Jane Doe")
-#         self.page.get_by_role("button", name="Continue").click()
-#         expect(self.page).to_have_url(re.compile(r".*/summary"))
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.get_by_role("button", name="Continue").click()
-#         self.summary_and_declaration_page(self.page)
-
-#     def test_can_add_another_end_user(self):
-#         self.page = self.create_test_breach()
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.locator("form div").filter(has_text="Full name John smith Change").get_by_role("link").click()
-#         expect(self.page).to_have_url(re.compile(r".*/name/.*"))
-#         self.page.get_by_label("What is your full name?").fill("Jane Doe")
-#         self.page.get_by_role("button", name="Continue").click()
-#         expect(self.page).to_have_url(re.compile(r".*/summary"))
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.get_by_role("button", name="Continue").click()
-#         self.summary_and_declaration_page(self.page)
+    def test_can_add_another_end_user(self):
+        breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.page = self.create_breach(breach_details_owner)
+        self.page.get_by_role("heading", name="Check your answers").click()
+        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
+        expect(self.page.get_by_text("The UK", exact=True)).to_have_count(2)
+        expect(self.page.get_by_text("Outside the UK", exact=True)).to_have_count(2)
+        self.page.get_by_role("link", name="Add another end-user end-user").click()
+        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
+        self.page = self.create_end_user(self.page, data.END_USERS["end_user4"])
+        expect(self.page).to_have_url(re.compile(r".*/end_user_added/*"))
+        self.page.get_by_label("No").check()
+        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/summary/*"))
+        expect(self.page.get_by_text("The UK", exact=True)).to_have_count(2)
+        expect(self.page.get_by_text("Outside the UK", exact=True)).to_have_count(3)
+        expect(self.page.get_by_text("End User4")).to_be_visible()
+        self.page.get_by_role("button", name="Continue").click()
+        self.summary_and_declaration_page(self.page)
 
 
-# class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
-#     def test_can_change_uploaded_documents(self):
-#         self.page = self.create_test_breach()
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.locator("form div").filter(has_text="Full name John smith Change").get_by_role("link").click()
-#         expect(self.page).to_have_url(re.compile(r".*/name/.*"))
-#         self.page.get_by_label("What is your full name?").fill("Jane Doe")
-#         self.page.get_by_role("button", name="Continue").click()
-#         expect(self.page).to_have_url(re.compile(r".*/summary"))
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.get_by_role("button", name="Continue").click()
-#         self.summary_and_declaration_page(self.page)
+class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
+    # todo - change uploaded documents
 
-#     def test_can_change_summary_of_the_breach(self):
-#         self.page = self.create_test_breach()
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.locator("form div").filter(has_text="Full name John smith Change").get_by_role("link").click()
-#         expect(self.page).to_have_url(re.compile(r".*/name/.*"))
-#         self.page.get_by_label("What is your full name?").fill("Jane Doe")
-#         self.page.get_by_role("button", name="Continue").click()
-#         expect(self.page).to_have_url(re.compile(r".*/summary"))
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.get_by_role("button", name="Continue").click()
-#         self.summary_and_declaration_page(self.page)
+    def test_can_change_summary_of_the_breach(self):
+        self.page = self.create_breach(breach_details_owner)
+        self.page.get_by_text("Summary of the breach", exact=True).click()
+        expect(self.page.get_by_text("Happened a month ago")).to_be_visible()
+        self.page.get_by_role("link", name="Change summary of the breach").click()
+        expect(self.page).to_have_url(re.compile(r".*/tell_us_about_the_suspected_breach/.*"))
+        self.page.get_by_label("Give a summary of the breach").fill("Occured last year")
+        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/summary"))
+        expect(self.page.get_by_text("Happened a month ago")).not_to_be_visible()
+        expect(self.page.get_by_text("Occured last year")).to_be_visible()
+        self.page.get_by_role("button", name="Continue").click()
+        self.summary_and_declaration_page(self.page)
