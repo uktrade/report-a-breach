@@ -331,32 +331,11 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def create_end_users(cls, page):
-        # Where were the goods supplied to (end user page)
-        expect(page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
-
+    def no_end_users(cls, page):
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_text("This is the address of the").click()
-        page.get_by_label("The UK", exact=True).check()
+        page.get_by_label("I do not know", exact=True).check()
         page.get_by_role("button", name="Continue").click()
-
-        # About the End User
-        page.get_by_role("heading", name="About the end-user").click()
-        page.get_by_role("heading", name="Name and digital contact").click()
-        page.get_by_label("Name of person (optional)").click()
-        page.get_by_label("Name of person (optional)").fill("End User")
-        page.get_by_label("Name of person (optional)").press("Tab")
-        page.get_by_label("Name of business (optional)").fill("Business End")
-        page.get_by_label("Address line 1 (optional)").click()
-        page.get_by_label("Address line 1 (optional)").fill("End ser addr")
-        page.get_by_label("Additional contact details (").click()
-        page.get_by_label("Additional contact details (").fill("additional details")
-        page.get_by_role("button", name="Continue").click()
-
-        # Add another End User
-        page.get_by_label("Yes").check()
-        page.get_by_role("button", name="Continue").click()
-        return page
 
     @classmethod
     def create_end_user(cls, page, end_user_details):
@@ -385,71 +364,6 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Town or city (optional)").fill(end_user_details["town_or_city"])
         page.get_by_label("Additional contact details (").fill(end_user_details["additional_contact_details"])
         page.get_by_role("button", name="Continue").click()
-
-        return page
-
-    @classmethod
-    def create_test_breach(cls):
-        new_browser = cls.playwright.chromium.launch(headless=True)
-        context = new_browser.new_context()
-        page = context.new_page()
-        page.goto(cls.base_url)
-
-        # Tasklist
-        page.get_by_role("heading", name="Task list").click()
-        page.get_by_role("link", name="Your details").click()
-
-        # 1. Your Details
-        page = cls.create_owner_details(page)
-
-        # Tasklist
-        page.get_by_role("heading", name="Task list").click()
-        page.get_by_role("link", name="2. About the person or").click()
-
-        # 2. About the person or business you're reporting
-        page = cls.create_non_uk_breacher(page)
-
-        # Tasklist
-        page.get_by_role("heading", name="Task list").click()
-        page.get_by_role("link", name="Overview of the suspected breach").click()
-
-        # 3. Overview of the suspected breach
-        page = cls.overview_of_breach(page)
-
-        # Tasklist
-        page.get_by_role("heading", name="Task list").click()
-        page.get_by_role("link", name="The supply chain").click()
-
-        page = cls.create_uk_supplier(page)
-        page = cls.create_end_users(page)
-
-        # Were There Other Addresses in the Supply Chain Page
-        page.get_by_role("heading", name="Were there any other").click()
-        page.get_by_label("Yes").check()
-        page.get_by_text("Give all addresses").click()
-        page.get_by_label("Give all addresses").fill("Addr supply chain")
-        page.get_by_role("button", name="Continue").click()
-
-        #
-        # Upload Documents Page
-        #
-        page = cls.upload_documents_page(page)
-        page.get_by_role("button", name="Continue").click()
-
-        #
-        # Give a Summary of the Suspected Breach Page
-        #
-        page.get_by_text("Give a summary of the breach", exact=True).click()
-        page.get_by_text("You can also include anything").click()
-        page.get_by_label("Give a summary of the breach").click()
-        page.get_by_label("Give a summary of the breach").fill("summary")
-        page.get_by_role("button", name="Continue").click()
-
-        #
-        # Tasklist
-        #
-        page.get_by_role("heading", name="Task list").click()
-        page.get_by_role("link", name="Continue").click()
 
         return page
 
