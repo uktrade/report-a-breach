@@ -14,7 +14,7 @@ class TestZeroEndUsersView:
         expected_redirect = HttpResponseRedirect(
             status=302,
             content_type="text/html; charset=utf-8",
-            redirect_to="/report_a_suspected_breach/where_were_the_goods_supplied_to/",
+            redirect_to="/report_a_suspected_breach/where_were_the_goods_supplied_to/?add_another_end_user=yes",
         )
 
         assert response.status_code == expected_redirect.status_code
@@ -52,7 +52,7 @@ class TestZeroEndUsersView:
         expected_redirect = HttpResponseRedirect(
             status=302,
             content_type="text/html; charset=utf-8",
-            redirect_to="/report_a_suspected_breach/where_were_the_goods_made_available_to/",
+            redirect_to="/report_a_suspected_breach/where_were_the_goods_made_available_to/?add_another_end_user=yes",
         )
 
         assert response.status_code == expected_redirect.status_code
