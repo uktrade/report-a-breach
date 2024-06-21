@@ -68,12 +68,21 @@ def test_process_email_step(self, form: Form) -> dict[str, Any]:
 
 def test_request_verify_form_valid(self, form: Form) -> HttpResponse:
     """Monkey-patching the form_valid of the request verify code view to always use the same verify code for testing."""
+    import logging
+
     from django.contrib.sessions.models import Session
     from report_a_suspected_breach.models import ReporterEmailVerification
     from report_a_suspected_breach.views import RequestVerifyCodeView
 
+    logger = logging.getLogger(__name__)
+
+    reporter_email_address = self.request.session["reporter_email_address"]
+
     verify_code = "987654"
     user_session = Session.objects.get(session_key=self.request.session.session_key)
+    if getattr(self.request, "limited", False):
+        logger.warning(f"User has been rate-limited: {reporter_email_address}")
+        return self.form_invalid(form)
     ReporterEmailVerification.objects.create(
         reporter_session=user_session,
         email_verification_code=verify_code,
