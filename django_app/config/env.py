@@ -162,7 +162,7 @@ class DBTPlatformSettings(BaseSettings):
     in_build_step: bool = Field(alias="BUILD_STEP", default=False)
 
     # Redis env vars
-    rab_cache_endpoint: str = ""
+    rab_cache_endpoint: str = Field(alias="RAB_CACHE_ENDPOINT", default="")
 
     @computed_field
     @property
