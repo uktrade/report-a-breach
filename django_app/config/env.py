@@ -162,7 +162,7 @@ class DBTPlatformSettings(BaseSettings):
     in_build_step: bool = Field(alias="BUILD_STEP", default=False)
 
     # Redis env vars
-    celery_broker_url: str = ""
+    rab_cache_endpoint: str = ""
 
     @computed_field
     @property
@@ -218,7 +218,7 @@ class DBTPlatformSettings(BaseSettings):
         if self.in_build_step:
             return ""
 
-        return self.celery_broker_url
+        return self.rab_cache_endpoint
 
 
 if "CIRCLECI" in os.environ:
