@@ -244,17 +244,6 @@ TRUNCATE_WORDS_LIMIT = 30
 
 en_formats.DATE_FORMAT = "d/m/Y"
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": env.redis_url,
-        "TIMEOUT": 60 * 60 * 24,  # in seconds: 60 * 60 * 24 (24 hours)
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    }
-}
-
 # CSP policies
 
 # The default policy is to only allow resources from the same origin (self)
@@ -307,3 +296,18 @@ CSP_REPORT_URI = env.csp_report_uri
 # Django Ratelimit
 RATELIMIT_VIEW = "core.views.rate_limited_view"
 RATELIMIT = "10/m"
+
+# Redis
+REDIS_URL = env.redis_url
+
+# Caches
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "TIMEOUT": 60 * 60 * 24,  # in seconds: 60 * 60 * 24 (24 hours)
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
