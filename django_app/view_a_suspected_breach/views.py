@@ -46,15 +46,23 @@ class WhichBreachReportView(LoginRequiredMixin, StaffUserOnlyMixin, FormView):
     template_name = "view_a_suspected_breach/landing.html"
     form_class = WhichBreachReportForm
 
-    def form_valid(self, form: WhichBreachReportForm) -> HttpResponse:
-        cleaned_data = form.cleaned_data
-        self.form = form
-        breach_reference_id = cleaned_data["which_breach_report"]
-        self.request.session["breach_reference_id"] = breach_reference_id
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breach_objects"] = Breach.objects.all()
+        breach_list = []
+        for breach in context["breach_objects"]:
+            breach_list.append(breach)
+        return context
 
-    def get_success_url(self):
-        return reverse("view_a_suspected_breach:breach_report", kwargs={"pk": self.form.cleaned_data["which_breach_report"]})
+    # def form_valid(self, form: WhichBreachReportForm) -> HttpResponse:
+    #     cleaned_data = form.cleaned_data
+    #     self.form = form
+    #     # breach_reference_id = cleaned_data["which_breach_report"]
+    #     # self.request.session["breach_reference_id"] = breach_reference_id
+    #     return super().form_valid(form)
+
+    # def get_success_url(self):
+    #     return reverse("view_a_suspected_breach:breach_report", kwargs={"pk": self.form.cleaned_data["which_breach_report"]})
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
