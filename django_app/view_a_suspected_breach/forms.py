@@ -12,11 +12,10 @@ class WhichBreachReportForm(BaseForm):
     )
 
     class Media:
-        js = ("javascript/form_steps/which_sanctions_regimes.js",)
+        js = ("javascript/form_steps/which_breach_report_search.js",)
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
-
         self.helper.layout = Layout(
             Field.text("search_bar", field_width=Fluid.THREE_QUARTERS),
         )

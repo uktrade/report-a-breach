@@ -54,16 +54,6 @@ class WhichBreachReportView(LoginRequiredMixin, StaffUserOnlyMixin, FormView):
             breach_list.append(breach)
         return context
 
-    # def form_valid(self, form: WhichBreachReportForm) -> HttpResponse:
-    #     cleaned_data = form.cleaned_data
-    #     self.form = form
-    #     # breach_reference_id = cleaned_data["which_breach_report"]
-    #     # self.request.session["breach_reference_id"] = breach_reference_id
-    #     return super().form_valid(form)
-
-    # def get_success_url(self):
-    #     return reverse("view_a_suspected_breach:breach_report", kwargs={"pk": self.form.cleaned_data["which_breach_report"]})
-
 
 @method_decorator(require_view_a_breach(), name="dispatch")
 class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, DetailView):
