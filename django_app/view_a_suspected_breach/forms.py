@@ -12,7 +12,7 @@ class WhichBreachReportForm(BaseForm):
     )
 
     class Media:
-        js = ("javascript/form_steps/which_breach_report_search.js",)
+        js = ["view_a_suspected_breach/javascript/which_breach_report_search.js"]
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
