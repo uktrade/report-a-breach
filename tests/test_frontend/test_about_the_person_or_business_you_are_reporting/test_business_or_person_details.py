@@ -5,8 +5,12 @@ from playwright.sync_api import expect
 from .. import conftest, data
 
 
-class TestAboutTheSupplierUKAddress(conftest.PlaywrightTestBase):
-    def test_correct_input_returns_supplied_to(self):
+class TestAboutThePersonOrBusinessUKAddress(conftest.PlaywrightTestBase):
+    """
+    Tests for about the person or business page, using UK address
+    """
+
+    def test_correct_input_returns_when_did_you_first_suspect(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
@@ -33,11 +37,11 @@ class TestAboutTheSupplierUKAddress(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("County (optional)")).to_be_visible()
         self.page.get_by_role("heading", name="Business or person details").click()
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Enter the name of the business or person").click()
-        self.page.get_by_role("link", name="Enter address line 1, such as the building and street").click()
-        self.page.get_by_role("link", name="Enter town or city").click()
-        self.page.get_by_role("link", name="Enter postcode").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter the name of the business or person")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter address line 1, such as the building and street")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter town or city")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter postcode")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/business_or_person_details"))
 
     def test_incorrect_uk_postcode_returns_error(self):
@@ -58,13 +62,17 @@ class TestAboutTheSupplierUKAddress(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(r".*/business_or_person_details"))
         self.fill_uk_address_details(self.page, breacher_address)
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Enter a full UK postcode").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter a full UK postcode")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/business_or_person_details"))
 
 
-class TestAboutTheSupplierNonUKAddress(conftest.PlaywrightTestBase):
-    def test_correct_input_returns_supplied_to(self):
+class TestAboutThePersonOrBusinessNonUKAddress(conftest.PlaywrightTestBase):
+    """
+    Tests for about the person or business page, using non UK address
+    """
+
+    def test_correct_input_returns_when_did_you_suspect(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
@@ -88,7 +96,7 @@ class TestAboutTheSupplierNonUKAddress(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/business_or_person_details"))
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Enter the name of the business or person").click()
-        self.page.get_by_role("link", name="Select country").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter the name of the business or person")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Select country")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/business_or_person_details"))

@@ -6,6 +6,10 @@ from .. import conftest
 
 
 class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
+    """
+    Tests for where were the goods made available to page
+    """
+
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
@@ -19,11 +23,13 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         self.create_uk_made_available_supplier(self.page)
         self.page.get_by_role("heading", name="Where were the goods,").click()
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role(
-            "link",
-            name="Select if the goods, services, technology or technical assistance were made available to the UK",
-        ).click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(
+            self.page.get_by_role(
+                "link",
+                name="Select if the goods, services, technology or technical assistance were made available to the UK",
+            )
+        ).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_made_available_to"))
 
     def test_uk_option_returns_uk_address_capture(self):

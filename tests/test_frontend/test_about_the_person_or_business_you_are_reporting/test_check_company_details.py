@@ -6,6 +6,10 @@ from .. import conftest
 
 
 class TestCheckCompanyDetails(conftest.PlaywrightTestBase):
+    """
+    Tests for check company details page
+    """
+
     def test_details_match(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()

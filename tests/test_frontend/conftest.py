@@ -112,7 +112,7 @@ class PlaywrightTestBase(TransactionTestCase):
         return page
 
     @classmethod
-    def summary_and_declaration_page(cls, page):
+    def declaration_and_complete_page(cls, page):
         #
         # Declaration Page
         #

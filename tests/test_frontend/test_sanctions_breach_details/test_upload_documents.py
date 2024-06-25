@@ -6,6 +6,10 @@ from .. import conftest
 
 
 class TestUploadDocuments(conftest.PlaywrightTestBase):
+    """
+    Tests for the upload documents page
+    """
+
     def test_no_input_goes_to_suspected_breach(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
@@ -70,8 +74,8 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
         self.upload_documents_page(self.page, files=["./tests/test_frontend/testfiles/missing_filetype"])
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("button", name="Continue")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/tell_us_about_the_suspected_breach"))
 
     def test_malware_file_raises_error(self):
@@ -92,7 +96,7 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
         self.upload_documents_page(self.page, files=["./tests/test_frontend/testfiles/malware_file_eicar.txt"])
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="A virus was found in one of the files you uploaded.").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="A virus was found in one of the files you uploaded.")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/tell_us_about_the_suspected_breach"))

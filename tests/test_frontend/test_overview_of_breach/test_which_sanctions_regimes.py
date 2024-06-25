@@ -6,6 +6,10 @@ from .. import conftest
 
 
 class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
+    """
+    Tests for which sanctions regimes page
+    """
+
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
@@ -17,8 +21,8 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
         self.create_suspected_data(self.page, exact=True)
         self.page.get_by_role("heading", name="Which sanctions regimes do").click()
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Select the sanctions regime you suspect has been breached").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Select the sanctions regime you suspect has been breached")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/which_sanctions_regime"))
 
     def test_can_select_multiple_sanctions_regimes(self):

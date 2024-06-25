@@ -6,6 +6,10 @@ from .. import conftest
 
 
 class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
+    """
+    Tests for the tell us about the suspected breach page
+    """
+
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
@@ -27,8 +31,8 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_text("Give a summary of the breach", exact=True).click()
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Enter a summary of the breach").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter a summary of the breach")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/tell_us_about_the_suspected_breach"))
 
     def test_correct_input_goes_to_summary(self):

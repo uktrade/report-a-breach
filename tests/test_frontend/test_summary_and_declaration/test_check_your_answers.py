@@ -31,6 +31,10 @@ breach_details_companies_house = {
 
 
 class TestCheckYourAnswersYourDetails(conftest.PlaywrightTestBase):
+    """
+    Tests for check your answers page, specific to the your details section
+    """
+
     def test_business_work_for_show_condition(self):
         self.page = self.create_breach(breach_details_third_party)
         self.page.get_by_role("heading", name="Check your answers").click()
@@ -56,7 +60,7 @@ class TestCheckYourAnswersYourDetails(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("Jane Doe")).to_be_visible()
         expect(self.page.get_by_text("John smith")).not_to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_name_and_business_reporter_works_for(self):
         self.page = self.create_breach(breach_details_third_party)
@@ -85,10 +89,13 @@ class TestCheckYourAnswersYourDetails(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("Reporter Business")).to_be_visible()
         expect(self.page.get_by_text("DBT")).not_to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
 
-class TestCheckYourAnswersBreacherDetails(conftest.PlaywrightTestBase):
+class TestCheckYourAnswersPersonOrBusinessYouAreReporting(conftest.PlaywrightTestBase):
+    """
+    Tests for check your answers page, specific to the person or business you're reporting section
+    """
 
     def test_can_change_uk_breacher_details(self):
         self.page = self.create_breach(breach_details_owner)
@@ -118,7 +125,7 @@ class TestCheckYourAnswersBreacherDetails(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_text("Breach Lane, Breach Avenue, Another Town, BB0 0BB, United Kingdom")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_non_uk_breacher_details(self):
         self.page = self.create_breach(breach_details_third_party)
@@ -151,7 +158,7 @@ class TestCheckYourAnswersBreacherDetails(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_text("Germany Lane, Germany Avenue, Germany Town, Venezuela, Venezuela")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_companies_house_details(self):
         self.page = self.create_breach(breach_details_companies_house)
@@ -185,10 +192,13 @@ class TestCheckYourAnswersBreacherDetails(conftest.PlaywrightTestBase):
         self.page.get_by_text("BISSOT PROPERTY MANAGEMENT LTD", exact=True).click()
         self.page.get_by_text("20-22 Wenlock Road, N1 7GU", exact=True).click()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
 
 class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
+    """
+    Tests for check your answers page, specific to the overview of the breach section
+    """
 
     def test_can_change_date_first_suspected_breach(self):
         self.page = self.create_breach(breach_details_owner)
@@ -209,7 +219,7 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("Approximate date 01/01/2011")).to_be_visible()
         expect(self.page.get_by_text("Exact date 03/05/2024")).not_to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_sanctions_regimes_breached(self):
         self.page = self.create_breach(breach_details_owner)
@@ -227,7 +237,7 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("The Oscars Fireplaces")).not_to_be_visible()
         expect(self.page.get_by_text("The Tonys")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_what_were_the_goods(self):
         self.page = self.create_breach(breach_details_owner)
@@ -242,10 +252,14 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("Accountancy goods")).not_to_be_visible()
         expect(self.page.get_by_text("Technology goods")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
 
 class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
+    """
+    Tests for check your answers page, specific to the supply chain section
+    """
+
     # todo - can change all options: breach location, uk location, non-uk location, I do not know, they have not been supplied yet
     def test_can_change_location_of_supplier(self):
         self.page = self.create_breach(breach_details_owner)
@@ -268,7 +282,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, Venezuela")).to_be_visible()
 
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_to_unknown_location_of_supplier(self):
         self.page = self.create_breach(breach_details_owner)
@@ -286,7 +300,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("I do not know")).to_be_visible()
         expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, United Kingdom")).not_to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_name_and_address_of_supplier_to_unknown(self):
         self.page = self.create_breach(breach_details_owner)
@@ -304,7 +318,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("I do not know")).to_be_visible()
         expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, United Kingdom")).not_to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_location_of_end_user(self):
         breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
@@ -338,7 +352,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("End User1 AL1, AL2, Town, American Samoa")).to_be_visible()
 
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_change_name_and_address_of_end_user(self):
         breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
@@ -365,7 +379,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("End User2")).not_to_be_visible()
         expect(self.page.get_by_text("Alex Good")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
     def test_can_add_another_end_user(self):
         breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
@@ -385,10 +399,14 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("Outside the UK", exact=True)).to_have_count(3)
         expect(self.page.get_by_text("End User4")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)
 
 
 class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
+    """
+    Tests for check your answers page, specific to the sanctions breach details section
+    """
+
     # todo - change uploaded documents
 
     def test_can_change_summary_of_the_breach(self):
@@ -403,4 +421,4 @@ class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("Happened a month ago")).not_to_be_visible()
         expect(self.page.get_by_text("Occured last year")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
-        self.summary_and_declaration_page(self.page)
+        self.declaration_and_complete_page(self.page)

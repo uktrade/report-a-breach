@@ -5,7 +5,11 @@ from playwright.sync_api import expect
 from .. import conftest
 
 
-class TestWhereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase):
+class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase):
+    """
+    Tests for were there any other addresses in the supply chain page
+    """
+
     def test_no_input_returns_error(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Reset session").click()
@@ -20,8 +24,8 @@ class TestWhereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBas
         self.no_end_users(self.page)
         self.page.get_by_role("heading", name="Were there any other").click()
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Select yes if there were any").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Select yes if there were any")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/were_there_other_addresses_in_the_supply_chain"))
 
     def test_yes_and_no_input_returns_error(self):
@@ -40,8 +44,8 @@ class TestWhereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBas
         self.page.get_by_label("Yes").check()
         self.page.get_by_label("Give all addresses").click()
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Enter other addresses in the supply chain").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter other addresses in the supply chain")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/were_there_other_addresses_in_the_supply_chain"))
 
     def test_yes_and_correct_input_returns_upload_documents(self):

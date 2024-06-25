@@ -6,6 +6,10 @@ from .. import conftest
 
 
 class TestReporterProfessionalRelationship(conftest.PlaywrightTestBase):
+    """
+    Tests for reporter professional relationship page
+    """
+
     def test_reporter_professional_relationship(self):
         self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
         self.page.get_by_role("link", name="Your details").click()
@@ -21,6 +25,6 @@ class TestReporterProfessionalRelationship(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(r".*/start*"))
         self.page.get_by_role("heading", name="What is your professional").click()
         self.page.get_by_role("button", name="Continue").click()
-        self.page.get_by_role("heading", name="There is a problem").click()
-        self.page.get_by_role("link", name="Select your professional").click()
+        expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Select your professional")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/start*"))

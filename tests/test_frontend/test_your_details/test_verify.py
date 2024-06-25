@@ -14,15 +14,15 @@ class TestVerify(conftest.PlaywrightTestBase):
         self.page.goto(self.get_form_step_page("email"))
         self.verify_email_details(self.page, INCORRECT_CODE_DETAILS)
         expect(self.page).to_have_url(re.compile(r".*/email_verify"))
-        self.page.get_by_label("There is a problem").click()
-        self.page.get_by_role("link", name="Code is incorrect. Enter the 6 digit").click()
+        expect(self.page.get_by_label("There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Code is incorrect. Enter the 6 digit")).to_be_visible()
 
     def test_verify_no_code_raises_error(self):
         self.page.goto(self.get_form_step_page("email"))
         self.verify_email_details(self.page, EMPTY_CODE_DETAILS)
         expect(self.page).to_have_url(re.compile(r".*/email_verify"))
-        self.page.get_by_label("There is a problem").click()
-        self.page.get_by_role("link", name="Enter the 6 digit security code").click()
+        expect(self.page.get_by_label("There is a problem")).to_be_visible()
+        expect(self.page.get_by_role("link", name="Enter the 6 digit security code")).to_be_visible()
 
     def test_verify_code(self):
         self.page.goto(self.get_form_step_page("email"))
