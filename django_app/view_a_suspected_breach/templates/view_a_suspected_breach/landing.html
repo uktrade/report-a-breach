@@ -3,47 +3,48 @@
 {% block column_content %}
   {% block form_content %}
     {% crispy form %}
-
-    {% for breach_report in breach_objects %}
-      <dl class="govuk-summary-list govuk-summary-list--no-border">
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">
-            Submitted by:
-          </dt>
-          <dd class="govuk-summary-list__value" name="reporter_full_name">
-            {{ breach_report.reporter_full_name }}
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">
-            Business or person suspected of breaching sanctions
-          </dt>
-          <dd class="govuk-summary-list__value">
-            {{ breach_report.reporter_name_of_business_you_work_for }}
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">
-            Submitted on:
-          </dt>
-          <dd class="govuk-summary-list__value">
-            {{ breach_report.created_at }}
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">
-            Files uploaded:
-          </dt>
-          <dd class="govuk-summary-list__value">
-            {{ breach_report.uploadeddocument_set.name }}
-          </dd>
-        </div>
-      </dl>
-      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-    {% endfor %}
-
   {% endblock form_content %}
+
+  {% for breach_report in breach_objects %}
+    <dl class="govuk-summary-list govuk-summary-list--no-border">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Submitted by:
+        </dt>
+        <dd class="govuk-summary-list__value" name="reporter_full_name">
+          {{ breach_report.reporter_full_name }}
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Business or person suspected of breaching sanctions
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {{ breach_report.reporter_name_of_business_you_work_for }}
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Submitted on:
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {{ breach_report.created_at }}
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Files uploaded:
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {{ breach_report.uploadeddocument_set.name }}
+        </dd>
+      </div>
+    </dl>
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+  {% endfor %}
+
+
+  {% block extra_js %}
+    {{ form.media.js }}
+  {% endblock extra_js %}
 {% endblock column_content %}
-{% block extra_js %}
-  {{ form.media.js }}
-{% endblock %}
