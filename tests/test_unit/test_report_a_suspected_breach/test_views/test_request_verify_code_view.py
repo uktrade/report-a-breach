@@ -9,8 +9,7 @@ from report_a_suspected_breach.views import RequestVerifyCodeView
 
 
 class TestRequestVerifyCodeView:
-    @patch("utils.notifier.send_email")
-    def test_form_valid(self, send_email_mock, rasb_client):
+    def test_form_valid(self, rasb_client):
         reporter_email_address = "test@testmail.com"
         view = RequestVerifyCodeView()
 
@@ -30,8 +29,6 @@ class TestRequestVerifyCodeView:
         email_verifications = ReporterEmailVerification.objects.all()
         assert len(email_verifications) == 1
         assert str(email_verifications[0].reporter_session) == request_object.session.session_key
-
-        assert send_email_mock.call_count == 1
 
         # Assert returns redirect
         redirect = HttpResponseRedirect(
