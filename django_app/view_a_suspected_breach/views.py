@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import DetailView, FormView, TemplateView
 from report_a_suspected_breach.models import Breach
 from utils.breach_report import get_breach_context_data
 
@@ -16,7 +16,7 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView):
+class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
     template_name = "view_a_suspected_breach/summary_reports.html"
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:

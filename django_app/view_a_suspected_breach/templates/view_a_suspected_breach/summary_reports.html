@@ -5,10 +5,23 @@
             Suspected breach reports
         </h1>
     </div>
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="sort">
+            Sort by
+        </label>
+        <select class="govuk-select" id="sort" name="sort">
+            <option value="published">Recently published</option>
+            <option value="updated" selected>Recently updated</option>
+            <option value="views">Most views</option>
+            <option value="comments">Most comments</option>
+        </select>
+    </div>
     {% for breach_report in breach_objects %}
         <h2 class="govuk-heading-m">Summary of the breach</h2>
+        {{ breach_report.tell_us_about_the_suspected_breach }}
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row--no-border">
+                <br>
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Submitted by:
                 </dt>
