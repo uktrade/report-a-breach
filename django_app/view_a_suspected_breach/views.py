@@ -16,6 +16,16 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
+class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView):
+    template_name = "view_a_suspected_breach/summary_reports.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breach_objects"] = Breach.objects.all()
+        return context
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
 class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
     template_name = "view_a_suspected_breach/user_admin.html"
 
