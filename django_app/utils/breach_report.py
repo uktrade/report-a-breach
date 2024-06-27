@@ -49,15 +49,11 @@ def get_breach_context_data(context, breach) -> dict[str, Any]:
     upload_documents = get_breach_documents(PermanentDocumentStorage(), str(breach.id))
     context["documents"] = upload_documents
 
-    # Reporter Summary
-    summary = breach.tell_us_about_the_suspected_breach
-    context["summary"] = summary
-
     return context
 
 
 def sort_breaches(sort_str: str, breach_objects: Breach) -> list[Breach]:
-    if sort_str == "date of report (newest)":
+    if sort_str == "newest":
         sorted_breaches = breach_objects.order_by("-created_by")
     else:
         sorted_breaches = breach_objects.order_by("created_by")

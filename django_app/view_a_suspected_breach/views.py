@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, FormView, TemplateView
 from report_a_suspected_breach.models import Breach
@@ -20,14 +21,14 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
     template_name = "view_a_suspected_breach/summary_reports.html"
     form_class = SelectForm
-    success_url = reverse("view_a_suspected_breach:sorted_summary_reports")
+    success_url = reverse_lazy("view_a_suspected_breach:sorted_summary_reports")
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         breach_objects = Breach.objects.all()
         context["breach_objects"] = []
         for breach in breach_objects:
-            context["breach_objects"].extend(get_breach_context_data(breach))
+            context["breach_objects"].extend(get_breach_context_data(context, breach))
         return context
 
     def form_valid(self, form: Any) -> HttpResponseRedirect:
@@ -43,14 +44,14 @@ class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, For
 class SortedSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
     template_name = "view_a_suspected_breach/summary_reports.html"
     form_class = SelectForm
-    success_url = reverse("view_a_suspected_breach:sorted_summary_reports")
+    success_url = reverse_lazy("view_a_suspected_breach:sorted_summary_reports")
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         sorted_breaches = self.request.session.pop("sorted_breaches")
         context["breach_objects"] = []
         for breach in sorted_breaches:
-            context["breach_objects"].extend(get_breach_context_data(breach))
+            context["breach_objects"].extend(get_breach_context_data(context, breach))
         return context
 
     def form_valid(self, form: Any) -> HttpResponseRedirect:
