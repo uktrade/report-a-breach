@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, FormView, TemplateView
 from report_a_suspected_breach.models import Breach
-from utils.breach_report import get_breach_context_data, sort_breaches
+from utils.breach_report import get_breach_context_data
 
 from .forms import SelectForm
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
@@ -18,9 +18,8 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
+class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView):
     template_name = "view_a_suspected_breach/summary_reports.html"
-    form_class = SelectForm
     success_url = reverse_lazy("view_a_suspected_breach:sorted_summary_reports")
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
@@ -31,14 +30,6 @@ class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, For
             context["breach_objects"].extend(get_breach_context_data(context, breach))
         return context
 
-    def form_valid(self, form: Any) -> HttpResponseRedirect:
-        sort_by = form.cleaned_data
-        breach_objects = Breach.objects.all()
-        sorted_breaches = sort_breaches(sort_by["sort_by"], breach_objects)
-        self.request.session["sorted_breaches"] = sorted_breaches
-        self.request.session.modified = True
-        return super().form_valid(form)
-
 
 @method_decorator(require_view_a_breach(), name="dispatch")
 class SortedSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
@@ -48,17 +39,20 @@ class SortedSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, Form
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        sorted_breaches = self.request.session.pop("sorted_breaches")
+        breach_objects = Breach.objects.all()
+        if self.request.session.get("sort_by", "") and self.request.session.get("sort_by", "") == "oldest":
+            sorted_breaches = breach_objects.order_by("created_at")
+        else:
+            sorted_breaches = breach_objects.order_by("-created_at")
         context["breach_objects"] = []
         for breach in sorted_breaches:
-            context["breach_objects"].extend(get_breach_context_data(context, breach))
+            breach_context = get_breach_context_data({}, breach)
+            context["breach_objects"].extend([breach_context])
         return context
 
-    def form_valid(self, form: Any) -> HttpResponseRedirect:
-        sorted_breaches = form.cleaned_data
-        breach_objects = Breach.objects.all()
-        sorted_breaches = sort_breaches(sorted_breaches["sort_by"], breach_objects)
-        self.request.session["sorted_breaches"] = sorted_breaches
+    def form_valid(self, form: SelectForm) -> HttpResponse:
+        sort_by = form.data["sort"]
+        self.request.session["sort_by"] = sort_by
         self.request.session.modified = True
         return super().form_valid(form)
 
