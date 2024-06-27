@@ -8,21 +8,58 @@ from django.shortcuts import get_object_or_404, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, FormView, TemplateView
 from report_a_suspected_breach.models import Breach
-from utils.breach_report import get_breach_context_data
+from utils.breach_report import get_breach_context_data, sort_breaches
 
+from .forms import SelectForm
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
+class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
     template_name = "view_a_suspected_breach/summary_reports.html"
+    form_class = SelectForm
+    success_url = reverse("view_a_suspected_breach:sorted_summary_reports")
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["breach_objects"] = Breach.objects.all()
+        breach_objects = Breach.objects.all()
+        context["breach_objects"] = []
+        for breach in breach_objects:
+            context["breach_objects"].extend(get_breach_context_data(breach))
         return context
+
+    def form_valid(self, form: Any) -> HttpResponseRedirect:
+        sort_by = form.cleaned_data
+        breach_objects = Breach.objects.all()
+        sorted_breaches = sort_breaches(sort_by["sort_by"], breach_objects)
+        self.request.session["sorted_breaches"] = sorted_breaches
+        self.request.session.modified = True
+        return super().form_valid(form)
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class SortedSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
+    template_name = "view_a_suspected_breach/summary_reports.html"
+    form_class = SelectForm
+    success_url = reverse("view_a_suspected_breach:sorted_summary_reports")
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        sorted_breaches = self.request.session.pop("sorted_breaches")
+        context["breach_objects"] = []
+        for breach in sorted_breaches:
+            context["breach_objects"].extend(get_breach_context_data(breach))
+        return context
+
+    def form_valid(self, form: Any) -> HttpResponseRedirect:
+        sorted_breaches = form.cleaned_data
+        breach_objects = Breach.objects.all()
+        sorted_breaches = sort_breaches(sorted_breaches["sort_by"], breach_objects)
+        self.request.session["sorted_breaches"] = sorted_breaches
+        self.request.session.modified = True
+        return super().form_valid(form)
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")

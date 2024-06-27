@@ -1,10 +1,7 @@
-from typing import Any
-
 from core.forms import BaseForm
 from crispy_forms_gds.helper import FormHelper
 from crispy_forms_gds.layout import Layout, Submit
 from django import forms
-from report_a_suspected_breach.models import Breach
 
 
 class SelectForm(BaseForm):
@@ -24,12 +21,12 @@ class SelectForm(BaseForm):
             Submit("submit", "Submit"),
         )
 
-    def clean_sort_by(self) -> dict[str, Any]:
-        sort_by = self.cleaned_data["sort_by"]
-        breaches = Breach.objects.all()
-        if sort_by["sort_by"] == "date of report (newest)":
-            sorted_breaches = breaches.order_by("-created_by")
-        else:
-            sorted_breaches = breaches.order_by("created_by")
-        sort_by["sort_by"] = sorted_breaches
-        return sort_by
+    # def clean_sort_by(self) -> dict[str, Any]:
+    #     sort_by = self.cleaned_data["sort_by"]
+    #     breaches = Breach.objects.all()
+    #     if sort_by["sort_by"] == "date of report (newest)":
+    #         sorted_breaches = breaches.order_by("-created_by")
+    #     else:
+    #         sorted_breaches = breaches.order_by("created_by")
+    #     sort_by["sort_by"] = sorted_breaches
+    #     return sort_by

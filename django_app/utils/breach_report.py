@@ -3,7 +3,7 @@ from typing import Any
 from core.document_storage import PermanentDocumentStorage
 from django.forms.models import model_to_dict
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
-from report_a_suspected_breach.models import PersonOrCompany
+from report_a_suspected_breach.models import Breach, PersonOrCompany
 from utils.companies_house import get_formatted_address
 from utils.s3 import get_breach_documents
 
@@ -49,4 +49,16 @@ def get_breach_context_data(context, breach) -> dict[str, Any]:
     upload_documents = get_breach_documents(PermanentDocumentStorage(), str(breach.id))
     context["documents"] = upload_documents
 
+    # Reporter Summary
+    summary = breach.tell_us_about_the_suspected_breach
+    context["summary"] = summary
+
     return context
+
+
+def sort_breaches(sort_str: str, breach_objects: Breach) -> list[Breach]:
+    if sort_str == "date of report (newest)":
+        sorted_breaches = breach_objects.order_by("-created_by")
+    else:
+        sorted_breaches = breach_objects.order_by("created_by")
+    return sorted_breaches
