@@ -4,26 +4,24 @@
         <h1 class="govuk-heading-l">
             Suspected breach reports
         </h1>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
     </div>
     <form method="post" action="{% url 'view_a_suspected_breach:sorted_summary_reports' %}">
         {% csrf_token %}
         <div class="govuk-form-group">
-            <label class="govuk-label" for="sort">
-                Sort by
-            </label>
-            <select class="govuk-select" id="sort" name="sort" onchange="this.form.submit()">
-                <option class="submit" value="newest">Date of report (newest)</option>
-                <option class="submit" value="oldest">Date of report (oldest)</option>
-            </select>
+            <label class="govuk-label" for="sort">Sort by
+                <select class="govuk-select" id="sort" name="sort" onchange="this.form.submit()">
+                    <option class="submit" value="newest">Date of report (newest)</option>
+                    <option class="submit" value="oldest">Date of report (oldest)</option>
+                </select></label>
         </div>
     </form>
-
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
     {% for breach_report in breach_objects %}
         <h2 class="govuk-heading-m">Summary of the breach</h2>
-        {{ breach_report.breach.tell_us_about_the_suspected_breach }}
-        <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row--no-border">
-                <br>
+        {{ breach_report.breach.tell_us_about_the_suspected_breach }}<br>
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
+            <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Submitted by:
                 </dt>
@@ -31,15 +29,15 @@
                     {{ breach_report.breach.reporter_full_name }}
                 </dd>
             </div>
-            <div class="govuk-summary-list__row--no-border">
+            <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Business or person suspected of breaching sanctions:
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ breach_report.breacher }}
+                    {{ breach_report.breacher.name }}
                 </dd>
             </div>
-            <div class="govuk-summary-list__row--no-border">
+            <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Submitted on:
                 </dt>
@@ -47,7 +45,7 @@
                     {{ breach_report.breach.created_at }}
                 </dd>
             </div>
-            <div class="govuk-summary-list__row--no-border">
+            <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Files uploaded:
                 </dt>

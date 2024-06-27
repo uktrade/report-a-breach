@@ -27,7 +27,7 @@ class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, Tem
         breach_objects = Breach.objects.all()
         context["breach_objects"] = []
         for breach in breach_objects:
-            context["breach_objects"].extend(get_breach_context_data(context, breach))
+            context["breach_objects"].extend([get_breach_context_data({}, breach)])
         return context
 
 
@@ -46,8 +46,7 @@ class SortedSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, Form
             sorted_breaches = breach_objects.order_by("-created_at")
         context["breach_objects"] = []
         for breach in sorted_breaches:
-            breach_context = get_breach_context_data({}, breach)
-            context["breach_objects"].extend([breach_context])
+            context["breach_objects"].extend([get_breach_context_data({}, breach)])
         return context
 
     def form_valid(self, form: SelectForm) -> HttpResponse:
