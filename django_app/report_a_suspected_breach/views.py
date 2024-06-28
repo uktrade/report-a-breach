@@ -11,7 +11,14 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.forms import Form
-from django.http import Http404, HttpRequest, HttpResponse, JsonResponse, QueryDict
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+    QueryDict,
+)
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -21,7 +28,7 @@ from django_ratelimit.decorators import ratelimit
 from feedback.forms import FeedbackForm
 from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
-from utils.notifier import verify_email
+from utils.notifier import send_email, verify_email
 from utils.s3 import (
     delete_session_files,
     generate_presigned_url,
@@ -30,7 +37,7 @@ from utils.s3 import (
 )
 
 from .choices import TypeOfRelationshipChoices
-from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm
+from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm, ZeroEndUsersForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -265,6 +272,10 @@ class ReportABreachWizardView(BaseWizardView):
         kwargs["request"] = self.request
 
         if step == "business_or_person_details":
+            manual_companies_house_input = (
+                self.get_cleaned_data_for_step("manual_companies_house_input").get("manual_companies_house_input") == "in_the_uk"
+            )
+
             where_is_the_address = (
                 self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person").get("where_is_the_address")
                 == "in_the_uk"
@@ -276,6 +287,9 @@ class ReportABreachWizardView(BaseWizardView):
                 == "no"
             )
             if where_is_the_address or do_you_know_the_registered_company_number:
+                kwargs["is_uk_address"] = "in_the_uk"
+
+            elif manual_companies_house_input:
                 kwargs["is_uk_address"] = "in_the_uk"
 
         if step == "about_the_supplier":
@@ -371,16 +385,13 @@ class ReportABreachWizardView(BaseWizardView):
         new_business_or_person_details.save()
 
     def save_companies_house_company_to_db(
-        self, breach: Breach, cleaned_data: dict[dict[str, str], str], relationship: TypeOfRelationshipChoices
+        self, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
     ) -> None:
-        companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
-        if self.request.session.get("company_details_500"):
-            companies_house_details["registered_company_number"] = cleaned_data["manual_companies_house_number"]
         new_companies_house_company = PersonOrCompany.objects.create(
-            name=companies_house_details.get("registered_company_name"),
+            name=companies_house_company.get("registered_company_name"),
             country="GB",
-            registered_company_number=companies_house_details.get("registered_company_number"),
-            registered_office_address=companies_house_details.get("registered_office_address"),
+            registered_company_number=companies_house_company.get("registered_company_number"),
+            registered_office_address=companies_house_company.get("registered_office_address"),
             breach=breach,
             type_of_relationship=relationship,
         )
@@ -446,8 +457,8 @@ class ReportABreachWizardView(BaseWizardView):
                 breacher_details = cleaned_data["business_or_person_details"]
                 self.save_person_or_company_to_db(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
             else:
-
-                self.save_companies_house_company_to_db(new_breach, cleaned_data, TypeOfRelationshipChoices.breacher)
+                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
+                self.save_companies_house_company_to_db(new_breach, companies_house_details, TypeOfRelationshipChoices.breacher)
 
             # Save Supplier Details to Database
             if show_about_the_supplier_page(self):
@@ -466,6 +477,13 @@ class ReportABreachWizardView(BaseWizardView):
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
+
+            # Send confirmation email to the user
+            send_email(
+                email=cleaned_data["email"]["reporter_email_address"],
+                template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
+                context={"user name": reporter_full_name, "reference number": new_reference},
+            )
 
         return redirect(reverse("report_a_suspected_breach:complete"))
 
@@ -620,10 +638,41 @@ class DownloadDocumentView(View):
 
 class DeleteEndUserView(View):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        redirect_to = redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
         if end_user_uuid := self.request.POST.get("end_user_uuid"):
             end_users = self.request.session.pop("end_users", None)
             end_users.pop(end_user_uuid, None)
             self.request.session["end_users"] = end_users
             self.request.session.modified = True
+            if len(end_users) == 0:
+                redirect_to = redirect(reverse_lazy("report_a_suspected_breach:zero_end_users"))
+        return redirect_to
 
-        return redirect(reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "end_user_added"}))
+
+class ZeroEndUsersView(FormView):
+    form_class = ZeroEndUsersForm
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if form_h1_header := getattr(ZeroEndUsersForm, "form_h1_header"):
+            context["form_h1_header"] = form_h1_header
+        return context
+
+    def form_valid(self, form):
+        self.form = form
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        add_end_user = self.form.cleaned_data["do_you_want_to_add_an_end_user"]
+        if add_end_user:
+            if self.request.session.get("made_available_journey"):
+                return f"{get_wizard_step_url('where_were_the_goods_made_available_to')}?add_another_end_user=yes"
+
+            else:
+                return f"{get_wizard_step_url('where_were_the_goods_supplied_to')}?add_another_end_user=yes"
+
+        else:
+            return reverse_lazy(
+                "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
+            )

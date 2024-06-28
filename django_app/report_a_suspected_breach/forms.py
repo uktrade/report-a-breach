@@ -12,6 +12,7 @@ from crispy_forms_gds.layout import (
     ConditionalRadios,
     Field,
     Fieldset,
+    Fixed,
     Fluid,
     Layout,
     Size,
@@ -129,6 +130,7 @@ class EmailVerifyForm(BaseForm):
                 {"request_verify_code": request_verify_code},
             ),
         )
+        self.helper.layout = Layout(Fieldset(Field.text("email_verification_code", field_width=Fixed.FIVE)))
 
 
 class NameForm(BaseModelForm):
@@ -282,10 +284,21 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
 
 
 class ManualCompaniesHouseInputForm(BaseForm):
-    manual_companies_house_input = forms.CharField(
-        label="Please re-enter the registered company number",
-        help_text="We encountered an error accessing the Companies House API. Please provide the company number here",
-        required=True,
+    form_h1_header = (
+        "We cannot check the registered company number with Companies House at present, "
+        "you will need to enter the address manually"
+    )
+    manual_companies_house_input = forms.ChoiceField(
+        label="Where is the business located?",
+        choices=(
+            ("in_the_uk", "In the UK"),
+            ("outside_the_uk", "Outside the UK"),
+        ),
+        widget=forms.RadioSelect,
+        error_messages={
+            "required": "Select if the address of the business suspected of "
+            "breaching sanctions is in the UK, or outside the UK"
+        },
     )
 
 
@@ -702,6 +715,28 @@ class EndUserAddedForm(BaseForm):
         coerce=lambda x: x == "True",
         label="Do you want to add another end-user?",
         error_messages={"required": "Select yes if you want to add another end-user"},
+        widget=forms.RadioSelect,
+        required=True,
+    )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper.legend_size = Size.MEDIUM
+        self.helper.legend_tag = None
+
+
+class ZeroEndUsersForm(BaseForm):
+    revalidate_on_done = False
+    form_h1_header = "You've removed all end-users"
+
+    do_you_want_to_add_an_end_user = forms.TypedChoiceField(
+        choices=(
+            Choice(True, "Yes"),
+            Choice(False, "No"),
+        ),
+        coerce=lambda x: x == "True",
+        label="Do you want to add an end-user?",
+        error_messages={"required": "Select yes if you want to add an end-user"},
         widget=forms.RadioSelect,
         required=True,
     )
