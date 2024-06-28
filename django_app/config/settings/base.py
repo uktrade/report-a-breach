@@ -61,7 +61,6 @@ CRISPY_TEMPLATE_PACK = "gds"
 
 # AWS
 AWS_S3_REGION_NAME = env.aws_default_region
-AWS_ENDPOINT_URL = env.aws_endpoint_url
 
 # General S3
 AWS_S3_OBJECT_PARAMETERS = {"ContentDisposition": "attachment"}
@@ -198,6 +197,7 @@ EMAIL_VERIFY_CODE_TEMPLATE_ID = env.email_verify_code_template_id
 EMAIL_VASB_USER_ADMIN_TEMPLATE_ID = env.email_vasb_user_admin_template_id
 EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID = env.email_user_report_confirmation_template_id
 RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
+EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID = env.email_user_report_confirmation_template_id
 
 # SENTRY
 SENTRY_DSN = env.sentry_dsn
@@ -244,17 +244,6 @@ else:
 TRUNCATE_WORDS_LIMIT = 30
 
 en_formats.DATE_FORMAT = "d/m/Y"
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": env.redis_url,
-        "TIMEOUT": 60 * 60 * 24,  # in seconds: 60 * 60 * 24 (24 hours)
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    }
-}
 
 # CSP policies
 
@@ -308,3 +297,18 @@ CSP_REPORT_URI = env.csp_report_uri
 # Django Ratelimit
 RATELIMIT_VIEW = "core.views.rate_limited_view"
 RATELIMIT = "10/m"
+
+# Redis
+REDIS_URL = env.redis_url
+
+# Caches
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "TIMEOUT": 60 * 60 * 24,  # in seconds: 60 * 60 * 24 (24 hours)
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}

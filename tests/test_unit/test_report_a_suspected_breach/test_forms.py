@@ -235,6 +235,16 @@ class TestAboutTheEndUserForm:
         assert form.errors.as_data()["postal_code"][0].code == "invalid"
 
 
+class TestZeroEndUsersForm:
+    def test_do_you_want_to_add_an_end_user_validation(self):
+        form = forms.ZeroEndUsersForm(data={"do_you_want_to_add_an_end_user": True})
+        assert form.is_valid()
+        form = forms.ZeroEndUsersForm(data={})
+        assert not form.is_valid()
+        assert "do_you_want_to_add_an_end_user" in form.errors
+        assert form.errors.as_data()["do_you_want_to_add_an_end_user"][0].code == "required"
+
+
 class TestUploadDocumentsForm:
     class MockAllSessionFiles:
         def __init__(self, length: int = 0):
@@ -356,13 +366,16 @@ class TestWhichSanctionsRegimeForm:
         assert flat_choices[-1] == "Other Regime"
         assert flat_choices[-2] == "Unknown Regime"
 
-    def test_other_regime_selected_non_error(self):
-        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Other Regime", "Unknown Regime"]})
-        assert form.is_valid()
+    def test_assert_unknown_regime_selected_error(self):
+        SanctionsRegimeFactory.create(full_name="test regime")
+        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Unknown Regime", "test regime"]})
+        assert not form.is_valid()
+        assert "which_sanctions_regime" in form.errors
+        assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"
 
     def test_assert_other_regime_selected_error(self):
         SanctionsRegimeFactory.create(full_name="test regime")
-        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Unknown Regime", "test regime"]})
+        form = forms.WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Other Regime", "test regime"]})
         assert not form.is_valid()
         assert "which_sanctions_regime" in form.errors
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"

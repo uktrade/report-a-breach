@@ -11,6 +11,29 @@ class SessionStorage(WizardSessionStorage):
                     return end_user_dict["dirty_data"]
             else:
                 return None
+        if step == "where_were_the_goods_supplied_to":
+            if end_user_uuid := self.request.resolver_match.kwargs.get("end_user_uuid", None):
+                step_data = super().get_step_data(step)
+                if end_user_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None):
+                    country = end_user_dict["cleaned_data"]["country"]
+                    if country == "GB":
+                        step_data["where_were_the_goods_supplied_to-where_were_the_goods_supplied_to"] = "in_the_uk"
+                    else:
+                        step_data["where_were_the_goods_supplied_to-where_were_the_goods_supplied_to"] = "outside_the_uk"
+                return step_data
+
+        if step == "where_were_the_goods_made_available_to":
+            if end_user_uuid := self.request.resolver_match.kwargs.get("end_user_uuid", None):
+                step_data = super().get_step_data(step)
+                if end_user_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None):
+                    country = end_user_dict["cleaned_data"]["country"]
+                    if country == "GB":
+                        step_data["where_were_the_goods_made_available_to-where_were_the_goods_made_available_to"] = "in_the_uk"
+                    else:
+                        step_data["where_were_the_goods_made_available_to-where_were_the_goods_made_available_to"] = (
+                            "outside_the_uk"
+                        )
+                return step_data
 
         if step == "end_user_added":
             # we don't want to remember people's choices for this step, if they want to add a new end user will change
