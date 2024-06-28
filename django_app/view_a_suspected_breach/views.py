@@ -18,44 +18,25 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, TemplateView):
-    template_name = "view_a_suspected_breach/summary_reports.html"
-    success_url = reverse_lazy("view_a_suspected_breach:sorted_summary_reports")
-
-    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        breach_objects = Breach.objects.all()
-        # newest
-        sorted_breaches = breach_objects.order_by("-created_at")
-        context["breach_objects"] = []
-        for breach in sorted_breaches:
-            context["breach_objects"].extend([get_breach_context_data({}, breach)])
-        return context
-
-
-@method_decorator(require_view_a_breach(), name="dispatch")
-class SortedSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
+class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
     template_name = "view_a_suspected_breach/summary_reports.html"
     form_class = SelectForm
-    success_url = reverse_lazy("view_a_suspected_breach:sorted_summary_reports")
+    success_url = reverse_lazy("view_a_suspected_breach:summary_reports")
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        breach_objects = Breach.objects.all()
-        if self.request.session.get("sort_by", "") and self.request.session.get("sort_by", "") == "oldest":
-            # oldest
-            sorted_breaches = breach_objects.order_by("created_at")
-        else:
-            # newest
-            sorted_breaches = breach_objects.order_by("-created_at")
         context["breach_objects"] = []
+        breach_objects = Breach.objects.all()
+        sorted_breaches = breach_objects.order_by("-created_at")
+        if sort := self.request.session.pop("sort", ""):
+            if sort == "oldest":
+                sorted_breaches = breach_objects.order_by("created_at")
         for breach in sorted_breaches:
             context["breach_objects"].extend([get_breach_context_data({}, breach)])
         return context
 
     def form_valid(self, form: SelectForm) -> HttpResponse:
-        sort_by = form.data["sort"]
-        self.request.session["sort_by"] = sort_by
+        self.request.session["sort"] = form.data["sort"]
         self.request.session.modified = True
         return super().form_valid(form)
 

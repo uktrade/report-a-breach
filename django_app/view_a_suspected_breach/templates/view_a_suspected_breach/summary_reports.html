@@ -7,13 +7,13 @@
         </h1>
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
     </div>
-    <form method="post" action="{% url 'view_a_suspected_breach:sorted_summary_reports' %}">
+    <form method="post" action="{% url 'view_a_suspected_breach:summary_reports' %}">
         {% csrf_token %}
         <div class="govuk-form-group">
             <label class="govuk-label" for="sort">Sort by
                 <select class="govuk-select" id="sort" name="sort" onchange="this.form.submit()">
-                    <option class="submit" value="newest">Date of report (newest)</option>
-                    <option class="submit" value="oldest">Date of report (oldest)</option>
+                    <option value="newest">Date of report (newest)</option>
+                    <option value="oldest">Date of report (oldest)</option>
                 </select></label>
         </div>
     </form>
