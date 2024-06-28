@@ -18,60 +18,68 @@
         </div>
     </form>
     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-with-summary-sections">
 
-        {% for breach_report in breach_objects %}
-            <div class="govuk-accordion__section">
-                <div class="govuk-accordion__section-header">
-                    <h2 class="govuk-accordion__section-heading">
+    {% for breach_report in breach_objects %}
+        <a href="{%  url 'view_a_suspected_breach:breach_report' pk=breach_report.breach.id %}">View suspected breach report ID:{{ breach_report.breach.reference }}</a><br>
+        <br>
+        <h3 class="govuk-heading-s">Summary of the breach</h3>
+        <dd class="govuk-summary-list__value">
 
-                        <span class="govuk-accordion__section-button" id="accordion-with-summary-sections-heading-1">
-                            <a href="{%  url 'view_a_suspected_breach:breach_report' pk=breach_report.breach.id %}">View suspected breach report ID:{{ breach_report.breach.reference }}</a>
-                            <br><br>Summary of the breach
-                        </span>
-                    </h2>
-                </div>
-                <div id="accordion-with-summary-sections-content-1" class="govuk-accordion__section-content">
-                    <p class="govuk-body">{{ breach_report.breach.tell_us_about_the_suspected_breach }}</p>
-                </div>
+            {% include "report_a_suspected_breach/partials/truncated_text.html" with text=breach_report.breach.tell_us_about_the_suspected_breach|linebreaksbr %}
+
+        </dd>
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Submitted by:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ breach_report.breach.reporter_full_name }}
+                </dd>
             </div>
-
-
-
-            <dl class="govuk-summary-list govuk-summary-list--no-border">
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Submitted by:
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ breach_report.breach.reporter_full_name }}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Business or person suspected of breaching sanctions:
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ breach_report.breacher.name }}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Submitted on:
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ breach_report.breach.created_at }}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Files uploaded:
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ breach_report.documents }}
-                    </dd>
-                </div>
-            </dl>
-        {% endfor %}
-    </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Business or person suspected of breaching sanctions:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ breach_report.breacher.name }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Submitted on:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ breach_report.breach.created_at }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Files uploaded:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ breach_report.documents }}
+                </dd>
+            </div>
+        </dl>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    {% endfor %}
 {% endblock column_content %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
+        $(document).ready(function () {
+            $('body').on('click', '.read_more_button', function () {
+                $(this).closest('.text_truncator').find('.truncated_text').addClass('hidden');
+                $(this).closest('.text_truncator').find('.expanded_text').removeClass('hidden');
+            });
+            $('body').on('click', '.read_less_button', function () {
+                $(this).closest('.text_truncator').find('.truncated_text').removeClass('hidden');
+                $(this).closest('.text_truncator').find('.expanded_text').addClass('hidden');
+            })
+
+
+        })
+    </script>
+{% endblock extra_js %}
