@@ -2,6 +2,20 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load get_end_user_url %}
 {% block title %}View Suspected Breach Report{% endblock title %}
+{% block back_button %}
+	            {# JS-enabled back link #}
+    <a class="govuk-back-link govuk-link--no-visited-state show-on-js-enabled hide-on-js-disabled"
+       href="javascript: window.history.go(-1)">View all suspected breach reports</a>
+
+	            {# JS-disabled back link #}
+    {% if "HTTP_REFERER" in request.META %}
+        <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-disabled"
+           href="{{ back_button_link|default_if_none:request.META.HTTP_REFERER|default_if_none:"/" }}">View all suspected breach reports</a>
+    {% else %}
+        <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-disabled"
+           href="{{ back_button_link|default_if_none:"/" }}">View all suspected breach reports</a>
+    {% endif %}
+{% endblock %}
 {% block form_content %}
     {% include "report_a_suspected_breach/partials/summary_report.html" %}
 {% endblock form_content %}

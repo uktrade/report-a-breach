@@ -25,8 +25,10 @@ class DefaultSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, Tem
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         breach_objects = Breach.objects.all()
+        # newest
+        sorted_breaches = breach_objects.order_by("-created_at")
         context["breach_objects"] = []
-        for breach in breach_objects:
+        for breach in sorted_breaches:
             context["breach_objects"].extend([get_breach_context_data({}, breach)])
         return context
 
@@ -41,8 +43,10 @@ class SortedSummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, Form
         context = super().get_context_data(**kwargs)
         breach_objects = Breach.objects.all()
         if self.request.session.get("sort_by", "") and self.request.session.get("sort_by", "") == "oldest":
+            # oldest
             sorted_breaches = breach_objects.order_by("created_at")
         else:
+            # newest
             sorted_breaches = breach_objects.order_by("-created_at")
         context["breach_objects"] = []
         for breach in sorted_breaches:
