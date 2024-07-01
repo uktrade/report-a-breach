@@ -3,11 +3,11 @@
 {% load get_wizard_step_url %}
 {% load countries %}
 
-{% block title %}You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}{% endblock title %}
+{% block title %}You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1  or request.session.end_users.keys|length == 0 %}s{% endif %}{% endblock title %}
 
 {% block column_content %}
     <h1 class="govuk-heading-l">
-        You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 %}s{% endif %}
+        You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1 or request.session.end_users.keys|length == 0 %}s{% endif %}
     </h1>
     {% for id, end_user in request.session.end_users.items %}
         <div class="action-wrapper">
@@ -46,8 +46,6 @@
                         {{ end_user.cleaned_data.name_of_business }}
                     {% endif %}
                 </dd>
-
-
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -55,15 +53,6 @@
                 </dt>
                 <dd class="govuk-summary-list__value">
                     {{ end_user.cleaned_data.readable_address }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Country
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% get_country end_user.cleaned_data.country as country %}
-                    {{ country.name }}
                 </dd>
             </div>
         </dl>
