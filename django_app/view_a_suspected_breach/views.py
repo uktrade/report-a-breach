@@ -28,7 +28,7 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
         kwargs["request"] = self.request
         initial_dict = {}
 
-        if sort := self.request.session.pop("sort", ""):
+        if sort := self.request.session.get("sort", ""):
             initial_dict["sort"] = sort
             kwargs["initial"] = initial_dict
 
@@ -36,7 +36,7 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        sort = self.request.session.get("sort", "")
+        sort = self.request.session.pop("sort", "")
         # don't query again if the user hasn't selected a new sort and if the context data already exists
         if not sort and context.get("breach_objects", []):
             return context
