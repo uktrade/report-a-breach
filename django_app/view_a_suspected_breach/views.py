@@ -27,11 +27,11 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         context["breach_objects"] = []
         breach_objects = Breach.objects.all()
-        # TODO: don't want to sort twice, need to put all sort logic into an if/else
-        sorted_breaches = breach_objects.order_by("-created_at")
-        if sort := self.request.session.pop("sort", ""):
-            if sort == "oldest":
-                sorted_breaches = breach_objects.order_by("created_at")
+        sort = self.request.session.pop("sort", "")
+        if sort == "oldest":
+            sorted_breaches = breach_objects.order_by("created_at")
+        else:
+            sorted_breaches = breach_objects.order_by("-created_at")
         for breach in sorted_breaches:
             context["breach_objects"].extend([get_breach_context_data({}, breach)])
         return context
