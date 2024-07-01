@@ -268,15 +268,14 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 cleaned_data["registered_company_number"] = company_details["company_number"]
                 cleaned_data["registered_company_name"] = company_details["company_name"]
                 cleaned_data["registered_office_address"] = get_formatted_address(company_details["registered_office_address"])
-            except Exception as err:
-                if type(err) is CompaniesHouseException:
-                    self.add_error(
-                        "registered_company_number",
-                        forms.ValidationError(
-                            code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
-                        ),
-                    )
-                elif type(err) is CompaniesHouse500Error:
+            except CompaniesHouseException:
+                  self.add_error(
+                      "registered_company_number",
+                      forms.ValidationError(
+                          code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
+                      ),
+                  )
+            except CompaniesHouse500Error:
                     self.request.session["company_details_500"] = True
                     self.request.session.modified = True
 
