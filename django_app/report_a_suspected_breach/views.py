@@ -523,6 +523,8 @@ class UploadDocumentsView(FormView):
         """Loop through the files and save them to the temporary storage. If the request is Ajax, return a JsonResponse.
 
         If the request is not Ajax, redirect to the summary page (the next step in the form)."""
+        sentry_sdk.capture_message("form_valid")
+        sentry_sdk.capture_message(form.cleaned_data["document"])
         for temporary_file in form.cleaned_data["document"]:
             session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
             sentry_sdk.capture_message(
