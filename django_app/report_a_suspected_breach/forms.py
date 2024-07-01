@@ -29,7 +29,6 @@ from utils.companies_house import (
 )
 from utils.s3 import get_all_session_files
 
-from .choices import IsTheDateAccurateChoices
 from .exceptions import CompaniesHouseException
 from .fields import DateInputField, MultipleFileField
 from .models import (
@@ -104,15 +103,16 @@ class EmailVerifyForm(BaseForm):
 
         verify_timeout_seconds = settings.EMAIL_VERIFY_TIMEOUT_SECONDS
 
-        verification_objects = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
+        verification_object = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
         )
-        verify_code = verification_objects.email_verification_code
+        self.verification_object = verification_object
+        verify_code = verification_object.email_verification_code
         if email_verification_code != verify_code:
             raise forms.ValidationError("Code is incorrect. Enter the 6 digit security code we sent to your email")
 
         # check if the user has submitted the verify code within the specified timeframe
-        allowed_lapse = verification_objects.date_created + timedelta(seconds=verify_timeout_seconds)
+        allowed_lapse = verification_object.date_created + timedelta(seconds=verify_timeout_seconds)
         if allowed_lapse < now():
             raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
 
@@ -301,11 +301,11 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
             "name",
             "website",
             "country",
+            "town_or_city",
             "address_line_1",
             "address_line_2",
             "address_line_3",
             "address_line_4",
-            "town_or_city",
             "county",
             "postal_code",
         ]
@@ -327,11 +327,11 @@ class BusinessOrPersonDetailsForm(BasePersonBusinessDetailsForm):
             ),
             Fieldset(
                 Field.text("country", field_width=Fluid.ONE_THIRD),
+                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_1", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_2", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_3", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_4", field_width=Fluid.ONE_THIRD),
-                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
                 Field.text("county", field_width=Fluid.ONE_THIRD),
                 Field.text("postal_code", field_width=Fluid.ONE_THIRD),
                 legend="Address",
@@ -373,7 +373,7 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
             "is_the_date_accurate": forms.RadioSelect,
         }
         error_messages = {
-            "is_the_date_accurate": {"required": "Select whether you know the exact date, or the approximate date"},
+            "is_the_date_accurate": {"required": "Select whether the date you entered was the exact date or an approximate date"},
         }
         labels = {
             "is_the_date_accurate": "Is the date you entered exact or approximate?",
@@ -395,19 +395,12 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
     def clean(self) -> dict[str, str]:
         cleaned_data = super().clean()
-        if is_the_date_accurate := cleaned_data.get("is_the_date_accurate"):
-            when_did_you_first_suspected = cleaned_data.get("when_did_you_first_suspect")
-            if not self["when_did_you_first_suspect"].errors:
-                # if the date has been entered but just isn't valid, we don't want to show the 'required' error.
-                # invalid dates are not part of cleaned_data, so we can't see them here
-
-                if is_the_date_accurate == IsTheDateAccurateChoices.exact and not when_did_you_first_suspected:
-                    self.add_error("when_did_you_first_suspect", "Enter the exact date")
-                    return cleaned_data
-                elif is_the_date_accurate == IsTheDateAccurateChoices.approximate and not when_did_you_first_suspected:
-                    self.add_error("when_did_you_first_suspect", "Enter the approximate date")
-                    return cleaned_data
-
+        if not cleaned_data.get("when_did_you_first_suspect") and "when_did_you_first_suspect" not in self.errors:
+            # we only want to show the required error message if the date is not present
+            self.add_error(
+                "when_did_you_first_suspect",
+                "Enter the date you first suspected the business or person had breached trade sanctions",
+            )
         return cleaned_data
 
     def clean_when_did_you_first_suspect(self) -> str | None:
@@ -502,8 +495,7 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
         choices=(()),
         widget=forms.RadioSelect,
         error_messages={
-            "required": "Select if the goods, services, technological assistance"
-            " or technology were supplied from the UK, or from outside the UK"
+            "required": "Select where the goods, services, technological assistance or technology were supplied from"
         },
     )
 
@@ -528,8 +520,7 @@ class WhereWereTheGoodsMadeAvailableForm(BaseForm):
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology made available from?",
         error_messages={
-            "required": "Select if the goods, services, technological assistance or "
-            "technology were made available from the UK, or from outside the UK"
+            "required": "Select where the goods, services, technological assistance or technology were made available from"
         },
     )
 
@@ -658,11 +649,11 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
             ),
             Fieldset(
                 Field.text("country", field_width=Fluid.ONE_THIRD),
+                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_1", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_2", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_3", field_width=Fluid.ONE_THIRD),
                 Field.text("address_line_4", field_width=Fluid.ONE_THIRD),
-                Field.text("town_or_city", field_width=Fluid.ONE_THIRD),
                 Field.text("county", field_width=Fluid.ONE_THIRD),
                 Field.text("postal_code", field_width=Fluid.ONE_THIRD),
                 legend="Address",
