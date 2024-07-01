@@ -2,6 +2,7 @@ import logging
 import uuid
 from typing import Any
 
+import sentry_sdk
 from core.decorators import cached_classproperty
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.templatetags.get_wizard_step_url import get_wizard_step_url
@@ -524,6 +525,9 @@ class UploadDocumentsView(FormView):
         If the request is not Ajax, redirect to the summary page (the next step in the form)."""
         for temporary_file in form.cleaned_data["document"]:
             session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
+            sentry_sdk.capture_message(
+                f"{self.file_storage.bucket_name},{self.file_storage.access_key},{self.file_storage.secret_key}"
+            )
             self.file_storage.save(session_keyed_file_name, temporary_file.file)
 
             # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
@@ -532,6 +536,8 @@ class UploadDocumentsView(FormView):
             cache.set(redis_cache_key, temporary_file.name)
 
             if is_ajax(self.request):
+                # if it's an AJAX request, then files are sent to this view one at a time, so we can return a response
+                # immediately, and not at the end of the for-loop
                 return JsonResponse(
                     {
                         "success": True,
