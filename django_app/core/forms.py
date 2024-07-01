@@ -117,6 +117,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             self.fields["town_or_city"].required = False
             self.fields["address_line_1"].required = False
             self.fields["country"].required = True
+            self.fields["country"].empty_label = "Select country"
 
         self.helper.label_size = None
 

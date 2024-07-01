@@ -15,7 +15,7 @@ class Breach(BaseModel):
         null=False, blank=False, choices=choices.ReporterProfessionalRelationshipChoices.choices
     )
     reporter_email_address = models.EmailField()
-    reporter_email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.CASCADE, blank=True, null=True)
+    reporter_email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.SET_NULL, blank=True, null=True)
     reference = models.CharField(null=True, blank=True, max_length=6)
     reporter_full_name = models.CharField(max_length=255)
     reporter_name_of_business_you_work_for = models.CharField(max_length=300, verbose_name="Business you work for")
@@ -53,19 +53,20 @@ class ReporterEmailVerification(BaseModel):
     reporter_session = models.ForeignKey(Session, on_delete=models.CASCADE)
     email_verification_code = models.CharField(max_length=6)
     date_created = models.DateTimeField(auto_now_add=True)
+    verified = models.BooleanField(default=False)
 
 
 class PersonOrCompany(BaseModel):
     name = models.TextField()
     name_of_business = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-    website = models.URLField(null=True, blank=True)
+    website = models.CharField(null=True, blank=True, max_length=512)
     address_line_1 = models.TextField()
     address_line_2 = models.TextField(null=True, blank=True)
     address_line_3 = models.TextField(null=True, blank=True)
     address_line_4 = models.TextField(null=True, blank=True)
     town_or_city = models.TextField()
-    country = CountryField()
+    country = CountryField(blank_label="Select country")
     county = models.TextField(null=True, blank=True)
     postal_code = models.TextField()
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)

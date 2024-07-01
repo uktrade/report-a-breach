@@ -25,7 +25,7 @@ class SessionStorage(WizardSessionStorage):
         if step == "where_were_the_goods_made_available_to":
             if end_user_uuid := self.request.resolver_match.kwargs.get("end_user_uuid", None):
                 step_data = super().get_step_data(step)
-                if end_user_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None):
+                if end_user_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None) and step_data:
                     country = end_user_dict["cleaned_data"]["country"]
                     if country == "GB":
                         step_data["where_were_the_goods_made_available_to-where_were_the_goods_made_available_to"] = "in_the_uk"
