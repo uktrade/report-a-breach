@@ -274,11 +274,18 @@ class ReportABreachWizardView(BaseWizardView):
         kwargs["request"] = self.request
 
         if step == "business_or_person_details":
+            manual_companies_house_input = (
+                self.get_cleaned_data_for_step("manual_companies_house_input").get("manual_companies_house_input") == "in_the_uk"
+            )
+
             where_is_the_address = self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person").get(
                 "where_is_the_address"
             )
 
             if where_is_the_address == "in_the_uk":
+                kwargs["is_uk_address"] = True
+
+            elif manual_companies_house_input:
                 kwargs["is_uk_address"] = True
 
         if step == "about_the_supplier":

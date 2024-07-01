@@ -2,7 +2,10 @@ import unittest
 from unittest.mock import patch
 
 from django.test import override_settings
-from report_a_suspected_breach.exceptions import CompaniesHouseException
+from report_a_suspected_breach.exceptions import (
+    CompaniesHouse500Error,
+    CompaniesHouseException,
+)
 
 from django_app.utils.companies_house import (
     get_companies_house_basic_auth_token,
@@ -19,6 +22,9 @@ class TestCompaniesHouse(unittest.TestCase):
             return {"company_number": "12345678", "name": "Test Company"}
 
     class MockBadResponse:
+        status_code = 400
+
+    class Mock500Response:
         status_code = 500
 
     @patch("requests.get", return_value=MockGoodResponse)
@@ -30,6 +36,11 @@ class TestCompaniesHouse(unittest.TestCase):
     @patch("requests.get", return_value=MockBadResponse)
     def test_failure_get_company(self, mocked_get):
         with self.assertRaises(CompaniesHouseException):
+            get_details_from_companies_house("12345678")
+
+    @patch("requests.get", return_value=Mock500Response)
+    def test_500_failure_get_company(self, mocked_get):
+        with self.assertRaises(CompaniesHouse500Error):
             get_details_from_companies_house("12345678")
 
     @override_settings(COMPANIES_HOUSE_API_KEY="1234")
