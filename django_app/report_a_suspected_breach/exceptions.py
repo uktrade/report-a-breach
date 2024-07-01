@@ -4,6 +4,12 @@ class CompaniesHouseException(Exception):
     pass
 
 
+class EmailNotVerifiedException(Exception):
+    """Exception raised when user tries to save a breach object without verifying their email address."""
+
+    pass
+
+
 class CompaniesHouse500Error(Exception):
     """Exception raised when the Companies House API returns a 500 error"""
 

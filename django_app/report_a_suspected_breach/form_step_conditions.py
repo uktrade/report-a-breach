@@ -24,8 +24,17 @@ def show_check_company_details_page_condition(wizard: View) -> bool:
 
 
 def show_where_is_the_address_of_the_business_or_person_page_condition(wizard: View) -> bool:
-    cleaned_data = wizard.get_cleaned_data_for_step("are_you_reporting_a_business_on_companies_house")
-    return cleaned_data.get("business_registered_on_companies_house", False) in ["no", "do_not_know"]
+    is_the_business_on_companies_house = wizard.get_cleaned_data_for_step("are_you_reporting_a_business_on_companies_house").get(
+        "business_registered_on_companies_house"
+    )
+    do_you_know_the_registered_company_number = wizard.get_cleaned_data_for_step("do_you_know_the_registered_company_number").get(
+        "do_you_know_the_registered_company_number"
+    )
+
+    if is_the_business_on_companies_house == "yes" and do_you_know_the_registered_company_number == "yes":
+        return False
+
+    return True
 
 
 def show_do_you_know_the_registered_company_number_page(wizard: View) -> bool:
@@ -66,7 +75,7 @@ def show_business_or_personal_details_page(wizard: View) -> bool:
 
     show_page = (
         where_is_the_address_cleaned_data.get("where_is_the_address")
-        and are_you_reporting_a_business_on_companies_house_cleaned_data.get("do_you_know_the_registered_company_number", "no")
+        and are_you_reporting_a_business_on_companies_house_cleaned_data.get("do_you_know_the_registered_company_number")
         in [
             "no",
             "do_not_know",

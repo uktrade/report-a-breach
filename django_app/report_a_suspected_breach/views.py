@@ -37,6 +37,7 @@ from utils.s3 import (
 )
 
 from .choices import TypeOfRelationshipChoices
+from .exceptions import EmailNotVerifiedException
 from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm, ZeroEndUsersForm
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
@@ -134,6 +135,7 @@ class ReportABreachWizardView(BaseWizardView):
         # the exception to this is if the user wants to explicitly start the next task, in which case we should let them
         # or, if they're trying to change their answers from the summary page
         self.tasklist = get_tasklist(self)
+
         if (
             not request.GET.get("start", "") == "true"
             and not request.session.get("redirect") == "summary"
@@ -276,9 +278,8 @@ class ReportABreachWizardView(BaseWizardView):
                 self.get_cleaned_data_for_step("manual_companies_house_input").get("manual_companies_house_input") == "in_the_uk"
             )
 
-            where_is_the_address = (
-                self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person").get("where_is_the_address")
-                == "in_the_uk"
+            where_is_the_address = self.get_cleaned_data_for_step("where_is_the_address_of_the_business_or_person").get(
+                "where_is_the_address"
             )
             do_you_know_the_registered_company_number = (
                 self.get_cleaned_data_for_step("do_you_know_the_registered_company_number").get(
@@ -286,7 +287,7 @@ class ReportABreachWizardView(BaseWizardView):
                 )
                 == "no"
             )
-            if where_is_the_address or do_you_know_the_registered_company_number:
+            if where_is_the_address == "in_the_uk" or do_you_know_the_registered_company_number:
                 kwargs["is_uk_address"] = "in_the_uk"
 
             elif manual_companies_house_input:
@@ -420,6 +421,11 @@ class ReportABreachWizardView(BaseWizardView):
             reporter_email_verification = ReporterEmailVerification.objects.filter(
                 reporter_session=self.request.session.session_key
             ).latest("date_created")
+
+            if not reporter_email_verification.verified:
+                # the user hasn't verified their email address, don't let them submit
+                raise EmailNotVerifiedException()
+
             # Save Breach to Database
             new_breach = Breach.objects.create(
                 reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
@@ -484,6 +490,9 @@ class ReportABreachWizardView(BaseWizardView):
                 template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
                 context={"user name": reporter_full_name, "reference number": new_reference},
             )
+
+        # deleting the reporter_email_verification object(s) as no longer needed
+        ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).delete()
 
         return redirect(reverse("report_a_suspected_breach:complete"))
 
@@ -619,6 +628,11 @@ class EmailVerifyView(FormView):
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name_and_business_you_work_for"})
         else:
             return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "start"})
+
+    def form_valid(self, form):
+        form.verification_object.verified = True
+        form.verification_object.save()
+        return super().form_valid(form)
 
 
 class DownloadDocumentView(View):

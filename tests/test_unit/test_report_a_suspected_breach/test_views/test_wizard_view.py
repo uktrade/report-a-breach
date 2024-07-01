@@ -1,3 +1,4 @@
+import datetime as dt
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -68,6 +69,14 @@ class TestReportABreachWizardView:
         session = rasb_client.session
         session["end_users"] = data.end_users
         session.save()
+
+        # setup email verification object
+        ReporterEmailVerification.objects.create(
+            reporter_session=rasb_client.session._get_session_from_db(),
+            email_verification_code="12345",
+            date_created=dt.datetime.now(),
+            verified=True,
+        )
 
         # SetUp View
         view.setup(request_object)

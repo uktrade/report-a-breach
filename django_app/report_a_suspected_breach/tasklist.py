@@ -146,6 +146,7 @@ class SanctionsBreachDetailsTask(Task):
     name = "Sanctions breach details"
     hint_text = "Upload documents and give any additional information"
     optional_steps = {"upload_documents"}
+    non_wizard_steps = {"upload_documents"}
 
 
 class SummaryAndDeclaration(Task):

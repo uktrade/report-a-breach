@@ -5,6 +5,7 @@ from report_a_suspected_breach import tasklist
 
 
 class TestTasklist:
+
     def test_current_task(self, rasb_client):
         response = rasb_client.get(reverse("report_a_suspected_breach:landing"))
         assert isinstance(response.tasklist.current_task, tasklist.YourDetailsTask)
