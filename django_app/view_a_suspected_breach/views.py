@@ -5,14 +5,54 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import DetailView, FormView, TemplateView
 from report_a_suspected_breach.models import Breach
 from utils.breach_report import get_breach_context_data
 
+from .forms import SelectForm
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, FormView):
+    template_name = "view_a_suspected_breach/summary_reports.html"
+    form_class = SelectForm
+    success_url = reverse_lazy("view_a_suspected_breach:summary_reports")
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        initial_dict = {}
+
+        if sort := self.request.session.get("sort", ""):
+            initial_dict["sort"] = sort
+            kwargs["initial"] = initial_dict
+
+        return kwargs
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        sort = self.request.session.pop("sort", "")
+        # don't query again if the user hasn't selected a new sort and if the context data already exists
+        if not sort and context.get("breach_objects", []):
+            return context
+        context["breach_objects"] = []
+        breach_objects = Breach.objects.all()
+        sorted_breaches = breach_objects.order_by("-created_at")
+        if sort == "oldest":
+            sorted_breaches = reversed(sorted_breaches)
+        for breach in sorted_breaches:
+            context["breach_objects"].extend([get_breach_context_data({}, breach)])
+        return context
+
+    def form_valid(self, form: SelectForm) -> HttpResponse:
+        self.request.session["sort"] = form.cleaned_data["sort_by"]
+        self.request.session.modified = True
+        return super().form_valid(form)
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")

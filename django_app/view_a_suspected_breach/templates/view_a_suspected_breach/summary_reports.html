@@ -1,0 +1,86 @@
+{% extends "core/base.html" %}
+{% block back_button %}{% endblock back_button %}
+{% block column_content %}
+    <div>
+        <h1 class="govuk-heading-l">
+            Suspected breach reports
+        </h1>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    </div>
+    <form method="post" action="{% url 'view_a_suspected_breach:summary_reports' %}">
+        {% csrf_token %}
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="sort">Sort by
+                <select class="govuk-select" id="sort_by" name="sort_by" onchange="this.form.submit()">
+{#                    <option value="default">default</option>#}
+                    <option value="newest">Date of report (newest)</option>
+                    <option value="oldest">Date of report (oldest)</option>
+                </select></label>
+        </div>
+    </form>
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    {% for breach_report in breach_objects %}
+        <p class="govuk-body">
+            <a href="{%  url 'view_a_suspected_breach:breach_report' pk=breach_report.breach.id %}">View suspected breach report ID:{{ breach_report.breach.reference }}</a></p>
+        <h3 class="govuk-heading-s">Summary of the breach</h3>
+        <dd class="govuk-summary-list__value">
+            {% include "report_a_suspected_breach/partials/truncated_text.html" with text=breach_report.breach.tell_us_about_the_suspected_breach|linebreaksbr %}
+        </dd>
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Submitted by:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ breach_report.breach.reporter_full_name }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Business or person suspected of breaching sanctions:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ breach_report.breacher.name }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Submitted on:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ breach_report.breach.created_at }}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    Files uploaded:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {% for document, _ in breach_report.documents.items %}
+                        {{ document }}
+                    {% endfor %}
+                </dd>
+            </div>
+        </dl>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    {% endfor %}
+{% endblock column_content %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
+        $(document).ready(function () {
+            $('body').on('click', '.read_more_button', function () {
+                $(this).closest('.text_truncator').find('.truncated_text').addClass('hidden');
+                $(this).closest('.text_truncator').find('.expanded_text').removeClass('hidden');
+            });
+            $('body').on('click', '.read_less_button', function () {
+                $(this).closest('.text_truncator').find('.truncated_text').removeClass('hidden');
+                $(this).closest('.text_truncator').find('.expanded_text').addClass('hidden');
+            })
+
+
+        })
+    </script>
+{% endblock extra_js %}
