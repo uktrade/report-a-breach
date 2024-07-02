@@ -11,7 +11,6 @@ from django.views.generic import DetailView, ListView, TemplateView
 from report_a_suspected_breach.models import Breach
 from utils.breach_report import get_breach_context_data
 
-from .forms import SelectForm
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
@@ -20,7 +19,6 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 @method_decorator(require_view_a_breach(), name="dispatch")
 class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
     template_name = "view_a_suspected_breach/summary_reports.html"
-    form_class = SelectForm
     success_url = reverse_lazy("view_a_suspected_breach:summary_reports")
 
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
