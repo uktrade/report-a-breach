@@ -75,7 +75,7 @@ def show_business_or_personal_details_page(wizard: View) -> bool:
 
     show_page = (
         where_is_the_address_cleaned_data.get("where_is_the_address")
-        and are_you_reporting_a_business_on_companies_house_cleaned_data.get("do_you_know_the_registered_company_number")
+        and are_you_reporting_a_business_on_companies_house_cleaned_data.get("business_registered_on_companies_house")
         in [
             "no",
             "do_not_know",
