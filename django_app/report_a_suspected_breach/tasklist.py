@@ -102,12 +102,14 @@ class AboutThePersonOrBusinessTask(Task):
     form_steps = {
         "are_you_reporting_a_business_on_companies_house": forms.AreYouReportingABusinessOnCompaniesHouseForm,
         "do_you_know_the_registered_company_number": forms.DoYouKnowTheRegisteredCompanyNumberForm,
+        "manual_companies_house_input": forms.ManualCompaniesHouseInputForm,
         "check_company_details": forms.SummaryForm,
         "where_is_the_address_of_the_business_or_person": forms.WhereIsTheAddressOfTheBusinessOrPersonForm,
         "business_or_person_details": forms.BusinessOrPersonDetailsForm,
     }
     name = "About the person or business you're reporting"
     hint_text = "Contact details"
+    optional_steps = {"manual_companies_house_input"}
 
 
 class OverviewOfTheSuspectedBreachTask(Task):

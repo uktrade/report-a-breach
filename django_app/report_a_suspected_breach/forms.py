@@ -12,6 +12,7 @@ from crispy_forms_gds.layout import (
     ConditionalRadios,
     Field,
     Fieldset,
+    Fixed,
     Fluid,
     Layout,
     Size,
@@ -29,7 +30,7 @@ from utils.companies_house import (
 )
 from utils.s3 import get_all_session_files
 
-from .exceptions import CompaniesHouseException
+from .exceptions import CompaniesHouse500Error, CompaniesHouseException
 from .fields import DateInputField, MultipleFileField
 from .models import (
     Breach,
@@ -129,6 +130,7 @@ class EmailVerifyForm(BaseForm):
                 {"request_verify_code": request_verify_code},
             ),
         )
+        self.helper.layout = Layout(Fieldset(Field.text("email_verification_code", field_width=Fixed.FIVE)))
 
 
 class NameForm(BaseModelForm):
@@ -273,8 +275,30 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                         code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
                     ),
                 )
+            except CompaniesHouse500Error:
+                self.request.session["company_details_500"] = True
+                self.request.session.modified = True
 
         return cleaned_data
+
+
+class ManualCompaniesHouseInputForm(BaseForm):
+    form_h1_header = (
+        "We cannot check the registered company number with Companies House at present, "
+        "you will need to enter the address manually"
+    )
+    manual_companies_house_input = forms.ChoiceField(
+        label="Where is the business located?",
+        choices=(
+            ("in_the_uk", "In the UK"),
+            ("outside_the_uk", "Outside the UK"),
+        ),
+        widget=forms.RadioSelect,
+        error_messages={
+            "required": "Select if the address of the business suspected of "
+            "breaching sanctions is in the UK, or outside the UK"
+        },
+    )
 
 
 class WhereIsTheAddressOfTheBusinessOrPersonForm(BaseForm):
