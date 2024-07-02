@@ -523,19 +523,18 @@ class UploadDocumentsView(FormView):
 
         If the request is not Ajax, redirect to the summary page (the next step in the form)."""
         for temporary_file in form.cleaned_data["document"]:
-            session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
-            self.file_storage.save(session_keyed_file_name, temporary_file.file)
-
             # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
             # we add a unique identifier to the key, so we do not overwrite previous uploads
             redis_cache_key = f"{self.request.session.session_key}{uuid.uuid4()}"
-            cache.set(redis_cache_key, temporary_file.name)
+            cache.set(redis_cache_key, temporary_file.original_name)
 
             if is_ajax(self.request):
+                # if it's an AJAX request, then files are sent to this view one at a time, so we can return a response
+                # immediately, and not at the end of the for-loop
                 return JsonResponse(
                     {
                         "success": True,
-                        "file_name": temporary_file.name,
+                        "file_name": temporary_file.original_name,
                     },
                     status=201,
                 )
