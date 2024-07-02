@@ -56,8 +56,10 @@
                     Files uploaded:
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% for document, _ in breach_report.documents.items %}
-                        {{ document }}
+                    {% for documents in breach_report.documents %}
+                        {% for document in documents.keys %}
+                            {{ document }}
+                        {% endfor %}
                     {% endfor %}
                 </dd>
             </div>
