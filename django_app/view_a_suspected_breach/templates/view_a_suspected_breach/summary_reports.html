@@ -51,18 +51,18 @@
                     {{ breach_report.breach.created_at }}
                 </dd>
             </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Files uploaded:
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% for documents in breach_report.documents %}
-                        {% for document in documents.keys %}
+            {% if breach_report.documents.items %}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                        Files uploaded:
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% for document, _ in breach_report.documents.items %}
                             {{ document }}
                         {% endfor %}
-                    {% endfor %}
-                </dd>
-            </div>
+                    </dd>
+                </div>
+            {% endif %}
         </dl>
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
     {% endfor %}
