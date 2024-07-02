@@ -30,7 +30,6 @@ from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
 from utils.notifier import send_email, verify_email
 from utils.s3 import (
-    delete_session_files,
     generate_presigned_url,
     get_all_session_files,
     get_user_uploaded_files,
@@ -335,21 +334,15 @@ class ReportABreachWizardView(BaseWizardView):
         if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
             permanent_storage_bucket = PermanentDocumentStorage()
             for object_key in session_files.keys():
-                try:
-                    permanent_storage_bucket.bucket.meta.client.copy(
-                        CopySource={
-                            "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
-                            "Key": f"{self.request.session.session_key}/{object_key}",
-                        },
-                        Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                        Key=f"{breach_id}/{object_key}",
-                        SourceClient=self.file_storage.bucket.meta.client,
-                    )
-                except Exception:
-                    # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
-                    pass
-                else:
-                    delete_session_files(TemporaryDocumentStorage(), self.request.session)
+                permanent_storage_bucket.bucket.meta.client.copy(
+                    CopySource={
+                        "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+                        "Key": f"{self.request.session.session_key}/{object_key}",
+                    },
+                    Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+                    Key=f"{breach_id}/{object_key}",
+                    SourceClient=self.file_storage.bucket.meta.client,
+                )
 
     def save_person_or_company_to_db(
         self, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
@@ -437,6 +430,7 @@ class ReportABreachWizardView(BaseWizardView):
                     "tell_us_about_the_suspected_breach"
                 ],
             )
+            self.store_documents_in_s3(new_breach.id)
             if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
                 new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
                 new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
@@ -467,7 +461,6 @@ class ReportABreachWizardView(BaseWizardView):
                     self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
             # Save Documents to S3 Permanent Bucket
-            self.store_documents_in_s3(new_breach.id)
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
