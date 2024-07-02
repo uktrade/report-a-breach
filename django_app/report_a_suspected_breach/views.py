@@ -30,7 +30,6 @@ from utils.breach_report import get_breach_context_data
 from utils.companies_house import get_formatted_address
 from utils.notifier import send_email, verify_email
 from utils.s3 import (
-    delete_session_files,
     generate_presigned_url,
     get_all_session_files,
     get_user_uploaded_files,
@@ -342,21 +341,15 @@ class ReportABreachWizardView(BaseWizardView):
         if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
             permanent_storage_bucket = PermanentDocumentStorage()
             for object_key in session_files.keys():
-                try:
-                    permanent_storage_bucket.bucket.meta.client.copy(
-                        CopySource={
-                            "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
-                            "Key": f"{self.request.session.session_key}/{object_key}",
-                        },
-                        Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                        Key=f"{breach_id}/{object_key}",
-                        SourceClient=self.file_storage.bucket.meta.client,
-                    )
-                except Exception:
-                    # todo - AccessDenied when copying from temporary to permanent bucket when deployed - investigate
-                    pass
-                else:
-                    delete_session_files(TemporaryDocumentStorage(), self.request.session)
+                permanent_storage_bucket.bucket.meta.client.copy(
+                    CopySource={
+                        "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+                        "Key": f"{self.request.session.session_key}/{object_key}",
+                    },
+                    Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+                    Key=f"{breach_id}/{object_key}",
+                    SourceClient=self.file_storage.bucket.meta.client,
+                )
 
     def save_person_or_company_to_db(
         self, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
@@ -444,6 +437,7 @@ class ReportABreachWizardView(BaseWizardView):
                     "tell_us_about_the_suspected_breach"
                 ],
             )
+            self.store_documents_in_s3(new_breach.id)
             if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
                 new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
                 new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
@@ -474,7 +468,6 @@ class ReportABreachWizardView(BaseWizardView):
                     self.save_person_or_company_to_db(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
             # Save Documents to S3 Permanent Bucket
-            self.store_documents_in_s3(new_breach.id)
             self.request.session["reference_id"] = new_reference
             self.storage.reset()
             self.storage.current_step = self.steps.first
@@ -530,19 +523,18 @@ class UploadDocumentsView(FormView):
 
         If the request is not Ajax, redirect to the summary page (the next step in the form)."""
         for temporary_file in form.cleaned_data["document"]:
-            session_keyed_file_name = f"{self.request.session.session_key}/{temporary_file.name}"
-            self.file_storage.save(session_keyed_file_name, temporary_file.file)
-
             # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
             # we add a unique identifier to the key, so we do not overwrite previous uploads
             redis_cache_key = f"{self.request.session.session_key}{uuid.uuid4()}"
-            cache.set(redis_cache_key, temporary_file.name)
+            cache.set(redis_cache_key, temporary_file.original_name)
 
             if is_ajax(self.request):
+                # if it's an AJAX request, then files are sent to this view one at a time, so we can return a response
+                # immediately, and not at the end of the for-loop
                 return JsonResponse(
                     {
                         "success": True,
-                        "file_name": temporary_file.name,
+                        "file_name": temporary_file.original_name,
                     },
                     status=201,
                 )

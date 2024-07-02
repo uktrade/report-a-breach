@@ -2,6 +2,7 @@ from typing import Any
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache.backends.dummy import DummyCache
+from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from django.forms import Form
 from django.http import HttpResponse
 
@@ -15,8 +16,15 @@ BASE_FRONTEND_TESTING_URL = "http://report-a-suspected-breach:8000"
 
 ENVIRONMENT = "test"
 
+
+class TestUploadHandler(TemporaryFileUploadHandler):
+    def new_file(self, *args, **kwargs):
+        super().new_file(*args, **kwargs)
+        self.file.original_name = self.file_name
+
+
 # we don't want to connect to ClamAV in testing, redefine and remove from list
-FILE_UPLOAD_HANDLERS = ("core.custom_upload_handler.CustomFileUploadHandler",)  # Order is important
+FILE_UPLOAD_HANDLERS = ("config.settings.test.TestUploadHandler",)
 
 
 # don't use redis when testing

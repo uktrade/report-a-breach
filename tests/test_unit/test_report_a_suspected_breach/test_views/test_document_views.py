@@ -9,21 +9,18 @@ from utils.s3 import get_user_uploaded_files
 logger = logging.getLogger(__name__)
 
 
-@patch("report_a_suspected_breach.views.TemporaryDocumentStorage.save")
 @patch("report_a_suspected_breach.forms.get_all_session_files", new=lambda x, y: [])
 @patch("report_a_suspected_breach.views.get_all_session_files", new=lambda x, y: [])
 class TestDocumentUploadView:
-    def test_successful_post(self, mocked_temporary_document_storage, rasb_client):
+    def test_successful_post(self, rasb_client):
         response = rasb_client.post(
             reverse("report_a_suspected_breach:upload_documents"),
             data={"document": SimpleUploadedFile("test.png", b"file_content")},
             headers={"x-requested-with": "XMLHttpRequest"},
         )
         assert response.status_code == 201
-        assert mocked_temporary_document_storage.call_count == 1
-        assert mocked_temporary_document_storage.called_with("file_content", "test.png")
 
-    def test_file_names_stored_in_cache(self, mocked_temporary_document_storage, rasb_client):
+    def test_file_names_stored_in_cache(self, rasb_client):
         cache.clear()
         assert not get_user_uploaded_files(rasb_client.session)
         rasb_client.post(
@@ -33,7 +30,7 @@ class TestDocumentUploadView:
         )
         assert get_user_uploaded_files(rasb_client.session) == ["test.png"]
 
-    def test_unsuccessful_post(self, mocked_temporary_document_storage, rasb_client):
+    def test_unsuccessful_post(self, rasb_client):
         response = rasb_client.post(
             reverse("report_a_suspected_breach:upload_documents"),
             data={"document": SimpleUploadedFile("bad.gif", b"GIF8")},
@@ -46,25 +43,22 @@ class TestDocumentUploadView:
         assert response["file_name"] == "bad.gif"
         assert "file_uploads" not in rasb_client.session
 
-    def test_non_ajax_successful_post(self, mocked_temporary_document_storage, rasb_client):
+    def test_non_ajax_successful_post(self, rasb_client):
         response = rasb_client.post(
             reverse("report_a_suspected_breach:upload_documents"),
             data={"document": SimpleUploadedFile("test.png", b"file_content")},
             follow=True,
         )
         assert response.status_code == 200
-        assert mocked_temporary_document_storage.call_count == 1
-        assert mocked_temporary_document_storage.called_with("file_content", "test.png")
         assert response.resolver_match.kwargs == {"step": "tell_us_about_the_suspected_breach"}
 
-    def test_non_ajax_unsuccessful_post(self, mocked_temporary_document_storage, rasb_client):
+    def test_non_ajax_unsuccessful_post(self, rasb_client):
         response = rasb_client.post(
             reverse("report_a_suspected_breach:upload_documents"),
             data={"document": SimpleUploadedFile("bad.gif", b"GIF8")},
             follow=True,
         )
         assert response.status_code == 200
-        assert mocked_temporary_document_storage.call_count == 0
         form = response.context["form"]
         assert not form.is_valid()
         assert "govuk-error-summary" in response.content.decode()
