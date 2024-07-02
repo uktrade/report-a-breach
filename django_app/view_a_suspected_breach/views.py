@@ -23,8 +23,13 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
     form_class = SelectForm
     success_url = reverse_lazy("view_a_suspected_breach:summary_reports")
 
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        self.request.session["sort"] = request.GET.get("sort_by", "newest")
+        self.request.session.modified = True
+        return super().get(request, **kwargs)
+
     def get_queryset(self) -> list[Breach]:
-        sort = self.request.session.pop("sort", "newest")
+        sort = self.request.session.get("sort", "newest")
         sorted_objects = []
         breach_objects = Breach.objects.all()
         sorted_breaches = breach_objects.order_by("-created_at")
@@ -36,13 +41,8 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["selected_sort"] = self.request.session.get("sort", "newest")
+        context["selected_sort"] = self.request.session.pop("sort", "newest")
         return context
-
-    def form_valid(self, form: SelectForm) -> HttpResponse:
-        self.request.session["sort"] = form.cleaned_data["sort_by"]
-        self.request.session.modified = True
-        return super().form_valid(form)
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
