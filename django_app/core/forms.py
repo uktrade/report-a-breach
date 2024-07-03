@@ -15,6 +15,7 @@ class EmptyForm(forms.Form):
 class BaseForm(forms.Form):
     bold_labels = True
     form_h1_header = None
+    grid_column_class = None
     single_question_form = False
     show_back_button = True
     # fields that you don't want to display (optional) next to the label if they're not required
@@ -36,6 +37,7 @@ class BaseForm(forms.Form):
     def __init__(self, *args: object, **kwargs: object) -> None:
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
+        self.grid_column_class = kwargs.pop("grid_column_class", self.grid_column_class)
         super().__init__(*args, **kwargs)
 
         if len(self.fields) == 1:

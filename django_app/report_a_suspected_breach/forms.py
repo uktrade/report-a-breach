@@ -287,6 +287,7 @@ class ManualCompaniesHouseInputForm(BaseForm):
         "We cannot check the registered company number with Companies House at present, "
         "you will need to enter the address manually"
     )
+
     manual_companies_house_input = forms.ChoiceField(
         label="Where is the business located?",
         choices=(
@@ -299,6 +300,18 @@ class ManualCompaniesHouseInputForm(BaseForm):
             "breaching sanctions is in the UK, or outside the UK"
         },
     )
+    grid_column_class = "govuk-grid-column-three-quarters"
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper.layout = Layout(
+            Fieldset(
+                Field.radios(
+                    "manual_companies_house_input",
+                    legend_size=Size.MEDIUM,
+                )
+            )
+        )
 
 
 class WhereIsTheAddressOfTheBusinessOrPersonForm(BaseForm):
