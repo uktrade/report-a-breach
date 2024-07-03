@@ -9,6 +9,10 @@ def show_check_company_details_page_condition(wizard: View) -> bool:
         "are_you_reporting_a_business_on_companies_house"
     )
 
+    manual_input_data = wizard.get_cleaned_data_for_step("manual_companies_house_input")
+    if manual_input_data.get("manual_companies_house_input", False):
+        return False
+
     show_page = (
         do_you_know_the_registered_company_number_cleaned_data.get("do_you_know_the_registered_company_number", False) == "yes"
         and do_you_know_the_registered_company_number_cleaned_data.get("registered_company_number", False)
@@ -67,13 +71,17 @@ def show_business_or_personal_details_page(wizard: View) -> bool:
     are_you_reporting_a_business_on_companies_house_cleaned_data = wizard.get_cleaned_data_for_step(
         "are_you_reporting_a_business_on_companies_house"
     )
+    manual_companies_house_input_data = wizard.get_cleaned_data_for_step("manual_companies_house_input")
 
-    show_page = where_is_the_address_cleaned_data.get(
-        "where_is_the_address"
-    ) and are_you_reporting_a_business_on_companies_house_cleaned_data.get("are_you_reporting_a_business_on_companies_house") in [
-        "no",
-        "do_not_know",
-    ]
+    show_page = (
+        where_is_the_address_cleaned_data.get("where_is_the_address")
+        and are_you_reporting_a_business_on_companies_house_cleaned_data.get("business_registered_on_companies_house")
+        in [
+            "no",
+            "do_not_know",
+        ]
+        or manual_companies_house_input_data.get("manual_companies_house_input")
+    )
 
     return show_page
     # we just want to check that the user has filled out this form as a way of checking if they have filled out the
@@ -125,3 +133,7 @@ def show_where_were_the_goods_made_available_to_page(wizard: View) -> bool:
         show_page = cleaned_data.get("where_were_the_goods_made_available_from") in ["different_uk_address", "outside_the_uk"]
 
     return show_page
+
+
+def show_manual_companies_house_input_page(wizard: View) -> bool:
+    return bool(wizard.request.session.get("company_details_500"))

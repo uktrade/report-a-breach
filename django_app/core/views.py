@@ -55,6 +55,11 @@ class BaseWizardView(NamedUrlSessionWizardView):
 
     def render(self, form: Form | None = None, **kwargs: object) -> HttpResponse:
         """Controls the rendering of the response."""
+        if self.steps.current == "do_you_know_the_registered_company_number" and self.request.session.get("company_details_500"):
+            return HttpResponseRedirect(
+                reverse("report_a_suspected_breach:step", kwargs={"step": "manual_companies_house_input"}) + "?start=true"
+            )
+
         steps_to_continue = [
             "verify",
             "business_or_person_details",
