@@ -283,11 +283,6 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
 
 
 class ManualCompaniesHouseInputForm(BaseForm):
-    form_h1_header = (
-        "We cannot check the registered company number with Companies House at present, "
-        "you will need to enter the address manually"
-    )
-
     manual_companies_house_input = forms.ChoiceField(
         label="Where is the business located?",
         choices=(
@@ -300,7 +295,6 @@ class ManualCompaniesHouseInputForm(BaseForm):
             "breaching sanctions is in the UK, or outside the UK"
         },
     )
-    grid_column_class = "govuk-grid-column-three-quarters"
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
