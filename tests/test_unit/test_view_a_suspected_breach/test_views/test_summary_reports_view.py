@@ -26,7 +26,6 @@ class TestSummaryReportsView:
 
         vasb_client.force_login(test_user)
         request.session = MagicMock()
-        request.session.modified = False
 
         response = vasb_client.get(reverse("view_a_suspected_breach:summary_reports"))
         assert response.status_code == 200
