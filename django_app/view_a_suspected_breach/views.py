@@ -5,14 +5,40 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 from report_a_suspected_breach.models import Breach
 from utils.breach_report import get_breach_context_data
 
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
+    template_name = "view_a_suspected_breach/summary_reports.html"
+    success_url = reverse_lazy("view_a_suspected_breach:summary_reports")
+
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        self.request.session["sort"] = request.GET.get("sort_by", "newest")
+        return super().get(request, **kwargs)
+
+    def get_queryset(self) -> list[Breach]:
+        sort = self.request.session.get("sort", "newest")
+        sorted_objects = []
+        sorted_breaches = Breach.objects.all().order_by("-created_at")
+        if sort == "oldest":
+            sorted_breaches = reversed(sorted_breaches)
+        for breach in sorted_breaches:
+            sorted_objects.extend([get_breach_context_data({}, breach)])
+        return sorted_objects
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["selected_sort"] = self.request.session.pop("sort", "newest")
+        return context
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
@@ -50,4 +76,5 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["back_button_text"] = "View all suspected breach reports"
         return get_breach_context_data(context, self.breach)
