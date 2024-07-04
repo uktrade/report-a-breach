@@ -137,3 +137,6 @@ def show_where_were_the_goods_made_available_to_page(wizard: View) -> bool:
 
 def show_manual_companies_house_input_page(wizard: View) -> bool:
     return bool(wizard.request.session.get("company_details_500"))
+
+
+# comment
