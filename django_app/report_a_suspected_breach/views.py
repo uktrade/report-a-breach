@@ -37,7 +37,13 @@ from utils.s3 import (
 
 from .choices import TypeOfRelationshipChoices
 from .exceptions import EmailNotVerifiedException
-from .forms import EmailVerifyForm, SummaryForm, UploadDocumentsForm, ZeroEndUsersForm
+from .forms import (
+    EmailVerifyForm,
+    NameAndBusinessYouWorkForForm,
+    SummaryForm,
+    UploadDocumentsForm,
+    ZeroEndUsersForm,
+)
 from .models import Breach, PersonOrCompany, ReporterEmailVerification, SanctionsRegime
 from .tasklist import (
     AboutThePersonOrBusinessTask,
@@ -677,3 +683,20 @@ class ZeroEndUsersView(FormView):
             return reverse_lazy(
                 "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
             )
+
+
+class NameAndBusinessYouWorkForView(FormView):
+    form_class = NameAndBusinessYouWorkForForm
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if form_h1_header := getattr(ZeroEndUsersForm, "form_h1_header"):
+            context["form_h1_header"] = form_h1_header
+        return context
+
+    def get_success_url(self) -> str:
+        if self.request.session.get("redirect") == "summary" or self.request.GET.get("redirect", "") == "summary":
+            return reverse_lazy("report_a_suspected_breach:summary")
+
+        return render(self.request, "report_a_suspected_breach/tasklist.html")

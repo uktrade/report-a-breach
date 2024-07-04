@@ -88,14 +88,6 @@ def show_business_or_personal_details_page(wizard: View) -> bool:
     # previous form in the chain of conditionals. A -> B -> C. If B is filled out, then A must-have been filled out.
 
 
-def show_name_and_business_you_work_for_page(view: View) -> bool:
-    return view.request.session.get("reporter_professional_relationship") in ("third_party", "no_professional_relationship")
-
-
-def show_name_page(view: View) -> bool:
-    return view.request.session.get("reporter_professional_relationship") in ("owner", "acting")
-
-
 def show_about_the_end_user_page(wizard: View) -> bool:
     cleaned_data = wizard.get_cleaned_data_for_step("where_were_the_goods_supplied_to")
     cleaned_data_available_step = wizard.get_cleaned_data_for_step("where_were_the_goods_made_available_to")

@@ -9,8 +9,6 @@ from .form_step_conditions import (
     show_do_you_know_the_registered_company_number_page,
     show_end_user_added_page,
     show_manual_companies_house_input_page,
-    show_name_and_business_you_work_for_page,
-    show_name_page,
     show_where_is_the_address_of_the_business_or_person_page_condition,
     show_where_were_the_goods_made_available_from_page,
     show_where_were_the_goods_made_available_to_page,
@@ -20,6 +18,7 @@ from .views import (
     DeleteDocumentsView,
     DeleteEndUserView,
     DownloadDocumentView,
+    NameAndBusinessYouWorkForView,
     UploadDocumentsView,
     ZeroEndUsersView,
 )
@@ -28,8 +27,6 @@ report_a_suspected_breach_wizard = views.ReportABreachWizardView.as_view(
     url_name="report_a_suspected_breach:step",
     done_step_name="confirmation",
     condition_dict={
-        "name": show_name_page,
-        "name_and_business_you_work_for": show_name_and_business_you_work_for_page,
         "check_company_details": show_check_company_details_page_condition,
         "business_or_person_details": show_business_or_personal_details_page,
         "where_is_the_address_of_the_business_or_person": show_where_is_the_address_of_the_business_or_person_page_condition,
@@ -72,4 +69,5 @@ urlpatterns = [
     path("request_verify_code", views.RequestVerifyCodeView.as_view(), name="request_verify_code"),
     path("delete_end_user_view", DeleteEndUserView.as_view(), name="delete_end_user"),
     path("zero_end_users", ZeroEndUsersView.as_view(), name="zero_end_users"),
+    path("name_and_business_you_work_for", NameAndBusinessYouWorkForView.as_view(), name="name_and_business_you_work_for"),
 ]
