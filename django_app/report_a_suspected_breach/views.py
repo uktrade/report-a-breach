@@ -60,6 +60,7 @@ class ReportABreachWizardView(BaseWizardView):
         "declaration": "report_a_suspected_breach/form_steps/declaration.html",
         "which_sanctions_regime": "report_a_suspected_breach/form_steps/which_sanctions_regimes.html",
         "upload_documents": "report_a_suspected_breach/form_steps/upload_documents.html",
+        "manual_companies_house_input": "report_a_suspected_breach/form_steps/manual_companies_house_input.html",
     }
     template_name = "report_a_suspected_breach/generic_form_step.html"
     storage_name = "report_a_suspected_breach.session.SessionStorage"
