@@ -144,6 +144,7 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "core.sites.context_processors.sites",
                 "core.context_processors.truncate_words_limit",
+                "core.context_processors.back_button",
             ],
         },
     },
