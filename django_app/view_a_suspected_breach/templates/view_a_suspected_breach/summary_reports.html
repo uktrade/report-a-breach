@@ -27,7 +27,7 @@
             <h3 class="govuk-heading-s govuk-summary-list__value">Summary of the breach</h3>
             {% include "report_a_suspected_breach/partials/truncated_text.html" with text=breach_report.breach.tell_us_about_the_suspected_breach|linebreaksbr %}
         </div>
-        <dl class="govuk-summary-list govuk-summary-list--no-border">
+        <dl class="govuk-summary-list govuk-summary-list--no-border mb-1">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-caption-m govuk-!-font-weight-regular">
                     Submitted by:
@@ -65,7 +65,7 @@
                 </div>
             {% endif %}
         </dl>
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible mb-1">
     {% endfor %}
 {% endblock column_content %}
 
