@@ -38,8 +38,11 @@ from utils.s3 import (
 from .choices import TypeOfRelationshipChoices
 from .exceptions import EmailNotVerifiedException
 from .forms import (
+    EmailForm,
     EmailVerifyForm,
     NameAndBusinessYouWorkForForm,
+    NameForm,
+    StartForm,
     SummaryForm,
     UploadDocumentsForm,
     ZeroEndUsersForm,
@@ -134,8 +137,8 @@ class ReportABreachWizardView(BaseWizardView):
         if self.storage.current_step == "upload_documents":
             return redirect(reverse("report_a_suspected_breach:upload_documents"))
 
-        if self.storage.current_step == "verify":
-            return redirect(reverse("report_a_suspected_breach:email_verify"))
+        # if self.storage.current_step == "verify":
+        #     return redirect(reverse("report_a_suspected_breach:email_verify"))
 
         # check if the user has completed a task, if so, redirect them to the tasklist
         # the exception to this is if the user wants to explicitly start the next task, in which case we should let them
@@ -143,7 +146,7 @@ class ReportABreachWizardView(BaseWizardView):
         self.tasklist = get_tasklist(self)
 
         if (
-            not request.GET.get("start", "") == "true"
+            not request.GET.get("landing", "") == "true"
             and not request.session.get("redirect") == "summary"
             and not request.GET.get("redirect", "") == "summary"
             and self.tasklist.should_show_task_list_page()
@@ -267,13 +270,13 @@ class ReportABreachWizardView(BaseWizardView):
 
         return self.get_form_step_data(form)
 
-    def process_email_step(self, form: Form) -> QueryDict:
-        reporter_email_address = form.cleaned_data.get("reporter_email_address")
-        self.request.session["reporter_email_address"] = reporter_email_address
-        self.request.session.modified = True
-
-        verify_email(reporter_email_address, self.request)
-        return self.get_form_step_data(form)
+    # def process_email_step(self, form: Form) -> QueryDict:
+    #     reporter_email_address = form.cleaned_data.get("reporter_email_address")
+    #     self.request.session["reporter_email_address"] = reporter_email_address
+    #     self.request.session.modified = True
+    #
+    #     verify_email(reporter_email_address, self.request)
+    #     return self.get_form_step_data(form)
 
     def get_form_kwargs(self, step: str | None) -> dict[str, Any]:
         kwargs = super().get_form_kwargs(step)
@@ -492,6 +495,32 @@ class ReportABreachWizardView(BaseWizardView):
         return redirect(reverse("report_a_suspected_breach:complete"))
 
 
+class StartView(FormView):
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+    form_class = StartForm
+    success_url = reverse_lazy("report_a_suspected_breach:email")
+
+    def form_valid(self, form: StartForm) -> HttpResponse:
+        self.request.session["completed_steps"] = {
+            "reporter_professional_relationship": form.cleaned_data["reporter_professional_relationship"]
+        }
+        self.request.session.modified = True
+        return super().form_valid(form)
+
+
+class EmailView(FormView):
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+    form_class = EmailForm
+    success_url = reverse_lazy("report_a_suspected_breach:email_verify")
+
+    def form_valid(self, form: EmailVerifyForm) -> HttpResponse:
+        reporter_email_address = form.cleaned_data.get("reporter_email_address")
+        self.request.session["completed_steps"].update({"reporter_email_address": reporter_email_address})
+
+        verify_email(reporter_email_address, self.request)
+        return super().form_valid(form)
+
+
 class CompleteView(TemplateView):
     template_name = "report_a_suspected_breach/complete.html"
 
@@ -584,7 +613,7 @@ class RequestVerifyCodeView(FormView):
     success_url = reverse_lazy("report_a_suspected_breach:email_verify")
 
     def form_valid(self, form: SummaryForm) -> HttpResponse:
-        reporter_email_address = self.request.session["reporter_email_address"]
+        reporter_email_address = self.request.session["completed_steps"]["reporter_email_address"]
         if getattr(self.request, "limited", False):
             logger.warning(f"User has been rate-limited: {reporter_email_address}")
             return self.form_invalid(form)
@@ -596,7 +625,6 @@ class RequestVerifyCodeView(FormView):
 class EmailVerifyView(FormView):
     form_class = EmailVerifyForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
-    success_url = reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name"})
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super(EmailVerifyView, self).get_form_kwargs()
@@ -610,22 +638,64 @@ class EmailVerifyView(FormView):
         return context
 
     def get_success_url(self) -> str:
-        # we're importing these methods here to avoid circular imports
-        from .form_step_conditions import (
-            show_name_and_business_you_work_for_page,
-            show_name_page,
-        )
-
-        if show_name_page(self):
-            return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name"})
-        elif show_name_and_business_you_work_for_page(self):
-            return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "name_and_business_you_work_for"})
+        relationship_data = self.request.session["completed_steps"].get("reporter_professional_relationship")
+        if relationship_data in ("owner", "acting"):
+            return reverse_lazy("report_a_suspected_breach:name")
+        elif relationship_data in ("third_party", "no_professional_relationship"):
+            return reverse_lazy("report_a_suspected_breach:name_and_business_you_work_for")
         else:
-            return reverse_lazy("report_a_suspected_breach:step", kwargs={"step": "start"})
+            return reverse_lazy("report_a_suspected_breach:landing")
 
     def form_valid(self, form):
         form.verification_object.verified = True
         form.verification_object.save()
+        self.request.session["completed_steps"].update({"email_verify": True})
+        return super().form_valid(form)
+
+
+class NameView(FormView):
+    form_class = NameForm
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+
+    # def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+    #     context = super().get_context_data(**kwargs)
+    #     if form_h1_header := getattr(EmailVerifyForm, "form_h1_header"):
+    #         context["form_h1_header"] = form_h1_header
+    #     return context
+
+    def get_success_url(self) -> str:
+        if self.request.session.get("redirect") == "summary" or self.request.GET.get("redirect", "") == "summary":
+            return reverse_lazy("report_a_suspected_breach:summary")
+
+        self.tasklist = get_tasklist(self)
+
+        return render(self.request, "report_a_suspected_breach/tasklist.html", context={"tasklist": self.tasklist})
+
+    def form_valid(self, form: NameAndBusinessYouWorkForForm) -> HttpResponse:
+        name = form.cleaned_data["reporter_full_name"]
+        self.request.session["completed_steps"].update({"name": name})
+        return super().form_valid(form)
+
+
+class NameAndBusinessYouWorkForView(FormView):
+    form_class = NameAndBusinessYouWorkForForm
+    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
+
+    # def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+    #     context = super().get_context_data(**kwargs)
+    #     if form_h1_header := getattr(ZeroEndUsersForm, "form_h1_header"):
+    #         context["form_h1_header"] = form_h1_header
+    #     return context
+
+    def get_success_url(self) -> str:
+        if self.request.session.get("redirect") == "summary" or self.request.GET.get("redirect", "") == "summary":
+            return reverse_lazy("report_a_suspected_breach:summary")
+
+        return render(self.request, "report_a_suspected_breach/tasklist.html")
+
+    def form_valid(self, form: NameAndBusinessYouWorkForForm) -> HttpResponse:
+        name_and_business_you_work_for = form.cleaned_data["name_and_business_you_work_for"]
+        self.request.session["completed_steps"].update({"name_and_business_you_work_for": name_and_business_you_work_for})
         return super().form_valid(form)
 
 
@@ -684,20 +754,3 @@ class ZeroEndUsersView(FormView):
             return reverse_lazy(
                 "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
             )
-
-
-class NameAndBusinessYouWorkForView(FormView):
-    form_class = NameAndBusinessYouWorkForForm
-    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
-
-    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        if form_h1_header := getattr(ZeroEndUsersForm, "form_h1_header"):
-            context["form_h1_header"] = form_h1_header
-        return context
-
-    def get_success_url(self) -> str:
-        if self.request.session.get("redirect") == "summary" or self.request.GET.get("redirect", "") == "summary":
-            return reverse_lazy("report_a_suspected_breach:summary")
-
-        return render(self.request, "report_a_suspected_breach/tasklist.html")

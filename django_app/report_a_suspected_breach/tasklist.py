@@ -56,9 +56,15 @@ class Task:
         found in the form_step_conditions.py file to determine if the step is optional for the user."""
 
         # Get the steps that have been completed in this task
-        completed_steps = set(
-            [step_name for step_name, _ in self.form_steps.items() if self.wizard_view.storage.get_step_data(step_name)]
-        )
+
+        if "nonwizard" in self.wizard_view.template_name:
+            view_storage = self.wizard_view.request.session.get("completed_steps", None)
+            completed_steps = set([step_name for step_name, _ in self.form_steps.items() if view_storage.get(step_name)])
+
+        else:
+            completed_steps = set(
+                [step_name for step_name, _ in self.form_steps.items() if self.wizard_view.storage.get_step_data(step_name)]
+            )
 
         # get a set of the steps that are missing
         missing_steps = set(self.form_steps.keys()) - completed_steps
@@ -68,6 +74,7 @@ class Task:
             # don't bother with the rest of the logic
             return True
 
+        # TODO: handle non wizard here
         # figure out if these missing steps are compulsory or optional or not part of wizard
         compulsory_steps = {*self.wizard_view.get_form_list().keys()} - self.optional_steps - self.non_wizard_steps
 
@@ -87,7 +94,7 @@ class YourDetailsTask(Task):
         "name_and_business_you_work_for": forms.NameAndBusinessYouWorkForForm,
     }
     name = "Your details"
-    non_wizard_steps = {"verify"}
+    non_wizard_steps = {"start", "email", "verify", "name", "name_and_business_you_work_for"}
 
     @cached_property
     def can_start(self) -> bool:

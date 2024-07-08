@@ -18,7 +18,10 @@ from .views import (
     DeleteDocumentsView,
     DeleteEndUserView,
     DownloadDocumentView,
+    EmailView,
     NameAndBusinessYouWorkForView,
+    NameView,
+    StartView,
     UploadDocumentsView,
     ZeroEndUsersView,
 )
@@ -44,7 +47,7 @@ report_a_suspected_breach_wizard = views.ReportABreachWizardView.as_view(
 app_name = "report_a_suspected_breach"
 
 urlpatterns = [
-    path("", report_a_suspected_breach_wizard, name="landing"),
+    path("", StartView.as_view(), name="landing"),
     path(
         "about_the_end_user/<str:end_user_uuid>/",
         report_a_suspected_breach_wizard,
@@ -69,5 +72,7 @@ urlpatterns = [
     path("request_verify_code", views.RequestVerifyCodeView.as_view(), name="request_verify_code"),
     path("delete_end_user_view", DeleteEndUserView.as_view(), name="delete_end_user"),
     path("zero_end_users", ZeroEndUsersView.as_view(), name="zero_end_users"),
+    path("email", EmailView.as_view(), name="email"),
+    path("name", NameView.as_view(), name="name"),
     path("name_and_business_you_work_for", NameAndBusinessYouWorkForView.as_view(), name="name_and_business_you_work_for"),
 ]
