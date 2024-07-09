@@ -22,6 +22,7 @@ from .views import (
     NameAndBusinessYouWorkForView,
     NameView,
     StartView,
+    TaskView,
     UploadDocumentsView,
     ZeroEndUsersView,
 )
@@ -47,7 +48,8 @@ report_a_suspected_breach_wizard = views.ReportABreachWizardView.as_view(
 app_name = "report_a_suspected_breach"
 
 urlpatterns = [
-    path("", StartView.as_view(), name="landing"),
+    path("", TaskView.as_view(), name="landing"),
+    path("start", StartView.as_view(), name="start"),
     path(
         "about_the_end_user/<str:end_user_uuid>/",
         report_a_suspected_breach_wizard,

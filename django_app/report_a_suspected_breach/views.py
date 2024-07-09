@@ -6,7 +6,7 @@ from core.decorators import cached_classproperty
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.templatetags.get_wizard_step_url import get_wizard_step_url
 from core.utils import is_ajax
-from core.views import BaseWizardView
+from core.views import BaseTemplateView, BaseWizardView
 from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
@@ -201,15 +201,15 @@ class ReportABreachWizardView(BaseWizardView):
         that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
 
         # we're importing these methods here to avoid circular imports
-        from .form_step_conditions import (
-            show_check_company_details_page_condition,
-            show_name_and_business_you_work_for_page,
-        )
+        from .form_step_conditions import show_check_company_details_page_condition
 
         cleaned_data = self.get_all_cleaned_data()
         context["form_data"] = cleaned_data
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self)
-        context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self)
+        context["is_third_party_relationship"] = cleaned_data["reporter_professional_relationship"] in [
+            "third_party",
+            "no_professional_relationship",
+        ]
         context["is_made_available_journey"] = self.request.session.get("made_available_journey")
         if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
             context["form_data"]["session_files"] = session_files
@@ -230,11 +230,11 @@ class ReportABreachWizardView(BaseWizardView):
                 context["form_data"]["about_the_supplier"] = context["form_data"]["business_or_person_details"]
         return context
 
-    def process_start_step(self, form: Form) -> QueryDict:
-        self.request.session["reporter_professional_relationship"] = form.cleaned_data["reporter_professional_relationship"]
-        self.request.session.modified = True
-
-        return self.get_form_step_data(form)
+    # def process_start_step(self, form: Form) -> QueryDict:
+    #     self.request.session["reporter_professional_relationship"] = form.cleaned_data["reporter_professional_relationship"]
+    #     self.request.session.modified = True
+    #
+    #     return self.get_form_step_data(form)
 
     def process_are_you_reporting_a_business_on_companies_house_step(self, form: Form) -> QueryDict:
         """We want to clear the company details from the session if the user selects anything but 'yes', if they do
@@ -667,7 +667,7 @@ class NameView(FormView):
         if self.request.session.get("redirect") == "summary" or self.request.GET.get("redirect", "") == "summary":
             return reverse_lazy("report_a_suspected_breach:summary")
 
-        self.tasklist = get_tasklist(self)
+        self.tasklist = get_tasklist(self, non_wizard_view=True)
 
         return render(self.request, "report_a_suspected_breach/tasklist.html", context={"tasklist": self.tasklist})
 
@@ -691,7 +691,9 @@ class NameAndBusinessYouWorkForView(FormView):
         if self.request.session.get("redirect") == "summary" or self.request.GET.get("redirect", "") == "summary":
             return reverse_lazy("report_a_suspected_breach:summary")
 
-        return render(self.request, "report_a_suspected_breach/tasklist.html")
+        self.tasklist = get_tasklist(self, non_wizard_view=True)
+
+        return render(self.request, "report_a_suspected_breach/tasklist.html", context={"tasklist": self.tasklist})
 
     def form_valid(self, form: NameAndBusinessYouWorkForForm) -> HttpResponse:
         name_and_business_you_work_for = form.cleaned_data["name_and_business_you_work_for"]
@@ -754,3 +756,12 @@ class ZeroEndUsersView(FormView):
             return reverse_lazy(
                 "report_a_suspected_breach:step", kwargs={"step": "were_there_other_addresses_in_the_supply_chain"}
             )
+
+
+class TaskView(BaseTemplateView):
+    template_name = "report_a_suspected_breach/tasklist.html"
+
+    def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
+        self.get_context_data(**kwargs)
+        tasklist = get_tasklist(self, non_wizard_view=True)
+        return render(self.request, self.template_name, context={"tasklist": tasklist})

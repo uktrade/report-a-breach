@@ -12,10 +12,12 @@ class Task:
     hint_text = ""
     show_on_tasklist = True
 
-    def __init__(self, wizard_view: View, task_list: list["Task"]) -> None:
+    def __init__(self, view: View, task_list: list["Task"], non_wizard_view: bool = False) -> None:
         super().__init__()
-        self.wizard_view = wizard_view
+        self.view = view
         self.task_list = task_list
+        # TODO: remove when wizard is gone
+        self.non_wizard_view = non_wizard_view
 
     @property
     def optional_steps(self) -> set:
@@ -38,7 +40,7 @@ class Task:
         return "Cannot start yet"
 
     def start_url(self) -> str:
-        return self.wizard_view.get_step_url([*self.form_steps.keys()][0])
+        return self.view.get_step_url(([*self.form_steps.keys()][0]))
 
     @cached_property
     def can_start(self) -> bool:
@@ -56,14 +58,16 @@ class Task:
         found in the form_step_conditions.py file to determine if the step is optional for the user."""
 
         # Get the steps that have been completed in this task
-
-        if "nonwizard" in self.wizard_view.template_name:
-            view_storage = self.wizard_view.request.session.get("completed_steps", None)
-            completed_steps = set([step_name for step_name, _ in self.form_steps.items() if view_storage.get(step_name)])
-
+        # TODO: remove when wizard is gone
+        if self.non_wizard_view:
+            view_storage = self.view.request.session.get("completed_steps", None)
+            if view_storage is not None:
+                completed_steps = set([step_name for step_name, _ in self.form_steps.items() if view_storage.get(step_name)])
+            else:
+                completed_steps = set()
         else:
             completed_steps = set(
-                [step_name for step_name, _ in self.form_steps.items() if self.wizard_view.storage.get_step_data(step_name)]
+                [step_name for step_name, _ in self.form_steps.items() if self.view.storage.get_step_data(step_name)]
             )
 
         # get a set of the steps that are missing
@@ -74,9 +78,8 @@ class Task:
             # don't bother with the rest of the logic
             return True
 
-        # TODO: handle non wizard here
         # figure out if these missing steps are compulsory or optional or not part of wizard
-        compulsory_steps = {*self.wizard_view.get_form_list().keys()} - self.optional_steps - self.non_wizard_steps
+        compulsory_steps = {*self.form_steps.keys()} - self.optional_steps - self.non_wizard_steps
 
         # find the intersection between compulsory_steps and missing_steps. If it exists, the task is not complete
         if compulsory_steps.intersection(missing_steps):
@@ -94,6 +97,7 @@ class YourDetailsTask(Task):
         "name_and_business_you_work_for": forms.NameAndBusinessYouWorkForForm,
     }
     name = "Your details"
+    # TODO: remove when wizard is gone
     non_wizard_steps = {"start", "email", "verify", "name", "name_and_business_you_work_for"}
 
     @cached_property
@@ -153,6 +157,7 @@ class SanctionsBreachDetailsTask(Task):
     name = "Sanctions breach details"
     hint_text = "Upload documents and give any additional information"
     optional_steps = {"upload_documents"}
+    # TODO: remove when wizard is gone
     non_wizard_steps = {"upload_documents"}
 
 
@@ -165,10 +170,12 @@ class SummaryAndDeclaration(Task):
 
 
 class TaskList:
-    def __init__(self, tasks: Iterable, wizard_view: View) -> None:
+    def __init__(self, tasks: Iterable, view: View, non_wizard_view: bool = False) -> None:
         super().__init__()
-        self.wizard_view = wizard_view
-        self.tasks = [task(wizard_view, self) for task in tasks]
+        self.view = view
+        self.tasks = [task(view, self, non_wizard_view) for task in tasks]
+        # TODO: remove when wizard is gone
+        self.non_wizard_view = non_wizard_view
 
     def __iter__(self) -> Iterable[Task]:
         return iter(self.tasks)
@@ -176,7 +183,11 @@ class TaskList:
     @cached_property
     def current_task(self) -> Task | None:
         """Get the current task object based on the current step in the wizard."""
-        return self.get_task_from_step_name(self.wizard_view.steps.current)
+        # TODO: remove when wizard is gone
+        if not self.non_wizard_view:
+            return self.get_task_from_step_name(self.view.steps.current)
+        else:
+            return self.get_task_from_step_name(self.view.template_name.split("/")[-1])
 
     def should_show_task_list_page(self) -> bool:
         """Should the user be shown the tasklist page.
@@ -184,7 +195,11 @@ class TaskList:
         Have they just started a new task?, or have they completed all tasks?"""
         """Check if the user has just started a new task. If so then show them the tasklist page"""
         if current_task := self.current_task:
-            return self.wizard_view.steps.current == [*current_task.form_steps.keys()][0]
+            # TODO: remove when wizard is gone
+            if self.non_wizard_view is None:
+                return self.view.steps.current == [*current_task.form_steps.keys()][0]
+            else:
+                return self.view.tasklist.current_task == [*current_task.form_steps.keys()][0]
 
         return False
 
@@ -200,7 +215,7 @@ class TaskList:
         return all(task.complete if task.show_on_tasklist else True for task in self.tasks)
 
 
-def get_tasklist(wizard_view: View) -> TaskList:
+def get_tasklist(view: View, non_wizard_view: bool = False) -> TaskList:
     return TaskList(
         tasks=(
             YourDetailsTask,
@@ -210,5 +225,7 @@ def get_tasklist(wizard_view: View) -> TaskList:
             SanctionsBreachDetailsTask,
             SummaryAndDeclaration,
         ),
-        wizard_view=wizard_view,
+        view=view,
+        # TODO: remove when wizard is gone
+        non_wizard_view=non_wizard_view,
     )
