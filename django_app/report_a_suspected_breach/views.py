@@ -761,7 +761,7 @@ class ZeroEndUsersView(FormView):
 class TaskView(BaseTemplateView):
     template_name = "report_a_suspected_breach/tasklist.html"
 
-    def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
-        self.get_context_data(**kwargs)
-        tasklist = get_tasklist(self, non_wizard_view=True)
-        return render(self.request, self.template_name, context={"tasklist": tasklist})
+    # def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
+    #     self.get_context_data(**kwargs)
+    #     tasklist = get_tasklist(self, non_wizard_view=True)
+    #     return render(self.request, self.template_name, context={"tasklist": tasklist})
