@@ -191,9 +191,14 @@ class BaseTemplateView(TemplateView):
         return step_list
 
     def get_step_url(self, step: str) -> str:
+        # TODO: tidy for loops
         steps = self.get_steps()
         for step_name in steps:
-            return self.tasklist.tasks.start_url if step_name == step else reverse_lazy("report_a_suspected_breach:landing")
+            if step_name == step:
+                for task in self.tasklist.tasks:
+                    if step_name in task.form_steps:
+                        return task.start_url
+        return reverse_lazy("report_a_suspected_breach:landing")
 
 
 class RedirectBaseDomainView(RedirectView):

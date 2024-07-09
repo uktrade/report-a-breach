@@ -79,7 +79,7 @@ class Task:
             return True
 
         # figure out if these missing steps are compulsory or optional or not part of wizard
-        compulsory_steps = {*self.form_steps.keys()} - self.optional_steps - self.non_wizard_steps
+        compulsory_steps = {*self.form_steps.keys()} - self.optional_steps
 
         # find the intersection between compulsory_steps and missing_steps. If it exists, the task is not complete
         if compulsory_steps.intersection(missing_steps):
@@ -92,7 +92,7 @@ class YourDetailsTask(Task):
     form_steps = {
         "start": forms.StartForm,
         "email": forms.EmailForm,
-        "verify": forms.EmailVerifyForm,
+        "email_verify": forms.EmailVerifyForm,
         "name": forms.NameForm,
         "name_and_business_you_work_for": forms.NameAndBusinessYouWorkForForm,
     }
