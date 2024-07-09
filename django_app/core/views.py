@@ -13,7 +13,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, RedirectView, TemplateView
 from django_ratelimit.exceptions import Ratelimited
 from formtools.wizard.views import NamedUrlSessionWizardView
-from report_a_suspected_breach.tasklist import TaskList, get_tasklist
+from report_a_suspected_breach.tasklist import get_tasklist
 
 from .forms import CookiesConsentForm, HideCookiesForm
 
@@ -180,8 +180,11 @@ class BaseWizardView(NamedUrlSessionWizardView):
 
 
 class BaseTemplateView(TemplateView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.tasklist = get_tasklist(self, non_wizard_view=True)
+
     def get_steps(self) -> list[str]:
-        self.tasklist: TaskList = get_tasklist(self, non_wizard_view=True)
         step_list = []
         for task in self.tasklist.tasks:
             step_list.extend(task.form_steps.keys())
@@ -190,7 +193,7 @@ class BaseTemplateView(TemplateView):
     def get_step_url(self, step: str) -> str:
         steps = self.get_steps()
         for step_name in steps:
-            return self.tasklist.tasks.start_url if step_name == step else reverse_lazy("report_a_suspected_breach_view:tasklist")
+            return self.tasklist.tasks.start_url if step_name == step else reverse_lazy("report_a_suspected_breach:landing")
 
 
 class RedirectBaseDomainView(RedirectView):
