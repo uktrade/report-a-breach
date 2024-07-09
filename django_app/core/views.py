@@ -221,7 +221,7 @@ class CookiesConsentView(FormView):
         if "came_from_cookies_page" in self.request.GET:
             response = redirect(reverse("cookies_consent") + "?cookies_set=true")
         else:
-            response = redirect(self.request.session.pop("redirect_back_to", "/") + "?cookies_set=true")
+            response = redirect(self.request.session.get("redirect_back_to", "/") + "?cookies_set=true")
 
         # regardless of their choice, we set a cookie to say they've made a choice
         response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
