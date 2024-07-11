@@ -312,3 +312,6 @@ CACHES = {
         },
     }
 }
+
+# Save every change to the session object to the DB
+SESSION_SAVE_EVERY_REQUEST = True

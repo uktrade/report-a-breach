@@ -68,8 +68,7 @@ class EmailView(BaseFormView):
 
     def form_valid(self, form: EmailForm) -> HttpResponse:
         reporter_email_address = form.cleaned_data.get("reporter_email_address")
-        self.request.session["completed_steps"].update({"reporter_email_address": reporter_email_address})
-
+        self.request.session["completed_steps"]["reporter_email_address"] = reporter_email_address
         verify_email(reporter_email_address, self.request)
         return super().form_valid(form)
 
@@ -217,7 +216,7 @@ class NameView(BaseFormView):
 
     def form_valid(self, form: NameForm) -> HttpResponse:
         name = form.cleaned_data["reporter_full_name"]
-        self.request.session["completed_steps"].update({"name": name})
+        self.request.session["completed_steps"]["name"] = name
         return super().form_valid(form)
 
 
@@ -372,7 +371,10 @@ class TaskView(TemplateView):
                     previous_task_completed = True
 
             if not success and task != "Your Details":
-                context["tasklist"][task]["can_start"] = False
+                if not previous_task_completed:
+                    context["tasklist"][task]["can_start"] = False
+                else:
+                    context["tasklist"][task]["can_start"] = True
                 previous_task_completed = False
             elif not success and task == "Your Details":
                 context["tasklist"][task]["can_start"] = True
