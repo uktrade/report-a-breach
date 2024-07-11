@@ -306,7 +306,7 @@ class TaskView(TemplateView):
             "success_steps": ["name", "name_and_business_you_work_for"],
         },
         "Second_Task": {"steps": ["anything"], "success_steps": ["abc"], "hint_text": "Some text"},
-        "Third_Task": {"steps": ["can't start"], "success_steps": ["123"]},
+        "Third_Task": {"steps": ["can't start"], "success_steps": ["123"], "hint_text": "Third task text"},
     }
 
     @staticmethod
@@ -324,11 +324,18 @@ class TaskView(TemplateView):
             context["tasklist"][task] = {}
             if not previous_task_completed and task != "Your Details":
                 context["tasklist"][task]["status"] = "Cannot start yet"
+            elif task == "Your Details":
+                context["tasklist"][task]["status"] = "Not yet started"
+            elif previous_task_completed:
+                context["tasklist"][task]["status"] = "Not yet started"
+
+            if self.tasklist[task].get("hint_text", ""):
+                context["tasklist"][task]["hint_text"] = self.tasklist[task]["hint_text"]
             context["tasklist"][task]["underscored_task_name"] = self.underscored_task_name(task)
             context["tasklist"][task]["start_url"] = self.tasklist[task]["steps"][0]
             context["tasklist"][task]["name"] = task
-            if self.tasklist[task].get("hint_text", ""):
-                context["tasklist"][task]["hint_text"] = self.tasklist[task]["hint_text"]
+
+            # Check if the task has been completed, if so update the status variables
             success = False
             for success_step in self.tasklist[task]["success_steps"]:
                 if success_step in self.request.session.get("completed_steps", {}):
@@ -336,7 +343,6 @@ class TaskView(TemplateView):
                     success = True
             if not success:
                 context["tasklist"][task]["can_start"] = previous_task_completed
-                context["tasklist"][task]["status"] = "Not yet started"
             else:
                 previous_task_completed = True
             if task == "Your Details":
