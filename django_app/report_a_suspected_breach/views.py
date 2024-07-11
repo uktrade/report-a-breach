@@ -57,7 +57,6 @@ class StartView(BaseFormView):
         self.request.session["completed_steps"] = {
             "reporter_professional_relationship": form.cleaned_data["reporter_professional_relationship"]
         }
-        self.request.session.modified = True
         return super().form_valid(form)
 
 
@@ -230,8 +229,9 @@ class NameAndBusinessYouWorkForView(BaseFormView):
         return reverse_lazy("report_a_suspected_breach:landing")
 
     def form_valid(self, form: NameAndBusinessYouWorkForForm) -> HttpResponse:
-        name_and_business_you_work_for = form.cleaned_data["name_and_business_you_work_for"]
-        self.request.session["completed_steps"].update({"name_and_business_you_work_for": name_and_business_you_work_for})
+        name = form.cleaned_data["reporter_full_name"]
+        business_you_work_for = form.cleaned_data["reporter_name_of_business_you_work_for"]
+        self.request.session["completed_steps"]["name_and_business_you_work_for"] = [name, business_you_work_for]
         return super().form_valid(form)
 
 
