@@ -299,19 +299,47 @@ class ZeroEndUsersView(FormView):
 class TaskView(TemplateView):
     template_name = "report_a_suspected_breach/tasklist.html"
 
-    # TODO: add rest of the tasks
     tasklist = {
         "Your Details": {
             "steps": ["start", "email", "email_verify"],
             "success_steps": ["name", "name_and_business_you_work_for"],
         },
-        "Second_Task": {"steps": ["anything"], "success_steps": ["abc"], "hint_text": "Some text"},
-        "Third_Task": {"steps": ["can't start"], "success_steps": ["123"], "hint_text": "Third task text"},
+        "About the person or business you're reporting": {
+            "steps": [
+                "are_you_reporting_a_business_on_companies_house",
+                "do_you_know_the_registered_company_number",
+                "manual_companies_house_input",
+                "where_is_the_address_of_the_business_or_person",
+            ],
+            "success_steps": ["check_company_details", "business_or_person_details"],
+            "hint_text": "Contact details",
+        },
+        "Overview of the suspected breach": {
+            "steps": [
+                "when_did_you_first_suspect",
+                "which_sanctions_regime",
+            ],
+            "success_steps": ["what_were_the_goods"],
+            "hint_text": "Which sanctions were breached, and what were the goods or services",
+        },
+        "The supply chain": {
+            "steps": [
+                "where_were_the_goods_supplied_from",
+                "about_the_supplier",
+                "where_were_the_goods_made_available_from",
+                "where_were_the_goods_supplied_to",
+                "where_were_the_goods_made_available_to",
+                "about_the_end_user",
+            ],
+            "success_steps": ["were_there_other_addresses_in_the_supply_chain"],
+            "hint_text": "Contact details for the supplier, end-user and anyone else in the supply chain",
+        },
+        "Sanctions breach details": {
+            "steps": ["upload_documents"],
+            "success_steps": ["tell_us_about_the_suspected_breach"],
+            "hint_text": "Upload documents and give any additional information",
+        },
     }
-
-    @staticmethod
-    def underscored_task_name(name: str) -> str:
-        return name.lower().replace(" ", "_")
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -331,20 +359,22 @@ class TaskView(TemplateView):
 
             if self.tasklist[task].get("hint_text", ""):
                 context["tasklist"][task]["hint_text"] = self.tasklist[task]["hint_text"]
-            context["tasklist"][task]["underscored_task_name"] = self.underscored_task_name(task)
+            context["tasklist"][task]["underscored_task_name"] = task.lower().replace(" ", "_")
             context["tasklist"][task]["start_url"] = self.tasklist[task]["steps"][0]
             context["tasklist"][task]["name"] = task
 
-            # Check if the task has been completed, if so update the status variables
+            # Check if the task has been completed
             success = False
             for success_step in self.tasklist[task]["success_steps"]:
                 if success_step in self.request.session.get("completed_steps", {}):
                     context["tasklist"][task]["status"] = "Completed"
                     success = True
-            if not success:
-                context["tasklist"][task]["can_start"] = previous_task_completed
-            else:
-                previous_task_completed = True
-            if task == "Your Details":
+                    previous_task_completed = True
+
+            if not success and task != "Your Details":
+                context["tasklist"][task]["can_start"] = False
+                previous_task_completed = False
+            elif not success and task == "Your Details":
                 context["tasklist"][task]["can_start"] = True
+
         return context
