@@ -7,47 +7,35 @@
         <h1 class="govuk-heading-l">Report a suspected breach of trade sanctions</h1>
         <ul class="govuk-task-list">
             {% for task in tasklist %}
-                {% if task.show_on_tasklist %}
-                    <li class="govuk-task-list__item govuk-task-list__item--with-link {% if not task.can_start %}tasklist_no_hover{% endif %}">
-                        <div class="govuk-task-list__name-and-hint">
-                            {% if task.can_start %}
-                                <a class="govuk-link govuk-task-list__link" href="{{ task.start_url }}?start=true"
-                                   aria-describedby="{{ task.underscored_task_name }}_hint {{ task.underscored_task_name }}_status">
-                                    {{ forloop.counter }}. {{ task.name }}
-                                </a>
-                            {% else %}
-                                <a class="govuk-body mb-1"
-                                   aria-describedby="{{ task.underscored_task_name }}_hint {{ task.underscored_task_name }}_status">
-                                    {{ forloop.counter }}. {{ task.name }}
-                                </a>
-                            {% endif %}
-                            {% if task.hint_text %}
-                                <p id="{{ task.underscored_task_name }}_hint" class="govuk-task-list__hint">
-                                    {{ task.hint_text }}
-                                </p>
-                            {% endif %}
-                        </div>
-                        {% if task.can_start %}
-                            <div
-                                class="govuk-task-list__status"
-                                id="{{ task.underscored_task_name }}_status">
-                                <strong class="govuk-tag govuk-tag--blue">
-                                    {{ task.status }}
-                                </strong>
-                            </div>
-                        {% else %}
-                            <div
-                                class="govuk-task-list__status govuk-task-list__status--cannot-start-yet"
-                                id="{{ task.underscored_task_name }}_status">
-                                {{ task.status }}
-                            </div>
+                <li class="govuk-task-list__item govuk-task-list__item--with-link ">
+                    <div class="govuk-task-list__name-and-hint">
+                        <a class="govuk-link govuk-task-list__link" href="{{ task.url }}?start=true"
+                           aria-describedby="
+                                             {% if task.help_text %}{{ task.key }}_hint{% endif %} {{ task.key }}_status">
+                            {{ forloop.counter }}. {{ task.title }}
+                        </a>
+                        {% if task.help_text %}
+                            <p id="{{ task.key }}_hint" class="govuk-task-list__hint">
+                                {{ task.help_text }}
+                            </p>
                         {% endif %}
-                    </li>
-                {% endif %}
+                    </div>
+                    <div
+                        class="govuk-task-list__status {% if not task.can_start %}govuk-task-list__status govuk-task-list__status--cannot-start-yet{% endif %}"
+                        id="{{ task.key }}_status">
+                        {% if task.can_start %}
+                            <strong class="govuk-tag govuk-tag--blue">
+                        {% endif %}
+                        {{ task.status_text }}
+                        {% if task.can_start %}
+                            </strong>
+                        {% endif %}
+                    </div>
+                </li>
             {% endfor %}
         </ul>
-        {% if tasklist.complete %}
-            <a href="{% get_wizard_step_url step_name=view.steps.current %}?start=true" class="govuk-button"
+        {% if show_continue_button %}
+            <a href="" class="govuk-button"
                data-module="govuk-button">
                 Continue
             </a>

@@ -187,7 +187,7 @@ class ReportABreachWizardView(BaseWizardView):
         that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
 
         # we're importing these methods here to avoid circular imports
-        from .form_step_conditions import (
+        from .form_step_conditions_old import (
             show_check_company_details_page_condition,
             show_name_and_business_you_work_for_page,
         )
@@ -316,7 +316,9 @@ class ReportABreachWizardView(BaseWizardView):
             "where_were_the_goods_supplied_from",
             "where_were_the_goods_made_available_from",
         ):
-            from .form_step_conditions import show_check_company_details_page_condition
+            from .form_step_conditions_old import (
+                show_check_company_details_page_condition,
+            )
 
             obtained_from_companies_house = show_check_company_details_page_condition(self)
             if obtained_from_companies_house:
@@ -385,7 +387,7 @@ class ReportABreachWizardView(BaseWizardView):
     def done(self, form_list: list[str], **kwargs: object) -> HttpResponse:
         cleaned_data = self.get_all_cleaned_data()
         # we're importing these methods here to avoid circular imports
-        from .form_step_conditions import (
+        from .form_step_conditions_old import (
             show_about_the_supplier_page,
             show_check_company_details_page_condition,
             show_name_and_business_you_work_for_page,
@@ -600,7 +602,7 @@ class EmailVerifyView(FormView):
 
     def get_success_url(self) -> str:
         # we're importing these methods here to avoid circular imports
-        from .form_step_conditions import (
+        from .form_step_conditions_old import (
             show_name_and_business_you_work_for_page,
             show_name_page,
         )
