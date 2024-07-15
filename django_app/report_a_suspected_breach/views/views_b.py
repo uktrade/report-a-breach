@@ -60,8 +60,7 @@ class WhereIsTheAddressOfTheBusinessOrPersonView(BaseFormView):
 
     def get_success_url(self) -> str:
         is_uk_address = self.form.cleaned_data.get("where_is_the_address") == "in_the_uk"
-        self.request.session["is_uk_address"] = is_uk_address
-        return reverse("report_a_suspected_breach:business_or_person_details")
+        return reverse("report_a_suspected_breach:business_or_person_details", kwargs={"is_uk_address": is_uk_address})
 
 
 class BusinessOrPersonDetailsView(BaseFormView):
@@ -72,5 +71,5 @@ class BusinessOrPersonDetailsView(BaseFormView):
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
-        kwargs["is_uk_address"] = self.request.session["is_uk_address"]
+        kwargs["is_uk_address"] = True if "True" in self.request.path else False
         return kwargs

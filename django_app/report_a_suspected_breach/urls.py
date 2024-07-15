@@ -33,7 +33,11 @@ views_a_urls = [
         views_b.WhereIsTheAddressOfTheBusinessOrPersonView.as_view(),
         name="where_is_the_address_of_the_business_or_person",
     ),
-    path("business_or_person_details", views_b.BusinessOrPersonDetailsView.as_view(), name="business_or_person_details"),
+    path(
+        "business_or_person_details/<str:is_uk_address>/",
+        views_b.BusinessOrPersonDetailsView.as_view(),
+        name="business_or_person_details",
+    ),
 ]
 
 urlpatterns = generic_urls + views_a_urls
