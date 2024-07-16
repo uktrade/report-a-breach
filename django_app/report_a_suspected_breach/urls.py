@@ -1,5 +1,5 @@
 from django.urls import path
-from report_a_suspected_breach.views import generic, views_a, views_b
+from report_a_suspected_breach.views import generic, views_a, views_b, views_c
 
 app_name = "report_a_suspected_breach"
 
@@ -38,6 +38,9 @@ views_a_urls = [
         views_b.BusinessOrPersonDetailsView.as_view(),
         name="business_or_person_details",
     ),
+    path("when_did_you_first_suspect", views_c.WhenDidYouFirstSuspectView.as_view(), name="when_did_you_first_suspect"),
+    path("which_sanctions_regime", views_c.WhichSanctionsRegimeView.as_view(), name="which_sanctions_regime"),
+    path("what_were_the_goods", views_c.WhatWereTheGoodsView.as_view(), name="what_were_the_goods"),
 ]
 
 urlpatterns = generic_urls + views_a_urls
