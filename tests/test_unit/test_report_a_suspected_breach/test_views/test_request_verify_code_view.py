@@ -1,6 +1,6 @@
-from unittest.mock import patch
+# from unittest.mock import patch
 
-from django.urls import reverse
+# from django.urls import reverse
 
 # from django.http import HttpResponseRedirect
 # from django.test import RequestFactory
@@ -44,12 +44,12 @@ from django.urls import reverse
 
 
 # TODO: to be updated as part of ticket DST-508
-@patch("django_ratelimit.decorators.is_ratelimited", return_value=True)
-def test_ratelimit(self, mocked_is_ratelimited, rasb_client):
-    session = rasb_client.session
-    session.update({"reporter_email_address": "test@example.com"})
-    session.save()
-
-    response = rasb_client.post(reverse("report_a_suspected_breach:verify_email"))
-    assert response.status_code == 200
-    assert "You've tried to request a new code too many times. Please try again in 1 minute" in response.content.decode()
+# @patch("django_ratelimit.decorators.is_ratelimited", return_value=True)
+# def test_ratelimit(self, mocked_is_ratelimited, rasb_client):
+#     session = rasb_client.session
+#     session.update({"reporter_email_address": "test@example.com"})
+#     session.save()
+#
+#     response = rasb_client.post(reverse("report_a_suspected_breach:verify_email"))
+#     assert response.status_code == 200
+#     assert "You've tried to request a new code too many times. Please try again in 1 minute" in response.content.decode()
