@@ -12,6 +12,7 @@ views_a_urls = [
     path("start", views_a.StartView.as_view(), name="start"),
     path("email", views_a.WhatIsYourEmailAddressView.as_view(), name="email"),
     path("verify_email", views_a.EmailVerifyView.as_view(), name="verify_email"),
+    path("request_verify_code", views_a.RequestVerifyCodeView.as_view(), name="request_verify_code"),
     path(
         "name_and_business_you_work_for", views_a.NameAndBusinessYouWorkForView.as_view(), name="name_and_business_you_work_for"
     ),
