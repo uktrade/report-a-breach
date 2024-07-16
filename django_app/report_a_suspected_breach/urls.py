@@ -17,6 +17,9 @@ views_a_urls = [
         "name_and_business_you_work_for", views_a.NameAndBusinessYouWorkForView.as_view(), name="name_and_business_you_work_for"
     ),
     path("name", views_a.YourNameView.as_view(), name="name"),
+]
+
+view_b_urls = [
     path(
         "are_you_reporting_a_business_on_companies_house",
         views_b.AreYouReportingCompaniesHouseBusinessView.as_view(),
@@ -41,7 +44,7 @@ views_a_urls = [
     ),
 ]
 
-urlpatterns = generic_urls + views_a_urls
+urlpatterns = generic_urls + views_a_urls + view_b_urls
 
 step_to_view_dict = {}
 view_to_step_dict = {}
