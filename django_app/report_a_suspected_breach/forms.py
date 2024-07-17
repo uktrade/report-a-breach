@@ -123,6 +123,7 @@ class EmailVerifyForm(BaseForm):
         super().__init__(*args, **kwargs)
         self.request = kwargs.pop("request") if "request" in kwargs else None
         request_verify_code = reverse_lazy("report_a_suspected_breach:request_verify_code")
+        self.helper.layout = Layout(Fieldset(Field.text("email_verification_code", field_width=Fixed.FIVE)))
         self.helper["email_verification_code"].wrap(
             Field,
             HTMLTemplate(
@@ -130,7 +131,6 @@ class EmailVerifyForm(BaseForm):
                 {"request_verify_code": request_verify_code},
             ),
         )
-        self.helper.layout = Layout(Fieldset(Field.text("email_verification_code", field_width=Fixed.FIVE)))
 
 
 class NameForm(BaseModelForm):
