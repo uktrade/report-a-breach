@@ -26,12 +26,16 @@ class WhereWereTheGoodsSuppliedFromView(BaseFormView):
 
 class AboutTheSupplierView(BaseFormView):
     form_class = forms.AboutTheSupplierForm
-    success_url = reverse_lazy("report_a_suspected_breach:where_were_the_goods_supplied_to")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["is_uk_address"] = True if self.kwargs["is_uk_address"] == "True" else False
         return kwargs
+
+    def get_success_url(self) -> str:
+        if not self.request.session.get("made_available_journey"):
+            return reverse("report_a_suspected_breach:where_were_the_goods_supplied_to")
+        return reverse("report_a_suspected_breach:where_were_the_goods_supplied_from")
 
 
 class WhereWereTheGoodsSuppliedToView(BaseFormView):
@@ -76,34 +80,34 @@ class WereThereOtherAddressesInTheSupplyChainView(BaseFormView):
     )
 
 
-# option 1
-#  if other
-# about the supplier
-# if same or i dont know
-# where were the goods supplied to
-# about the end user
-# you've added end user
-# were there any other addresses?
-# end
+class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
+    form_class = forms.WhereWereTheGoodsMadeAvailableFromForm
 
-# option 2 - not supplied yet
-# made available from
-# same address
-#  made available to
-# end user if not i dont know
-# were there any other addresses?
-# end
+    def get_success_url(self) -> str:
+        success_paths = {
+            "about_the_supplier": ["different_uk_address", "outside_the_uk"],
+            "where_were_the_goods_made_available_to": ["same_address", "do_not_know"],
+        }
+        form_data = self.form.cleaned_data.get("where_were_the_goods_made_available_from")
+        for path, choices in success_paths.items():
+            if form_data in choices:
+                if path == "about_the_supplier":
+                    is_uk_address = form_data == "different_uk_address"
+                    return reverse(f"report_a_suspected_breach:{path}", kwargs={"is_uk_address": is_uk_address})
+                return reverse(f"report_a_suspected_breach:{path}")
+
+    def form_valid(self, form: forms.WhereWereTheGoodsMadeAvailableFromForm) -> HttpResponse:
+        self.request.session["made_available_journey"] = True
+        self.request.session.modified = True
+        return super().form_valid(form)
 
 
-# option 3
+class WhereWereTheGoodsMadeAvailableToView(BaseFormView):
+    form_class = forms.WhereWereTheGoodsMadeAvailableToForm
 
-# class AboutTheSupplierView(BaseFormView):
-#     form_class = forms.AboutTheSupplierForm
-#
-#     def get_success_url(self):
-#
-#         pass
-#
-# class WhereWereTheGoodsMadeAvailableView(BaseFormView):
-#     form_class = forms.WhereWereTheGoodsSuppliedFromForm
-#     success_url = reverse_lazy("report_a_suspected_breach:about_the_supplier")
+    def get_success_url(self) -> str:
+        form_data = self.form.cleaned_data.get("where_were_the_goods_made_available_to")
+        if form_data == "do_not_know":
+            return reverse("report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain")
+        is_uk_address = form_data == "in_the_uk"
+        return reverse("report_a_suspected_breach:about_the_end_user", kwargs={"is_uk_address": is_uk_address})
