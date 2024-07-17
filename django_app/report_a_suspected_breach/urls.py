@@ -16,6 +16,9 @@ views_a_urls = [
         "name_and_business_you_work_for", views_a.NameAndBusinessYouWorkForView.as_view(), name="name_and_business_you_work_for"
     ),
     path("name", views_a.YourNameView.as_view(), name="name"),
+]
+
+view_b_urls = [
     path(
         "are_you_reporting_a_business_on_companies_house",
         views_b.AreYouReportingCompaniesHouseBusinessView.as_view(),
@@ -38,12 +41,15 @@ views_a_urls = [
         views_b.BusinessOrPersonDetailsView.as_view(),
         name="business_or_person_details",
     ),
+]
+
+view_c_urls = [
     path("when_did_you_first_suspect", views_c.WhenDidYouFirstSuspectView.as_view(), name="when_did_you_first_suspect"),
     path("which_sanctions_regime", views_c.WhichSanctionsRegimeView.as_view(), name="which_sanctions_regime"),
     path("what_were_the_goods", views_c.WhatWereTheGoodsView.as_view(), name="what_were_the_goods"),
 ]
 
-urlpatterns = generic_urls + views_a_urls
+urlpatterns = generic_urls + views_a_urls + view_b_urls + view_c_urls
 
 step_to_view_dict = {}
 view_to_step_dict = {}
