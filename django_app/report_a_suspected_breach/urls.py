@@ -18,7 +18,11 @@ views_a_urls = [
     path("name", views_a.YourNameView.as_view(), name="name"),
 ]
 
-urlpatterns = generic_urls + views_a_urls
+views_b_urls = []
+views_c_urls = []
+views_d_urls = []
+
+urlpatterns = generic_urls + views_a_urls + views_b_urls + views_c_urls + views_d_urls
 
 step_to_view_dict = {}
 view_to_step_dict = {}
