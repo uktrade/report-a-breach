@@ -19,7 +19,7 @@ class TaskListView(TemplateView):
                 "title": "Overview of the suspected breach",
                 "key": "overview_of_the_suspected_breach",
                 "help_text": "Which sanctions were breached, and what were the goods or services",
-                "url": reverse_lazy("report_a_suspected_breach:start"),
+                "url": reverse_lazy("report_a_suspected_breach:when_did_you_first_suspect"),
             },
             {
                 "title": "The supply chain",
