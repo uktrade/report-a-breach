@@ -11,14 +11,12 @@ class ReportBreachWebServiceConfig(AppConfig):
         if settings.ENVIRONMENT == "test":
             # if we're running on a test environment, we want to override the process_email_step method, so we always use the same
             # code for testing and don't send any emails
-            from config.settings.test import (
-                test_process_email_step,
+            from config.settings.test import (  # test_process_email_step,
                 test_request_verify_form_valid,
             )
-            from report_a_suspected_breach.views import (
-                ReportABreachWizardView,
-                RequestVerifyCodeView,
-            )
+            from report_a_suspected_breach.views.views_a import EmailVerifyView
 
-            ReportABreachWizardView.process_email_step = test_process_email_step
-            RequestVerifyCodeView.form_valid = test_request_verify_form_valid
+            # from utils.notifier import verify_email
+            #
+            # verify_email = test_process_email_step
+            EmailVerifyView.form_valid = test_request_verify_form_valid

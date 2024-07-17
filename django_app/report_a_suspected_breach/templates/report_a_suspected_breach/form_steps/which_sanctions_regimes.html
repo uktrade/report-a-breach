@@ -1,6 +1,5 @@
-{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% extends "report_a_suspected_breach/generic_nonwizard_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 
 {% block column_content %}
     {% error_summary form %}
@@ -11,9 +10,8 @@
         </legend>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ wizard.management_form }}
             <div class="govuk-fieldset__legend" id="checkbox"> Select all that apply </div>
-            {% crispy wizard.form %}
+            {% crispy form %}
         </form>
     </fieldset>
 {% endblock column_content %}
