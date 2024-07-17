@@ -65,12 +65,19 @@ class TestEmailVerifyForm:
         assert not form.is_valid()
         assert "email_verification_code" in form.errors
 
-    def test_email_verify_form_expired_code(self, rasb_client):
+    def test_email_verify_form_expired_code_2_hours(self, rasb_client):
         self.obj.date_created = self.obj.date_created - timedelta(days=1)
         self.obj.save()
         form = forms.EmailVerifyForm(data={"email_verification_code": self.verify_code}, request=self.request_object)
         assert not form.is_valid()
-        assert "email_verification_code" in form.errors
+        assert form.has_error("email_verification_code", "invalid")
+
+    def test_email_verify_form_expired_code_30_minutes(self, rasb_client):
+        self.obj.date_created = self.obj.date_created - timedelta(minutes=30)
+        self.obj.save()
+        form = forms.EmailVerifyForm(data={"email_verification_code": self.verify_code}, request=self.request_object)
+        assert not form.is_valid()
+        assert form.has_error("email_verification_code", "expired")
 
 
 class TestNameForm:

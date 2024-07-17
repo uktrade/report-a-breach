@@ -1,3 +1,4 @@
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.http import HttpResponse
@@ -50,3 +51,20 @@ class TestEmailVerifyCodeView:
             form.errors.as_data()["email_verification_code"][0].message
             == "You've tried to verify your email too many times. Try again in 1 minute"
         )
+
+    @patch("report_a_suspected_breach.views.views_a.verify_email")
+    def test_form_invalid_resent_code(self, mocked_verify_email, rasb_client):
+        session = rasb_client.session
+        session["reporter_email_address"] = "test@example.com"
+        session.save()
+
+        verification = ReporterEmailVerification.objects.create(
+            reporter_session=rasb_client.session._get_session_from_db(), email_verification_code="123456"
+        )
+        verification.date_created = verification.date_created - timedelta(minutes=30)
+        verification.save()
+
+        response = rasb_client.post(reverse("report_a_suspected_breach:verify_email"), data={"email_verification_code": "123456"})
+        assert response.status_code == 200
+        assert mocked_verify_email.called_once
+        assert mocked_verify_email.called_with("test@example.com")
