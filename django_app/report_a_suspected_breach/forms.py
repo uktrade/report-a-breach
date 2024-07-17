@@ -122,6 +122,7 @@ class EmailVerifyForm(BaseForm):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.request = kwargs.pop("request") if "request" in kwargs else None
+
         request_verify_code = reverse_lazy("report_a_suspected_breach:request_verify_code")
         self.helper["email_verification_code"].wrap(
             Field,
