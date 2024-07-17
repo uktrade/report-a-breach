@@ -80,7 +80,7 @@ def test_request_verify_form_valid(self, form: Form) -> HttpResponse:
 
     from django.contrib.sessions.models import Session
     from report_a_suspected_breach.models import ReporterEmailVerification
-    from report_a_suspected_breach.views import RequestVerifyCodeView
+    from report_a_suspected_breach.views.views_a import EmailVerifyView
 
     logger = logging.getLogger(__name__)
 
@@ -96,4 +96,4 @@ def test_request_verify_form_valid(self, form: Form) -> HttpResponse:
         email_verification_code=verify_code,
     )
     print(verify_code)
-    return super(RequestVerifyCodeView, self).form_valid(form)
+    return super(EmailVerifyView, self).form_valid(form)

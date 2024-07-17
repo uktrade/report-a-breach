@@ -13,13 +13,13 @@ class TaskListView(TemplateView):
                 "title": "About the person or business you're reporting",
                 "key": "about_the_person_or_business",
                 "help_text": "Contact details",
-                "url": reverse_lazy("report_a_suspected_breach:start"),
+                "url": reverse_lazy("report_a_suspected_breach:are_you_reporting_a_business_on_companies_house"),
             },
             {
                 "title": "Overview of the suspected breach",
                 "key": "overview_of_the_suspected_breach",
                 "help_text": "Which sanctions were breached, and what were the goods or services",
-                "url": reverse_lazy("report_a_suspected_breach:start"),
+                "url": reverse_lazy("report_a_suspected_breach:when_did_you_first_suspect"),
             },
             {
                 "title": "The supply chain",
