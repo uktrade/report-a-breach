@@ -14,10 +14,7 @@ class WhereWereTheGoodsSuppliedFromView(BaseFormView):
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
-        if (
-            self.request.session["do_you_know_the_registered_company_number"].get("do_you_know_the_registered_company_number")
-            == "yes"
-        ):
+        if self.request.session.get("company_details", {}).get("do_you_know_the_registered_company_number", "") == "yes":
             kwargs["address_string"] = self.request.session["company_details"].get("registered_office_address")
         else:
             kwargs["address_string"] = get_formatted_address(self.request.session["business_or_person_details"])
@@ -143,10 +140,7 @@ class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
-        if (
-            self.request.session["do_you_know_the_registered_company_number"].get("do_you_know_the_registered_company_number")
-            == "yes"
-        ):
+        if self.request.session.get("company_details", {}).get("do_you_know_the_registered_company_number", "") == "yes":
             kwargs["address_string"] = self.request.session["company_details"].get("registered_office_address")
         else:
             kwargs["address_string"] = get_formatted_address(self.request.session["business_or_person_details"])
@@ -155,7 +149,8 @@ class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
     def get_success_url(self) -> str:
         success_paths = {
             "about_the_supplier": ["different_uk_address", "outside_the_uk"],
-            "where_were_the_goods_made_available_to": ["same_address", "do_not_know"],
+            "where_were_the_goods_made_available_to": ["same_address"],
+            "were_there_other_addresses_in_the_supply_chain": ["i_do_not_know"],
         }
         form_data = self.form.cleaned_data.get("where_were_the_goods_made_available_from")
         for path, choices in success_paths.items():
