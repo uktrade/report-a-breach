@@ -170,7 +170,7 @@ class WhereWereTheGoodsMadeAvailableToView(BaseFormView):
 
     def get_success_url(self) -> str:
         form_data = self.form.cleaned_data.get("where_were_the_goods_made_available_to")
-        if form_data == "do_not_know":
+        if form_data == "i_do_not_know":
             return reverse("report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain")
         is_uk_address = form_data == "in_the_uk"
         self.request.session["is_uk_address"] = is_uk_address
