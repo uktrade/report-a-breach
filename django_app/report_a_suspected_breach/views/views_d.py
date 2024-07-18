@@ -185,4 +185,6 @@ class WhereWereTheGoodsMadeAvailableToView(BaseFormView):
         if form_data == "do_not_know":
             return reverse("report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain")
         is_uk_address = form_data == "in_the_uk"
-        return reverse("report_a_suspected_breach:about_the_end_user", kwargs={"is_uk_address": is_uk_address})
+        self.request.session["is_uk_address"] = is_uk_address
+        end_user_uuid = str(uuid.uuid4())
+        return reverse("report_a_suspected_breach:about_the_end_user", kwargs={"end_user_uuid": end_user_uuid})
