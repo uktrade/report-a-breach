@@ -52,13 +52,23 @@ class AboutTheSupplierView(BaseFormView):
 class WhereWereTheGoodsSuppliedToView(BaseFormView):
     form_class = forms.WhereWereTheGoodsSuppliedToForm
 
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        if self.request.method == "GET":
+            if end_user_uuid := self.request.GET.get("end_user_uuid", None):
+                if end_users_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None):
+                    kwargs["data"] = end_users_dict["dirty_data"]
+        return kwargs
+
     def get_success_url(self) -> str:
         form_data = self.form.cleaned_data.get("where_were_the_goods_supplied_to")
         if form_data == "i_do_not_know":
             return reverse("report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain")
         is_uk_address = form_data == "in_the_uk"
         self.request.session["is_uk_address"] = is_uk_address
-        end_user_uuid = str(uuid.uuid4())
+        end_user_uuid = self.request.GET.get("end_user_uuid", None)
+        if end_user_uuid is None:
+            end_user_uuid = str(uuid.uuid4())
         return reverse("report_a_suspected_breach:about_the_end_user", kwargs={"end_user_uuid": end_user_uuid})
 
 
@@ -82,8 +92,7 @@ class AboutTheEndUserView(BaseFormView):
         if not self.request.session.get("end_users"):
             self.request.session["end_users"] = {}
 
-        end_user_uuid = str(uuid.uuid4())
-        self.request.session["end_users"][end_user_uuid] = form.cleaned_data
+        self.request.session["end_users"][self.request.GET.get("end_user_uuid")] = form.cleaned_data
         return super().form_valid(form)
 
 
@@ -168,13 +177,23 @@ class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
 class WhereWereTheGoodsMadeAvailableToView(BaseFormView):
     form_class = forms.WhereWereTheGoodsMadeAvailableToForm
 
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        if self.request.method == "GET":
+            if end_user_uuid := self.request.GET.get("end_user_uuid", None):
+                if end_users_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None):
+                    kwargs["data"] = end_users_dict["dirty_data"]
+        return kwargs
+
     def get_success_url(self) -> str:
         form_data = self.form.cleaned_data.get("where_were_the_goods_made_available_to")
         if form_data == "i_do_not_know":
             return reverse("report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain")
         is_uk_address = form_data == "in_the_uk"
         self.request.session["is_uk_address"] = is_uk_address
-        end_user_uuid = str(uuid.uuid4())
+        end_user_uuid = self.request.GET.get("end_user_uuid", None)
+        if end_user_uuid is None:
+            end_user_uuid = str(uuid.uuid4())
         return reverse("report_a_suspected_breach:about_the_end_user", kwargs={"end_user_uuid": end_user_uuid})
 
 
