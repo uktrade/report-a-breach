@@ -1,5 +1,12 @@
 from django.urls import path
-from report_a_suspected_breach.views import generic, views_a, views_b, views_c, views_d
+from report_a_suspected_breach.views import (
+    generic,
+    views_a,
+    views_b,
+    views_c,
+    views_d,
+    views_e,
+)
 
 app_name = "report_a_suspected_breach"
 
@@ -19,7 +26,7 @@ views_a_urls = [
     path("name", views_a.YourNameView.as_view(), name="name"),
 ]
 
-view_b_urls = [
+views_b_urls = [
     path(
         "are_you_reporting_a_business_on_companies_house",
         views_b.AreYouReportingCompaniesHouseBusinessView.as_view(),
@@ -44,7 +51,7 @@ view_b_urls = [
     ),
 ]
 
-view_c_urls = [
+views_c_urls = [
     path("when_did_you_first_suspect", views_c.WhenDidYouFirstSuspectView.as_view(), name="when_did_you_first_suspect"),
     path("which_sanctions_regime", views_c.WhichSanctionsRegimeView.as_view(), name="which_sanctions_regime"),
     path("what_were_the_goods", views_c.WhatWereTheGoodsView.as_view(), name="what_were_the_goods"),
@@ -83,7 +90,18 @@ views_d_urls = [
     ),
 ]
 
-urlpatterns = generic_urls + views_a_urls + view_b_urls + view_c_urls + views_d_urls
+views_e_urls = [
+    path("upload_documents", views_e.UploadDocumentsView.as_view(), name="upload_documents"),
+    path("delete_documents", views_e.DeleteDocumentsView.as_view(), name="delete_documents"),
+    path("download_document/<str:file_name>", views_e.DownloadDocumentView.as_view(), name="download_document"),
+    path(
+        "tell_us_about_the_suspected_breach",
+        views_e.TellUsAboutTheSuspectedBreachView.as_view(),
+        name="tell_us_about_the_suspected_breach",
+    ),
+]
+
+urlpatterns = generic_urls + views_a_urls + views_b_urls + views_c_urls + views_d_urls + views_e_urls
 
 step_to_view_dict = {}
 view_to_step_dict = {}
