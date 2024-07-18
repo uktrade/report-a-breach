@@ -16,7 +16,4 @@ class ReportBreachWebServiceConfig(AppConfig):
             )
             from report_a_suspected_breach.views.views_a import EmailVerifyView
 
-            # from utils.notifier import verify_email
-            #
-            # verify_email = test_process_email_step
             EmailVerifyView.form_valid = test_request_verify_form_valid

@@ -1,6 +1,6 @@
 from typing import Any
 
-from core.views import BaseFormView
+from core.base_views import BaseFormView
 from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
 from report_a_suspected_breach import forms
