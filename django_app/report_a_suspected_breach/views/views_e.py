@@ -2,9 +2,9 @@ import logging
 import uuid
 from typing import Any
 
+from core.base_views import BaseFormView
 from core.document_storage import TemporaryDocumentStorage
 from core.utils import is_ajax
-from core.views import BaseFormView
 from django.core.cache import cache
 from django.forms import Form
 from django.http import Http404, HttpResponse, JsonResponse

@@ -1,4 +1,4 @@
-from core.views import BaseFormView
+from core.base_views import BaseFormView
 from django.urls import reverse_lazy
 from report_a_suspected_breach import forms
 

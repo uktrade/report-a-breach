@@ -215,7 +215,7 @@
                                 <a class="govuk-footer__link" href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">Cookies</a>
                             </li>
                             <li class="govuk-footer__inline-list-item hide-on-print">
-                                <a class="govuk-footer__link" href="{{ request.site.domain }}?reset=yes">Reset session</a>
+                                <a class="govuk-footer__link" href="{% url 'reset_session' %}">Reset session</a>
                             </li>
                         </ul>
                         <svg

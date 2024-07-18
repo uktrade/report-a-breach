@@ -9,9 +9,13 @@
             {% for task in tasklist %}
                 <li class="govuk-task-list__item govuk-task-list__item--with-link ">
                     <div class="govuk-task-list__name-and-hint">
-                        <a class="govuk-link govuk-task-list__link" href="{{ task.url }}?start=true"
+                        <a class="{% if task.can_start %}govuk-link govuk-task-list__link{% else %}govuk-body mb-1{% endif %}"
+                           {% if task.can_start %}href="{{ task.url }}?start=true"{% endif %}
                            aria-describedby="
-                                             {% if task.help_text %}{{ task.key }}_hint{% endif %} {{ task.key }}_status">
+                                             {% if task.help_text %}
+                                                 {{ task.key }}_hint
+                                             {% endif %}
+                                             {{ task.key }}_status">
                             {{ forloop.counter }}. {{ task.title }}
                         </a>
                         {% if task.help_text %}

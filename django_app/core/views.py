@@ -10,6 +10,7 @@ from django.forms import Form
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.views import View
 from django.views.generic import FormView, RedirectView
 from django_ratelimit.exceptions import Ratelimited
 from formtools.wizard.views import NamedUrlSessionWizardView
@@ -184,7 +185,7 @@ class RedirectBaseDomainView(RedirectView):
     @property
     def url(self) -> str:
         if is_report_a_suspected_breach_site(self.request.site):
-            return reverse("report_a_suspected_breach:landing")
+            return reverse("report_a_suspected_breach:tasklist")
         elif is_view_a_suspected_breach_site(self.request.site):
             # if users are not accessing a specific page in view-a-suspected-breach - raise a 404
             # unless they are staff, in which case take them to the manage users page
@@ -246,32 +247,9 @@ def rate_limited_view(request: HttpRequest, exception: Ratelimited) -> HttpRespo
     return HttpResponse("You have made too many", status=429)
 
 
-class BaseFormView(FormView):
-    template_name = "core/base_form_step.html"
+class ResetSessionView(View):
+    """Resets and clears the users session"""
 
-    @property
-    def step_name(self) -> str:
-        from report_a_suspected_breach.urls import view_to_step_dict
-
-        step_name = view_to_step_dict[self.__class__.__name__]
-        return step_name
-
-    def form_valid(self, form):
-        # we want to assign the form to the view ,so we can access it in the get_success_url method
-        self.form = form
-
-        # we want to store the form data in the session, so we can access it later on
-
-        self.request.session[self.step_name] = form.data
-
-        return super().form_valid(form)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-
-        kwargs["request"] = self.request
-
-        # restore the form data from the session, if it exists
-        if self.request.method == "GET":
-            kwargs["data"] = self.request.session.get(self.step_name, None)
-        return kwargs
+    def get(self, request: HttpRequest) -> HttpResponse:
+        request.session.flush()
+        return redirect("initial_redirect_view")

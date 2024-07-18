@@ -1,6 +1,6 @@
 import logging
 
-from core.views import BaseFormView
+from core.base_views import BaseFormView
 from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse_lazy
