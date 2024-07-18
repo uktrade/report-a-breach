@@ -46,6 +46,13 @@ class EmailVerifyView(BaseFormView):
         form.verification_object.save()
         return super().form_valid(form)
 
+    def form_invalid(self, form: forms.EmailVerifyForm) -> HttpResponse:
+        if form.has_error("email_verification_code", "expired"):
+            # we need to send the code again
+            reporter_email_address = self.request.session["reporter_email_address"]
+            verify_email(reporter_email_address, self.request)
+        return super().form_invalid(form)
+
 
 @method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class RequestVerifyCodeView(BaseFormView):

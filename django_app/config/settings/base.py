@@ -212,7 +212,7 @@ if SENTRY_DSN and SENTRY_ENVIRONMENT:
     )
 
 # Email Verification settings
-EMAIL_VERIFY_TIMEOUT_SECONDS = env.email_verify_timeout_seconds
+EMAIL_VERIFY_TIMEOUT_SECONDS = 900  # 15 minutes
 
 # Google Analytics
 GTM_ENABLED = env.gtm_enabled

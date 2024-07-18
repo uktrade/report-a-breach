@@ -90,7 +90,11 @@ class EmailVerifyForm(BaseForm):
 
     email_verification_code = forms.CharField(
         label="Enter the 6 digit security code",
-        error_messages={"required": "Enter the 6 digit security code we sent to your email"},
+        error_messages={
+            "required": "Enter the 6 digit security code we sent to your email",
+            "expired": "The code you entered is no longer valid. New code sent",
+            "invalid": "Code is incorrect. Enter the 6 digit security code we sent to your email",
+        },
         widget=forms.TextInput(attrs={"style": "max-width: 5em"}),
     )
 
@@ -107,15 +111,23 @@ class EmailVerifyForm(BaseForm):
         verification_object = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
         )
+
         self.verification_object = verification_object
         verify_code = verification_object.email_verification_code
         if email_verification_code != verify_code:
-            raise forms.ValidationError("Code is incorrect. Enter the 6 digit security code we sent to your email")
+            raise forms.ValidationError(self.fields["email_verification_code"].error_messages["invalid"], code="invalid")
 
         # check if the user has submitted the verify code within the specified timeframe
         allowed_lapse = verification_object.date_created + timedelta(seconds=verify_timeout_seconds)
         if allowed_lapse < now():
-            raise forms.ValidationError("The code you entered is no longer valid. Please verify your email again")
+            time_code_sent = verification_object.date_created
+
+            # 15 minutes ago, show a ‘code has expired’ error message and send the user a new code
+            # 2 hours ago, show an ‘incorrect security code’ message, even if the code was correct
+            if time_code_sent > (now() - timedelta(hours=2)):
+                raise forms.ValidationError(self.fields["email_verification_code"].error_messages["expired"], code="expired")
+            else:
+                raise forms.ValidationError(self.fields["email_verification_code"].error_messages["invalid"], code="invalid")
 
         return email_verification_code
 
