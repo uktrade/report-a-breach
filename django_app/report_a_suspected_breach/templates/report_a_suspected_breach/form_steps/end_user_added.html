@@ -1,6 +1,5 @@
 {% extends "report_a_suspected_breach/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 {% load countries %}
 
 {% block title %}You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1  or request.session.end_users.keys|length == 0 %}s{% endif %}{% endblock title %}
@@ -40,10 +39,10 @@
                     Name
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% if end_user.cleaned_data.name_of_person %}
-                        {{ end_user.cleaned_data.name_of_person }}
-                    {% elif end_user.cleaned_data.name_of_business %}
-                        {{ end_user.cleaned_data.name_of_business }}
+                    {% if end_user.name_of_person %}
+                        {{ end_user.name_of_person }}
+                    {% elif end_user.name_of_business %}
+                        {{ end_user.name_of_business }}
                     {% endif %}
                 </dd>
             </div>
@@ -52,7 +51,7 @@
                     Address
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ end_user.cleaned_data.readable_address }}
+                    {{ end_user.readable_address }}
                 </dd>
             </div>
         </dl>
@@ -60,7 +59,6 @@
     {% error_summary form %}
     <form method="post" enctype='multipart/form-data' novalidate>
         {% csrf_token %}
-        {{ wizard.management_form }}
-        {% crispy wizard.form %}
+        {% crispy form %}
     </form>
 {% endblock column_content %}
