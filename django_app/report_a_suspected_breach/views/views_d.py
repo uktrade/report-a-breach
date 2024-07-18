@@ -180,13 +180,6 @@ class WhereWereTheGoodsMadeAvailableToView(BaseFormView):
 
 class WereThereOtherAddressesInTheSupplyChainView(BaseFormView):
     form_class = forms.WereThereOtherAddressesInTheSupplyChainForm
-
-    def get_success_url(self) -> str:
-        form_data = self.form.cleaned_data.get("were_there_other_addresses_in_the_supply_chain")
-        if form_data in ["no", "i_do_not_know"]:
-            return reverse(
-                "report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "sanctions_breach_details"}
-            )
-        elif self.request.session.get("made_available_journey"):
-            return reverse("report_a_suspected_breach:where_were_the_goods_made_available_to")
-        return reverse("report_a_suspected_breach:where_were_the_goods_supplied_to")
+    success_url = reverse_lazy(
+        "report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "sanctions_breach_details"}
+    )
