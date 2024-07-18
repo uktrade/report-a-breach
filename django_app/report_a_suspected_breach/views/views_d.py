@@ -26,7 +26,7 @@ class WhereWereTheGoodsSuppliedFromView(BaseFormView):
     def get_success_url(self) -> str:
         success_paths = {
             "about_the_supplier": ["different_uk_address", "outside_the_uk"],
-            "where_were_the_goods_supplied_to": ["same_address", "do_not_know"],
+            "where_were_the_goods_supplied_to": ["same_address", "i_do_not_know"],
             "where_were_the_goods_made_available_from": ["they_have_not_been_supplied"],
         }
         form_data = self.form.cleaned_data.get("where_were_the_goods_supplied_from")
@@ -41,7 +41,7 @@ class WhereWereTheGoodsSuppliedFromView(BaseFormView):
 class AboutTheSupplierView(BaseFormView):
     form_class = forms.AboutTheSupplierForm
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
         kwargs["is_uk_address"] = True if self.kwargs["is_uk_address"] == "True" else False
         return kwargs
@@ -57,7 +57,7 @@ class WhereWereTheGoodsSuppliedToView(BaseFormView):
 
     def get_success_url(self) -> str:
         form_data = self.form.cleaned_data.get("where_were_the_goods_supplied_to")
-        if form_data == "do_not_know":
+        if form_data == "i_do_not_know":
             return reverse("report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain")
         is_uk_address = form_data == "in_the_uk"
         self.request.session["is_uk_address"] = is_uk_address
@@ -69,7 +69,7 @@ class AboutTheEndUserView(BaseFormView):
     form_class = forms.AboutTheEndUserForm
     success_url = reverse_lazy("report_a_suspected_breach:end_user_added")
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
 
         # restore the form data from the end_user_uuid, if it exists
@@ -94,7 +94,7 @@ class EndUserAddedView(BaseFormView):
     form_class = forms.EndUserAddedForm
     template_name = "report_a_suspected_breach/form_steps/end_user_added.html"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["end_users"] = self.request.session["end_users"]
         return context
@@ -121,7 +121,7 @@ class ZeroEndUsersView(BaseFormView):
     form_class = forms.ZeroEndUsersForm
     template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
 
-    def form_valid(self, form):
+    def form_valid(self, form: forms.ZeroEndUsersForm) -> HttpResponse:
         self.form = form
         return HttpResponseRedirect(self.get_success_url())
 
@@ -136,13 +136,6 @@ class ZeroEndUsersView(BaseFormView):
 
         else:
             return reverse("report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain")
-
-
-class WereThereOtherAddressesInTheSupplyChainView(BaseFormView):
-    form_class = forms.WereThereOtherAddressesInTheSupplyChainForm
-    success_url = reverse_lazy(
-        "report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "sanctions_breach_details"}
-    )
 
 
 class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
@@ -188,3 +181,17 @@ class WhereWereTheGoodsMadeAvailableToView(BaseFormView):
         self.request.session["is_uk_address"] = is_uk_address
         end_user_uuid = str(uuid.uuid4())
         return reverse("report_a_suspected_breach:about_the_end_user", kwargs={"end_user_uuid": end_user_uuid})
+
+
+class WereThereOtherAddressesInTheSupplyChainView(BaseFormView):
+    form_class = forms.WereThereOtherAddressesInTheSupplyChainForm
+
+    def get_success_url(self) -> str:
+        form_data = self.form.cleaned_data.get("were_there_other_addresses_in_the_supply_chain")
+        if form_data in ["no", "i_do_not_know"]:
+            return reverse(
+                "report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "sanctions_breach_details"}
+            )
+        elif self.request.session.get("made_available_journey"):
+            return reverse("report_a_suspected_breach:where_were_the_goods_made_available_to")
+        return reverse("report_a_suspected_breach:where_were_the_goods_supplied_to")

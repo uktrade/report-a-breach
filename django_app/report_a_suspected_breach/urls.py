@@ -63,7 +63,7 @@ views_d_urls = [
         views_d.WhereWereTheGoodsSuppliedFromView.as_view(),
         name="where_were_the_goods_supplied_from",
     ),
-    path("about_the_supplier", views_d.AboutTheSupplierView.as_view(), name="about_the_supplier"),
+    path("about_the_supplier/<str:is_uk_address>/", views_d.AboutTheSupplierView.as_view(), name="about_the_supplier"),
     path(
         "where_were_the_goods_made_available_from",
         views_d.WhereWereTheGoodsMadeAvailableFromView.as_view(),
