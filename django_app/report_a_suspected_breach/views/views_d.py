@@ -46,7 +46,7 @@ class AboutTheSupplierView(BaseFormView):
     def get_success_url(self) -> str:
         if not self.request.session.get("made_available_journey"):
             return reverse("report_a_suspected_breach:where_were_the_goods_supplied_to")
-        return reverse("report_a_suspected_breach:where_were_the_goods_supplied_from")
+        return reverse("report_a_suspected_breach:where_were_the_goods_made_available_to")
 
 
 class WhereWereTheGoodsSuppliedToView(BaseFormView):
