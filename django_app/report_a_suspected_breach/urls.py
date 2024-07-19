@@ -77,7 +77,7 @@ views_d_urls = [
     path(
         "where_were_the_goods_made_available_to/<str:end_user_uuid>/",
         views_d.WhereWereTheGoodsMadeAvailableToView.as_view(),
-        name="where_were_the_goods_made_available_to_end_user",
+        name="where_were_the_goods_made_available_to_end_user_uuid",
     ),
     path(
         "where_were_the_goods_supplied_to/<str:end_user_uuid>/",

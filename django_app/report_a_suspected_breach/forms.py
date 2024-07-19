@@ -598,11 +598,16 @@ class WhereWereTheGoodsSuppliedToForm(BaseForm):
     )
 
     def __init__(self, *args: object, **kwargs: object) -> None:
+        self.end_user_uuid = kwargs.pop("end_user_uuid", None)
         super().__init__(*args, **kwargs)
+
         if self.request.GET.get("add_another_end_user") == "yes" and self.request.method == "GET":
             # the user is trying to add another end-user, let's pop the "I do not know" option and clear their selection
             self.fields["where_were_the_goods_supplied_to"].choices.pop(-1)
             self.is_bound = False
+        if self.end_user_uuid:
+            # the user is trying to modify an end-user, pop the "I do not know" option
+            self.fields["where_were_the_goods_supplied_to"].choices.pop(-1)
 
 
 class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
@@ -622,11 +627,15 @@ class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
     )
 
     def __init__(self, *args: object, **kwargs: object) -> None:
+        self.end_user_uuid = kwargs.pop("end_user_uuid", None)
         super().__init__(*args, **kwargs)
         if self.request.GET.get("add_another_end_user") == "yes" and self.request.method == "GET":
             # the user is trying to add another end-user, let's pop the "I do not know" option
             self.fields["where_were_the_goods_made_available_to"].choices.pop(-1)
             self.is_bound = False
+        if self.end_user_uuid:
+            # the user is trying to modify an end-user, pop the "I do not know" option
+            self.fields["where_were_the_goods_made_available_to"].choices.pop(-1)
 
 
 class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
