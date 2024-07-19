@@ -39,10 +39,10 @@
                     Name
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% if end_user.name_of_person %}
-                        {{ end_user.name_of_person }}
-                    {% elif end_user.name_of_business %}
-                        {{ end_user.name_of_business }}
+                    {% if end_user.cleaned_data.name_of_person %}
+                        {{ end_user.cleaned_data.name_of_person }}
+                    {% elif end_user.cleaned_data.name_of_business %}
+                        {{ end_user.cleaned_data.name_of_business }}
                     {% endif %}
                 </dd>
             </div>
@@ -51,7 +51,7 @@
                     Address
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ end_user.readable_address }}
+                    {{ end_user.cleaned_data.readable_address }}
                 </dd>
             </div>
         </dl>

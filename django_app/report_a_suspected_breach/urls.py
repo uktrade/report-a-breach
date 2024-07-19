@@ -70,12 +70,22 @@ views_d_urls = [
         name="where_were_the_goods_made_available_from",
     ),
     path(
-        "where_were_the_goods_made_available_to/<str:end_user_uuid>/",
+        "where_were_the_goods_made_available_to",
         views_d.WhereWereTheGoodsMadeAvailableToView.as_view(),
         name="where_were_the_goods_made_available_to",
     ),
     path(
+        "where_were_the_goods_made_available_to/<str:end_user_uuid>/",
+        views_d.WhereWereTheGoodsMadeAvailableToView.as_view(),
+        name="where_were_the_goods_made_available_to_end_user",
+    ),
+    path(
         "where_were_the_goods_supplied_to/<str:end_user_uuid>/",
+        views_d.WhereWereTheGoodsSuppliedToView.as_view(),
+        name="where_were_the_goods_supplied_to_end_user_uuid",
+    ),
+    path(
+        "where_were_the_goods_supplied_to",
         views_d.WhereWereTheGoodsSuppliedToView.as_view(),
         name="where_were_the_goods_supplied_to",
     ),

@@ -78,10 +78,9 @@ class AboutTheEndUserView(BaseFormView):
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
-
         # restore the form data from the end_user_uuid, if it exists
         if self.request.method == "GET":
-            if end_user_uuid := self.request.GET.get("end_user_uuid", None):
+            if end_user_uuid := self.kwargs.get("end_user_uuid", None):
                 if end_users_dict := self.request.session.get("end_users", {}).get(end_user_uuid, None):
                     kwargs["data"] = end_users_dict["dirty_data"]
 
@@ -89,10 +88,15 @@ class AboutTheEndUserView(BaseFormView):
         return kwargs
 
     def form_valid(self, form: forms.AboutTheEndUserForm) -> HttpResponse:
-        if not self.request.session.get("end_users"):
-            self.request.session["end_users"] = {}
-
-        self.request.session["end_users"][self.request.GET.get("end_user_uuid")] = form.cleaned_data
+        end_users = self.request.session.get("end_users", {})
+        # get the end_user_uuid if it exists, otherwise create it
+        if end_user_uuid := self.request.GET.get("end_user_uuid", self.kwargs.get("end_user_uuid", str(uuid.uuid4()))):
+            # used to display the end_user_uuid data in end_users_added.html
+            end_users[end_user_uuid] = {
+                "cleaned_data": form.cleaned_data,
+                "dirty_data": form.data,
+            }
+        self.request.session["end_users"] = end_users
         return super().form_valid(form)
 
 
@@ -158,8 +162,7 @@ class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
     def get_success_url(self) -> str:
         success_paths = {
             "about_the_supplier": ["different_uk_address", "outside_the_uk"],
-            "where_were_the_goods_made_available_to": ["same_address"],
-            "were_there_other_addresses_in_the_supply_chain": ["i_do_not_know"],
+            "where_were_the_goods_made_available_to": ["same_address", "i_do_not_know"],
         }
         form_data = self.form.cleaned_data.get("where_were_the_goods_made_available_from")
         for path, choices in success_paths.items():
