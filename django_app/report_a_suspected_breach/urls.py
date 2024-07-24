@@ -1,5 +1,12 @@
 from django.urls import path
-from report_a_suspected_breach.views import generic, views_a, views_b, views_c, views_e
+from report_a_suspected_breach.views import (
+    generic,
+    views_a,
+    views_b,
+    views_c,
+    views_d,
+    views_e,
+)
 
 app_name = "report_a_suspected_breach"
 
@@ -50,6 +57,49 @@ views_c_urls = [
     path("what_were_the_goods", views_c.WhatWereTheGoodsView.as_view(), name="what_were_the_goods"),
 ]
 
+views_d_urls = [
+    path(
+        "where_were_the_goods_supplied_from",
+        views_d.WhereWereTheGoodsSuppliedFromView.as_view(),
+        name="where_were_the_goods_supplied_from",
+    ),
+    path("about_the_supplier/<str:is_uk_address>/", views_d.AboutTheSupplierView.as_view(), name="about_the_supplier"),
+    path(
+        "where_were_the_goods_made_available_from",
+        views_d.WhereWereTheGoodsMadeAvailableFromView.as_view(),
+        name="where_were_the_goods_made_available_from",
+    ),
+    path(
+        "where_were_the_goods_made_available_to",
+        views_d.WhereWereTheGoodsMadeAvailableToView.as_view(),
+        name="where_were_the_goods_made_available_to",
+    ),
+    path(
+        "where_were_the_goods_made_available_to/<str:end_user_uuid>/",
+        views_d.WhereWereTheGoodsMadeAvailableToView.as_view(),
+        name="where_were_the_goods_made_available_to_end_user_uuid",
+    ),
+    path(
+        "where_were_the_goods_supplied_to/<str:end_user_uuid>/",
+        views_d.WhereWereTheGoodsSuppliedToView.as_view(),
+        name="where_were_the_goods_supplied_to_end_user_uuid",
+    ),
+    path(
+        "where_were_the_goods_supplied_to",
+        views_d.WhereWereTheGoodsSuppliedToView.as_view(),
+        name="where_were_the_goods_supplied_to",
+    ),
+    path("about_the_end_user/<str:end_user_uuid>/", views_d.AboutTheEndUserView.as_view(), name="about_the_end_user"),
+    path("end_user_added", views_d.EndUserAddedView.as_view(), name="end_user_added"),
+    path("delete_end_user_view", views_d.DeleteEndUserView.as_view(), name="delete_end_user"),
+    path("zero_end_users", views_d.ZeroEndUsersView.as_view(), name="zero_end_users"),
+    path(
+        "were_there_other_addresses_in_the_supply_chain",
+        views_d.WereThereOtherAddressesInTheSupplyChainView.as_view(),
+        name="were_there_other_addresses_in_the_supply_chain",
+    ),
+]
+
 views_e_urls = [
     path("upload_documents", views_e.UploadDocumentsView.as_view(), name="upload_documents"),
     path("delete_documents", views_e.DeleteDocumentsView.as_view(), name="delete_documents"),
@@ -61,7 +111,7 @@ views_e_urls = [
     ),
 ]
 
-urlpatterns = generic_urls + views_a_urls + views_b_urls + views_c_urls + views_e_urls
+urlpatterns = generic_urls + views_a_urls + views_b_urls + views_c_urls + views_d_urls + views_e_urls
 
 step_to_view_dict = {}
 view_to_step_dict = {}

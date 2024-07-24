@@ -25,7 +25,7 @@ class TaskListView(TemplateView):
                 "title": "The supply chain",
                 "key": "supply_chain",
                 "help_text": "Contact details for the supplier, end-user and anyone else in the supply chain",
-                "url": reverse_lazy("report_a_suspected_breach:start"),
+                "url": reverse_lazy("report_a_suspected_breach:where_were_the_goods_supplied_from"),
             },
             {
                 "title": "Sanctions breach details",
