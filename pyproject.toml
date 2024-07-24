@@ -27,11 +27,9 @@ exclude_lines = [
     # Don't complain about missing debug-only code:
     'def __repr__',
     'if self\.debug',
-
     # Don't complain if tests don't hit defensive assertion code:
     'raise AssertionError',
     'raise NotImplementedError',
-
     # Don't complain if non-runnable code isn't run:
     'if 0:',
     'if __name__ == .__main__.:',
@@ -79,3 +77,24 @@ addopts = """
 """
 django_find_project = false
 pythonpath = "django_app"
+
+[tool.mypy]
+warn_unused_configs = true
+disallow_untyped_defs = true
+warn_return_any = false
+disable_error_code = [
+    "import-untyped",
+    "attr-defined",
+    "var-annotated",
+    "misc",
+    "import-not-found,"
+]
+exclude = [
+    "^tests/$",
+    "settings/$",
+    "migrations/$",
+]
+
+[[tool.mypy.overrides]]
+module = "django_app"
+ignore_missing_imports = true
