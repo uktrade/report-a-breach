@@ -34,6 +34,7 @@ redis = "~=5.0"
 django-redis = "*"
 django-csp = "~=3.8"
 django-ratelimit = "~=4.1.0"
+dbt-platform-helper = "==10.4.0"
 
 [dev-packages]
 black = "~=24.3"
