@@ -3,6 +3,7 @@ from typing import Any
 from core.base_views import BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
 from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
 from django.urls import reverse_lazy
 from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
@@ -72,7 +73,7 @@ class DeclarationView(BaseFormView):
             template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
             context={"user name": new_breach_object.reporter_full_name, "reference number": new_breach_object.reference},
         )
-        self.request.session["reference_id"] = new_breach_object.reference
+        self.request.session["breach_id"] = str(new_breach_object.pk)
         return super().form_valid(form)
 
 
@@ -81,6 +82,14 @@ class CompleteView(BaseTemplateView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        self.breach = Breach.objects.filter(reference=self.request.session.get("reference_id")).first()
-        context = get_breach_context_data(context, self.breach)
+        breach_object = Breach.objects.get(pk=self.request.session.get("breach_id"))
+
+        # we want to make sure that the user has access to the breach object,
+        # so we check if the session that created the breach object is the same as the current session
+        # if not, we raise a SuspiciousOperation. Sessions are wiped from the DB but users should really only see this
+        # page once they have submitted a report, so this should not be an issue.
+        if breach_object.reporter_session != self.request.session._get_session_from_db():
+            raise SuspiciousOperation("User does not have access to this breach object.")
+
+        context.update(get_breach_context_data(breach_object))
         return context

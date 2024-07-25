@@ -52,6 +52,7 @@ class Breach(BaseModel):
     )
     other_addresses_in_the_supply_chain = models.TextField(null=True, blank=True)
     tell_us_about_the_suspected_breach = models.TextField(null=True, blank=False)
+    reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
 
     def assign_reference(self) -> str:
         """Assigns a unique reference to this Breach object"""
@@ -64,7 +65,7 @@ class Breach(BaseModel):
 
     @classmethod
     def create_from_session(cls, request: "HttpRequest") -> "Breach":
-        """Creates a Breach object from the current session"""
+        """Creates a Breach object from the data stored in current session"""
         cleaned_data = get_all_cleaned_data(request)
 
         if show_name_and_business_you_work_for_page(request):
@@ -74,9 +75,10 @@ class Breach(BaseModel):
             ]
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
-            business_or_person_details_step = cleaned_data.get("business_or_person_details", {})
-            reporter_name_of_business_you_work_for = business_or_person_details_step.get("name", "")
+            business_or_person_details_step = cleaned_data["business_or_person_details"]
+            reporter_name_of_business_you_work_for = business_or_person_details_step["name"]
 
+        # atomic transaction so that if any part of the process fails, the whole process is rolled back
         with transaction.atomic():
             reporter_email_verification = ReporterEmailVerification.objects.filter(
                 reporter_session=request.session.session_key
@@ -108,6 +110,7 @@ class Breach(BaseModel):
                 tell_us_about_the_suspected_breach=cleaned_data["tell_us_about_the_suspected_breach"][
                     "tell_us_about_the_suspected_breach"
                 ],
+                reporter_session=request.session._get_session_from_db(),
             )
             # Save documents to s3 permanent bucket
             store_documents_in_s3(request, new_breach.id)
@@ -141,20 +144,17 @@ class Breach(BaseModel):
                     end_user_details["name"] = end_user_details.get("name_of_person", "")
                     PersonOrCompany.save_person_or_company(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
 
+        new_breach.assign_reference()
         new_breach.save()
         return new_breach
 
 
-class ReporterEmailVerification(BaseModel):
-    reporter_session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    email_verification_code = models.CharField(max_length=6)
-    date_created = models.DateTimeField(auto_now_add=True)
-    verified = models.BooleanField(default=False)
-
-
 class PersonOrCompany(BaseModel):
     @classmethod
-    def save_person_or_company(cls, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices):
+    def save_person_or_company(
+        cls, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> "PersonOrCompany":
+        """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
         return cls.objects.create(
             name=person_or_company.get("name", ""),
             name_of_business=person_or_company.get("name_of_business"),
@@ -176,7 +176,9 @@ class PersonOrCompany(BaseModel):
     @classmethod
     def save_companies_house_company(
         cls, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
-    ):
+    ) -> "PersonOrCompany":
+        """Converts a company retrieved from Companies House API into a PersonOrCompany object
+        and saves it to the database."""
         return cls.objects.create(
             name=companies_house_company.get("registered_company_name"),
             country="GB",
@@ -208,7 +210,6 @@ class PersonOrCompany(BaseModel):
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
     registered_office_address = models.CharField(null=True, blank=True)
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
 
 
 class SanctionsRegimeBreachThrough(BaseModel):
@@ -229,3 +230,10 @@ class UploadedDocument(BaseModel):
         ],
     )
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
+
+
+class ReporterEmailVerification(BaseModel):
+    reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
+    email_verification_code = models.CharField(max_length=6)
+    date_created = models.DateTimeField(auto_now_add=True)
+    verified = models.BooleanField(default=False)

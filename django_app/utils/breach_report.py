@@ -3,15 +3,14 @@ from typing import Any
 from core.document_storage import PermanentDocumentStorage
 from django.forms.models import model_to_dict
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
-from report_a_suspected_breach.models import PersonOrCompany
+from report_a_suspected_breach.models import Breach, PersonOrCompany
 from utils.companies_house import get_formatted_address
 from utils.s3 import get_breach_documents
 
 
-def get_breach_context_data(context, breach) -> dict[str, Any]:
+def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     """Method to return context information of a breach object and its related objects"""
-    # Breach
-    context["breach"] = breach
+    breach_context = {}
 
     # Breacher
     if breacher := PersonOrCompany.objects.filter(
@@ -21,32 +20,36 @@ def get_breach_context_data(context, breach) -> dict[str, Any]:
             breacher_address = breacher.registered_office_address
         else:
             breacher_address = get_formatted_address(model_to_dict(breacher))
-        context["breacher"] = breacher
-        context["breacher_address"] = breacher_address
+        breach_context["breacher"] = breacher
+        breach_context["breacher_address"] = breacher_address
 
     # Supplier
     if supplier := PersonOrCompany.objects.filter(
         breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.supplier
     ).first():
         supplier_address = get_formatted_address(model_to_dict(supplier))
-        context["supplier"] = supplier
-        context["supplier_address"] = supplier_address
+        breach_context["supplier"] = supplier
+        breach_context["supplier_address"] = supplier_address
 
     elif breach.where_were_the_goods_supplied_from == "same_address":
         if breacher:
-            context["supplier"] = breacher
-            context["supplier_address"] = breacher_address
+            breach_context["supplier"] = breacher
+            breach_context["supplier_address"] = breacher_address
 
     # End Users (recipients)
     recipients = PersonOrCompany.objects.filter(breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.recipient)
-    context["recipients"] = recipients
+    breach_context["recipients"] = recipients
 
     # Sanctions Regimes
     sanctions = breach.sanctions_regimes.all()
-    context["sanctions"] = sanctions
+    breach_context["sanctions"] = sanctions
 
     # Documents
     upload_documents = get_breach_documents(PermanentDocumentStorage(), str(breach.id))
-    context["documents"] = upload_documents
+    breach_context["documents"] = upload_documents
 
-    return context
+    # Reference
+    breach_context["reference"] = breach.reference
+    breach_context["reporter_email_address"] = breach.reporter_email_address
+
+    return breach_context
