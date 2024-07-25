@@ -27,3 +27,16 @@ def show_check_company_details_page_condition(request: HttpRequest) -> bool:
     )
 
     return show_page
+
+
+def show_about_the_supplier_page(request: HttpRequest) -> bool:
+    cleaned_data = get_cleaned_data_for_step(request, "where_were_the_goods_supplied_from")
+    cleaned_data_available = get_cleaned_data_for_step(request, "where_were_the_goods_made_available_from")
+    choices = ["different_uk_address", "outside_the_uk"]
+
+    show_page = (
+        cleaned_data.get("where_were_the_goods_supplied_from", False) in choices
+        or cleaned_data_available.get("where_were_the_goods_made_available_from", False) in choices
+    )
+
+    return show_page

@@ -115,6 +115,7 @@ views_e_urls = [
 views_f_urls = [
     path("check_your_answers", views_f.CheckYourAnswersView.as_view(), name="check_your_answers"),
     path("declaration", views_f.DeclarationView.as_view(), name="declaration"),
+    path("complete", views_f.CompleteView.as_view(), name="complete"),
 ]
 
 urlpatterns = generic_urls + views_a_urls + views_b_urls + views_c_urls + views_d_urls + views_e_urls + views_f_urls

@@ -2,12 +2,20 @@ from typing import Any
 
 from core.base_views import BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
+from django.conf import settings
+from django.urls import reverse_lazy
 from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
     show_name_and_business_you_work_for_page,
 )
 from report_a_suspected_breach.forms import DeclarationForm
-from report_a_suspected_breach.utils import get_cleaned_data_for_step
+from report_a_suspected_breach.models import Breach
+from report_a_suspected_breach.utils import (
+    get_all_cleaned_data,
+    get_cleaned_data_for_step,
+)
+from utils.breach_report import get_breach_context_data
+from utils.notifier import send_email
 from utils.s3 import get_all_session_files
 
 
@@ -20,14 +28,10 @@ class CheckYourAnswersView(BaseTemplateView):
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
         that are used to determine if a step should be shown, this is to avoid duplicating the logic here."""
-        from report_a_suspected_breach.urls import step_to_view_dict
 
         context = super().get_context_data(**kwargs)
 
-        all_cleaned_data = {}
-        form_views = [step for step, view in step_to_view_dict.items() if getattr(view, "form_class", None)]
-        for step_name in form_views:
-            all_cleaned_data[step_name] = get_cleaned_data_for_step(self.request, step_name)
+        all_cleaned_data = get_all_cleaned_data(self.request)
 
         context["form_data"] = all_cleaned_data
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self.request)
@@ -57,3 +61,26 @@ class CheckYourAnswersView(BaseTemplateView):
 
 class DeclarationView(BaseFormView):
     form_class = DeclarationForm
+    template_name = "report_a_suspected_breach/form_steps/declaration.html"
+    success_url = reverse_lazy("report_a_suspected_breach:complete")
+
+    def form_valid(self, form):
+        new_breach_object = Breach.create_from_session(self.request)
+        # Send confirmation email to the user
+        send_email(
+            email=new_breach_object.reporter_email_address,
+            template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
+            context={"user name": new_breach_object.reporter_full_name, "reference number": new_breach_object.reference},
+        )
+        self.request.session["reference_id"] = new_breach_object.reference
+        return super().form_valid(form)
+
+
+class CompleteView(BaseTemplateView):
+    template_name = "report_a_suspected_breach/complete.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        self.breach = Breach.objects.filter(reference=self.request.session.get("reference_id")).first()
+        context = get_breach_context_data(context, self.breach)
+        return context
