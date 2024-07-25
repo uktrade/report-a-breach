@@ -31,11 +31,17 @@ class TaskListView(TemplateView):
                 "title": "Sanctions breach details",
                 "key": "sanctions_breach_details",
                 "help_text": "Upload documents and give any additional information",
-                "url": reverse_lazy("report_a_suspected_breach:start"),
+                "url": reverse_lazy("report_a_suspected_breach:upload_documents"),
             },
         ]
 
         current_task_name = kwargs.get("current_task_name", "reporter_details")
+
+        if current_task_name == "summary":
+            context["show_continue_button"] = True
+        else:
+            context["show_continue_button"] = False
+
         seen_current_task = False
         for task in tasklist:
             if task["key"] == current_task_name:

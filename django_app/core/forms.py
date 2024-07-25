@@ -126,6 +126,12 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
         if self.is_uk_address:
             cleaned_data["country"] = "GB"
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
+        cleaned_data["is_uk_address"] = self.is_uk_address
+
+        # we want to get the actual website address, not just the domain or whatever the user has inputted
+        if website := cleaned_data.get("website"):
+            cleaned_data["clickable_website_url"] = website if website.startswith("http") else f"https://{website}"
+
         return cleaned_data
 
     def clean_postal_code(self) -> dict[str, Any]:

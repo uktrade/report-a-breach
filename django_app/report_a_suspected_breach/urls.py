@@ -6,6 +6,7 @@ from report_a_suspected_breach.views import (
     views_c,
     views_d,
     views_e,
+    views_f,
 )
 
 app_name = "report_a_suspected_breach"
@@ -111,11 +112,17 @@ views_e_urls = [
     ),
 ]
 
-urlpatterns = generic_urls + views_a_urls + views_b_urls + views_c_urls + views_d_urls + views_e_urls
+views_f_urls = [
+    path("check_your_answers", views_f.CheckYourAnswersView.as_view(), name="check_your_answers"),
+    path("declaration", views_f.DeclarationView.as_view(), name="declaration"),
+]
+
+urlpatterns = generic_urls + views_a_urls + views_b_urls + views_c_urls + views_d_urls + views_e_urls + views_f_urls
 
 step_to_view_dict = {}
 view_to_step_dict = {}
 
 for url in urlpatterns:
+
     step_to_view_dict[url.name] = url.callback.view_class
     view_to_step_dict[url.callback.view_class.__name__] = url.name

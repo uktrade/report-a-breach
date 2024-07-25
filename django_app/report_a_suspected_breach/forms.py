@@ -542,7 +542,7 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
         },
     )
 
-    def __init__(self, *args: object, address_string: str | None, **kwargs: object) -> None:
+    def __init__(self, *args: object, address_string: str | None = None, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
         if address_string is not None:
@@ -715,11 +715,6 @@ class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
             Field.textarea("additional_contact_details", field_width=Fluid.FULL, label_tag="h2", label_size=Size.MEDIUM),
         )
 
-    def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
-        cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
-        return cleaned_data
-
 
 class EndUserAddedForm(BaseForm):
     revalidate_on_done = False
@@ -740,6 +735,10 @@ class EndUserAddedForm(BaseForm):
         super().__init__(*args, **kwargs)
         self.helper.legend_size = Size.MEDIUM
         self.helper.legend_tag = None
+
+        # we never want to remember the choice to this question
+        if self.request.method == "GET":
+            self.is_bound = False
 
 
 class ZeroEndUsersForm(BaseForm):
