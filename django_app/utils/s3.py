@@ -1,8 +1,10 @@
 from typing import Any, List
 
+from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.cache import cache
+from django.http import HttpRequest
 from django.urls import reverse
 from storages.backends.s3boto3 import S3Boto3Storage
 
@@ -73,3 +75,23 @@ def get_user_uploaded_files(session: SessionBase) -> List[str]:
     cache_keys = list(cache.iter_keys(f"{session.session_key}*"))
     uploaded_files = [file_name for key, file_name in cache.get_many(cache_keys).items()]
     return uploaded_files
+
+
+def store_documents_in_s3(request: HttpRequest, breach_id: str) -> None:
+    """
+    Copies documents from the default temporary storage to permanent storage on s3
+    """
+    temporary_storage_bucket = TemporaryDocumentStorage()
+    permanent_storage_bucket = PermanentDocumentStorage()
+
+    if session_files := get_all_session_files(temporary_storage_bucket, request.session):
+        for object_key in session_files.keys():
+            permanent_storage_bucket.bucket.meta.client.copy(
+                CopySource={
+                    "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+                    "Key": f"{request.session.session_key}/{object_key}",
+                },
+                Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+                Key=f"{breach_id}/{object_key}",
+                SourceClient=temporary_storage_bucket.bucket.meta.client,
+            )
