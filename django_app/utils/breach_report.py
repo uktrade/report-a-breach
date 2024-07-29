@@ -51,5 +51,6 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     # Reference
     breach_context["reference"] = breach.reference
     breach_context["reporter_email_address"] = breach.reporter_email_address
+    breach_context["breach"] = breach
 
     return breach_context
