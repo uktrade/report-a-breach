@@ -489,7 +489,7 @@ class CompleteView(TemplateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         self.breach = Breach.objects.filter(reference=self.request.session.get("reference_id")).first()
-        context = get_breach_context_data(context, self.breach)
+        context.update(get_breach_context_data(self.breach))
         context["feedback_form"] = FeedbackForm()
 
         return context

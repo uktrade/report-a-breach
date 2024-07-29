@@ -77,4 +77,5 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["back_button_text"] = "View all suspected breach reports"
-        return get_breach_context_data(context, self.breach)
+        context.update(get_breach_context_data(self.breach))
+        return context
