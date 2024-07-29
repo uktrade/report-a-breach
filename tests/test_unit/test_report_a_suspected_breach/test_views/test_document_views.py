@@ -9,7 +9,7 @@ from utils.s3 import get_user_uploaded_files
 logger = logging.getLogger(__name__)
 
 
-@patch("report_a_suspected_breach.forms.get_all_session_files", new=lambda x, y: [])
+@patch("report_a_suspected_breach.forms.forms_e.get_all_session_files", new=lambda x, y: [])
 @patch("report_a_suspected_breach.views.views_e.get_all_session_files", new=lambda x, y: [])
 class TestDocumentUploadView:
     def test_successful_post(self, rasb_client):

@@ -157,8 +157,8 @@ class TestDoYouKnowTheRegisteredCompanyNumberForm:
         )
         assert form.is_valid()
 
-    @patch("report_a_suspected_breach.get_details_from_companies_house")
-    @patch("report_a_suspected_breach.get_formatted_address")
+    @patch("report_a_suspected_breach.forms.forms_b.get_details_from_companies_house")
+    @patch("report_a_suspected_breach.forms.forms_b.get_formatted_address")
     def test_clean(self, mocked_get_formatted_address, mocked_get_details_from_companies_house, request_object):
         mocked_get_details_from_companies_house.return_value = {
             "company_number": "12345678",
@@ -349,7 +349,7 @@ class TestUploadDocumentsForm:
         assert "document" in form.errors
         assert form.errors.as_data()["document"][0].code == "too_large"
 
-    @patch("report_a_suspected_breach.get_all_session_files", return_value=MockAllSessionFiles(length=10))
+    @patch("report_a_suspected_breach.forms.forms_e.get_all_session_files", return_value=MockAllSessionFiles(length=10))
     def test_too_many_uploaded(self, mocked_get_all_session_files, request_object):
         good_file = SimpleUploadedFile("good.pdf", b"%PDF-test_pdf")
 
