@@ -241,6 +241,19 @@ class TestAboutTheEndUserForm:
         assert "postal_code" in form.errors
         assert form.errors.as_data()["postal_code"][0].code == "invalid"
 
+    def test_clickable_website_url(self):
+        form = forms.AboutTheEndUserForm(data={"website": "example.com"})
+        form.is_valid()
+        assert form.cleaned_data["clickable_website_url"] == "https://example.com"
+
+        form = forms.AboutTheEndUserForm(data={"website": "https://example.com"})
+        form.is_valid()
+        assert form.cleaned_data["clickable_website_url"] == "https://example.com"
+
+        form = forms.AboutTheEndUserForm(data={"website": "https123://example.com"})
+        form.is_valid()
+        assert form.cleaned_data["clickable_website_url"] == "https123://example.com"
+
 
 class TestZeroEndUsersForm:
     def test_do_you_want_to_add_an_end_user_validation(self):

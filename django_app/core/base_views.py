@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, TemplateView
 from report_a_suspected_breach.utils import get_dirty_form_data
 
@@ -39,7 +40,7 @@ class BaseFormView(FormView):
         self.request.session[self.step_name] = form_data
 
         redirect_to_url = self.request.GET.get("redirect_to_url", None) or self.request.session.pop("redirect_to_url", None)
-        if redirect_to_url:
+        if redirect_to_url and url_has_allowed_host_and_scheme(redirect_to_url, allowed_hosts=None):
             if self.redirect_after_post:
                 # we want to redirect the user to a specific page after the form is submitted
                 return redirect(redirect_to_url)
