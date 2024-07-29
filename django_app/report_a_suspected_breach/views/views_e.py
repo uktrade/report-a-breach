@@ -29,11 +29,7 @@ class UploadDocumentsView(BaseFormView):
     form_class = forms.UploadDocumentsForm
     template_name = "report_a_suspected_breach/form_steps/upload_documents.html"
     file_storage = TemporaryDocumentStorage()
-
-    def get_form_kwargs(self) -> dict[str, Any]:
-        kwargs = super().get_form_kwargs()
-        kwargs["request"] = self.request
-        return kwargs
+    success_url = reverse_lazy("report_a_suspected_breach:tell_us_about_the_suspected_breach")
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         """Retrieve the already uploaded files from the session storage and add them to the context."""
@@ -46,6 +42,7 @@ class UploadDocumentsView(BaseFormView):
         """Loop through the files and save them to the temporary storage. If the request is Ajax, return a JsonResponse.
 
         If the request is not Ajax, redirect to the summary page (the next step in the form)."""
+
         for temporary_file in form.cleaned_data["document"]:
             # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
             # we add a unique identifier to the key, so we do not overwrite previous uploads
@@ -65,7 +62,7 @@ class UploadDocumentsView(BaseFormView):
         if is_ajax(self.request):
             return JsonResponse({"success": True}, status=200)
         else:
-            return redirect(("report_a_suspected_breach:tell_us_about_the_suspected_breach"))
+            return super().form_valid(form)
 
     def form_invalid(self, form: Form) -> HttpResponse:
         if is_ajax(self.request):

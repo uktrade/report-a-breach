@@ -59,8 +59,7 @@
     </div>
 
     <div class="moj-multi-file-upload">
-        <form id="main_file_upload_form" method="post" enctype='multipart/form-data' novalidate
-              action="{% url 'report_a_suspected_breach:upload_documents' %}">
+        <form id="main_file_upload_form" method="post" enctype='multipart/form-data' novalidate>
             {% csrf_token %}
             {% crispy form %}
         </form>

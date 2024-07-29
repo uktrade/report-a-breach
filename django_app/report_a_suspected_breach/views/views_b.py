@@ -21,6 +21,7 @@ class AreYouReportingCompaniesHouseBusinessView(BaseFormView):
 
 class DoYouKnowTheRegisteredCompanyNumberView(BaseFormView):
     form_class = forms.DoYouKnowTheRegisteredCompanyNumberForm
+    redirect_after_post = False
 
     def form_valid(self, form: forms.DoYouKnowTheRegisteredCompanyNumberForm) -> HttpResponse:
         self.form = form
@@ -57,6 +58,7 @@ class CheckCompanyDetailsView(BaseFormView):
 
 class WhereIsTheAddressOfTheBusinessOrPersonView(BaseFormView):
     form_class = forms.WhereIsTheAddressOfTheBusinessOrPersonForm
+    redirect_after_post = False
 
     def get_success_url(self) -> str:
         is_uk_address = self.form.cleaned_data.get("where_is_the_address") == "in_the_uk"

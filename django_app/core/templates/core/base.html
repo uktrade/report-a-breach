@@ -29,66 +29,78 @@
         <meta name="theme-color" content="#0b0c0c">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         {% block cookie_banner %}
-            {% if request.resolver_match.url_name != "cookies_consent" %}
-                {% if request.COOKIES.cookie_preferences_set != "true" %}
-                    <div class="govuk-cookie-banner hide-on-print" data-nosnippet role="region"
-                         aria-label="Cookies on Report a suspected trade sanctions breach">
-                        <div class="govuk-cookie-banner__message govuk-width-container">
-                            <div class="govuk-grid-row">
-                                <div class="govuk-grid-column-two-thirds">
-                                    <h2 class="govuk-cookie-banner__heading govuk-heading-m">
-                                        Cookies on Report a suspected breach of trade sanctions
-                                    </h2>
-                                    <div class="govuk-cookie-banner__content">
-                                        <p class="govuk-body">We use some essential cookies to make this service
-                                            work.</p>
-                                        <p class="govuk-body">We’d also like to use analytics cookies so we can
-                                            understand how you use the service and make improvements.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="govuk-button-group">
-                                <form method="post" action="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="govuk-button" data-module="govuk-button"
-                                            name="do_you_want_to_accept_analytics_cookies" value="True">
-                                        Accept analytics cookies
-                                    </button>
-                                    <button type="submit" class="govuk-button" data-module="govuk-button"
-                                            name="do_you_want_to_accept_analytics_cookies" value="False">
-                                        Reject analytics cookies
-                                    </button>
-                                    <a class="govuk-link" href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">View
-                                        cookies</a>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                {% if "cookies_set" in request.GET %}
-                    <form method="post" action="{% url 'hide_cookies' %}?banner=True">
-                        {% csrf_token %}
-                        <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
+            {% if gtm_enabled %}
+                {% if request.resolver_match.url_name != "cookies_consent" %}
+                    {% if request.COOKIES.cookie_preferences_set != "true" %}
+                        <div class="govuk-cookie-banner hide-on-print" data-nosnippet role="region"
+                             aria-label="Cookies on Report a suspected trade sanctions breach">
                             <div class="govuk-cookie-banner__message govuk-width-container">
                                 <div class="govuk-grid-row">
                                     <div class="govuk-grid-column-two-thirds">
+                                        <h2 class="govuk-cookie-banner__heading govuk-heading-m">
+                                            Cookies on Report a suspected breach of trade sanctions
+                                        </h2>
                                         <div class="govuk-cookie-banner__content">
-                                            {% if request.COOKIES.accepted_ga_cookies == "true" %}
-                                                <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">change your cookie settings</a> at any time.</p>
-                                            {% elif request.COOKIES.accepted_ga_cookies == "false" %}
-                                                <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">change your cookie settings</a> at any time.</p>
-                                            {% endif %}
+                                            <p class="govuk-body">We use some essential cookies to make this service
+                                                work.</p>
+                                            <p class="govuk-body">We’d also like to use analytics cookies so we can
+                                                understand how you use the service and make improvements.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="govuk-button-group">
-                                    <button type="submit" class="govuk-button" data-module="govuk-button" name="hide_cookies" value="True">
-                                        Hide cookie message
-                                    </button>
+                                    <form method="post"
+                                          action="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="govuk-button" data-module="govuk-button"
+                                                name="do_you_want_to_accept_analytics_cookies" value="True">
+                                            Accept analytics cookies
+                                        </button>
+                                        <button type="submit" class="govuk-button" data-module="govuk-button"
+                                                name="do_you_want_to_accept_analytics_cookies" value="False">
+                                            Reject analytics cookies
+                                        </button>
+                                        <a class="govuk-link"
+                                           href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">View
+                                            cookies</a>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    {% endif %}
+                    {% if "cookies_set" in request.GET %}
+                        <form method="post" action="{% url 'hide_cookies' %}?banner=True">
+                            {% csrf_token %}
+                            <div class="govuk-cookie-banner" data-nosnippet role="region"
+                                 aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
+                                <div class="govuk-cookie-banner__message govuk-width-container">
+                                    <div class="govuk-grid-row">
+                                        <div class="govuk-grid-column-two-thirds">
+                                            <div class="govuk-cookie-banner__content">
+                                                {% if request.COOKIES.accepted_ga_cookies == "true" %}
+                                                    <p class="govuk-body">You’ve accepted analytics cookies. You can <a
+                                                        class="govuk-link"
+                                                        href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">change
+                                                        your cookie settings</a> at any time.</p>
+                                                {% elif request.COOKIES.accepted_ga_cookies == "false" %}
+                                                    <p class="govuk-body">You’ve rejected analytics cookies. You can <a
+                                                        class="govuk-link"
+                                                        href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">change
+                                                        your cookie settings</a> at any time.</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="govuk-button-group">
+                                        <button type="submit" class="govuk-button" data-module="govuk-button"
+                                                name="hide_cookies" value="True">
+                                            Hide cookie message
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endblock cookie_banner %}
@@ -167,18 +179,24 @@
                         Beta
                     </strong>
                     <span class="govuk-phase-banner__text">
-                        This is a new service – Help us improve it and
-                        <a class="govuk-link" target="_blank" href="{% url 'feedback:collect_full_feedback' %}?url={{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}">
-                            give your feedback (opens in a new tab).
-                        </a>
+                        This is a new service
+						{# don't show the feedback text whilst on a feedback page #}
+                        {% if request.resolver_match.app_name != "feedback" %}
+                            – Help us improve it and
+                            <a class="govuk-link" target="_blank"
+                               href="{% url 'feedback:collect_full_feedback' %}?url={{ request.scheme }}://
+                                     {{ request.META.HTTP_HOST }}{{ request.path }}">
+                                give your feedback (opens in a new tab).
+                            </a>
+                        {% endif %}
                     </span>
                 </p>
             </div>
             {% block back_button %}
-	            {# JS-enabled back link #}
+				{# JS-enabled back link #}
                 <a class="govuk-back-link govuk-link--no-visited-state show-on-js-enabled hide-on-js-disabled"
                    href="javascript: window.history.go(-1)">{{ back_button_text }}</a>
-	            {# JS-disabled back link #}
+				{# JS-disabled back link #}
                 {% if "HTTP_REFERER" in request.META %}
                     <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-disabled"
                        href="{{ back_button_link|default_if_none:"/" }}?start=true">{{ back_button_text }}</a>
@@ -212,7 +230,8 @@
                         <h2 class="govuk-visually-hidden">Support links</h2>
                         <ul class="govuk-footer__inline-list">
                             <li class="govuk-footer__inline-list-item hide-on-print">
-                                <a class="govuk-footer__link" href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">Cookies</a>
+                                <a class="govuk-footer__link"
+                                   href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">Cookies</a>
                             </li>
                             <li class="govuk-footer__inline-list-item hide-on-print">
                                 <a class="govuk-footer__link" href="{% url 'reset_session' %}">Reset session</a>
@@ -251,6 +270,7 @@
             <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"></script>
             <script type="module" nonce="{{ request.csp_nonce }}">
                 import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"
+
                 initAll()
             </script>
             {% block extra_js %}{% endblock %}
