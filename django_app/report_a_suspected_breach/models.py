@@ -75,8 +75,7 @@ class Breach(BaseModel):
             ]
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
-            business_or_person_details_step = cleaned_data["business_or_person_details"]
-            reporter_name_of_business_you_work_for = business_or_person_details_step["name"]
+            reporter_name_of_business_you_work_for = ""
 
         # atomic transaction so that if any part of the process fails, the whole process is rolled back
         with transaction.atomic():

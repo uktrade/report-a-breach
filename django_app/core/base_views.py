@@ -36,6 +36,14 @@ class BaseFormView(FormView):
             if len(value) == 1:
                 form_data[key] = value[0]
 
+        # check what (if any) fields have changed. This is useful if we want to control where the user gets redirected
+        # to after the form is submitted depending on what they've changed
+        self.changed_fields = []
+        if previous_data := get_dirty_form_data(self.request, self.step_name):
+            for key, value in previous_data.items():
+                if key in form_data and form_data[key] != value:
+                    self.changed_fields.append(key)
+
         # now keep it in the session
         self.request.session[self.step_name] = form_data
 

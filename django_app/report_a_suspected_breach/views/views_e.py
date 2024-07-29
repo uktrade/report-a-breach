@@ -11,7 +11,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import View
-from report_a_suspected_breach import forms
+from report_a_suspected_breach.forms import forms_e as forms
 from utils.s3 import (
     generate_presigned_url,
     get_all_session_files,

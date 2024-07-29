@@ -1,9 +1,10 @@
 from typing import Any
 
 from core.base_views import BaseFormView
+from core.forms import SummaryForm
 from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
-from report_a_suspected_breach import forms
+from report_a_suspected_breach.forms import forms_b as forms
 
 
 class AreYouReportingCompaniesHouseBusinessView(BaseFormView):
@@ -44,7 +45,7 @@ class ManualCompaniesHouseView(BaseFormView):
 
 
 class CheckCompanyDetailsView(BaseFormView):
-    form_class = forms.SummaryForm
+    form_class = SummaryForm
     template_name = "report_a_suspected_breach/form_steps/check_company_details.html"
     success_url = reverse_lazy(
         "report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "overview_of_the_suspected_breach"}

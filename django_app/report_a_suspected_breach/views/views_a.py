@@ -1,15 +1,16 @@
 import logging
 
 from core.base_views import BaseFormView
+from core.forms import SummaryForm
 from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
-from report_a_suspected_breach import forms
 from report_a_suspected_breach.form_step_conditions import (
     show_name_and_business_you_work_for_page,
 )
+from report_a_suspected_breach.forms import forms_a as forms
 from utils.notifier import verify_email
 
 logger = logging.getLogger(__name__)
@@ -56,11 +57,11 @@ class EmailVerifyView(BaseFormView):
 
 @method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class RequestVerifyCodeView(BaseFormView):
-    form_class = forms.SummaryForm
+    form_class = SummaryForm
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
     success_url = reverse_lazy("report_a_suspected_breach:verify_email")
 
-    def form_valid(self, form: forms.SummaryForm) -> HttpResponse:
+    def form_valid(self, form: SummaryForm) -> HttpResponse:
         reporter_email_address = self.request.session["reporter_email_address"]
         if getattr(self.request, "limited", False):
             logger.warning(f"User has been rate-limited: {reporter_email_address}")

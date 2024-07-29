@@ -5,13 +5,21 @@ from core.base_views import BaseFormView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from report_a_suspected_breach import forms
+from report_a_suspected_breach.forms import forms_d as forms
 from utils.companies_house import get_formatted_address
 
 
 class WhereWereTheGoodsSuppliedFromView(BaseFormView):
     form_class = forms.WhereWereTheGoodsSuppliedFromForm
-    redirect_after_post = False
+
+    @property
+    def redirect_after_post(self) -> bool:
+        """If the user has changed their answer, we want to redirect them to the next page, so they can continue the
+        new journey. If they haven't changed their answer, we want to keep redirect them to the redirect_to_url."""
+        if "where_were_the_goods_supplied_from" in self.changed_fields:
+            return False
+        else:
+            return True
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
@@ -154,7 +162,6 @@ class DeleteEndUserView(BaseFormView):
 
 class ZeroEndUsersView(BaseFormView):
     form_class = forms.ZeroEndUsersForm
-    template_name = "report_a_suspected_breach/generic_nonwizard_form_step.html"
 
     def form_valid(self, form: forms.ZeroEndUsersForm) -> HttpResponse:
         self.form = form
