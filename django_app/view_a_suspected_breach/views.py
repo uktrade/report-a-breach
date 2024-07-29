@@ -32,7 +32,7 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
         if sort == "oldest":
             sorted_breaches = reversed(sorted_breaches)
         for breach in sorted_breaches:
-            sorted_objects.extend([get_breach_context_data({}, breach)])
+            sorted_objects.extend([get_breach_context_data(breach)])
         return sorted_objects
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
