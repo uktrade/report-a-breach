@@ -54,7 +54,7 @@ logger = logging.getLogger(__name__)
 
 class ReportABreachWizardView(BaseWizardView):
     template_names_lookup = {
-        "summary": "report_a_suspected_breach/form_steps/sumcmarycheck_your_answers.html",
+        "summary": "report_a_suspected_breach/form_steps/check_your_answers.html",
         "check_company_details": "report_a_suspected_breach/form_steps/check_company_details.html",
         "end_user_added": "report_a_suspected_breach/form_steps/end_user_added.html",
         "declaration": "report_a_suspected_breach/form_steps/declaration.html",
