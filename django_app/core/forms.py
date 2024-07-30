@@ -92,5 +92,7 @@ class HideCookiesForm(BaseForm):
         self.helper.add_input(Submit("hide cookie message", "Hide cookie message", css_class="govuk-button"))
 
 
-class SummaryForm(BaseForm):
+class GenericForm(BaseForm):
+    """Generic form when we're using a FormView which doesn't actually require a form"""
+
     pass

@@ -6,7 +6,7 @@
 # from django.test import RequestFactory
 
 
-# from report_a_suspected_breach.forms import SummaryForm
+# from report_a_suspected_breach.forms import GenericForm
 # from report_a_suspected_breach.models import ReporterEmailVerification
 # from report_a_suspected_breach.views.views_a import EmailVerifyView
 
@@ -26,7 +26,7 @@
 #         view.setup(request_object)
 #
 #         # Call form_valid method of view
-#         response = view.form_valid(SummaryForm)
+#         response = view.form_valid(GenericForm)
 #
 #         # Assert ReporterEmailVerification object created
 #         email_verifications = ReporterEmailVerification.objects.all()

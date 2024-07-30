@@ -103,7 +103,7 @@ class AboutThePersonOrBusinessTask(Task):
         "are_you_reporting_a_business_on_companies_house": forms.AreYouReportingABusinessOnCompaniesHouseForm,
         "do_you_know_the_registered_company_number": forms.DoYouKnowTheRegisteredCompanyNumberForm,
         "manual_companies_house_input": forms.ManualCompaniesHouseInputForm,
-        "check_company_details": forms.SummaryForm,
+        "check_company_details": forms.GenericForm,
         "where_is_the_address_of_the_business_or_person": forms.WhereIsTheAddressOfTheBusinessOrPersonForm,
         "business_or_person_details": forms.BusinessOrPersonDetailsForm,
     }
@@ -152,7 +152,7 @@ class SanctionsBreachDetailsTask(Task):
 class SummaryAndDeclaration(Task):
     show_on_tasklist = False
     form_steps = {
-        "summary": forms.SummaryForm,
+        "summary": forms.GenericForm,
         "declaration": forms.DeclarationForm,
     }
 
