@@ -1,6 +1,5 @@
-{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 {% block title %}Check company details{% endblock title %}
 {% block form_content %}
     <form method="post">
@@ -18,7 +17,7 @@
                     {{ request.session.company_details.registered_company_number }}
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link" href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?change=yes">Change<span class="govuk-visually-hidden">registered company number</span></a>
+                    <a class="govuk-link" href="{% url 'report_a_suspected_breach:do_you_know_the_registered_company_number' %}?change=yes">Change<span class="govuk-visually-hidden">registered company number</span></a>
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -39,6 +38,6 @@
             </div>
         </dl>
         {% csrf_token %}
-        {% crispy wizard.form %}
+        {% crispy form %}
     </form>
 {% endblock form_content %}

@@ -2,13 +2,14 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 
 {% block extra_css %}
-    {{ wizard.form.media.css }}
+    {{ form.media.css }}
 {% endblock extra_css %}
+
 {% block title %}
-    {% if form_h1_header %}
+    {% if form.form_h1_header %}
         {{form_h1_header}}
     {% else %}
-        {% for field in wizard.form %}
+        {% for field in form %}
             {% if forloop.first %}
                 {{ field.label }}
             {% endif %}
@@ -19,17 +20,16 @@
 {% block column_content %}
     {% error_summary form %}
     <form method="post" enctype='multipart/form-data' novalidate>
-        {% if form_h1_header %}
-            <h1 class="govuk-heading-l">{{ form_h1_header }}</h1>
+        {% if form.form_h1_header %}
+            <h1 class="govuk-heading-l">{{ form.form_h1_header }}</h1>
         {% endif %}
-
         {% csrf_token %}
-        {{ wizard.management_form }}
         {% block form_content %}
+            {% crispy form %}
         {% endblock form_content %}
     </form>
 {% endblock column_content %}
 
 {% block extra_js %}
-    {{ wizard.form.media.js }}
+    {{ form.media.js }}
 {% endblock extra_js %}

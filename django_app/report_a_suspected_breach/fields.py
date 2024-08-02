@@ -68,3 +68,15 @@ class MultipleFileField(forms.FileField):
         else:
             result = single_file_clean(data, initial)
         return result
+
+
+class DefaultChoiceField(forms.ChoiceField):
+    """A ChoiceField that validates particular values as always okay despite not being in the choices."""
+
+    def validate(self, value: Any) -> None:
+        if value not in self.empty_values and value not in self.valid_values:
+            raise forms.ValidationError(self.error_messages["invalid_choice"], code="invalid_choice")
+
+    def __init__(self, *args: object, valid_values: list[str], **kwargs: object) -> None:
+        self.valid_values = valid_values
+        super().__init__(*args, **kwargs)

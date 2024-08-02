@@ -1,6 +1,5 @@
-{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 {% load get_end_user_url %}
 {% load countries %}
 {% block title %}Check your answers{% endblock title %}
@@ -26,10 +25,10 @@
             <dd class="govuk-summary-list__actions">
                 {% if is_third_party_relationship %}
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:name_and_business_you_work_for' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">your full name</span></a>
                 {% else %}
-                    <a class="govuk-link" href="{% get_wizard_step_url 'name' %}?redirect=summary">Change<span
+                    <a class="govuk-link" href="{% url 'report_a_suspected_breach:name' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">your full name</span></a>
                 {% endif %}
             </dd>
@@ -44,7 +43,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'name_and_business_you_work_for' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:name_and_business_you_work_for' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">business you work for</span></a>
                 </dd>
             </div>
@@ -62,7 +61,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'do_you_know_the_registered_company_number' %}?redirect=summary&change=yes">Change<span
+                       href="{% url 'report_a_suspected_breach:do_you_know_the_registered_company_number' %}?redirect_to_url=report_a_suspected_breach:check_your_answers&change=yes">Change<span
                         class="govuk-visually-hidden">registered company number</span></a>
                 </dd>
             </div>
@@ -82,24 +81,25 @@
                 {% if is_company_obtained_from_companies_house %}
                 {% else %}
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">person or business name</span></a>
                 {% endif %}
             </dd>
         </div>
-        {% if form_data.business_or_person_details.website %}
+        {% if form_data.business_or_person_details.clickable_website_url %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Website
                 </dt>
                 <dd class="govuk-summary-list__value">
                     <a class="govuk-link"
-                       href="{{ form_data.about_the_supplier.website }}">{{ form_data.business_or_person_details.website }}<span
+                       target="_blank"
+                       href="{{ form_data.about_the_supplier.clickable_website_url }}">{{ form_data.business_or_person_details.clickable_website_url }}<span
                         class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">person or business website</span></a>
                 </dd>
             </div>
@@ -121,7 +121,7 @@
                 {% if is_company_obtained_from_companies_house %}
                 {% else %}
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'business_or_person_details' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">person or business address</span></a>
                 {% endif %}
             </dd>
@@ -139,7 +139,7 @@
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
-                   href="{% get_wizard_step_url 'when_did_you_first_suspect' %}?redirect=summary">Change<span
+                   href="{% url 'report_a_suspected_breach:when_did_you_first_suspect' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                     class="govuk-visually-hidden">when you first suspected the breach</span></a>
             </dd>
         </div>
@@ -155,7 +155,7 @@
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
-                   href="{% get_wizard_step_url 'which_sanctions_regime' %}?redirect=summary">Change<span
+                   href="{% url 'report_a_suspected_breach:which_sanctions_regime' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                     class="govuk-visually-hidden">sanctions regime breached</span></a>
             </dd>
         </div>
@@ -168,7 +168,7 @@
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
-                   href="{% get_wizard_step_url 'what_were_the_goods' %}?redirect=summary">Change<span
+                   href="{% url 'report_a_suspected_breach:what_were_the_goods' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                     class="govuk-visually-hidden">details of the goods or services</span></a>
             </dd>
         </div>
@@ -186,7 +186,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">location of supplier</span></a>
                 </dd>
         {% else %}
@@ -204,7 +204,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">location of supplier</span></a>
                 </dd>
             </div>
@@ -219,7 +219,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'where_were_the_goods_supplied_from' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">name and address of supplier</span></a>
                 </dd>
             </div>
@@ -227,7 +227,7 @@
     </dl>
     {% if form_data.end_users %}
         {% for end_user, value in form_data.end_users.items %}
-            <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h2>
+            <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
             <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
@@ -244,13 +244,13 @@
                     {% if is_made_available_journey %}
                         <dd class="govuk-summary-list__actions">
                             <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to' end_user_uuid=end_user %}?redirect=summary">Change<span
+                               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                                 class="govuk-visually-hidden">location of end-user {{forloop.counter}}</span></a>
                         </dd>
                     {% else %}
                         <dd class="govuk-summary-list__actions">
                             <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to' end_user_uuid=end_user %}?redirect=summary">Change<span
+                               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                                 class="govuk-visually-hidden">location of end-user {{forloop.counter}}</span></a>
                         </dd>
                     {% endif %}
@@ -266,7 +266,7 @@
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link"
-                           href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
+                           href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                             class="govuk-visually-hidden">name and address of end-user {{forloop.counter}}</span></a>
                     </dd>
                 </div>
@@ -283,7 +283,7 @@
                         </dd>
                         <dd class="govuk-summary-list__actions">
                             <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
+                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                                 class="govuk-visually-hidden">website of end-user {{forloop.counter}}</span></a>
                         </dd>
                     </div>
@@ -298,7 +298,7 @@
                         </dd>
                         <dd class="govuk-summary-list__actions">
                             <a class="govuk-link"
-                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect=summary">Change<span
+                               href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                                 class="govuk-visually-hidden">additional contact information of end-user {{forloop.counter}}</span></a>
                         </dd>
                     </div>
@@ -310,12 +310,12 @@
     <dl class="govuk-summary-list">
         {% if is_made_available_journey %}
             <a class="govuk-link"
-               href="{% get_wizard_step_url 'where_were_the_goods_made_available_to' %}?add_another_end_user=yes&redirect=summary">Add another
+               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to' %}?add_another_end_user=yes&redirect=report_a_suspected_breach:check_your_answers">Add another
                 end-user<span
                     class="govuk-visually-hidden">end-user</span></a>
         {% else %}
             <a class="govuk-link"
-               href="{% get_wizard_step_url 'where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect=summary">Add another
+               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect=report_a_suspected_breach:check_your_answers">Add another
                 end-user<span
                     class="govuk-visually-hidden">end-user</span></a>
         {% endif %}
@@ -332,7 +332,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'were_there_other_addresses_in_the_supply_chain' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">other addresses in supply chain</span></a>
                 </dd>
             </div>
@@ -347,14 +347,13 @@
                 </dt>
                 <dd class="govuk-summary-list__value">
                     {% for document, url in form_data.session_files.items %}
-
                         <a href="{{url}}" download>{{document}}</a><br>
                     {% endfor %}
 
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
-                       href="{% get_wizard_step_url 'upload_documents' %}?redirect=summary">Change<span
+                       href="{% url 'report_a_suspected_breach:upload_documents' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                         class="govuk-visually-hidden">supporting documents</span></a>
                 </dd>
             </div>
@@ -368,12 +367,14 @@
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
-                   href="{% get_wizard_step_url 'tell_us_about_the_suspected_breach' %}?redirect=summary">Change<span
+                   href="{% url 'report_a_suspected_breach:tell_us_about_the_suspected_breach' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                     class="govuk-visually-hidden">summary of the breach</span></a>
             </dd>
         </div>
     </dl>
-    {% crispy wizard.form %}
+    <a class="govuk-button" data-module="govuk-button" href="{% url 'report_a_suspected_breach:declaration' %}">
+        Continue
+    </a>
 {% endblock form_content %}
 
 
@@ -389,8 +390,6 @@
                 $(this).closest('.text_truncator').find('.truncated_text').removeClass('hidden');
                 $(this).closest('.text_truncator').find('.expanded_text').addClass('hidden');
             })
-
-
         })
     </script>
 {% endblock extra_js %}

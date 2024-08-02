@@ -17,7 +17,7 @@ class TestDeleteEndUserView:
         )
         assert "end_user1" not in rasb_client.session["end_users"].keys()
         assert rasb_client.session["end_users"] != data.end_users
-        assert response.url == "/report_a_suspected_breach/end_user_added/"
+        assert response.url == "/report_a_suspected_breach/end_user_added"
         assert response.status_code == 302
 
     def test_delete_all_end_users_post(self, rasb_client):
@@ -51,5 +51,5 @@ class TestDeleteEndUserView:
             reverse("report_a_suspected_breach:delete_end_user"),
         )
         assert rasb_client.session["end_users"] == data.end_users
-        assert response.url == "/report_a_suspected_breach/end_user_added/"
+        assert response.url == "/report_a_suspected_breach/end_user_added"
         assert response.status_code == 302
