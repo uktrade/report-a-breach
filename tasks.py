@@ -9,7 +9,7 @@ def test(context: Any) -> None:
 
 
 @task
-def unit_tests(context: Any) -> None:
+def unittest(context: Any) -> None:
     context.run("pipenv run pytest tests/test_unit")
 
 

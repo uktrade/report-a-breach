@@ -1,11 +1,25 @@
 import uuid
+from typing import TYPE_CHECKING
 
 from core.models import BaseModel
 from django.contrib.postgres.fields import DateRangeField
 from django.contrib.sessions.models import Session
-from django.db import models
+from django.db import models, transaction
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from django_countries.fields import CountryField
+from report_a_suspected_breach.form_step_conditions import (
+    show_about_the_supplier_page,
+    show_check_company_details_page_condition,
+    show_name_and_business_you_work_for_page,
+)
+from utils.s3 import store_documents_in_s3
+
+from .choices import TypeOfRelationshipChoices
+from .exceptions import EmailNotVerifiedException
+from .utils import get_all_cleaned_data
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 from . import choices
 
@@ -38,6 +52,7 @@ class Breach(BaseModel):
     )
     other_addresses_in_the_supply_chain = models.TextField(null=True, blank=True)
     tell_us_about_the_suspected_breach = models.TextField(null=True, blank=False)
+    reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
 
     def assign_reference(self) -> str:
         """Assigns a unique reference to this Breach object"""
@@ -48,15 +63,130 @@ class Breach(BaseModel):
         self.save()
         return reference
 
+    @classmethod
+    def create_from_session(cls, request: "HttpRequest") -> "Breach":
+        """Creates a Breach object from the data stored in current session"""
+        cleaned_data = get_all_cleaned_data(request)
 
-class ReporterEmailVerification(BaseModel):
-    reporter_session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    email_verification_code = models.CharField(max_length=6)
-    date_created = models.DateTimeField(auto_now_add=True)
-    verified = models.BooleanField(default=False)
+        if show_name_and_business_you_work_for_page(request):
+            reporter_full_name = cleaned_data["name_and_business_you_work_for"]["reporter_full_name"]
+            reporter_name_of_business_you_work_for = cleaned_data["name_and_business_you_work_for"][
+                "reporter_name_of_business_you_work_for"
+            ]
+        else:
+            reporter_full_name = cleaned_data["name"]["reporter_full_name"]
+            reporter_name_of_business_you_work_for = ""
+
+        # atomic transaction so that if any part of the process fails, the whole process is rolled back
+        with transaction.atomic():
+            reporter_email_verification = ReporterEmailVerification.objects.filter(
+                reporter_session=request.session.session_key
+            ).latest("date_created")
+
+            if not reporter_email_verification.verified:
+                # the user hasn't verified their email address, don't let them submit
+                raise EmailNotVerifiedException()
+
+            # Save Breach to Database
+            new_breach = Breach.objects.create(
+                reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
+                reporter_email_address=cleaned_data["email"]["reporter_email_address"],
+                reporter_email_verification=reporter_email_verification,
+                reporter_full_name=reporter_full_name,
+                reporter_name_of_business_you_work_for=reporter_name_of_business_you_work_for,
+                when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
+                is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
+                what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
+                where_were_the_goods_supplied_from=cleaned_data["where_were_the_goods_supplied_from"][
+                    "where_were_the_goods_supplied_from"
+                ],
+                were_there_other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
+                    "were_there_other_addresses_in_the_supply_chain"
+                ],
+                other_addresses_in_the_supply_chain=cleaned_data["were_there_other_addresses_in_the_supply_chain"][
+                    "other_addresses_in_the_supply_chain"
+                ],
+                tell_us_about_the_suspected_breach=cleaned_data["tell_us_about_the_suspected_breach"][
+                    "tell_us_about_the_suspected_breach"
+                ],
+                reporter_session=request.session._get_session_from_db(),
+            )
+            # Save documents to s3 permanent bucket
+            store_documents_in_s3(request, new_breach.id)
+
+            if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
+                new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
+                new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
+                sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
+                new_breach.sanctions_regimes.set(sanctions_regimes)
+
+            # Save breacher details to database
+            if not show_check_company_details_page_condition(request):
+                breacher_details = cleaned_data["business_or_person_details"]
+                PersonOrCompany.save_person_or_company(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
+
+            else:
+                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
+                PersonOrCompany.save_companies_house_company(
+                    new_breach, companies_house_details, TypeOfRelationshipChoices.breacher
+                )
+
+            # Save supplier details to database
+            if show_about_the_supplier_page(request):
+                supplier_details = cleaned_data["about_the_supplier"]
+                PersonOrCompany.save_person_or_company(new_breach, supplier_details, TypeOfRelationshipChoices.supplier)
+
+            # Save recipient(s) details to database
+            if end_users := request.session.get("end_users", None):
+                for end_user in end_users:
+                    end_user_details = end_users[end_user]["cleaned_data"]
+                    end_user_details["name"] = end_user_details.get("name_of_person", "")
+                    PersonOrCompany.save_person_or_company(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
+
+        new_breach.assign_reference()
+        new_breach.save()
+        return new_breach
 
 
 class PersonOrCompany(BaseModel):
+    @classmethod
+    def save_person_or_company(
+        cls, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> "PersonOrCompany":
+        """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
+        return cls.objects.create(
+            name=person_or_company.get("name", ""),
+            name_of_business=person_or_company.get("name_of_business"),
+            website=person_or_company.get("website"),
+            email=person_or_company.get("email"),
+            address_line_1=person_or_company.get("address_line_1"),
+            address_line_2=person_or_company.get("address_line_2"),
+            address_line_3=person_or_company.get("address_line_3"),
+            address_line_4=person_or_company.get("address_line_4"),
+            town_or_city=person_or_company.get("town_or_city"),
+            country=person_or_company.get("country"),
+            county=person_or_company.get("county"),
+            postal_code=person_or_company.get("postal_code", ""),
+            additional_contact_details=person_or_company.get("additional_contact_details"),
+            breach=breach,
+            type_of_relationship=relationship,
+        )
+
+    @classmethod
+    def save_companies_house_company(
+        cls, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
+    ) -> "PersonOrCompany":
+        """Converts a company retrieved from Companies House API into a PersonOrCompany object
+        and saves it to the database."""
+        return cls.objects.create(
+            name=companies_house_company.get("registered_company_name"),
+            country="GB",
+            registered_company_number=companies_house_company.get("registered_company_number"),
+            registered_office_address=companies_house_company.get("registered_office_address"),
+            breach=breach,
+            type_of_relationship=relationship,
+        )
+
     name = models.TextField()
     name_of_business = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -79,7 +209,6 @@ class PersonOrCompany(BaseModel):
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
     registered_office_address = models.CharField(null=True, blank=True)
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
 
 
 class SanctionsRegimeBreachThrough(BaseModel):
@@ -100,3 +229,10 @@ class UploadedDocument(BaseModel):
         ],
     )
     breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
+
+
+class ReporterEmailVerification(BaseModel):
+    reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
+    email_verification_code = models.CharField(max_length=6)
+    date_created = models.DateTimeField(auto_now_add=True)
+    verified = models.BooleanField(default=False)

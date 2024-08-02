@@ -1,4 +1,9 @@
-from core.views import CookiesConsentView, HideCookiesView, RedirectBaseDomainView
+from core.views import (
+    CookiesConsentView,
+    HideCookiesView,
+    RedirectBaseDomainView,
+    ResetSessionView,
+)
 from django.conf import settings
 from django.urls import include, path
 
@@ -10,6 +15,7 @@ urlpatterns = [
     path("hide_cookies", HideCookiesView.as_view(), name="hide_cookies"),
     path("feedback/", include("feedback.urls")),
     path("pingdom/", include("healthcheck.urls")),
+    path("reset_session/", ResetSessionView.as_view(), name="reset_session"),
     path("throw_error/", lambda x: 1 / 0),
 ]
 

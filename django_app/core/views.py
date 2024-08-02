@@ -10,6 +10,7 @@ from django.forms import Form
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.views import View
 from django.views.generic import FormView, RedirectView
 from django_ratelimit.exceptions import Ratelimited
 from formtools.wizard.views import NamedUrlSessionWizardView
@@ -184,7 +185,7 @@ class RedirectBaseDomainView(RedirectView):
     @property
     def url(self) -> str:
         if is_report_a_suspected_breach_site(self.request.site):
-            return reverse("report_a_suspected_breach:landing")
+            return reverse("report_a_suspected_breach:tasklist")
         elif is_view_a_suspected_breach_site(self.request.site):
             # if users are not accessing a specific page in view-a-suspected-breach - raise a 404
             # unless they are staff, in which case take them to the manage users page
@@ -244,3 +245,11 @@ class HideCookiesView(FormView):
 
 def rate_limited_view(request: HttpRequest, exception: Ratelimited) -> HttpResponse:
     return HttpResponse("You have made too many", status=429)
+
+
+class ResetSessionView(View):
+    """Resets and clears the users session"""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        request.session.flush()
+        return redirect("initial_redirect_view")

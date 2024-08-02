@@ -1,6 +1,5 @@
-{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 
 {% block row_content %}
     <div class="govuk-grid-column-three-quarters">
@@ -12,8 +11,7 @@
                 {% error_summary form %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ wizard.management_form }}
-                    {% crispy wizard.form %}
+                    {% crispy form %}
                 </form>
             </fieldset>
         {% endblock column_content %}

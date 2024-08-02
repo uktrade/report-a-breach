@@ -1,6 +1,5 @@
-{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 {% block title %}Request a new code{% endblock title %}
 {% block form_content %}
     {% if request.limited %}
@@ -22,7 +21,7 @@
     </h1>
     <p class="govuk-body">Emails may take a few minutes to arrive. Check your junk folder. <br>
         If you still do not receive the email, you can request a new one.</p>
-    <button type="submit" name="wizard_goto_step" class="govuk-button" data-module="govuk-button" id="request_new_code_button">
+    <button type="submit" class="govuk-button" data-module="govuk-button" id="request_new_code_button">
         Request a new code
     </button>
     <details class="govuk-details">

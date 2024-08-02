@@ -25,14 +25,14 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
         self.request.session["sort"] = request.GET.get("sort_by", "newest")
         return super().get(request, **kwargs)
 
-    def get_queryset(self) -> list[Breach]:
+    def get_queryset(self) -> list[dict[str, Any]]:
         sort = self.request.session.get("sort", "newest")
         sorted_objects = []
         sorted_breaches = Breach.objects.all().order_by("-created_at")
         if sort == "oldest":
             sorted_breaches = reversed(sorted_breaches)
         for breach in sorted_breaches:
-            sorted_objects.extend([get_breach_context_data({}, breach)])
+            sorted_objects.extend([get_breach_context_data(breach)])
         return sorted_objects
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
@@ -77,4 +77,5 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["back_button_text"] = "View all suspected breach reports"
-        return get_breach_context_data(context, self.breach)
+        context.update(get_breach_context_data(self.breach))
+        return context

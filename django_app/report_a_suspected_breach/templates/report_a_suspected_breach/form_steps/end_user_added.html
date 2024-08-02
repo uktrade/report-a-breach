@@ -1,6 +1,5 @@
-{% extends "report_a_suspected_breach/base_form_step.html" %}
+{% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_wizard_step_url %}
 {% load countries %}
 
 {% block title %}You've added {{ request.session.end_users.keys|length }} end-user{% if request.session.end_users.keys|length > 1  or request.session.end_users.keys|length == 0 %}s{% endif %}{% endblock title %}
@@ -14,12 +13,21 @@
             <div>
                 <h3 class="govuk-heading-m" style="float:left;">End-user {{ forloop.counter }} </h3>
                 <ul class="govuk-summary-card__actions">
-                    <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
+                    {% if is_made_available_journey %}
+                        <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
 
-                        <a class="govuk-link" style="font-size: 19px; text-align:right"
-                           href="{% url 'report_a_suspected_breach:about_the_end_user' end_user_uuid=id %}">Change<span
-                            class="govuk-visually-hidden"> End-user {{forloop.counter}} details </span></a>
-                    </dd>
+                            <a class="govuk-link" style="font-size: 19px; text-align:right"
+                               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to_end_user_uuid' end_user_uuid=id %}">Change<span
+                                class="govuk-visually-hidden"> End-user {{forloop.counter}} details </span></a>
+                        </dd>
+                    {% else %}
+                        <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
+
+                            <a class="govuk-link" style="font-size: 19px; text-align:right"
+                               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to_end_user_uuid' end_user_uuid=id %}">Change<span
+                                class="govuk-visually-hidden"> End-user {{forloop.counter}} details </span></a>
+                        </dd>
+                    {% endif %}
                     <dd class="govuk-summary-list__action">
                         <form id="delete_end_user_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
                               action="{% url 'report_a_suspected_breach:delete_end_user' %}?end_user_uuid={{ id }}">
@@ -60,7 +68,6 @@
     {% error_summary form %}
     <form method="post" enctype='multipart/form-data' novalidate>
         {% csrf_token %}
-        {{ wizard.management_form }}
-        {% crispy wizard.form %}
+        {% crispy form %}
     </form>
 {% endblock column_content %}
