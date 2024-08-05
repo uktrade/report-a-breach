@@ -5,4 +5,4 @@ python django_app/manage.py loaddata django_app/report_a_suspected_breach/fixtur
 
 # Start webserver
 echo "Running in DBT Platform"
-opentelemetry-instrument gunicorn django_app.config.wsgi --config django_app/config/gunicorn.py
+gunicorn django_app.config.wsgi --config django_app/config/gunicorn.py
