@@ -31,4 +31,5 @@ class HealthCheckView(View):
             "healthcheck.html",
             context={"all_good": all_good, "time_taken": time_taken},
             content_type="text/xml",
+            status=200,
         )
