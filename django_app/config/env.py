@@ -2,7 +2,8 @@ import os
 from typing import Any
 
 from dbt_copilot_python.database import database_url_from_env
-from dbt_copilot_python.network import setup_allowed_hosts
+
+#  from dbt_copilot_python.network import setup_allowed_hosts
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 from pydantic_settings import BaseSettings as PydanticBaseSettings
 from pydantic_settings import SettingsConfigDict
@@ -169,7 +170,7 @@ class DBTPlatformSettings(BaseSettings):
         if self.in_build_step:
             return self.rab_allowed_hosts
         else:
-            return setup_allowed_hosts(self.rab_allowed_hosts)
+            return self.rab_allowed_hosts
 
     @computed_field
     @property
