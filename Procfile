@@ -1,1 +1,1 @@
-web: bash ./run.sh
+web: python django_app/manage.py migrate --no-input && python django_app/manage.py loaddata django_app/report_a_suspected_breach/fixtures/*.json && gunicorn django_app.config.wsgi --config django_app/config/gunicorn.py
