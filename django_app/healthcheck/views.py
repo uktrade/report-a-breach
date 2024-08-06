@@ -4,6 +4,7 @@ from config.env import DBTPlatformSettings, env
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
+from healthcheck.checks import db_check
 
 
 class HealthCheckView(View):
@@ -18,9 +19,9 @@ class HealthCheckView(View):
             return HttpResponse(status=200)
 
         start = time.time()
-        # is_db_good = db_check()
+        is_db_good = db_check()
         #  is_s3_good = s3_check()
-        all_good = True and True
+        all_good = is_db_good and True
 
         end = time.time()
         time_taken = round(end - start, 3)
