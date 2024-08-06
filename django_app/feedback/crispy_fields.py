@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 from crispy_forms.layout import HTML
 from crispy_forms_gds.layout import Field
@@ -12,7 +12,7 @@ class HTMLTemplate(HTML):
 
     This is useful for rendering custom HTML as part of a form without having to define the HTML in Python."""
 
-    def __init__(self, html_template_path: str, html_context: str | None = None) -> None:
+    def __init__(self, html_template_path: str, html_context: Dict[str, Any] | None = None) -> None:
         if not html_context:
             html_context = {}
 
