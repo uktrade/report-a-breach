@@ -315,3 +315,5 @@ CACHES = {
 }
 
 SESSION_SAVE_EVERY_REQUEST = True
+
+OTSI_EMAIL = env.otsi_email

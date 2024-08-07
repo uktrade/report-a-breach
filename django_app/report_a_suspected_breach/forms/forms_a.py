@@ -103,14 +103,15 @@ class EmailVerifyForm(BaseForm):
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
-        self.request = kwargs.pop("request") if "request" in kwargs else None
+        if self.request.method == "GET":
+            self.is_bound = False
 
         request_verify_code = reverse_lazy("report_a_suspected_breach:request_verify_code")
         self.helper["email_verification_code"].wrap(
             Field,
             HTMLTemplate(
-                "report_a_suspected_breach/partials/not_received_code_help_text.html",
-                {"request_verify_code": request_verify_code},
+                html_template_path="report_a_suspected_breach/partials/not_received_code_help_text.html",
+                html_context={"request_verify_code": request_verify_code},
             ),
         )
 
