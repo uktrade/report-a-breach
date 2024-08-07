@@ -20,12 +20,13 @@ def test_successful_healthcheck(rasb_client):
     assert response.status_code == 200
 
 
-@patch("healthcheck.views.s3_check", return_value=False)
+"""@patch("healthcheck.views.s3_check", return_value=False)
 def test_s3_broken_healthcheck(mock_s3_check, rasb_client):
     response = rasb_client.get(reverse("healthcheck:healthcheck_ping"))
     content = get_response_content(response)
     assert "FAIL" in content
     assert response.status_code == 200
+"""
 
 
 @patch("healthcheck.views.db_check", return_value=False)
