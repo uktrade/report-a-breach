@@ -35,6 +35,7 @@ django-redis = "*"
 django-csp = "~=3.8"
 django-ratelimit = "~=4.1.0"
 dbt-platform-helper = "==10.4.0"
+psycopg2-binary = "*"
 
 [dev-packages]
 black = "~=24.3"
