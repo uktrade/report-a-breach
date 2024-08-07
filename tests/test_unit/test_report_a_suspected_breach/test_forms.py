@@ -74,25 +74,26 @@ class TestEmailVerifyForm:
         )
         request_object = RequestFactory()
         request_object.session = rasb_client.session._get_session_from_db()
+        request_object.method = "POST"
         self.request_object = request_object
 
-    def test_email_verify_form_correct(self, rasb_client):
+    def test_email_verify_form_correct(self):
         form = EmailVerifyForm(data={"email_verification_code": self.verify_code}, request=self.request_object)
         assert form.is_valid()
 
-    def test_email_verify_form_incorrect_code(self, rasb_client):
+    def test_email_verify_form_incorrect_code(self):
         form = EmailVerifyForm(data={"email_verification_code": "1"}, request=self.request_object)
         assert not form.is_valid()
         assert "email_verification_code" in form.errors
 
-    def test_email_verify_form_expired_code_2_hours(self, rasb_client):
+    def test_email_verify_form_expired_code_2_hours(self):
         self.obj.date_created = self.obj.date_created - timedelta(days=1)
         self.obj.save()
         form = EmailVerifyForm(data={"email_verification_code": self.verify_code}, request=self.request_object)
         assert not form.is_valid()
         assert form.has_error("email_verification_code", "invalid")
 
-    def test_email_verify_form_expired_code_30_minutes(self, rasb_client):
+    def test_email_verify_form_expired_code_30_minutes(self):
         self.obj.date_created = self.obj.date_created - timedelta(minutes=30)
         self.obj.save()
         form = EmailVerifyForm(data={"email_verification_code": self.verify_code}, request=self.request_object)
