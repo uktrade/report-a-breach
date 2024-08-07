@@ -2,7 +2,6 @@ import os
 
 from dbt_copilot_python.database import database_url_from_env
 from dbt_copilot_python.network import setup_allowed_hosts
-
 from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings as PydanticBaseSettings
 from pydantic_settings import SettingsConfigDict
