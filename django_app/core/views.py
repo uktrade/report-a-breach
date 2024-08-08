@@ -3,6 +3,7 @@ from collections import OrderedDict
 from typing import Any, Iterable
 
 import ring
+from core.checks import db_check
 from core.sites import (
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
@@ -15,7 +16,6 @@ from django.views import View
 from django.views.generic import FormView, RedirectView
 from django_ratelimit.exceptions import Ratelimited
 from formtools.wizard.views import NamedUrlSessionWizardView
-from healthcheck.checks import db_check
 
 from .forms import CookiesConsentForm, HideCookiesForm
 
