@@ -41,7 +41,7 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     breach_context["recipients"] = recipients
 
     # Sanctions Regimes
-    sanctions = breach.sanctions_regimes.all()
+    sanctions = breach.sanctions_regimes_breached
     breach_context["sanctions"] = sanctions
 
     # Documents

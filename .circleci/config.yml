@@ -38,6 +38,12 @@ jobs:
             DATABASE_URL: ""
         steps:
           - checkout
+          - add_ssh_keys:
+              fingerprints:
+                - "SHA256:srykW79sztyym4YTZsVCiRPRG+qY+pjtVETeJbYdAHw"
+          - run:
+              name: Install git submodules
+              command: git submodule init && git submodule update
           - restore_dependency_cache
           - install_dependencies
           - save_dependency_cache
@@ -90,6 +96,12 @@ jobs:
 
       steps:
         - checkout
+        - add_ssh_keys:
+            fingerprints:
+              - "SHA256:srykW79sztyym4YTZsVCiRPRG+qY+pjtVETeJbYdAHw"
+        - run:
+            name: Install git submodules
+            command: git submodule init && git submodule update
         - restore_dependency_cache
         - install_dependencies
         - save_dependency_cache

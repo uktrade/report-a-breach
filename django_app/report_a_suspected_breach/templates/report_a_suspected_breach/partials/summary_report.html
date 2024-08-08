@@ -86,8 +86,10 @@
             </dt>
             <dd class="govuk-summary-list__value">
                 {% for regime in sanctions %}
-                    {{ regime.full_name }}
-                    <br>
+                    {{ regime }}
+                    {% if not forloop.last %}
+                        <br><br>
+                    {% endif %}
                 {% endfor %}
                 {% if breach.unknown_sanctions_regime %}
                     Unknown regime<br>

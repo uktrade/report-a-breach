@@ -145,6 +145,7 @@ TEMPLATES = [
                 "core.sites.context_processors.sites",
                 "core.context_processors.truncate_words_limit",
                 "core.context_processors.back_button",
+                "core.context_processors.is_debug_mode",
             ],
         },
     },
@@ -198,7 +199,6 @@ EMAIL_VERIFY_CODE_TEMPLATE_ID = env.email_verify_code_template_id
 EMAIL_VASB_USER_ADMIN_TEMPLATE_ID = env.email_vasb_user_admin_template_id
 EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID = env.email_user_report_confirmation_template_id
 RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
-EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID = env.email_user_report_confirmation_template_id
 
 # SENTRY
 SENTRY_DSN = env.sentry_dsn
@@ -227,7 +227,7 @@ ENFORCE_STAFF_SSO = env.enforce_staff_sso
 
 if ENFORCE_STAFF_SSO:
     AUTHENTICATION_BACKENDS = [
-        "auth.breach_portal_auth.BreachPortalAuth",
+        "view_a_suspected_breach.authbrokers.BreachPortalAuth",
     ]
     AUTHBROKER_URL = env.authbroker_url
     AUTHBROKER_CLIENT_ID = env.authbroker_client_id

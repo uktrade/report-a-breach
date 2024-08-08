@@ -1,3 +1,25 @@
+  * [Setup](#setup)
+    + [1. Setting up your virtual environment](#1-setting-up-your-virtual-environment)
+    + [2. Installing pre-commit](#2-installing-pre-commit)
+    + [3. Setup your local environment variables](#3-setup-your-local-environment-variables)
+    + [4. Setup AWS localstack](#4-setup-aws-localstack)
+    + [5. Run the backing services](#5-run-the-backing-services)
+    + [6. Setup local custom domains](#6-setup-local-custom-domains)
+    + [7. Run the web server](#7-run-the-web-server)
+  * [Useful commands](#useful-commands)
+    + [Django](#django)
+    + [Dependencies](#dependencies)
+    + [Localstack](#localstack)
+    + [Testing](#testing)
+      - [End-to-End tests](#end-to-end-tests)
+    + [Single Sign On (SSO)](#single-sign-on--sso-)
+  * [Standards](#standards)
+    + [Linting and Formatting](#linting-and-formatting)
+    + [Branches](#branches)
+    + [Commits](#commits)
+    + [Pull Requests](#pull-requests)
+    + [Local development tools](#local-development-tools)
+
 # report-a-breach-prototype
 A prototype for the report a breach service
 
@@ -15,7 +37,7 @@ brew install pipenv
 ```
 Once installed, we need to install the requirements for the project:
 ```
-pipenv install
+pipenv install --dev
 ```
 
 If you're using homebrew, install libmagic:
@@ -92,13 +114,19 @@ To view the view-a-suspected-breach app, navigate to: http://view-a-suspected-br
 ## Useful commands
 ### Django
 Along with the above runserver command, while developing on the project, \
-the following will be handy when making changes to the db model:\
-`invoke makemigrations`\
-`invoke migrate`
+the following will be handy when making changes to the db model:
+
+```
+invoke makemigrations
+invoke migrate
+```
 
 ### Dependencies
-To add a new dependency to the project, use the following command:\
-`pipenv install <package-name>`
+To add a new dependency to the project, use the following command:
+
+```
+pipenv install <package-name>
+```
 
 ### Localstack
 We use Localstack to emulate AWS services locally, specifically S3. Two buckets are created on container startup:
@@ -107,23 +135,43 @@ We use Localstack to emulate AWS services locally, specifically S3. Two buckets 
 - `permanent-document-bucket` that's used to store uploaded files permanently
 
 Localstack works similarly to the awscli. For example, to see objects inside the `temporary-document-bucket` bucket, run command:\
-`awslocal s3 ls temporary-document-bucket`
+```
+awslocal s3 ls temporary-document-bucket
+```
 
+### Updating the list of sanctions regimes
+We store the list of Sanction regimes in a private git submodule located in `django_app/sanctions_regimes`. If this list
+has changed, you can update it from the latest version of the submodule by running the following command:
+```
+git submodule update --remote --merge
+```
 
 ### Testing
 
 #### End-to-End tests
 We use playwright for end-to-end testing.
-To run the end-to-end tests for report a breach, start the django server using the test config settings:\
-`pipenv run python manage.py runserver --settings=config.settings.test`
+To run the end-to-end tests for report a breach, start the django server using the test config settings:
+
+```
+pipenv run python manage.py runserver --settings=config.settings.test
+```
 
 To run end-to-end tests only:\
-`pipenv run pytest tests/test_frontend`\
-A useful command for writing end-to-end tests is:\
-`pipenv run playwright codegen http://report-a-suspected-breach:8000/`
+```
+pipenv run pytest tests/test_frontend
+```
+
+A useful command for writing end-to-end tests is:
+```
+pipenv run playwright codegen http://report-a-suspected-breach:8000/
+```
 
 ### Single Sign On (SSO)
-The app works out of the box with Mock SSO, which is part of the Docker Compose setup. If the OAuth 2.0 flow isn't working, try setting the AUTHBROKER_URL to docker.for.mac.localhost:8080 or host.docker.internal:8080 (value varies across platforms). This is because the Mock SSO service (configured with the AUTHBROKER_URL) must be accessible from outside of docker-compose for the authorization redirect, and also from within docker-compose to make the access token POST request.
+The app works out of the box with Mock SSO, which is part of the Docker Compose setup. If the OAuth 2.0 flow isn't working,
+try setting the `AUTHBROKER_URL` to `docker.for.mac.localhost:8080` or `host.docker.internal:8080`
+(value varies across platforms). This is because the Mock SSO service (configured with the AUTHBROKER_URL)
+must be accessible from outside of docker-compose for the authorization redirect, and also from within docker-compose
+to make the access token POST request.
 
 ## Standards
 ### Linting and Formatting
