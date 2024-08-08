@@ -3,7 +3,7 @@ from collections import OrderedDict
 from typing import Any, Iterable
 
 import ring
-from core.checks import db_check
+from core.checks import db
 from core.sites import (
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
@@ -265,7 +265,7 @@ class HealthCheckView(View):
 
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         start = time.time()
-        is_db_good = db_check()
+        is_db_good = db.db_check()
         #  is_s3_good = s3_check()
         all_good = is_db_good and True
 
