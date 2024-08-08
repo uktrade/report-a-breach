@@ -8,7 +8,7 @@ class ReportASuspectedBreachCurrentSiteMiddleware(CurrentSiteMiddleware):
 
     # List of views that do not add the site to the current request object.
     site_exempt_views = [
-        "healthcheck:healthcheck_ping",
+        "healthcheck:ping",
     ]
 
     def process_request(self, request: HttpRequest) -> None:
