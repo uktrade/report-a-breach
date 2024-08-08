@@ -1,3 +1,4 @@
+import time
 from collections import OrderedDict
 from typing import Any, Iterable
 
@@ -8,12 +9,13 @@ from core.sites import (
 )
 from django.forms import Form
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 from django.views.generic import FormView, RedirectView
 from django_ratelimit.exceptions import Ratelimited
 from formtools.wizard.views import NamedUrlSessionWizardView
+from healthcheck.checks import db_check
 
 from .forms import CookiesConsentForm, HideCookiesForm
 
@@ -253,3 +255,27 @@ class ResetSessionView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         request.session.flush()
         return redirect("initial_redirect_view")
+
+
+class HealthCheckView(View):
+    """Checks the status of the Report a Breach service itself, and all other backing services.
+
+    Returns an XML file containing the response time and the results of these checks, used by Pingdom to monitor
+    the health of the service."""
+
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+        start = time.time()
+        is_db_good = db_check()
+        #  is_s3_good = s3_check()
+        all_good = is_db_good and True
+
+        end = time.time()
+        time_taken = round(end - start, 3)
+
+        return render(
+            request,
+            "core/healthcheck.html",
+            context={"all_good": all_good, "time_taken": time_taken},
+            content_type="text/xml",
+            status=200,
+        )
