@@ -49,6 +49,7 @@ class BaseSettings(PydanticBaseSettings):
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
+    aws_pingdom_domain: str = "127.0.0.1"
 
     # SSO
     enforce_staff_sso: bool = False

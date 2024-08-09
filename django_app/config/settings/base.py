@@ -221,6 +221,7 @@ GTM_ID = env.gtm_id
 # Django sites
 REPORT_A_SUSPECTED_BREACH_DOMAIN = env.report_a_suspected_breach_domain
 VIEW_A_SUSPECTED_BREACH_DOMAIN = env.view_a_suspected_breach_domain
+AWS_PINGDOM_DOMAIN = env.aws_pingdom_domain
 
 # Authentication - SSO
 ENFORCE_STAFF_SSO = env.enforce_staff_sso

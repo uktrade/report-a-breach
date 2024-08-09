@@ -11,6 +11,7 @@ def insert_sites(apps, schema_editor):
     Site.objects.create(domain=settings.REPORT_A_SUSPECTED_BREACH_DOMAIN, name="report-a-suspected-breach")
     # Register SITE_ID = 2
     Site.objects.create(domain=settings.VIEW_A_SUSPECTED_BREACH_DOMAIN, name="view-a-suspected-breach")
+    Site.objects.create(domain=settings.AWS_PINGDOM_DOMAIN, name="127.0.0.1")
 
 
 def remove_sites(apps, schema_editor):
