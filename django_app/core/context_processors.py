@@ -11,3 +11,8 @@ def truncate_words_limit(request: HttpRequest) -> dict[str, int]:
 def back_button(request: HttpRequest) -> dict[str, str]:
     """Default back button values - can be overridden in the context dictionary of a view."""
     return {"back_button_text": "Back", "back_button_link": request.META.get("HTTP_REFERER", None)}
+
+
+def is_debug_mode(request: HttpRequest) -> dict[str, bool]:
+    """Add a flag to the context to indicate if the site is in debug mode."""
+    return {"is_debug_mode": settings.DEBUG}

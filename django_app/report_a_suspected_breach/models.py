@@ -2,7 +2,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 from core.models import BaseModel
-from django.contrib.postgres.fields import DateRangeField
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.sessions.models import Session
 from django.db import models, transaction
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
@@ -35,9 +35,9 @@ class Breach(BaseModel):
     reporter_name_of_business_you_work_for = models.CharField(max_length=300, verbose_name="Business you work for")
     when_did_you_first_suspect = models.DateField()
     is_the_date_accurate = models.CharField(choices=choices.IsTheDateAccurateChoices.choices, max_length=11)
-    sanctions_regimes = models.ManyToManyField("SanctionsRegime", through="SanctionsRegimeBreachThrough", blank=True)
     unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
     where_were_the_goods_supplied_from = models.TextField()
+    sanctions_regimes_breached = ArrayField(base_field=models.CharField(max_length=255), blank=True, null=True, default=list)
     other_sanctions_regime = models.BooleanField(blank=True, default=False)
     what_were_the_goods = models.TextField()
     business_registered_on_companies_house = models.CharField(
@@ -117,8 +117,8 @@ class Breach(BaseModel):
             if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
                 new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
                 new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
-                sanctions_regimes = SanctionsRegime.objects.filter(full_name__in=declared_sanctions)
-                new_breach.sanctions_regimes.set(sanctions_regimes)
+
+                new_breach.sanctions_regimes_breached = declared_sanctions
 
             # Save breacher details to database
             if not show_check_company_details_page_condition(request):
@@ -209,17 +209,6 @@ class PersonOrCompany(BaseModel):
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
     registered_office_address = models.CharField(null=True, blank=True)
-
-
-class SanctionsRegimeBreachThrough(BaseModel):
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
-    sanctions_regime = models.ForeignKey("SanctionsRegime", on_delete=models.CASCADE, blank=True, null=True)
-
-
-class SanctionsRegime(BaseModel):
-    short_name = models.TextField()
-    full_name = models.TextField()
-    date_range = DateRangeField(blank=True, null=True)
 
 
 class UploadedDocument(BaseModel):

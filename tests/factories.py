@@ -21,21 +21,6 @@ class BreacherandSupplierFactory(factory.django.DjangoModelFactory):
     where_were_the_goods_supplied_from = "same_address"
 
 
-class SanctionsRegimeFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "report_a_suspected_breach.SanctionsRegime"
-
-    full_name = factory.Faker("name")
-
-
-class SanctionsRegimeBreachThroughFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "report_a_suspected_breach.SanctionsRegimeBreachThrough"
-
-    breach = factory.SubFactory(BreachFactory)
-    sanctions_regime = factory.SubFactory(SanctionsRegimeFactory)
-
-
 class BreacherPersonOrCompanyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "report_a_suspected_breach.PersonOrCompany"
@@ -70,15 +55,6 @@ class RecipientPersonOrCompanyFactory(factory.django.DjangoModelFactory):
 
 
 class BreachWith2SanctionsFactory(BreachFactory):
-    sanctions1 = factory.RelatedFactory(
-        SanctionsRegimeBreachThroughFactory,
-        factory_related_name="breach",
-    )
-    sanctions2 = factory.RelatedFactory(
-        SanctionsRegimeBreachThroughFactory,
-        factory_related_name="breach",
-    )
-
     breacher = factory.RelatedFactory(
         BreacherPersonOrCompanyFactory,
         factory_related_name="breach",
@@ -94,11 +70,6 @@ class BreachWith2SanctionsFactory(BreachFactory):
 
 
 class BreachWithCompaniesHouseFactory(BreachFactory):
-    sanctions1 = factory.RelatedFactory(
-        SanctionsRegimeBreachThroughFactory,
-        factory_related_name="breach",
-    )
-
     breacher = factory.RelatedFactory(
         BreacherCompaniesHouseCompanyFactory,
         factory_related_name="breach",
@@ -109,11 +80,6 @@ class BreachWithCompaniesHouseFactory(BreachFactory):
 
 
 class BreachBreacherAndSupplierFactory(BreacherandSupplierFactory):
-    sanctions1 = factory.RelatedFactory(
-        SanctionsRegimeBreachThroughFactory,
-        factory_related_name="breach",
-    )
-
     breacher = factory.RelatedFactory(
         BreacherPersonOrCompanyFactory,
         factory_related_name="breach",

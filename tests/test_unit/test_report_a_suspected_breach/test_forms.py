@@ -26,9 +26,7 @@ from report_a_suspected_breach.forms.forms_d import (
     ZeroEndUsersForm,
 )
 from report_a_suspected_breach.forms.forms_e import UploadDocumentsForm
-from report_a_suspected_breach.models import ReporterEmailVerification, SanctionsRegime
-
-from tests.factories import SanctionsRegimeFactory
+from report_a_suspected_breach.models import ReporterEmailVerification
 
 
 class TestStartForm:
@@ -392,26 +390,44 @@ class TestWhichSanctionsRegimeForm:
         assert "which_sanctions_regime" in form.errors
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "required"
 
+    @patch(
+        "report_a_suspected_breach.forms.forms_c.active_regimes",
+        [
+            {"name": "test regime", "is_active": True},
+            {"name": "test regime1", "is_active": True},
+            {"name": "test regime2", "is_active": True},
+        ],
+    )
     def test_choices_creation(self):
-        SanctionsRegimeFactory.create_batch(5)
         form = WhichSanctionsRegimeForm()
-        assert len(form.fields["which_sanctions_regime"].choices) == 7  # 5 + 2 default choices
+        assert len(form.fields["which_sanctions_regime"].choices) == 5  # 3 + 2 default choices
         flat_choices = [choice[0] for choice in form.fields["which_sanctions_regime"].choices]
-        for regime in SanctionsRegime.objects.all():
-            assert regime.full_name in flat_choices
+        assert "test regime" in flat_choices
+        assert "test regime1" in flat_choices
+        assert "test regime2" in flat_choices
 
         assert flat_choices[-1] == "Other Regime"
         assert flat_choices[-2] == "Unknown Regime"
 
+    @patch(
+        "report_a_suspected_breach.forms.forms_c.active_regimes",
+        [
+            {"name": "test regime", "is_active": True},
+        ],
+    )
     def test_assert_unknown_regime_selected_error(self):
-        SanctionsRegimeFactory.create(full_name="test regime")
         form = WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Unknown Regime", "test regime"]})
         assert not form.is_valid()
         assert "which_sanctions_regime" in form.errors
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"
 
+    @patch(
+        "report_a_suspected_breach.forms.forms_c.active_regimes",
+        [
+            {"name": "test regime", "is_active": True},
+        ],
+    )
     def test_assert_other_regime_selected_error(self):
-        SanctionsRegimeFactory.create(full_name="test regime")
         form = WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Other Regime", "test regime"]})
         assert not form.is_valid()
         assert "which_sanctions_regime" in form.errors

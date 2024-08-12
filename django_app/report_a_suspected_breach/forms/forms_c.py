@@ -5,7 +5,8 @@ from django import forms
 from django.utils.timezone import now
 from feedback.crispy_fields import get_field_with_label_id
 from report_a_suspected_breach.fields import DateInputField
-from report_a_suspected_breach.models import Breach, SanctionsRegime
+from report_a_suspected_breach.models import Breach
+from sanctions_regimes.report_a_breach import active_regimes
 
 Field.template = "core/custom_fields/field.html"
 
@@ -71,6 +72,8 @@ class WhenDidYouFirstSuspectForm(BaseModelForm):
 
 
 class WhichSanctionsRegimeForm(BaseForm):
+    form_h1_header = "Which Sanctions Regime"
+
     which_sanctions_regime = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         choices=(()),
@@ -87,11 +90,12 @@ class WhichSanctionsRegimeForm(BaseForm):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         checkbox_choices = []
-        for i, item in enumerate(SanctionsRegime.objects.values("full_name")):
-            if i == len(SanctionsRegime.objects.values("full_name")) - 1:
-                checkbox_choices.append(Choice(item["full_name"], item["full_name"], divider="or"))
-            else:
-                checkbox_choices.append(Choice(item["full_name"], item["full_name"]))
+
+        for item in active_regimes:
+            checkbox_choices.append(Choice(item["name"], item["name"]))
+
+        # adding the OR separator to the last option
+        checkbox_choices[-1].divider = "or"
 
         checkbox_choices.append(Choice("Unknown Regime", "I do not know"))
         checkbox_choices.append(Choice("Other Regime", "Other regime"))

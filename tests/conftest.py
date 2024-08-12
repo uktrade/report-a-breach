@@ -8,7 +8,6 @@ from tests.factories import (
     BreachFactory,
     BreachWith2SanctionsFactory,
     BreachWithCompaniesHouseFactory,
-    SanctionsRegimeFactory,
 )
 from tests.helpers import get_test_client
 
@@ -37,12 +36,6 @@ def vasb_client(db):
 def breach_object(db):
     """Fixture to create a breach object."""
     return BreachFactory()
-
-
-@pytest.fixture()
-def sanctions_regime_object(db):
-    """Fixture to create a SanctionsRegime object."""
-    return SanctionsRegimeFactory()
 
 
 @pytest.fixture()

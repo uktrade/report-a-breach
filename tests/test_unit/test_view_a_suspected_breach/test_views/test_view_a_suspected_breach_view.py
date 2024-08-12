@@ -4,10 +4,7 @@ from core.sites import SiteName
 from django.contrib.auth.models import User
 from django.test import RequestFactory
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
-from report_a_suspected_breach.models import (
-    PersonOrCompany,
-    SanctionsRegimeBreachThrough,
-)
+from report_a_suspected_breach.models import PersonOrCompany
 from view_a_suspected_breach.views import ViewASuspectedBreachView
 
 
@@ -37,7 +34,6 @@ class TestViewASuspectedBreachView:
 
         breach_id = breach_with_sanctions_object.id
         response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_id}/")
-        sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
@@ -49,7 +45,6 @@ class TestViewASuspectedBreachView:
         assert response.context["breacher"] == breacher
         assert response.context["supplier"] == supplier
         assert set(response.context["recipients"]) == set(recipients)
-        assert set(breach_with_sanctions_object.sanctions_regimes.through.objects.all()) == set(sanctions_regimes)
 
     @patch("view_a_suspected_breach.mixins.send_email")
     def test_get_context_data_companies_house(self, mock_email, vasb_client, breach_with_companies_house_object):
@@ -67,7 +62,6 @@ class TestViewASuspectedBreachView:
         vasb_client.force_login(test_user)
         breach_id = breach_with_companies_house_object.id
         response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_id}/")
-        sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
@@ -79,7 +73,6 @@ class TestViewASuspectedBreachView:
         else:
             assert "supplier" not in response.context.keys()
         assert set(response.context["recipients"]) == set(recipients)
-        assert set(breach_with_companies_house_object.sanctions_regimes.through.objects.all()) == set(sanctions_regimes)
 
     @patch("view_a_suspected_breach.mixins.send_email")
     def test_get_context_data_breacher_and_supplier(self, mock_email, vasb_client, breacher_and_supplier_object):
@@ -98,7 +91,6 @@ class TestViewASuspectedBreachView:
 
         breach_id = breacher_and_supplier_object.id
         response = vasb_client.get(f"/view_a_suspected_breach/view/{breach_id}/")
-        sanctions_regimes = SanctionsRegimeBreachThrough.objects.all()
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
@@ -107,4 +99,3 @@ class TestViewASuspectedBreachView:
         assert response.context["breacher"] == breacher
         assert response.context["supplier"].name == breacher.name
         assert set(response.context["recipients"]) == set(recipients)
-        assert set(breacher_and_supplier_object.sanctions_regimes.through.objects.all()) == set(sanctions_regimes)
