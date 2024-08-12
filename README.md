@@ -140,8 +140,12 @@ awslocal s3 ls temporary-document-bucket
 ```
 
 ### Updating the list of sanctions regimes
-We store the list of Sanction regimes in a private git submodule located in `django_app/sanctions_regimes`. If this list
-has changed, you can update it from the latest version of the submodule by running the following command:
+We store the list of Sanction regimes in a private git submodule located in `django_app/sanctions_regimes`.
+The first time you clone the repo, you may need to initialise the submodule:
+```
+git submodule update --init
+```
+If this list has changed, you can update it from the latest version of the submodule by running the following command:
 ```
 git submodule update --remote --merge
 ```
