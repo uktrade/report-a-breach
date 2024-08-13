@@ -89,7 +89,7 @@ class TestEmailVerifyForm:
         self.obj.save()
         form = EmailVerifyForm(data={"email_verification_code": self.verify_code}, request=self.request_object)
         assert not form.is_valid()
-        assert form.has_error("email_verification_code", "invalid")
+        assert form.has_error("email_verification_code", "invalid_after_expired")
 
     def test_email_verify_form_expired_code_30_minutes(self):
         self.obj.date_created = self.obj.date_created - timedelta(minutes=30)
