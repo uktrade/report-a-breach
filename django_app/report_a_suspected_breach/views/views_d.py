@@ -14,12 +14,11 @@ class WhereWereTheGoodsSuppliedFromView(BaseFormView):
 
     @property
     def redirect_after_post(self) -> bool:
-        """If the user has changed their answer, we want to redirect them to the next page, so they can continue the
-        new journey. If they haven't changed their answer, we want to keep redirect them to the redirect_to_url."""
-        if "where_were_the_goods_supplied_from" in self.changed_fields:
-            return False
-        else:
+        """If the user selects the same address or I do not know, we want to redirect back to summary"""
+        if self.form.cleaned_data.get("where_were_the_goods_supplied_from") in ["same_address", "i_do_not_know"]:
             return True
+        else:
+            return False
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
@@ -182,6 +181,14 @@ class ZeroEndUsersView(BaseFormView):
 
 class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
     form_class = forms.WhereWereTheGoodsMadeAvailableForm
+
+    @property
+    def redirect_after_post(self) -> bool:
+        """If the user selects the same address or I do not know, we want to redirect back to summary"""
+        if self.form.cleaned_data.get("where_were_the_goods_made_available_from") in ["same_address", "i_do_not_know"]:
+            return True
+        else:
+            return False
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
