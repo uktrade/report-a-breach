@@ -64,6 +64,7 @@ class EmailVerifyForm(BaseForm):
             "required": "Enter the 6 digit security code we sent to your email",
             "expired": "The code you entered is no longer valid. New code sent",
             "invalid": "Code is incorrect. Enter the 6 digit security code we sent to your email",
+            "invalid_after_expired": "The code you entered is no longer valid. Please verify your email again",
         },
         widget=forms.TextInput(attrs={"style": "max-width: 5em"}),
     )
@@ -97,7 +98,9 @@ class EmailVerifyForm(BaseForm):
             if time_code_sent > (now() - timedelta(hours=2)):
                 raise forms.ValidationError(self.fields["email_verification_code"].error_messages["expired"], code="expired")
             else:
-                raise forms.ValidationError(self.fields["email_verification_code"].error_messages["invalid"], code="invalid")
+                raise forms.ValidationError(
+                    self.fields["email_verification_code"].error_messages["invalid_after_expired"], code="invalid_after_expired"
+                )
 
         return email_verification_code
 
