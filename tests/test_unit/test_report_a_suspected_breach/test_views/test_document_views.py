@@ -50,7 +50,7 @@ class TestDocumentUploadView:
             follow=True,
         )
         assert response.status_code == 200
-        assert response.request["PATH_INFO"] == "/report_a_suspected_breach/tell_us_about_the_suspected_breach"
+        assert response.request["PATH_INFO"] == reverse("report_a_suspected_breach:tell_us_about_the_suspected_breach")
 
     def test_non_ajax_unsuccessful_post(self, rasb_client):
         response = rasb_client.post(

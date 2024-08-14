@@ -27,7 +27,7 @@ views_a_urls = [
 
 views_b_urls = [
     path(
-        "business-registered-with-Ccompanies-House",
+        "business-registered-with-Companies-House",
         views_b.AreYouReportingCompaniesHouseBusinessView.as_view(),
         name="are_you_reporting_a_business_on_companies_house",
     ),
