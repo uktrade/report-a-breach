@@ -42,10 +42,13 @@ class CheckYourAnswersView(BaseTemplateView):
             context["form_data"]["session_files"] = session_files
         if end_users := self.request.session.get("end_users", None):
             context["form_data"]["end_users"] = end_users
-
         if (
             get_cleaned_data_for_step(self.request, "where_were_the_goods_supplied_from").get(
                 "where_were_the_goods_supplied_from"
+            )
+            == "same_address"
+            or get_cleaned_data_for_step(self.request, "where_were_the_goods_made_available_from").get(
+                "where_were_the_goods_made_available_from"
             )
             == "same_address"
         ):

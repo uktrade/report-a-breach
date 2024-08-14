@@ -61,19 +61,20 @@ class WhereWereTheGoodsSuppliedFromForm(BaseForm):
 
 
 class WhereWereTheGoodsMadeAvailableForm(BaseForm):
-    where_were_the_goods_made_available_from = forms.ChoiceField(
+    where_were_the_goods_made_available_from = DefaultChoiceField(
         choices=(()),
         widget=forms.RadioSelect,
         label="Where were the goods, services, technological assistance or technology made available from?",
         error_messages={
             "required": "Select where the goods, services, technological assistance or technology were made available from"
         },
+        valid_values=["same_address"],
     )
 
-    def __init__(self, address_string: str | None, *args: object, **kwargs: object) -> None:
+    def __init__(self, *args: object, address_string: str | None = None, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         address_choices = []
-        if address_string is not None:
+        if address_string:
             address_choices.append(Choice("same_address", address_string, divider="or"))
 
         address_choices += [
