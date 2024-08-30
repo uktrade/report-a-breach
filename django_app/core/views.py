@@ -11,7 +11,7 @@ from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import View
-from django.views.generic import FormView, RedirectView
+from django.views.generic import FormView, RedirectView, TemplateView
 from django_ratelimit.exceptions import Ratelimited
 from formtools.wizard.views import NamedUrlSessionWizardView
 
@@ -253,3 +253,7 @@ class ResetSessionView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         request.session.flush()
         return redirect("initial_redirect_view")
+
+
+class PrivacyNoticeView(TemplateView):
+    template_name = "core/privacy_notice.html"

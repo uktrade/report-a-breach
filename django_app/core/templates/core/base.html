@@ -233,6 +233,10 @@
                                 <a class="govuk-footer__link"
                                    href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">Cookies</a>
                             </li>
+                            <li class="govuk-footer__inline-list-item hide-on-print">
+                                <a class="govuk-footer__link"
+                                   href="{% url 'privacy_notice' %}?redirect_back_to={{ request.path }}">Privacy</a>
+                            </li>
                             {% if is_debug_mode %}
                                 <li class="govuk-footer__inline-list-item hide-on-print">
                                     <a class="govuk-footer__link" href="{% url 'reset_session' %}">Reset session</a>
