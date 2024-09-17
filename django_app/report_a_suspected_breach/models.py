@@ -67,7 +67,6 @@ class Breach(BaseModel):
     def create_from_session(cls, request: "HttpRequest") -> "Breach":
         """Creates a Breach object from the data stored in current session"""
         cleaned_data = get_all_cleaned_data(request)
-
         if show_name_and_business_you_work_for_page(request):
             reporter_full_name = cleaned_data["name_and_business_you_work_for"]["reporter_full_name"]
             reporter_name_of_business_you_work_for = cleaned_data["name_and_business_you_work_for"][

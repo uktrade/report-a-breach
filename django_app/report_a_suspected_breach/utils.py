@@ -13,6 +13,7 @@ def get_cleaned_data_for_step(request: HttpRequest, step_name: str) -> dict:
     view_class = step_to_view_dict[step_name]
     form_class = view_class.form_class
     form = form_class(get_dirty_form_data(request, step_name), request=request)
+
     if form.is_valid():
         return form.cleaned_data
     else:
