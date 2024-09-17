@@ -1,3 +1,4 @@
+from django import forms
 from django.shortcuts import redirect
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, TemplateView
@@ -32,9 +33,11 @@ class BaseFormView(FormView):
 
         # Django QueryDict is a weird beast, we need to check if the key maps to a list of values (as it does with a
         # multi-select field) and if it does, we need to convert it to a list. If not, we can just keep the value as is.
+        # We also need to keep the value as it is if the form is an ArrayField.
         for key, value in form_data.items():
-            if len(value) == 1:
-                form_data[key] = value[0]
+            if not isinstance(form.fields.get(key), forms.MultipleChoiceField):
+                if len(value) == 1:
+                    form_data[key] = value[0]
 
         # check what (if any) fields have changed. This is useful if we want to control where the user gets redirected
         # to after the form is submitted depending on what they've changed
