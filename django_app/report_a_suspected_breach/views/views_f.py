@@ -19,8 +19,7 @@ from report_a_suspected_breach.utils import (
 from utils.breach_report import get_breach_context_data
 from utils.notifier import send_email
 from utils.s3 import get_all_session_files
-
-from django_app.view_a_suspected_breach.utils import craft_view_a_suspected_breach_url
+from view_a_suspected_breach.utils import craft_view_a_suspected_breach_url
 
 
 class CheckYourAnswersView(BaseTemplateView):
