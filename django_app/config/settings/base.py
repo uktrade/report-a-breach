@@ -198,6 +198,7 @@ GOV_NOTIFY_API_KEY = env.gov_notify_api_key
 EMAIL_VERIFY_CODE_TEMPLATE_ID = env.email_verify_code_template_id
 EMAIL_VASB_USER_ADMIN_TEMPLATE_ID = env.email_vasb_user_admin_template_id
 EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID = env.email_user_report_confirmation_template_id
+OTSI_NEW_APPLICATION_TEMPLATE_ID = env.otsi_new_application_template_id
 RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
 
 # SENTRY
@@ -318,3 +319,4 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_AGE = 86400
 
 OTSI_EMAIL = env.otsi_email
+PROTOCOL = "https://"

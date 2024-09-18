@@ -3,8 +3,9 @@ from typing import Any
 from core.base_views import BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
     show_name_and_business_you_work_for_page,
@@ -18,6 +19,7 @@ from report_a_suspected_breach.utils import (
 from utils.breach_report import get_breach_context_data
 from utils.notifier import send_email
 from utils.s3 import get_all_session_files
+from view_a_suspected_breach.utils import craft_view_a_suspected_breach_url
 
 
 class CheckYourAnswersView(BaseTemplateView):
@@ -76,6 +78,16 @@ class DeclarationView(BaseFormView):
             template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
             context={"user name": new_breach_object.reporter_full_name, "reference number": new_breach_object.reference},
         )
+        # Send confirmation email to OTSI staff
+        view_application_url = craft_view_a_suspected_breach_url(
+            reverse("view_a_suspected_breach:breach_report", kwargs={"pk": new_breach_object.pk})
+        )
+        for user in User.objects.filter(is_staff=True):
+            send_email(
+                email=user.email,
+                template_id=settings.OTSI_NEW_APPLICATION_TEMPLATE_ID,
+                context={"reference_number": new_breach_object.reference, "report_url": view_application_url},
+            )
         self.request.session["breach_id"] = str(new_breach_object.pk)
         return super().form_valid(form)
 
