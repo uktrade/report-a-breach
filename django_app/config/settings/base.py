@@ -316,6 +316,7 @@ CACHES = {
 }
 
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 86400
 
 OTSI_EMAIL = env.otsi_email
 PROTOCOL = "https://"

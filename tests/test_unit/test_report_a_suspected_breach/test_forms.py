@@ -378,7 +378,8 @@ class TestUploadDocumentsForm:
         assert not form.is_valid()
         assert "document" in form.errors
         assert form.errors.as_data()["document"][0].message == (
-            "&lt;img src=xonerror=alert(document.domain)&gt;gif." "gif cannot be uploaded, it is not a valid file type"
+            "The selected file must be a DOC, DOCX, ODT, FODT, XLS, XLSX, ODS, FODS, PPT, PPTX, ODP, "
+            "FODP, PDF, TXT, CSV, ZIP, HTML, JPEG, JPG or PNG"
         )
 
 

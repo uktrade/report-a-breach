@@ -39,7 +39,10 @@ class TestDocumentUploadView:
         assert response.status_code == 200
         response = response.json()
         assert response["success"] is False
-        assert "it is not a valid file type" in response["error"]
+        assert (
+            "The selected file must be a DOC, DOCX, ODT, FODT, XLS, XLSX, ODS, FODS, PPT, PPTX, ODP, FODP, "
+            "PDF, TXT, CSV, ZIP, HTML, JPEG, JPG or PNG" in response["error"]
+        )
         assert response["file_name"] == "bad.gif"
         assert "file_uploads" not in rasb_client.session
 
@@ -62,7 +65,10 @@ class TestDocumentUploadView:
         form = response.context["form"]
         assert not form.is_valid()
         assert "govuk-error-summary" in response.content.decode()
-        assert "it is not a valid file type" in response.content.decode()
+        assert (
+            "The selected file must be a DOC, DOCX, ODT, FODT, XLS, XLSX, ODS, FODS, PPT, PPTX, ODP, FODP, "
+            "PDF, TXT, CSV, ZIP, HTML, JPEG, JPG or PNG" in response.content.decode()
+        )
 
 
 @patch("report_a_suspected_breach.views.views_e.TemporaryDocumentStorage.delete")
