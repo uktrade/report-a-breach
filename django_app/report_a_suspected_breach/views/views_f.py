@@ -86,7 +86,7 @@ class DeclarationView(BaseFormView):
             send_email(
                 email=user.email,
                 template_id=settings.OTSI_NEW_APPLICATION_TEMPLATE_ID,
-                context={"application_number": new_breach_object.reference, "url": view_application_url},
+                context={"reference_number": new_breach_object.reference, "report_url": view_application_url},
             )
         self.request.session["breach_id"] = str(new_breach_object.pk)
         return super().form_valid(form)
