@@ -176,24 +176,6 @@ class TestDoYouKnowTheRegisteredCompanyNumberForm:
         assert cleaned_data["registered_office_address"] == "12 road, London"
         assert cleaned_data["registered_company_number"] == "12345678"
 
-    def test_clean_from_session(self, request_object):
-        """Tests that if the session contacts company details, the form will use those instead"""
-        request_object.session["company_details"] = {
-            "registered_company_name": "Test Company",
-            "registered_office_address": "12 road, London",
-            "registered_company_number": "12345678",
-        }
-
-        form = DoYouKnowTheRegisteredCompanyNumberForm(
-            data={"do_you_know_the_registered_company_number": "yes", "registered_company_number": "12345678"},
-            request=request_object,
-        )
-        form.is_valid()
-        cleaned_data = form.clean()
-        assert cleaned_data["registered_company_name"] == "Test Company"
-        assert cleaned_data["registered_office_address"] == "12 road, London"
-        assert cleaned_data["registered_company_number"] == "12345678"
-
     def test_form_is_unbound(self, request_object):
         form = DoYouKnowTheRegisteredCompanyNumberForm(
             data={"do_you_know_the_registered_company_number": "yes", "registered_company_number": "12345678"},

@@ -107,15 +107,6 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 # we don't need to continue if the company number is missing
                 return cleaned_data
 
-            # now we need to get the company details from Companies House
-            # and store them in the form. First we check the request session to see if
-            # they're already been obtained
-            if session_company_details := self.request.session.get("company_details"):
-                if cleaned_data["registered_company_number"] == session_company_details["registered_company_number"]:
-                    cleaned_data["registered_company_name"] = session_company_details["registered_company_name"]
-                    cleaned_data["registered_office_address"] = session_company_details["registered_office_address"]
-                return cleaned_data
-
             # todo: companies house have updated their API so an invalid number returns 500.
             #  Issue-tracker: https://forum.aws.chdev.org/t/non-existing-company-number-returns-500/8468
             if registered_company_number.isdigit() and len(registered_company_number) == 8:
