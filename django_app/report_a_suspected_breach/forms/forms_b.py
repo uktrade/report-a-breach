@@ -114,24 +114,37 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 if cleaned_data["registered_company_number"] == session_company_details["registered_company_number"]:
                     cleaned_data["registered_company_name"] = session_company_details["registered_company_name"]
                     cleaned_data["registered_office_address"] = session_company_details["registered_office_address"]
-                    return cleaned_data
+                return cleaned_data
 
-            try:
-                company_details = get_details_from_companies_house(registered_company_number)
-                cleaned_data["registered_company_number"] = company_details["company_number"]
-                cleaned_data["registered_company_name"] = company_details["company_name"]
-                cleaned_data["registered_office_address"] = get_formatted_address(company_details["registered_office_address"])
-            except CompaniesHouseException:
+            # todo: companies house have updated their API so an invalid number returns 500.
+            #  Issue-tracker: https://forum.aws.chdev.org/t/non-existing-company-number-returns-500/8468
+            if registered_company_number.isdigit() and len(registered_company_number) == 8:
+                # Re-checking companies house API, so remove 500
+                self.request.session.pop("company_details_500", None)
+                try:
+                    company_details = get_details_from_companies_house(registered_company_number)
+                    cleaned_data["registered_company_number"] = company_details["company_number"]
+                    cleaned_data["registered_company_name"] = company_details["company_name"]
+                    cleaned_data["registered_office_address"] = get_formatted_address(
+                        company_details["registered_office_address"]
+                    )
+                except CompaniesHouseException:
+                    self.add_error(
+                        "registered_company_number",
+                        forms.ValidationError(
+                            code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
+                        ),
+                    )
+                except CompaniesHouse500Error:
+                    self.request.session["company_details_500"] = True
+                    self.request.session.modified = True
+            else:
                 self.add_error(
                     "registered_company_number",
                     forms.ValidationError(
                         code="invalid", message=self.Meta.error_messages["registered_company_number"]["invalid"]
                     ),
                 )
-            except CompaniesHouse500Error:
-                self.request.session["company_details_500"] = True
-                self.request.session.modified = True
-
         return cleaned_data
 
 
