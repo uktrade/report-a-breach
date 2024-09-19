@@ -24,12 +24,12 @@ def get_details_from_companies_house(registration_number: str) -> dict[str, Any]
     Retrieves and returns details of a company from Companies House
     using registration number that is passed in.
     """
+
     get_company_headers = {"Authorization": f"Basic {get_companies_house_basic_auth_token()}"}
     response = requests.get(
         f"{COMPANIES_HOUSE_BASE_DOMAIN}/company/{registration_number}",
         headers=get_company_headers,
     )
-
     if response.status_code == 200:
         return response.json()
 

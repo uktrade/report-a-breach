@@ -30,13 +30,14 @@ class DoYouKnowTheRegisteredCompanyNumberView(BaseFormView):
         return super().form_valid(form)
 
     def get_success_url(self) -> str:
+        success_url = reverse("report_a_suspected_breach:where_is_the_address_of_the_business_or_person")
         has_companies_house_number = self.form.cleaned_data.get("do_you_know_the_registered_company_number") == "yes"
         if has_companies_house_number:
             if self.request.session.get("company_details_500", ""):
-                return reverse("report_a_suspected_breach:manual_companies_house_input")
+                success_url = reverse("report_a_suspected_breach:manual_companies_house_input")
             else:
-                return reverse("report_a_suspected_breach:check_company_details")
-        return reverse("report_a_suspected_breach:where_is_the_address_of_the_business_or_person")
+                success_url = reverse("report_a_suspected_breach:check_company_details")
+        return success_url
 
 
 class ManualCompaniesHouseView(BaseFormView):
