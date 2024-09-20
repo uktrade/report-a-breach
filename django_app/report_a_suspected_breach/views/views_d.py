@@ -218,6 +218,7 @@ class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
 
 class WhereWereTheGoodsMadeAvailableToView(BaseFormView):
     form_class = forms.WhereWereTheGoodsMadeAvailableToForm
+    redirect_after_post = False
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
