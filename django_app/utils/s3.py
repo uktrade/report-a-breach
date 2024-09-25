@@ -4,7 +4,6 @@ from core.document_storage import PermanentDocumentStorage, TemporaryDocumentSto
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.cache import cache
-from django.http import HttpRequest
 from django.urls import reverse
 from storages.backends.s3boto3 import S3Boto3Storage
 
@@ -36,11 +35,15 @@ def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> d
 
     user_uploaded_files = get_user_uploaded_files(session)
     for content in response.get("Contents", []):
-        file_name = content["Key"].rpartition("/")[2]
+        key = content["Key"]
+        file_name = key.rpartition("/")[2]
 
         # checking that a file with this name was uploaded in the session
         if file_name in user_uploaded_files:
-            session_files[file_name] = reverse("report_a_suspected_breach:download_document", kwargs={"file_name": file_name})
+            session_files[key] = {
+                "file_name": file_name,
+                "url": reverse("report_a_suspected_breach:download_document", kwargs={"file_name": file_name}),
+            }
     return session_files
 
 
@@ -77,21 +80,21 @@ def get_user_uploaded_files(session: SessionBase) -> List[str]:
     return uploaded_files
 
 
-def store_documents_in_s3(request: HttpRequest, breach_id: str) -> None:
+def store_document_in_permanent_bucket(object_key: str, breach_pk: str) -> str:
     """
-    Copies documents from the default temporary storage to permanent storage on s3
+    Copies a specific document from the temporary storage to permanent storage on s3
     """
     temporary_storage_bucket = TemporaryDocumentStorage()
     permanent_storage_bucket = PermanentDocumentStorage()
 
-    if session_files := get_all_session_files(temporary_storage_bucket, request.session):
-        for object_key in session_files.keys():
-            permanent_storage_bucket.bucket.meta.client.copy(
-                CopySource={
-                    "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
-                    "Key": f"{request.session.session_key}/{object_key}",
-                },
-                Bucket=settings.PERMANENT_S3_BUCKET_NAME,
-                Key=f"{breach_id}/{object_key}",
-                SourceClient=temporary_storage_bucket.bucket.meta.client,
-            )
+    new_key = f"{breach_pk}/{object_key}"
+    permanent_storage_bucket.bucket.meta.client.copy(
+        CopySource={
+            "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,
+            "Key": object_key,
+        },
+        Bucket=settings.PERMANENT_S3_BUCKET_NAME,
+        Key=new_key,
+        SourceClient=temporary_storage_bucket.bucket.meta.client,
+    )
+    return new_key

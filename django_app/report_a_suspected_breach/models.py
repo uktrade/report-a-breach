@@ -1,6 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING
 
+from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.models import BaseModel
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.sessions.models import Session
@@ -12,7 +13,7 @@ from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
     show_name_and_business_you_work_for_page,
 )
-from utils.s3 import store_documents_in_s3
+from utils.s3 import get_all_session_files, store_document_in_permanent_bucket
 
 from .choices import TypeOfRelationshipChoices
 from .exceptions import EmailNotVerifiedException
@@ -110,8 +111,6 @@ class Breach(BaseModel):
                 ],
                 reporter_session=request.session._get_session_from_db(),
             )
-            # Save documents to s3 permanent bucket
-            store_documents_in_s3(request, new_breach.id)
 
             if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
                 new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
@@ -130,6 +129,8 @@ class Breach(BaseModel):
                     new_breach, companies_house_details, TypeOfRelationshipChoices.breacher
                 )
 
+            # Save documents to permanent bucket and database
+            UploadedDocument.save_documents(new_breach, request)
             # Save supplier details to database
             if show_about_the_supplier_page(request):
                 supplier_details = cleaned_data["about_the_supplier"]
@@ -212,11 +213,32 @@ class PersonOrCompany(BaseModel):
 
 class UploadedDocument(BaseModel):
     file = models.FileField(
+        null=True,
+        blank=True,
+        # if we're storing the document in the DB, we can assume it's in the permanent bucket
+        storage=PermanentDocumentStorage(),
         validators=[
             validate_virus_check_result,
         ],
     )
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
+    breach = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=False, related_name="documents")
+
+    def file_name(self) -> str:
+        return self.file.name.split("/")[-1]
+
+    def url(self) -> str:
+        return self.file.url
+
+    @classmethod
+    def save_documents(cls, breach, request) -> None:
+        # Save documents
+        documents = get_all_session_files(TemporaryDocumentStorage(), request.session)
+        for key, _ in documents.items():
+            new_key = store_document_in_permanent_bucket(object_key=key, breach_pk=breach.pk)
+            UploadedDocument.objects.create(
+                breach=breach,
+                file=new_key,
+            )
 
 
 class ReporterEmailVerification(BaseModel):
