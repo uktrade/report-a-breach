@@ -53,14 +53,14 @@
                     {{ breach_report.breach.created_at }}
                 </dd>
             </div>
-            {% if breach_report.documents.items %}
+            {% if breach_report.breach.documents %}
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-caption-m govuk-!-font-weight-regular">
                         Files uploaded:
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% for document, _ in breach_report.documents.items %}
-                            {{ document }}
+                        {% for document in breach_report.breach.documents.all %}
+                            <a href="{{ document.url }}" download>{{ document.file_name }}</a><br>
                         {% endfor %}
                     </dd>
                 </div>

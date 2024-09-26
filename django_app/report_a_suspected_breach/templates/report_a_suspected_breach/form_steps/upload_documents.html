@@ -1,6 +1,5 @@
 {% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds static %}
-
 {% block title %}Upload documents{% endblock title %}
 
 {% block extra_css %}
@@ -63,28 +62,27 @@
             {% csrf_token %}
             {% crispy form %}
         </form>
-
         <div class="moj-multi-file__uploaded-files {% if not session_files %}moj-hidden{% endif %}">
             <h2 class="govuk-heading-m">Files added</h2>
             <div class="govuk-summary-list moj-multi-file-upload__list">
-                {% for document, url in session_files.items %}
+                {% for object_key, more_info in session_files.items %}
                     <div class="govuk-summary-list__row moj-multi-file-upload__row">
                         <dd class="govuk-summary-list__value moj-multi-file-upload__message">
                             <span class="moj-multi-file-upload__filename">
-                                {{ document }}
+                                {{ more_info.file_name }}
                             </span>
                         </dd>
                         <dd class="govuk-summary-list__actions moj-multi-file-upload__actions">
                             <form id="delete_documents_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
-                                  action="{% url 'report_a_suspected_breach:delete_documents' %}?file_name={{ document }}" class="show-on-js-disabled hide-on-js-enabled">
+                                  action="{% url 'report_a_suspected_breach:delete_documents' %}?file_name={{ object_key }}" class="show-on-js-disabled hide-on-js-enabled">
                                 {% csrf_token %}
                                 <button type="submit" class=" govuk-link button-that-looks-like-link" form="delete_documents_form_{{ forloop.counter }}">
                                     Remove
                                 </button>
                             </form>
-                            <a class="moj-multi-file-upload__delete govuk-!-margin-bottom-0 hide-on-js-disabled show-on-js-enabled"
-                               href="javascript:void(0)" data-file-name="{{ document }}">
-                                Remove <span class="govuk-visually-hidden">{{ document }}</span>
+                            <a class="moj-multi-file-upload__delete govuk-!-margin-bottom-0 hide-on-js-disabled show-on-js-enabled button-that-looks-like-link"
+                               href="javascript:void(0)" data-file-name="{{ more_info.file_name }}">
+                                Remove<span class="govuk-visually-hidden">{{ more_info.file_name }} </span>
                             </a>
                         </dd>
                     </div>
@@ -92,7 +90,6 @@
             </div>
         </div>
     </div>
-
     <button type="submit" class="govuk-button" data-module="govuk-button" form="main_file_upload_form">
         Continue
     </button>

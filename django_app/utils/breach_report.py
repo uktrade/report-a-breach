@@ -1,11 +1,9 @@
 from typing import Any
 
-from core.document_storage import PermanentDocumentStorage
 from django.forms.models import model_to_dict
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import Breach, PersonOrCompany
 from utils.companies_house import get_formatted_address
-from utils.s3 import get_breach_documents
 
 
 def get_breach_context_data(breach: Breach) -> dict[str, Any]:
@@ -43,10 +41,6 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     # Sanctions Regimes
     sanctions = breach.sanctions_regimes_breached
     breach_context["sanctions"] = sanctions
-
-    # Documents
-    upload_documents = get_breach_documents(PermanentDocumentStorage(), str(breach.id))
-    breach_context["documents"] = upload_documents
 
     # Reference
     breach_context["reference"] = breach.reference

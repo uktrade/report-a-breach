@@ -214,17 +214,15 @@
     {% endif %}
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">
-        {% if documents.items %}
+        {% if breach.documents %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Upload supporting documents
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% for document, url in documents.items %}
-
-                        <a href="{{url}}" download>{{document}}</a><br>
+                    {% for document in breach.documents.all %}
+                        <a href="{{ document.url }}" download>{{ document.file_name }}</a><br>
                     {% endfor %}
-
                 </dd>
             </div>
         {% endif %}

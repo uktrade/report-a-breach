@@ -42,7 +42,6 @@ class UploadDocumentsView(BaseFormView):
         """Loop through the files and save them to the temporary storage. If the request is Ajax, return a JsonResponse.
 
         If the request is not Ajax, redirect to the summary page (the next step in the form)."""
-
         for temporary_file in form.cleaned_data["document"]:
             # adding the file name to the cache, so we can retrieve it later and confirm they uploaded it
             # we add a unique identifier to the key, so we do not overwrite previous uploads
@@ -67,7 +66,11 @@ class UploadDocumentsView(BaseFormView):
     def form_invalid(self, form: Form) -> HttpResponse:
         if is_ajax(self.request):
             return JsonResponse(
-                {"success": False, "error": form.errors["document"][0], "file_name": self.request.FILES["document"].name},
+                {
+                    "success": False,
+                    "error": form.errors["document"][0],
+                    "file_name": self.request.FILES["document"].name.rpartition("/")[2],
+                },
                 status=200,
             )
         else:
@@ -79,7 +82,6 @@ class DeleteDocumentsView(View):
         if file_name := self.request.GET.get("file_name"):
             full_file_path = f"{self.request.session.session_key}/{file_name}"
             TemporaryDocumentStorage().delete(full_file_path)
-
             if is_ajax(self.request):
                 return JsonResponse({"success": True}, status=200)
             else:

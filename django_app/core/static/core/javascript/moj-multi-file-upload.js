@@ -167,7 +167,7 @@ $.MultiFileUpload.prototype.getFileRowHtml = function (file) {
 };
 
 $.MultiFileUpload.prototype.getDeleteButtonHtml = function (file_name) {
-    var html = '<a class="moj-multi-file-upload__delete govuk-!-margin-bottom-0" href="javascript:void(0)">';
+    var html = '<a class="moj-multi-file-upload__delete govuk-!-margin-bottom-0" href="javascript:void(0)" data-file-name="' + file_name + '">';
     html += 'Remove <span class="govuk-visually-hidden">' + file_name + '</span>';
     html += '</a>';
     return html;
