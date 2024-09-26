@@ -1,6 +1,5 @@
 {% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
-{% load get_end_user_url %}
 {% load countries %}
 {% block title %}Check your answers{% endblock title %}
 {% block form_content %}
@@ -342,24 +341,25 @@
     {% endif %}
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">
-        {% if form_data.session_files.items %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Upload supporting documents
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% for document, url in form_data.session_files.items %}
-                        <a href="{{url}}" download>{{document}}</a><br>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Upload supporting documents
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {% if not form_data.session_files.items %}
+                    None uploaded
+                {% else %}
+                    {% for _, more_info in form_data.session_files.items %}
+                        <a class="govuk-link" href="{{ more_info.url }}" download>{{ more_info.file_name }}</a><br>
                     {% endfor %}
-
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:upload_documents' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">supporting documents</span></a>
-                </dd>
-            </div>
-        {% endif %}
+                {% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% url 'report_a_suspected_breach:upload_documents' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                    class="govuk-visually-hidden">supporting documents</span></a>
+            </dd>
+        </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 Summary of the breach
