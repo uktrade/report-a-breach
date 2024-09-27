@@ -107,15 +107,15 @@ class TestAdminManageUsers:
         assert response.status_code == 200
 
     def test_base_redirect_view_staff(self, vasb_client):
-        """Logged-in users who are staff should be redirected to the manage users page"""
+        """Logged-in users who are staff should be redirected to the view-all-reports page"""
         staff_user = User.objects.create_user("Joan", "joan@example.com", is_active=True, is_staff=True)
         vasb_client.force_login(staff_user)
         response = vasb_client.get("/")
         assert response.status_code == 302
 
     def test_base_redirect_view_not_staff(self, vasb_client):
-        """Logged-in users who are not staff should see a 404"""
+        """Logged-in users who are not staff should be redirected to the view-all-reports page"""
         staff_user = User.objects.create_user("Joan", "joan@example.com", is_active=True, is_staff=False)
         vasb_client.force_login(staff_user)
         response = vasb_client.get("/")
-        assert response.status_code == 404
+        assert response.status_code == 302
