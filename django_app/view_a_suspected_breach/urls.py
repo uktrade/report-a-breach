@@ -7,5 +7,5 @@ app_name = "view_a_suspected_breach"
 urlpatterns = [
     path("view-all-reports", views.SummaryReportsView.as_view(), name="summary_reports"),
     path("view-report/<uuid:pk>/", views.ViewASuspectedBreachView.as_view(), name="breach_report"),
-    path("user_admin/", views.ManageUsersView.as_view(), name="user_admin"),
+    path("manage-users/", views.ManageUsersView.as_view(), name="user_admin"),
 ]
