@@ -10,8 +10,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path("", RedirectBaseDomainView.as_view(), name="initial_redirect_view"),
-    path("report_a_suspected_breach/", include("report_a_suspected_breach.urls")),
-    path("view_a_suspected_breach/", include("view_a_suspected_breach.urls")),
+    path("report/", include("report_a_suspected_breach.urls")),
+    path("view/", include("view_a_suspected_breach.urls")),
     path("cookies_consent", CookiesConsentView.as_view(), name="cookies_consent"),
     path("hide_cookies", HideCookiesView.as_view(), name="hide_cookies"),
     path("feedback/", include("feedback.urls")),

@@ -12,6 +12,7 @@ from report_a_suspected_breach.views import (
 app_name = "report_a_suspected_breach"
 
 generic_urls = [
+    path("", generic.RedirectBaseReportView.as_view(), name="initial_redirect_view"),
     path("task-list", generic.TaskListView.as_view(), name="tasklist"),
     path("task-list/<str:current_task_name>/", generic.TaskListView.as_view(), name="tasklist_with_current_task"),
 ]
