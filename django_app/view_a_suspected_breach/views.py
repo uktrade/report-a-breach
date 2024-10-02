@@ -7,13 +7,21 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import DetailView, ListView, RedirectView, TemplateView
 from report_a_suspected_breach.models import Breach
 from utils.breach_report import get_breach_context_data
 
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
+
+
+class RedirectBaseViewerView(RedirectView):
+    """Redirects view_a_suspected_breach base site visits to view-all-reports view"""
+
+    @property
+    def url(self) -> str:
+        return reverse("view_a_suspected_breach:summary_reports")
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")

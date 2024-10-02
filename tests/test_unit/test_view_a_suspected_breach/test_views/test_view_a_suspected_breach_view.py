@@ -33,7 +33,7 @@ class TestViewASuspectedBreachView:
         vasb_client.force_login(test_user)
 
         breach_id = breach_with_sanctions_object.id
-        response = vasb_client.get(f"/view_a_suspected_breach/view-report/{breach_id}/")
+        response = vasb_client.get(f"/view/view-report/{breach_id}/")
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
@@ -61,7 +61,7 @@ class TestViewASuspectedBreachView:
 
         vasb_client.force_login(test_user)
         breach_id = breach_with_companies_house_object.id
-        response = vasb_client.get(f"/view_a_suspected_breach/view-report/{breach_id}/")
+        response = vasb_client.get(f"/view/view-report/{breach_id}/")
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
@@ -90,7 +90,7 @@ class TestViewASuspectedBreachView:
         vasb_client.force_login(test_user)
 
         breach_id = breacher_and_supplier_object.id
-        response = vasb_client.get(f"/view_a_suspected_breach/view-report/{breach_id}/")
+        response = vasb_client.get(f"/view/view-report/{breach_id}/")
         breacher = PersonOrCompany.objects.filter(
             breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
