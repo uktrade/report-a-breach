@@ -16,6 +16,7 @@ from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
 
 
+@method_decorator(require_view_a_breach(), name="dispatch")
 class RedirectBaseViewerView(RedirectView):
     """Redirects view_a_suspected_breach base site visits to view-all-reports view"""
 
