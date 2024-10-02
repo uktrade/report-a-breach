@@ -11,6 +11,11 @@ def insert_sites(apps, schema_editor):
     Site.objects.create(domain=settings.REPORT_A_SUSPECTED_BREACH_DOMAIN, name="report-a-suspected-breach")
     # Register SITE_ID = 2
     Site.objects.create(domain=settings.VIEW_A_SUSPECTED_BREACH_DOMAIN, name="view-a-suspected-breach")
+    if settings.ENVIRONMENT == "production":
+        # Register SITE_ID = 3
+        Site.objects.create(domain=settings.REPORT_A_SUSPECTED_BREACH_EXTRA_DOMAIN, name="report-a-suspected-breach")
+        # Register SITE_ID = 4
+        Site.objects.create(domain=settings.VIEW_A_SUSPECTED_BREACH_EXTRA_DOMAIN, name="view-a-suspected-breach")
 
 
 def remove_sites(apps, schema_editor):
