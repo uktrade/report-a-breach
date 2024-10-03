@@ -82,7 +82,7 @@ class DeclarationView(BaseFormView):
             reverse("view_a_suspected_breach:breach_report", kwargs={"pk": new_breach_object.pk})
         )
 
-        for email in settings.NEW_APPLICATION_ALERT_RECIPIENTS:
+        for email in settings.NEW_BREACH_REPORTED_ALERT_RECIPIENTS:
             send_email(
                 email=email,
                 template_id=settings.OTSI_NEW_APPLICATION_TEMPLATE_ID,

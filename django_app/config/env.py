@@ -29,6 +29,7 @@ class BaseSettings(PydanticBaseSettings):
     email_vasb_user_admin_template_id: str = ""
     email_user_report_confirmation_template_id: str = ""
     otsi_new_application_template_id: str = ""
+    new_breach_reported_alert_recipients: str = ""
 
     sentry_dsn: str = ""
     sentry_environment: str = ""
