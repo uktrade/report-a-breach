@@ -200,7 +200,10 @@ EMAIL_VASB_USER_ADMIN_TEMPLATE_ID = env.email_vasb_user_admin_template_id
 EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID = env.email_user_report_confirmation_template_id
 OTSI_NEW_APPLICATION_TEMPLATE_ID = env.otsi_new_application_template_id
 RESTRICT_SENDING = env.restrict_sending  # if True, only send to whitelisted domains
-NEW_BREACH_REPORTED_ALERT_RECIPIENTS = env.new_breach_reported_alert_recipients.split(",")
+if "," in env.new_breach_reported_alert_recipients:  # check if multiple recipients
+    NEW_BREACH_REPORTED_ALERT_RECIPIENTS = env.new_breach_reported_alert_recipients.split(",")
+else:
+    NEW_BREACH_REPORTED_ALERT_RECIPIENTS = [env.new_breach_reported_alert_recipients]
 
 # SENTRY
 SENTRY_DSN = env.sentry_dsn
