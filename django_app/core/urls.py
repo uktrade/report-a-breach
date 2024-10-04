@@ -16,7 +16,7 @@ urlpatterns = [
     path("hide_cookies", HideCookiesView.as_view(), name="hide_cookies"),
     path("feedback/", include("feedback.urls")),
     path("healthcheck/", include("healthcheck.urls")),
-    path("privacy_notice", PrivacyNoticeView.as_view(), name="privacy_notice"),
+    path("privacy-notice", PrivacyNoticeView.as_view(), name="privacy_notice"),
     path("reset_session/", ResetSessionView.as_view(), name="reset_session"),
     path("throw_error/", lambda x: 1 / 0),
 ]

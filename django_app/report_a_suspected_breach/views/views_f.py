@@ -87,6 +87,7 @@ class DeclarationView(BaseFormView):
                 template_id=settings.OTSI_NEW_APPLICATION_TEMPLATE_ID,
                 context={"reference_number": new_breach_object.reference, "report_url": view_application_url},
             )
+
         self.request.session["breach_id"] = str(new_breach_object.pk)
         return super().form_valid(form)
 
@@ -104,6 +105,9 @@ class CompleteView(BaseTemplateView):
         # page once they have submitted a report, so this should not be an issue.
         if breach_object.reporter_session != self.request.session._get_session_from_db():
             raise SuspiciousOperation("User does not have access to this breach object.")
+
+        # Requirement to clear the session post submission hence making this page single view
+        self.request.session.flush()
 
         context.update(get_breach_context_data(breach_object))
         return context
