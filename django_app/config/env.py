@@ -29,6 +29,7 @@ class BaseSettings(PydanticBaseSettings):
     email_vasb_user_admin_template_id: str = ""
     email_user_report_confirmation_template_id: str = ""
     otsi_new_application_template_id: str = ""
+    new_breach_reported_alert_recipients: str = "email@example.com"
 
     sentry_dsn: str = ""
     sentry_environment: str = ""
@@ -50,7 +51,8 @@ class BaseSettings(PydanticBaseSettings):
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
-
+    report_a_suspected_breach_extra_domain: str = ""
+    view_a_suspected_breach_extra_domain: str = ""
     # SSO
     enforce_staff_sso: bool = False
     authbroker_url: str = ""

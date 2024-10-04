@@ -3,7 +3,6 @@ from typing import Any
 from core.base_views import BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
 from django.urls import reverse, reverse_lazy
 from report_a_suspected_breach.form_step_conditions import (
@@ -82,9 +81,9 @@ class DeclarationView(BaseFormView):
         view_application_url = craft_view_a_suspected_breach_url(
             reverse("view_a_suspected_breach:breach_report", kwargs={"pk": new_breach_object.pk})
         )
-        for user in User.objects.filter(is_staff=True):
+        for email in settings.NEW_BREACH_REPORTED_ALERT_RECIPIENTS:
             send_email(
-                email=user.email,
+                email=email,
                 template_id=settings.OTSI_NEW_APPLICATION_TEMPLATE_ID,
                 context={"reference_number": new_breach_object.reference, "report_url": view_application_url},
             )

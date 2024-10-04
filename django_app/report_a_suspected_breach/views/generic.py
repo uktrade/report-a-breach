@@ -1,5 +1,13 @@
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import RedirectView, TemplateView
+
+
+class RedirectBaseReportView(RedirectView):
+    """Redirects report_a_breach base site visits to tasklist view"""
+
+    @property
+    def url(self) -> str:
+        return reverse("report_a_suspected_breach:tasklist")
 
 
 class TaskListView(TemplateView):
