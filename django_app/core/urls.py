@@ -1,4 +1,5 @@
 from core.views import (
+    AccessibilityStatementView,
     CookiesConsentView,
     HideCookiesView,
     PrivacyNoticeView,
@@ -19,6 +20,7 @@ urlpatterns = [
     path("privacy-notice", PrivacyNoticeView.as_view(), name="privacy_notice"),
     path("reset_session/", ResetSessionView.as_view(), name="reset_session"),
     path("throw_error/", lambda x: 1 / 0),
+    path("accessibility-statement", AccessibilityStatementView.as_view(), name="accessibility_statement"),
 ]
 
 if settings.ENFORCE_STAFF_SSO:

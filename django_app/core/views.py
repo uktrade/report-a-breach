@@ -252,3 +252,7 @@ class ResetSessionView(View):
 
 class PrivacyNoticeView(TemplateView):
     template_name = "core/privacy_notice.html"
+
+
+class AccessibilityStatementView(TemplateView):
+    template_name = "core/accessibility_statement.html"
