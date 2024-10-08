@@ -240,6 +240,10 @@
                                 <a class="govuk-footer__link"
                                    href="{% url 'privacy_notice' %}">Privacy notice</a>
                             </li>
+                            <li class="govuk-footer__inline-list-item hide-on-print">
+                                <a class="govuk-footer__link"
+                                   href="{% url 'accessibility_statement' %}">Accessibility statement</a>
+                            </li>
                             {% if is_debug_mode %}
                                 <li class="govuk-footer__inline-list-item hide-on-print">
                                     <a class="govuk-footer__link" href="{% url 'reset_session' %}">Reset session</a>
