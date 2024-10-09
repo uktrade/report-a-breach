@@ -13,7 +13,7 @@ urlpatterns = [
     path("", RedirectBaseDomainView.as_view(), name="initial_redirect_view"),
     path("report/", include("report_a_suspected_breach.urls")),
     path("view/", include("view_a_suspected_breach.urls")),
-    path("cookies_consent", CookiesConsentView.as_view(), name="cookies_consent"),
+    path("cookies-policy", CookiesConsentView.as_view(), name="cookies_consent"),
     path("hide_cookies", HideCookiesView.as_view(), name="hide_cookies"),
     path("feedback/", include("feedback.urls")),
     path("healthcheck/", include("healthcheck.urls")),
