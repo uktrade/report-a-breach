@@ -213,7 +213,8 @@ if SENTRY_DSN and SENTRY_ENVIRONMENT:
         dsn=SENTRY_DSN,
         environment=SENTRY_ENVIRONMENT,
         integrations=[DjangoIntegration()],
-        traces_sample_rate=0,
+        enable_tracing=env.bool("SENTRY_ENABLE_TRACING", False),
+        traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", 0.0),
     )
 
 # Email Verification settings
