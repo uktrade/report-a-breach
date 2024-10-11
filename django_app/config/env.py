@@ -33,6 +33,8 @@ class BaseSettings(PydanticBaseSettings):
 
     sentry_dsn: str = ""
     sentry_environment: str = ""
+    sentry_enable_tracing: bool = False
+    sentry_traces_sample_rate: float = 0.0
 
     gtm_enabled: bool = True
     gtm_id: str = ""
