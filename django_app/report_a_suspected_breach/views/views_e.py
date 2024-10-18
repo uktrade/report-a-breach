@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class UploadDocumentsView(BaseFormView):
-    """View for uploading documents. This view is used in the wizard flow, but can also be accessed directly.
+    """View for uploading documents.
 
     Accepts both Ajax and non-Ajax requests, to accommodate both JS and non-JS users respectively."""
 
