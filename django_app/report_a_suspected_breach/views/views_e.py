@@ -100,9 +100,14 @@ class DownloadDocumentView(View):
         user_uploaded_files = get_user_uploaded_files(self.request.session)
 
         if file_name in user_uploaded_files:
-            logger.info(f"User is downloading file: {file_name}")
             session_keyed_file_name = f"{self.request.session.session_key}/{file_name}"
             file_url = generate_presigned_url(TemporaryDocumentStorage(), session_keyed_file_name)
+
+            if user_email := self.request.session.get("reporter_email_address"):
+                logger.info(f"{user_email} has downloaded file: {file_name}")
+            else:
+                logger.info(f"Downloaded file: {file_name}")
+
             return redirect(file_url)
 
         raise Http404()
