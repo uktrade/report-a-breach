@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from core.sites import require_view_a_breach
@@ -13,11 +14,12 @@ from utils.breach_report import get_breach_context_data
 
 from .mixins import ActiveUserRequiredMixin, StaffUserOnlyMixin
 
+logger = logging.getLogger(__name__)
+
+
 # ALL VIEWS HERE MUST BE DECORATED WITH AT LEAST LoginRequiredMixin
-
-
 @method_decorator(require_view_a_breach(), name="dispatch")
-class RedirectBaseViewerView(RedirectView):
+class RedirectBaseViewerView(LoginRequiredMixin, ActiveUserRequiredMixin, RedirectView):
     """Redirects view_a_suspected_breach base site visits to view-all-reports view"""
 
     @property
@@ -65,11 +67,13 @@ class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
             user_to_accept = User.objects.get(id=update_user)
             user_to_accept.is_active = True
             user_to_accept.save()
+            logger.info(f"{user_to_accept.email} has been accepted by {self.request.user.email}")
             return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
         if delete_user := self.request.GET.get("delete_user", None):
             denied_user = User.objects.get(id=delete_user)
             denied_user.delete()
+            logger.info(f"{denied_user.email} has been denied by {self.request.user.email}")
             return HttpResponseRedirect(reverse("view_a_suspected_breach:user_admin"))
 
         return super().get(request, **kwargs)
