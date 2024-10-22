@@ -19,7 +19,8 @@ def rasb_client(db):
     No user is logged in with this client.
     """
     rab_site = Site.objects.get(name=SiteName.report_a_suspected_breach)
-    return get_test_client(rab_site.domain)
+
+    return get_test_client(rab_site.domain, "report-a-suspected-breach")
 
 
 @pytest.fixture()
@@ -29,7 +30,7 @@ def vasb_client(db):
     No user is logged in with this client.
     """
     vab_site = Site.objects.get(name=SiteName.view_a_suspected_breach)
-    return get_test_client(vab_site.domain)
+    return get_test_client(vab_site.domain, http_host="view-a-suspected-breach")
 
 
 @pytest.fixture()
@@ -46,6 +47,9 @@ def request_object(rasb_client: Client, method: str = "GET"):
     request_object.method = method
     request_object.GET = {}
     request_object.POST = {}
+    request_object.scheme = "http"
+    request_object.META = {"HTTP_HOST": "apply-for-a-licence"}
+    request_object.path = "licence-url"
     return request_object
 
 
