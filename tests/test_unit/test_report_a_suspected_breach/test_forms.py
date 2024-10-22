@@ -6,13 +6,6 @@ from django import forms as django_forms
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory
 from report_a_suspected_breach import choices
-from report_a_suspected_breach.forms.forms_a import (
-    EmailForm,
-    EmailVerifyForm,
-    NameAndBusinessYouWorkForForm,
-    NameForm,
-    StartForm,
-)
 from report_a_suspected_breach.forms.forms_business import (
     AreYouReportingABusinessOnCompaniesHouseForm,
     DoYouKnowTheRegisteredCompanyNumberForm,
@@ -23,6 +16,13 @@ from report_a_suspected_breach.forms.forms_documents_and_details import (
 from report_a_suspected_breach.forms.forms_sanctions_and_goods import (
     WhenDidYouFirstSuspectForm,
     WhichSanctionsRegimeForm,
+)
+from report_a_suspected_breach.forms.forms_start import (
+    EmailForm,
+    EmailVerifyForm,
+    NameAndBusinessYouWorkForForm,
+    NameForm,
+    StartForm,
 )
 from report_a_suspected_breach.forms.forms_supply_chain import (
     AboutTheEndUserForm,
@@ -158,8 +158,8 @@ class TestDoYouKnowTheRegisteredCompanyNumberForm:
         )
         assert form.is_valid()
 
-    @patch("report_a_suspected_breach.forms.forms_b.get_details_from_companies_house")
-    @patch("report_a_suspected_breach.forms.forms_b.get_formatted_address")
+    @patch("report_a_suspected_breach.forms.forms_business.get_details_from_companies_house")
+    @patch("report_a_suspected_breach.forms.forms_business.get_formatted_address")
     def test_clean(self, mocked_get_formatted_address, mocked_get_details_from_companies_house, request_object):
         mocked_get_details_from_companies_house.return_value = {
             "company_number": "12345678",
@@ -379,7 +379,7 @@ class TestWhichSanctionsRegimeForm:
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "required"
 
     @patch(
-        "report_a_suspected_breach.forms.forms_c.active_regimes",
+        "report_a_suspected_breach.forms.forms_sanctions_and_goods.active_regimes",
         [
             {"name": "test regime", "is_active": True},
             {"name": "test regime1", "is_active": True},
@@ -398,7 +398,7 @@ class TestWhichSanctionsRegimeForm:
         assert flat_choices[-2] == "Unknown Regime"
 
     @patch(
-        "report_a_suspected_breach.forms.forms_c.active_regimes",
+        "report_a_suspected_breach.forms.forms_sanctions_and_goods.active_regimes",
         [
             {"name": "test regime", "is_active": True},
         ],
@@ -410,7 +410,7 @@ class TestWhichSanctionsRegimeForm:
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"
 
     @patch(
-        "report_a_suspected_breach.forms.forms_c.active_regimes",
+        "report_a_suspected_breach.forms.forms_sanctions_and_goods.active_regimes",
         [
             {"name": "test regime", "is_active": True},
         ],
