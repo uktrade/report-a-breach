@@ -17,7 +17,9 @@ class TestViewASuspectedBreach:
             is_active=True,
         )
 
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(
+            reverse("view_a_suspected_breach:breach_report", kwargs={"reference": breach_object.reference})
+        )
         request_object.user = test_user
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
@@ -25,7 +27,7 @@ class TestViewASuspectedBreach:
         vasb_client.force_login(test_user)
 
         view = ViewASuspectedBreachView()
-        view.setup(request_object, pk=breach_object.id)
+        view.setup(request_object, reference=breach_object.reference)
         response = view.dispatch(request_object)
 
         assert response.status_code == 200
@@ -46,7 +48,7 @@ class TestViewASuspectedBreach:
             is_staff=True,
         )
 
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.reference]))
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = test_user
@@ -59,7 +61,7 @@ class TestViewASuspectedBreach:
         mock_email.assert_called_once()
 
     def test_anonymous_user(self, vasb_client, breach_object):
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.reference]))
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = AnonymousUser()
