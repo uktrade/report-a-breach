@@ -48,8 +48,8 @@ def request_object(rasb_client: Client, method: str = "GET"):
     request_object.GET = {}
     request_object.POST = {}
     request_object.scheme = "http"
-    request_object.META = {"HTTP_HOST": "apply-for-a-licence"}
-    request_object.path = "licence-url"
+    request_object.META = {"HTTP_HOST": "report-a-suspected-breach"}
+    request_object.path = "tasklist"
     return request_object
 
 
