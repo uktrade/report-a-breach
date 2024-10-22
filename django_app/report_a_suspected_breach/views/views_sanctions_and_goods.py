@@ -1,6 +1,6 @@
 from core.base_views import BaseFormView
 from django.urls import reverse_lazy
-from report_a_suspected_breach.forms import forms_c as forms
+from report_a_suspected_breach.forms import forms_sanctions_and_goods as forms
 
 
 class WhenDidYouFirstSuspectView(BaseFormView):
