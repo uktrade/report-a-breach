@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.test import RequestFactory
 from django.urls import reverse
 from report_a_suspected_breach.models import ReporterEmailVerification, Session
-from report_a_suspected_breach.views.views_a import EmailVerifyView
+from report_a_suspected_breach.views.views_start import EmailVerifyView
 
 
 class TestEmailVerifyCodeView:
@@ -51,7 +51,7 @@ class TestEmailVerifyCodeView:
             == "You've tried to verify your email too many times. Try again in 1 minute"
         )
 
-    @patch("report_a_suspected_breach.views.views_a.verify_email")
+    @patch("report_a_suspected_breach.views.views_start.verify_email")
     def test_form_invalid_resent_code(self, mocked_verify_email, rasb_client):
         session = rasb_client.session
         session["reporter_email_address"] = "test@example.com"

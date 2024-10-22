@@ -9,8 +9,8 @@ from utils.s3 import get_user_uploaded_files
 logger = logging.getLogger(__name__)
 
 
-@patch("report_a_suspected_breach.forms.forms_e.get_all_session_files", new=lambda x, y: [])
-@patch("report_a_suspected_breach.views.views_e.get_all_session_files", new=lambda x, y: [])
+@patch("report_a_suspected_breach.forms.forms_documents_and_details.get_all_session_files", new=lambda x, y: [])
+@patch("report_a_suspected_breach.views.views_documents_and_details.get_all_session_files", new=lambda x, y: [])
 class TestDocumentUploadView:
     def test_successful_post(self, rasb_client):
         response = rasb_client.post(
@@ -71,7 +71,7 @@ class TestDocumentUploadView:
         )
 
 
-@patch("report_a_suspected_breach.views.views_e.TemporaryDocumentStorage.delete")
+@patch("report_a_suspected_breach.views.views_documents_and_details.TemporaryDocumentStorage.delete")
 class TestDeleteDocumentsView:
     def test_successful_post(self, mocked_temporary_document_storage, rasb_client):
         response = rasb_client.post(
@@ -95,10 +95,10 @@ class TestDeleteDocumentsView:
 
 class TestDownloadDocumentMiddleman:
 
-    @patch("report_a_suspected_breach.views.views_e.get_user_uploaded_files", return_value=["test.png"])
-    @patch("report_a_suspected_breach.views.views_e.generate_presigned_url", return_value="www.example.com")
+    @patch("report_a_suspected_breach.views.views_documents_and_details.get_user_uploaded_files", return_value=["test.png"])
+    @patch("report_a_suspected_breach.views.views_documents_and_details.generate_presigned_url", return_value="www.example.com")
     def test_download_document_middleman(self, mocked_uploaded_files, mocked_url, caplog, rasb_client):
-        with caplog.at_level(logging.INFO, logger="report_a_suspected_breach.views.views_e"):
+        with caplog.at_level(logging.INFO, logger="report_a_suspected_breach.views.views_documents_and_details"):
             session = rasb_client.session
             session.update({"reporter_email_address": "test@example.com"})
             session.save()
@@ -108,7 +108,7 @@ class TestDownloadDocumentMiddleman:
         assert response.status_code == 302
         assert response.url == "www.example.com"
 
-    @patch("report_a_suspected_breach.views.views_e.get_user_uploaded_files", return_value=["hello.png"])
+    @patch("report_a_suspected_breach.views.views_documents_and_details.get_user_uploaded_files", return_value=["hello.png"])
     def test_download_document_middleman_not_in_cache(self, mocked_uploaded_files, rasb_client):
         response = rasb_client.get(reverse("report_a_suspected_breach:download_document", kwargs={"file_name": "test.png"}))
         assert response.status_code == 404
