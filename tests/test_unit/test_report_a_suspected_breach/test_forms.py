@@ -13,19 +13,21 @@ from report_a_suspected_breach.forms.forms_a import (
     NameForm,
     StartForm,
 )
-from report_a_suspected_breach.forms.forms_b import (
+from report_a_suspected_breach.forms.forms_business import (
     AreYouReportingABusinessOnCompaniesHouseForm,
     DoYouKnowTheRegisteredCompanyNumberForm,
 )
-from report_a_suspected_breach.forms.forms_c import (
+from report_a_suspected_breach.forms.forms_documents_and_details import (
+    UploadDocumentsForm,
+)
+from report_a_suspected_breach.forms.forms_sanctions_and_goods import (
     WhenDidYouFirstSuspectForm,
     WhichSanctionsRegimeForm,
 )
-from report_a_suspected_breach.forms.forms_d import (
+from report_a_suspected_breach.forms.forms_supply_chain import (
     AboutTheEndUserForm,
     ZeroEndUsersForm,
 )
-from report_a_suspected_breach.forms.forms_e import UploadDocumentsForm
 from report_a_suspected_breach.models import ReporterEmailVerification
 
 
