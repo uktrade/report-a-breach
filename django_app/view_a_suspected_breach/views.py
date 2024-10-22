@@ -84,7 +84,7 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
     template_name = "view_a_suspected_breach/view_a_suspected_breach.html"
 
     def get_object(self, queryset=None) -> Breach:
-        self.breach = get_object_or_404(Breach, id=self.kwargs["pk"])
+        self.breach = get_object_or_404(Breach, reference=self.kwargs["reference"])
         return self.breach
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
