@@ -99,8 +99,12 @@ class TestDownloadDocumentMiddleman:
     @patch("report_a_suspected_breach.views.views_e.generate_presigned_url", return_value="www.example.com")
     def test_download_document_middleman(self, mocked_uploaded_files, mocked_url, caplog, rasb_client):
         with caplog.at_level(logging.INFO, logger="report_a_suspected_breach.views.views_e"):
+            session = rasb_client.session
+            session.update({"reporter_email_address": "test@example.com"})
+            session.save()
+
             response = rasb_client.get(reverse("report_a_suspected_breach:download_document", kwargs={"file_name": "test.png"}))
-            assert "User is downloading file: test.png" in caplog.text
+            assert "test@example.com has downloaded file: test.png" in caplog.text
         assert response.status_code == 302
         assert response.url == "www.example.com"
 

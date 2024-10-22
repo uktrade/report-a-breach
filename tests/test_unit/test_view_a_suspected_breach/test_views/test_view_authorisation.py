@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from core.sites import SiteName
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import RequestFactory
 from django.urls import reverse
@@ -119,3 +120,21 @@ class TestAdminManageUsers:
         vasb_client.force_login(staff_user)
         response = vasb_client.get("/")
         assert response.status_code == 302
+
+
+def test_all_views_require_login():
+    # gets all views from view_a_suspected_breach and asserts that they all require login
+    from view_a_suspected_breach.urls import urlpatterns
+
+    views = []
+    for pattern in urlpatterns:
+        if hasattr(pattern.callback, "cls"):
+            view = pattern.callback.cls
+        elif hasattr(pattern.callback, "view_class"):
+            view = pattern.callback.view_class
+        else:
+            view = pattern.callback
+        views.append(view)
+
+    for view in views:
+        assert issubclass(view, LoginRequiredMixin)

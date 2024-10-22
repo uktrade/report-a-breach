@@ -23,7 +23,7 @@ def show_check_company_details_page_condition(request: HttpRequest) -> bool:
         do_you_know_the_registered_company_number_cleaned_data.get("do_you_know_the_registered_company_number", False) == "yes"
         and do_you_know_the_registered_company_number_cleaned_data.get("registered_company_number", False)
         and are_you_reporting_a_business_on_companies_house_step_cleaned_data.get("business_registered_on_companies_house", False)
-        == "yes"
+        in ["yes", "do_not_know"]
     )
 
     return show_page

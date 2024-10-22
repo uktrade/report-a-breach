@@ -73,7 +73,7 @@
                         </div>
                     {% endif %}
                     {% if "cookies_set" in request.GET %}
-                        <form method="post" action="{% url 'hide_cookies' %}?banner=True">
+                        <form method="post" action="{% url 'hide_cookies' %}?banner=True&redirect_back_to={{ request.path }}">
                             {% csrf_token %}
                             <div class="govuk-cookie-banner" data-nosnippet role="region"
                                  aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
