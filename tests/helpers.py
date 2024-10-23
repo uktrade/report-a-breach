@@ -2,13 +2,13 @@ from django.http import HttpResponse
 from django.test import Client
 
 
-def get_test_client(server_name: str) -> Client:
+def get_test_client(server_name: str, http_host: str) -> Client:
     """Create a test client for a particular site.
 
     :param server_name: Domain to link to the correct site.
 
     """
-    client = Client(SERVER_NAME=server_name)
+    client = Client(SERVER_NAME=server_name, HTTP_HOST=http_host)
 
     return client
 
