@@ -317,7 +317,8 @@ CACHES = {
 
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 15 * 60
+# Session cookie age is set to 40 minutes
+SESSION_COOKIE_AGE = 40 * 60
 
 OTSI_EMAIL = env.otsi_email
 PROTOCOL = "https://"
