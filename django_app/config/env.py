@@ -55,8 +55,8 @@ class BaseSettings(PydanticBaseSettings):
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
     report_a_suspected_breach_extra_domain: str = ""
     view_a_suspected_breach_extra_domain: str = ""
+
     # SSO
-    enforce_staff_sso: bool = False
     authbroker_url: str = ""
     authbroker_client_id: str = ""
     authbroker_client_secret: str = ""
