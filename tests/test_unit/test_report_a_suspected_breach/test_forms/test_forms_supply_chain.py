@@ -19,6 +19,10 @@ class TestAboutTheEndUserForm:
         form.is_valid()
         assert form.cleaned_data["clickable_website_url"] == "https://example.com"
 
+        form = AboutTheEndUserForm(data={"website": "http://example.com"})
+        form.is_valid()
+        assert form.cleaned_data["clickable_website_url"] == "http://example.com"
+
         form = AboutTheEndUserForm(data={"website": "https://example.com"})
         form.is_valid()
         assert form.cleaned_data["clickable_website_url"] == "https://example.com"
