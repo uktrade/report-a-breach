@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from core.sites import SiteName
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import RequestFactory
 from django.urls import reverse
@@ -16,7 +17,9 @@ class TestViewASuspectedBreach:
             is_active=True,
         )
 
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(
+            reverse("view_a_suspected_breach:breach_report", kwargs={"reference": breach_object.reference})
+        )
         request_object.user = test_user
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
@@ -24,7 +27,7 @@ class TestViewASuspectedBreach:
         vasb_client.force_login(test_user)
 
         view = ViewASuspectedBreachView()
-        view.setup(request_object, pk=breach_object.id)
+        view.setup(request_object, reference=breach_object.reference)
         response = view.dispatch(request_object)
 
         assert response.status_code == 200
@@ -45,10 +48,12 @@ class TestViewASuspectedBreach:
             is_staff=True,
         )
 
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.reference]))
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = test_user
+        request_object.META = {"HTTP_HOST": "report-a-suspected-breach"}
+        request_object.path = "tasklist"
         view = ViewASuspectedBreachView()
         view.setup(request_object, pk=breach_object.id)
         vasb_client.force_login(test_user)
@@ -58,7 +63,7 @@ class TestViewASuspectedBreach:
         mock_email.assert_called_once()
 
     def test_anonymous_user(self, vasb_client, breach_object):
-        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.id]))
+        request_object = RequestFactory().get(reverse("view_a_suspected_breach:breach_report", args=[breach_object.reference]))
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = AnonymousUser()
@@ -119,3 +124,21 @@ class TestAdminManageUsers:
         vasb_client.force_login(staff_user)
         response = vasb_client.get("/")
         assert response.status_code == 302
+
+
+def test_all_views_require_login():
+    # gets all views from view_a_suspected_breach and asserts that they all require login
+    from view_a_suspected_breach.urls import urlpatterns
+
+    views = []
+    for pattern in urlpatterns:
+        if hasattr(pattern.callback, "cls"):
+            view = pattern.callback.cls
+        elif hasattr(pattern.callback, "view_class"):
+            view = pattern.callback.view_class
+        else:
+            view = pattern.callback
+        views.append(view)
+
+    for view in views:
+        assert issubclass(view, LoginRequiredMixin)

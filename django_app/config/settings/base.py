@@ -229,24 +229,19 @@ REPORT_A_SUSPECTED_BREACH_DOMAIN = env.report_a_suspected_breach_domain
 VIEW_A_SUSPECTED_BREACH_DOMAIN = env.view_a_suspected_breach_domain
 
 # Authentication - SSO
-ENFORCE_STAFF_SSO = env.enforce_staff_sso
+AUTHENTICATION_BACKENDS = [
+    "view_a_suspected_breach.authbrokers.BreachPortalAuth",
+]
+AUTHBROKER_URL = env.authbroker_url
+AUTHBROKER_CLIENT_ID = env.authbroker_client_id
+AUTHBROKER_CLIENT_SECRET = env.authbroker_client_secret
+AUTHBROKER_TOKEN_SESSION_KEY = env.authbroker_token_session_key
+AUTHBROKER_STAFF_SSO_SCOPE = env.authbroker_staff_sso_scope
 
-if ENFORCE_STAFF_SSO:
-    AUTHENTICATION_BACKENDS = [
-        "view_a_suspected_breach.authbrokers.BreachPortalAuth",
-    ]
-    AUTHBROKER_URL = env.authbroker_url
-    AUTHBROKER_CLIENT_ID = env.authbroker_client_id
-    AUTHBROKER_CLIENT_SECRET = env.authbroker_client_secret
-    AUTHBROKER_TOKEN_SESSION_KEY = env.authbroker_token_session_key
-    AUTHBROKER_STAFF_SSO_SCOPE = env.authbroker_staff_sso_scope
+OAUTHLIB_INSECURE_TRANSPORT = env.oauthlib_insecure_transport
 
-    OAUTHLIB_INSECURE_TRANSPORT = env.oauthlib_insecure_transport
-
-    LOGIN_URL = reverse_lazy("authbroker_client:login")
-    LOGIN_REDIRECT_URL = reverse_lazy("view_a_suspected_breach:landing")
-else:
-    LOGIN_URL = "/admin/login"
+LOGIN_URL = reverse_lazy("authbroker_client:login")
+LOGIN_REDIRECT_URL = reverse_lazy("view_a_suspected_breach:landing")
 
 TRUNCATE_WORDS_LIMIT = 30
 
@@ -322,7 +317,8 @@ CACHES = {
 
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 15 * 60
+# Session cookie age is set to 40 minutes
+SESSION_COOKIE_AGE = 40 * 60
 
 OTSI_EMAIL = env.otsi_email
 PROTOCOL = "https://"

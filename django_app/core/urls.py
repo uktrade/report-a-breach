@@ -6,7 +6,6 @@ from core.views import (
     RedirectBaseDomainView,
     ResetSessionView,
 )
-from django.conf import settings
 from django.urls import include, path
 
 urlpatterns = [
@@ -23,7 +22,6 @@ urlpatterns = [
     path("accessibility-statement", AccessibilityStatementView.as_view(), name="accessibility_statement"),
 ]
 
-if settings.ENFORCE_STAFF_SSO:
-    urlpatterns.append(
-        path("auth/", include("authbroker_client.urls")),
-    )
+urlpatterns.append(
+    path("auth/", include("authbroker_client.urls")),
+)

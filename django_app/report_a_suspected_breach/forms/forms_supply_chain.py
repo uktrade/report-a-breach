@@ -14,7 +14,7 @@ from crispy_forms_gds.layout import (
 from django import forms
 from report_a_suspected_breach.fields import DefaultChoiceField
 from report_a_suspected_breach.forms.base_forms import BasePersonBusinessDetailsForm
-from report_a_suspected_breach.forms.forms_b import BusinessOrPersonDetailsForm
+from report_a_suspected_breach.forms.forms_business import BusinessOrPersonDetailsForm
 from report_a_suspected_breach.models import Breach, PersonOrCompany
 
 Field.template = "core/custom_fields/field.html"

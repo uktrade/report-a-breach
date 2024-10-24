@@ -23,7 +23,7 @@
 
     {% for breach_report in object_list %}
         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
-            <a href="{%  url 'view_a_suspected_breach:breach_report' pk=breach_report.breach.id %}" class="govuk-link">View suspected breach report ID:{{ breach_report.breach.reference }}</a></h3>
+            <a href="{%  url 'view_a_suspected_breach:breach_report' reference=breach_report.breach.reference %}" class="govuk-link">View suspected breach report ID:{{ breach_report.breach.reference }}</a></h3>
         <div class="govuk-body">
             <h3 class="govuk-heading-s govuk-summary-list__value">Summary of the breach</h3>
             {% include "report_a_suspected_breach/partials/truncated_text.html" with text=breach_report.breach.tell_us_about_the_suspected_breach|linebreaksbr %}

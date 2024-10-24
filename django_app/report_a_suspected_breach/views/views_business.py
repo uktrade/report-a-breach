@@ -4,7 +4,7 @@ from core.base_views import BaseFormView
 from core.forms import GenericForm
 from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
-from report_a_suspected_breach.forms import forms_b as forms
+from report_a_suspected_breach.forms import forms_business as forms
 
 
 class AreYouReportingCompaniesHouseBusinessView(BaseFormView):

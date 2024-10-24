@@ -102,7 +102,13 @@ Add the below to your `/etc/hosts` file:
 127.0.0.1       view-a-suspected-breach
 ```
 
-### 7. Run the web server
+### 7. Load the submodules
+The first time you clone the repo, you may need to initialise the submodule:
+```
+git submodule update --init
+```
+
+### 8. Run the web server
 After following the setup, use the following to run the web app
 
 `invoke runserver`

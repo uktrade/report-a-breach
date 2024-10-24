@@ -11,7 +11,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import View
-from report_a_suspected_breach.forms import forms_e as forms
+from report_a_suspected_breach.forms import forms_documents_and_details as forms
 from utils.s3 import (
     generate_presigned_url,
     get_all_session_files,
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class UploadDocumentsView(BaseFormView):
-    """View for uploading documents. This view is used in the wizard flow, but can also be accessed directly.
+    """View for uploading documents.
 
     Accepts both Ajax and non-Ajax requests, to accommodate both JS and non-JS users respectively."""
 
@@ -100,9 +100,14 @@ class DownloadDocumentView(View):
         user_uploaded_files = get_user_uploaded_files(self.request.session)
 
         if file_name in user_uploaded_files:
-            logger.info(f"User is downloading file: {file_name}")
             session_keyed_file_name = f"{self.request.session.session_key}/{file_name}"
             file_url = generate_presigned_url(TemporaryDocumentStorage(), session_keyed_file_name)
+
+            if user_email := self.request.session.get("reporter_email_address"):
+                logger.info(f"{user_email} has downloaded file: {file_name}")
+            else:
+                logger.info(f"Downloaded file: {file_name}")
+
             return redirect(file_url)
 
         raise Http404()

@@ -1,5 +1,8 @@
+import string
+
 import factory
 from django.utils import timezone
+from factory.fuzzy import FuzzyText
 
 
 class BreachFactory(factory.django.DjangoModelFactory):
@@ -11,9 +14,10 @@ class BreachFactory(factory.django.DjangoModelFactory):
         "random_element",
         elements=["same_address", "different_uk_address", "outside_the_uk", "they_have_not_been_supplied", "i_do_not_know"],
     )
+    reference = FuzzyText(length=4, chars=string.ascii_uppercase + string.digits)
 
 
-class BreacherandSupplierFactory(factory.django.DjangoModelFactory):
+class BreacherandSupplierFactory(BreachFactory):
     class Meta:
         model = "report_a_suspected_breach.Breach"
 
