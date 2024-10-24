@@ -12,7 +12,6 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
     class Meta:
         widgets = {
             "name": forms.TextInput,
-            "website": forms.TextInput,
             "country": forms.Select,
             "address_line_1": forms.TextInput,
             "address_line_2": forms.TextInput,
@@ -24,7 +23,6 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
         }
         labels = {
             "name": "Name of business or person",
-            "website": "Website address",
             "country": "Country",
             "address_line_1": "Address line 1",
             "address_line_2": "Address line 2",
@@ -42,6 +40,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             "country": {"required": "Select country"},
         }
 
+    website = forms.URLField(widget=forms.TextInput, label="Website address", required=False)
     readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, *args: object, **kwargs: object) -> None:
