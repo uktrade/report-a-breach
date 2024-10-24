@@ -79,7 +79,7 @@ class DeclarationView(BaseFormView):
         )
         # Send confirmation email to OTSI staff
         view_application_url = craft_view_a_suspected_breach_url(
-            reverse("view_a_suspected_breach:breach_report", kwargs={"pk": new_breach_object.reference})
+            reverse("view_a_suspected_breach:breach_report", kwargs={"reference": new_breach_object.reference})
         )
         for email in settings.NEW_BREACH_REPORTED_ALERT_RECIPIENTS:
             send_email(

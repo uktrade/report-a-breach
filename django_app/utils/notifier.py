@@ -1,5 +1,6 @@
 from typing import Any
 
+import sentry_sdk
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.http import HttpRequest, HttpResponse
@@ -26,21 +27,20 @@ def verify_email(reporter_email_address: str, request: HttpRequest) -> None:
 
 def send_email(email: str, context: dict[str, Any], template_id: str, reference: str | None = None) -> HttpResponse | bool:
     """Send an email using the GOV.UK Notify API."""
-    if is_whitelisted(email):
-        client = NotificationsAPIClient(settings.GOV_NOTIFY_API_KEY)
-        try:
-            send_report = client.send_email_notification(
-                email_address=email,
-                template_id=template_id,
-                personalisation=get_context(context),
-                reference=reference,
-            )
-            return send_report
-        except HTTPError:
-            # todo - handle exceptions here
-            return False
-    else:
-        return False
+    client = NotificationsAPIClient(settings.GOV_NOTIFY_API_KEY)
+    try:
+        send_report = client.send_email_notification(
+            email_address=email,
+            template_id=template_id,
+            personalisation=get_context(context),
+            reference=reference,
+        )
+        return send_report
+    except HTTPError as err:
+        # something has gone wrong, let's fail silently and report the error
+        sentry_sdk.capture_exception(err)
+
+    return False
 
 
 def get_context(extra_context: dict | None = None) -> dict[str, Any]:
@@ -51,21 +51,3 @@ def get_context(extra_context: dict | None = None) -> dict[str, Any]:
     }
     context.update(extra_context)
     return context
-
-
-def is_whitelisted(email: str) -> bool:
-    """
-    Temporary measure to restrict notify emails to certain domains.
-    disabled on production.
-    """
-    if settings.RESTRICT_SENDING:
-        _, domain = email.split("@")
-        email_domain_whitelist = (
-            "gov.uk",
-            "businessandtrade.gov.uk",
-            "trade.gov.uk",
-            "digital.trade.gov.uk",
-        )
-        return domain in email_domain_whitelist
-    else:
-        return True

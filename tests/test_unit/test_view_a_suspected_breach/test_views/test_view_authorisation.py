@@ -52,6 +52,8 @@ class TestViewASuspectedBreach:
         request_object.site = SiteName
         request_object.site.name = SiteName.view_a_suspected_breach
         request_object.user = test_user
+        request_object.META = {"HTTP_HOST": "report-a-suspected-breach"}
+        request_object.path = "tasklist"
         view = ViewASuspectedBreachView()
         view.setup(request_object, pk=breach_object.id)
         vasb_client.force_login(test_user)
