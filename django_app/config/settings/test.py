@@ -80,7 +80,7 @@ def test_request_verify_form_valid(self, form: Form) -> HttpResponse:
 
     from django.contrib.sessions.models import Session
     from report_a_suspected_breach.models import ReporterEmailVerification
-    from report_a_suspected_breach.views.views_a import EmailVerifyView
+    from report_a_suspected_breach.views.views_start import EmailVerifyView
 
     logger = logging.getLogger(__name__)
 

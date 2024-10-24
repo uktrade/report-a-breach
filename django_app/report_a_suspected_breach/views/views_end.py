@@ -9,7 +9,7 @@ from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
     show_name_and_business_you_work_for_page,
 )
-from report_a_suspected_breach.forms.forms_f import DeclarationForm
+from report_a_suspected_breach.forms.forms_end import DeclarationForm
 from report_a_suspected_breach.models import Breach
 from report_a_suspected_breach.utils import (
     get_all_cleaned_data,
