@@ -85,7 +85,7 @@
                 {% endif %}
             </dd>
         </div>
-        {% if form_data.business_or_person_details.clickable_website_url %}
+        {% if form_data.business_or_person_details.website %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Website
@@ -93,7 +93,7 @@
                 <dd class="govuk-summary-list__value">
                     <a class="govuk-link"
                        target="_blank"
-                       href="{{ form_data.about_the_supplier.clickable_website_url }}">{{ form_data.business_or_person_details.clickable_website_url }}<span
+                       href="{{ form_data.about_the_supplier.website }}">{{ form_data.business_or_person_details.website }}<span
                         class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
                 </dd>
                 <dd class="govuk-summary-list__actions">

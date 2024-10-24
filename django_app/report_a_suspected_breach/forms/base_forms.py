@@ -9,10 +9,11 @@ from utils.companies_house import get_formatted_address
 class BasePersonBusinessDetailsForm(BaseModelForm):
     """A base form for capturing personal or business details. Such as the End-User Form and the BusinessOrPersonDetails Form."""
 
+    website = forms.URLField(widget=forms.TextInput, label="Website address", required=False)
+
     class Meta:
         widgets = {
             "name": forms.TextInput,
-            "website": forms.TextInput,
             "country": forms.Select,
             "address_line_1": forms.TextInput,
             "address_line_2": forms.TextInput,
@@ -24,7 +25,6 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
         }
         labels = {
             "name": "Name of business or person",
-            "website": "Website address",
             "country": "Country",
             "address_line_1": "Address line 1",
             "address_line_2": "Address line 2",
@@ -68,10 +68,6 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             cleaned_data["country"] = "GB"
         cleaned_data["readable_address"] = get_formatted_address(cleaned_data)
         cleaned_data["is_uk_address"] = self.is_uk_address
-
-        # we want to get the actual website address, not just the domain or whatever the user has inputted
-        if website := cleaned_data.get("website"):
-            cleaned_data["clickable_website_url"] = website if website.startswith("http") else f"https://{website}"
 
         return cleaned_data
 
