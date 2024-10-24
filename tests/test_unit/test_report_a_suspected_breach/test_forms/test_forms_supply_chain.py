@@ -32,6 +32,10 @@ class TestAboutTheEndUserForm:
         assert not form.is_valid()
         assert form.errors["website"][0] == "Enter a valid URL."
 
+        form = AboutTheEndUserForm(data={"website": "example"})
+        assert not form.is_valid()
+        assert form.errors["website"][0] == "Enter a valid URL."
+
 
 class TestZeroEndUsersForm:
     def test_do_you_want_to_add_an_end_user_validation(self):
