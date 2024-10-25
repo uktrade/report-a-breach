@@ -14,18 +14,27 @@ class TestAboutTheEndUserForm:
         assert "postal_code" in form.errors
         assert form.errors.as_data()["postal_code"][0].code == "invalid"
 
-    def test_clickable_website_url(self):
+    def test_valid_website_url(self):
         form = AboutTheEndUserForm(data={"website": "example.com"})
         form.is_valid()
-        assert form.cleaned_data["clickable_website_url"] == "https://example.com"
+        assert form.cleaned_data["website"] == "http://example.com"
+
+        form = AboutTheEndUserForm(data={"website": "http://example.com"})
+        form.is_valid()
+        assert form.cleaned_data["website"] == "http://example.com"
 
         form = AboutTheEndUserForm(data={"website": "https://example.com"})
         form.is_valid()
-        assert form.cleaned_data["clickable_website_url"] == "https://example.com"
+        assert form.cleaned_data["website"] == "https://example.com"
 
+    def test_invalid_website_url(self):
         form = AboutTheEndUserForm(data={"website": "https123://example.com"})
-        form.is_valid()
-        assert form.cleaned_data["clickable_website_url"] == "https123://example.com"
+        assert not form.is_valid()
+        assert form.errors["website"][0] == "Enter a valid URL."
+
+        form = AboutTheEndUserForm(data={"website": "example"})
+        assert not form.is_valid()
+        assert form.errors["website"][0] == "Enter a valid URL."
 
 
 class TestZeroEndUsersForm:
