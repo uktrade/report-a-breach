@@ -39,7 +39,7 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
             "address_line_1": {"required": "Enter address line 1, such as the building and street"},
             "town_or_city": {"required": "Enter town or city"},
             "postal_code": {"required": "Enter postcode", "invalid": "Enter a full UK postcode"},
-            "country": {"required": "Select country"},
+            "country": {"required": "Select country!"},
         }
 
     readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
