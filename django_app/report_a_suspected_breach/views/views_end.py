@@ -106,7 +106,7 @@ class CompleteView(BaseTemplateView):
         if breach_object.reporter_session != self.request.session._get_session_from_db():
             raise SuspiciousOperation("User does not have access to this breach object.")
 
-        # Requirement to clear the session post submission hence making this page single view
+        # Requirement to clear the session post submission hence making this page single view.
         self.request.session.flush()
 
         context.update(get_breach_context_data(breach_object))
