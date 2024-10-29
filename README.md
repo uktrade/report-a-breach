@@ -89,7 +89,7 @@ Use docker-compose to run the backing services
 docker-compose up -d
 ```
 
-Collect the apps static files
+Collect the apps static files:
 
 ```
 invoke collectstatic
