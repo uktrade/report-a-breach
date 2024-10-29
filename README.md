@@ -109,7 +109,7 @@ git submodule update --init
 ```
 
 ### 8. Run the web server
-After following the setup, use the following to run the web app
+After following the setup, use the following to run the web app:
 
 `invoke runserver`
 
