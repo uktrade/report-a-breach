@@ -21,7 +21,7 @@
     + [Local development tools](#local-development-tools)
 
 # report-a-breach-prototype
-A prototype for the report a breach service
+A prototype for the report a breach service.
 
 ## Setup
 The project requires Python 3.11. Backing services are provided by Docker whilst the web app itself is ran as a normal process with Pipenv.
