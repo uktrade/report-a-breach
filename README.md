@@ -62,7 +62,7 @@ pre-commit autoupdate
 
 
 ### 3. Setup your local environment variables
-Copy and paste the `.env.example` file and rename it to `.env`
+Copy and paste the `.env.example` file and rename it to `.env`:
 ```
 cp .env.example .env
 ```
