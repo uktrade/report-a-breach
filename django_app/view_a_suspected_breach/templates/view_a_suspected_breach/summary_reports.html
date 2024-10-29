@@ -59,10 +59,10 @@
                     Files uploaded:
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% if not breach_report.documents %}
+                    {% if not breach_report.breach.documents.all %}
                         None uploaded
                     {% else %}
-                        {% for document in breach_report.documents.all %}
+                        {% for document in breach_report.breach.documents.all %}
                             <a href="{{ document.url }}" download>{{ document.file_name }}</a><br>
                         {% endfor %}
                     {% endif %}

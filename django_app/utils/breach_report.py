@@ -2,7 +2,7 @@ from typing import Any
 
 from django.forms.models import model_to_dict
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
-from report_a_suspected_breach.models import Breach, PersonOrCompany, UploadedDocument
+from report_a_suspected_breach.models import Breach, PersonOrCompany
 from utils.companies_house import get_formatted_address
 
 
@@ -46,9 +46,5 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     breach_context["reference"] = breach.reference
     breach_context["reporter_email_address"] = breach.reporter_email_address
     breach_context["breach"] = breach
-
-    # Documents
-    documents = UploadedDocument.objects.filter(breach=breach.id)
-    breach_context["documents"] = documents
 
     return breach_context
