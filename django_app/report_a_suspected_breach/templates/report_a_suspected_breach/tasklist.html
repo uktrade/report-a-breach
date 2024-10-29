@@ -24,7 +24,7 @@
                         {% endif %}
                     </div>
                     <div
-                        class="govuk-task-list__status {% if not task.can_start %}govuk-task-list__status govuk-task-list__status--cannot-start-yet{% endif %}"
+                        class="govuk-task-list__status {% if task.status_text == 'Cannot start yet' %}govuk-task-list__status--cannot-start-yet{% endif %}"
                         id="{{ task.key }}_status">
                         {% if task.can_start %}
                             <strong class="govuk-tag govuk-tag--blue">
