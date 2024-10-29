@@ -76,7 +76,7 @@ aws configure
 ```
 
 You can use the following dummy credentials that are provided by AWS. Alternatively, you can use your own credentials
-if you have an AWS account, Localstack does not validate them anyway.
+if you have an AWS account, Localstack does not validate them anyway:
 ```
 AWS Access Key ID : AKIAIOSFODNN7EXAMPLE
 AWS Secret Access Key : wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
