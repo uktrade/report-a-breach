@@ -53,18 +53,21 @@
                     {{ breach_report.breach.created_at }}
                 </dd>
             </div>
-            {% if breach_report.breach.documents %}
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-caption-m govuk-!-font-weight-regular">
-                        Files uploaded:
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% for document in breach_report.breach.documents.all %}
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-caption-m govuk-!-font-weight-regular">
+                    Files uploaded:
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {% if not breach_report.documents %}
+                        None uploaded
+                    {% else %}
+                        {% for document in breach_report.documents.all %}
                             <a href="{{ document.url }}" download>{{ document.file_name }}</a><br>
                         {% endfor %}
-                    </dd>
-                </div>
-            {% endif %}
+                    {% endif %}
+                </dd>
+            </div>
         </dl>
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible mb-1">
     {% endfor %}

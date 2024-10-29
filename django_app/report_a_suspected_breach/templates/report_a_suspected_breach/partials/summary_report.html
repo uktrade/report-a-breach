@@ -219,10 +219,10 @@
                 Upload supporting documents
             </dt>
             <dd class="govuk-summary-list__value">
-                {% if not breach.documents.items %}
+                {% if not documents %}
                     None uploaded
                 {% else %}
-                    {% for document in breach.documents.all %}
+                    {% for document in documents.all %}
                         <a href="{{ document.url }}" download>{{ document.file_name }}</a><br>
                     {% endfor %}
                 {% endif %}
