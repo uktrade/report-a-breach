@@ -21,7 +21,7 @@
     + [Local development tools](#local-development-tools)
 
 # report-a-breach-prototype
-A prototype for the report a breach service
+A prototype for the report a breach service.
 
 ## Setup
 The project requires Python 3.11. Backing services are provided by Docker whilst the web app itself is ran as a normal process with Pipenv.
@@ -62,7 +62,7 @@ pre-commit autoupdate
 
 
 ### 3. Setup your local environment variables
-Copy and paste the `.env.example` file and rename it to `.env`
+Copy and paste the `.env.example` file and rename it to `.env`:
 ```
 cp .env.example .env
 ```
@@ -76,7 +76,7 @@ aws configure
 ```
 
 You can use the following dummy credentials that are provided by AWS. Alternatively, you can use your own credentials
-if you have an AWS account, Localstack does not validate them anyway.
+if you have an AWS account, Localstack does not validate them anyway:
 ```
 AWS Access Key ID : AKIAIOSFODNN7EXAMPLE
 AWS Secret Access Key : wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -89,7 +89,7 @@ Use docker-compose to run the backing services
 docker-compose up -d
 ```
 
-Collect the apps static files
+Collect the apps static files:
 
 ```
 invoke collectstatic
@@ -109,7 +109,7 @@ git submodule update --init
 ```
 
 ### 8. Run the web server
-After following the setup, use the following to run the web app
+After following the setup, use the following to run the web app:
 
 `invoke runserver`
 
