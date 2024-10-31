@@ -14,6 +14,22 @@
                 {{ breach.reporter_full_name }}
             </dd>
         </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Email
+            </dt>
+            <dd class="govuk-summary-list__value">
+                <a href="mailto:{{ breach.reporter_email_address }}" class="govuk-link">{{ breach.reporter_email_address }}</a>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Professional relationship with the business or person being reported
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ breach.get_reporter_professional_relationship_display }}
+            </dd>
+        </div>
 
         <div class="govuk-summary-list__row">
             {% if breach.reporter_name_of_business_you_work_for %}

@@ -47,3 +47,7 @@
         display: none !important;
       }
 }
+
+.govuk-summary-list__key {
+    width: 50%;
+}
