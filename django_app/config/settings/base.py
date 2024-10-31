@@ -123,9 +123,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "core.middleware.ReportASuspectedBreachCurrentSiteMiddleware",
+    "django_ratelimit.middleware.RatelimitMiddleware",
+    # Security middleware
     "csp.middleware.CSPMiddleware",
     "core.middleware.SetPermittedCrossDomainPolicyHeaderMiddleware",
-    "django_ratelimit.middleware.RatelimitMiddleware",
+    "core.middleware.CacheControlMiddleware",
+    "core.middleware.XSSProtectionMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
