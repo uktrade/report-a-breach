@@ -241,7 +241,7 @@ AUTHBROKER_STAFF_SSO_SCOPE = env.authbroker_staff_sso_scope
 OAUTHLIB_INSECURE_TRANSPORT = env.oauthlib_insecure_transport
 
 LOGIN_URL = reverse_lazy("authbroker_client:login")
-LOGIN_REDIRECT_URL = reverse_lazy("view_a_suspected_breach:landing")
+LOGIN_REDIRECT_URL = reverse_lazy("view_a_suspected_breach:initial_redirect_view")
 
 TRUNCATE_WORDS_LIMIT = 30
 
