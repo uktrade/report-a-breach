@@ -259,7 +259,6 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = (
     "'self'",
     "'unsafe-eval'",
-    "'unsafe-inline'",
     "https://sentry.ci.uktrade.digital/",
     "https://cdnjs.cloudflare.com",
     "https://www.googletagmanager.com",

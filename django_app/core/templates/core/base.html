@@ -9,7 +9,7 @@
     <head>
         {% if gtm_enabled %}
 			<!-- Google Tag Manager -->
-            <script>
+            <script nonce="{{ request.csp_nonce }}">
                 (function (w, d, s, l, i) {
                     w[l] = w[l] || [];
                     w[l].push({
