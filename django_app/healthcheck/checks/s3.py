@@ -1,4 +1,4 @@
-from botocore.exceptions import EndpointConnectionError
+import sentry_sdk
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 
 
@@ -13,5 +13,6 @@ def s3_check() -> bool:
         assert temporary_document_bucket.creation_date
         assert permanent_document_bucket.creation_date
         return True
-    except EndpointConnectionError:
+    except Exception as e:
+        sentry_sdk.capture_message(e)
         return False
