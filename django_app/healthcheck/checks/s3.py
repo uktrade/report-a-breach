@@ -14,5 +14,5 @@ def s3_check() -> bool:
         assert permanent_document_bucket.creation_date
         return True
     except Exception as e:
-        sentry_sdk.capture_message(e)
+        sentry_sdk.capture_exception(e)
         return False
