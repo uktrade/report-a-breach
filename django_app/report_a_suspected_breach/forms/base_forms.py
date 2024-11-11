@@ -9,8 +9,6 @@ from utils.companies_house import get_formatted_address
 class BasePersonBusinessDetailsForm(BaseModelForm):
     """A base form for capturing personal or business details. Such as the End-User Form and the BusinessOrPersonDetails Form."""
 
-    website = forms.URLField(widget=forms.TextInput, label="Website address", required=False)
-
     class Meta:
         widgets = {
             "name": forms.TextInput,
@@ -43,6 +41,12 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
         }
 
     readable_address = forms.CharField(widget=forms.HiddenInput, required=False)
+    website = forms.URLField(
+        widget=forms.TextInput,
+        label="Website address",
+        required=False,
+        error_messages={"invalid": "Enter website in the correct format, such as www.example.com or example.com"},
+    )
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         self.is_uk_address = kwargs.pop("is_uk_address", False)
