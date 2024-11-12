@@ -19,7 +19,7 @@
 
 {% block column_content %}
     {% error_summary form %}
-    <form method="post" enctype='multipart/form-data' novalidate>
+    <form action="{{ request.get_full_path }}" method="post" enctype='multipart/form-data' novalidate>
         {% if form.form_h1_header %}
             <h1 class="govuk-heading-l">{{ form.form_h1_header }}</h1>
         {% endif %}

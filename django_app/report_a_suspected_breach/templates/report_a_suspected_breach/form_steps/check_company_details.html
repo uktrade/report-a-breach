@@ -2,7 +2,7 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 {% block title %}Check company details{% endblock title %}
 {% block form_content %}
-    <form method="post">
+    <form action="{{ request.get_full_path }}" method="post">
         <div>
             <h1 class="govuk-heading-l">
                 Check company details
