@@ -17,8 +17,22 @@
     {% endif %}
 {% endblock title %}
 
-{% block non_js_session_expiry_disclaimer %}
-    <div class="govuk-notification-banner hide-on-js-enabled show-on-js-disabled" role="region" aria-labelledby="govuk-notification-banner-title"
+{% block body_end %}
+	{# session expiry dialog pop-up #}
+    <dialog id="session_expiry_dialog">
+        <p class="govuk-heading-l">Your report will time out soon</p>
+        <p class="govuk-body">You've been inactive for a while.</p>
+        <p class="govuk-body">Your report will be deleted unless you continue within the time remaining.</p>
+        <p class="govuk-body">We do this for your security.</p>
+        <p class="govuk-body" autofocus><strong id="session_expiry_time_remaining">{{ session_expiry_minutes }}
+            minutes</strong> remaining</p>
+        <button class="govuk-button" id="ping_session_button">Continue</button>
+    </dialog>
+{% endblock body_end %}
+
+{% block column_start %}
+    <div class="govuk-notification-banner hide-on-js-enabled show-on-js-disabled" role="region"
+         aria-labelledby="govuk-notification-banner-title"
          data-module="govuk-notification-banner">
         <div class="govuk-notification-banner__header">
             <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
@@ -34,7 +48,7 @@
             </p>
         </div>
     </div>
-{% endblock non_js_session_expiry_disclaimer %}
+{% endblock column_start %}
 
 {% block column_content %}
     {% error_summary form %}
