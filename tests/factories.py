@@ -1,8 +1,25 @@
+import random
 import string
 
 import factory
 from django.utils import timezone
 from factory.fuzzy import FuzzyText
+from feedback.models import FeedbackItem
+
+
+class ModelFieldLazyChoice(factory.LazyFunction):
+    def __init__(self, model_class, field, *args, **kwargs):
+        field = model_class._meta.get_field(field)
+        choices = [choice[0] for choice in field.choices]
+        super().__init__(function=lambda: random.choice(choices), *args, **kwargs)
+
+
+class ArrayFieldLazyChoice(factory.LazyFunction):
+    def __init__(self, model_class, field, *args, **kwargs):
+        field = model_class._meta.get_field(field)
+
+        choices = [choice[0] for choice in field.base_field.choices]
+        super().__init__(function=lambda: random.choices(choices, k=random.randint(1, len(choices))), *args, **kwargs)
 
 
 class BreachFactory(factory.django.DjangoModelFactory):
@@ -91,3 +108,12 @@ class BreachBreacherAndSupplierFactory(BreacherandSupplierFactory):
     recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
 
     recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+
+
+class FeedbackFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FeedbackItem
+
+    rating = ModelFieldLazyChoice(FeedbackItem, "rating")
+    did_you_experience_any_issues = ArrayFieldLazyChoice(FeedbackItem, "did_you_experience_any_issues")
+    how_we_could_improve_the_service = factory.Faker("text")
