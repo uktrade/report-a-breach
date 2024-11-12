@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}
+
+{% block back_button %}{% endblock back_button %}
+
+{% block column_content %}
+    <h1 class="govuk-heading-l">Your report has been deleted</h1>
+    <p class="govuk-body">We've deleted your report because you were inactive for {{ session_expiry_minutes }} minutes.</p>
+    <p class="govuk-body">This is to protect your information.</p>
+    <p class="govuk-body">You'll need to start again</p>
+
+    <a class="govuk-button" href="{% url 'initial_redirect_view' %}">Start again</a>
+{% endblock column_content %}

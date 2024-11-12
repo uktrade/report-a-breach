@@ -97,3 +97,19 @@ class AccessibilityStatementView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["otsi_email"] = settings.OTSI_EMAIL
         return context
+
+
+class PingSessionView(View):
+    """Pings the session to keep it alive"""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        return HttpResponse("pong")
+
+
+class SessionExpiredView(TemplateView):
+    template_name = "core/session_expired.html"
+
+    def get(self, request: HttpRequest, *args, **kwargs):
+        # the session should already be empty by definition but just in case, manually clear
+        request.session.flush()
+        return super().get(request, *args, **kwargs)

@@ -16,3 +16,8 @@ def back_button(request: HttpRequest) -> dict[str, str]:
 def is_debug_mode(request: HttpRequest) -> dict[str, bool]:
     """Add a flag to the context to indicate if the site is in debug mode."""
     return {"is_debug_mode": settings.DEBUG}
+
+
+def session_expiry_times(request: HttpRequest) -> dict[str, int]:
+    """Add the session expiry time in seconds & minutes to the context."""
+    return {"session_expiry_seconds": settings.SESSION_COOKIE_AGE, "session_expiry_minutes": settings.SESSION_COOKIE_AGE / 60}

@@ -149,6 +149,7 @@ TEMPLATES = [
                 "core.context_processors.truncate_words_limit",
                 "core.context_processors.back_button",
                 "core.context_processors.is_debug_mode",
+                "core.context_processors.session_expiry_times",
             ],
         },
     },
