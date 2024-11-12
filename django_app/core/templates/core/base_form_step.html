@@ -1,5 +1,5 @@
 {% extends "core/base.html" %}
-{% load crispy_forms_tags crispy_forms_gds %}
+{% load crispy_forms_tags crispy_forms_gds static %}
 
 {% block extra_css %}
     {{ form.media.css }}
@@ -51,4 +51,10 @@
 
 {% block extra_js %}
     {{ form.media.js }}
+    <script src="{% static 'core/javascript/session_dialog.js' %}"></script>
+    <script nonce="{{ request.csp_nonce }}">
+        window.onload = function () {
+            setup_session_dialog({{ session_expiry_seconds }})
+        }
+    </script>
 {% endblock extra_js %}

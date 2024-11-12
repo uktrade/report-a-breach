@@ -288,12 +288,6 @@
 
                 initAll()
             </script>
-            <script src="{% static 'core/javascript/session_dialog.js' %}"></script>
-            <script nonce="{{ request.csp_nonce }}">
-                window.onload = function () {
-                    setup_session_dialog({{ session_expiry_seconds }})
-                }
-            </script>
             {% block extra_js %}{% endblock %}
         </footer>
 
@@ -303,7 +297,7 @@
             <p class="govuk-body">You've been inactive for a while</p>
             <p class="govuk-body">Your report will be deleted unless you continue within the time remaining.</p>
             <p class="govuk-body">We do this for your security</p>
-            <p class="govuk-body"><strong id="session_expiry_time_remaining">{% widthratio session_expiry_seconds 60 1  %} minutes</strong> remaining</p>
+            <p class="govuk-body" autofocus><strong id="session_expiry_time_remaining">{{ session_expiry_minutes }} minutes</strong> remaining</p>
             <button class="govuk-button" id="ping_session_button">Continue</button>
         </dialog>
     </body>
