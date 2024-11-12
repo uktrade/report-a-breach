@@ -13,6 +13,7 @@ from django.views.generic import FormView, RedirectView, TemplateView
 from django_ratelimit.exceptions import Ratelimited
 
 from .forms import CookiesConsentForm, HideCookiesForm
+from .utils import update_last_activity_session_timestamp
 
 
 class RedirectBaseDomainView(RedirectView):
@@ -103,6 +104,7 @@ class PingSessionView(View):
     """Pings the session to keep it alive"""
 
     def get(self, request: HttpRequest) -> HttpResponse:
+        update_last_activity_session_timestamp(request)
         return HttpResponse("pong")
 
 

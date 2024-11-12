@@ -1,6 +1,8 @@
 import magic
+from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest
+from django.utils import timezone
 
 
 def get_mime_type(file: UploadedFile) -> str:
@@ -20,3 +22,10 @@ def is_ajax(request: HttpRequest) -> bool:
 
 def is_request_ratelimited(request: HttpRequest) -> bool:
     return getattr(request, "limited", False)
+
+
+def update_last_activity_session_timestamp(request: HttpRequest) -> None:
+    """
+    Update the session timestamp to the current time
+    """
+    request.session[settings.SESSION_LAST_ACTIVITY_KEY] = timezone.now().isoformat()

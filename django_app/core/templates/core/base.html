@@ -297,6 +297,7 @@
             {% block extra_js %}{% endblock %}
         </footer>
 
+        {# session expiry dialog pop-up #}
         <dialog id="session_expiry_dialog">
             <p class="govuk-heading-l">Your report will time out soon</p>
             <p class="govuk-body">You've been inactive for a while</p>
@@ -305,15 +306,5 @@
             <p class="govuk-body"><strong id="session_expiry_time_remaining">{% widthratio session_expiry_seconds 60 1  %} minutes</strong> remaining</p>
             <button class="govuk-button" id="ping_session_button">Continue</button>
         </dialog>
-        <button id="dialog_show_button">Show the dialog</button>
-
-        <script>
-            const dialog = document.querySelector("dialog");
-            // "Show the dialog" button opens the dialog modally
-            document.getElementById("dialog_show_button").addEventListener("click", () => {
-                dialog.showModal();
-            });
-
-        </script>
     </body>
 </html>
