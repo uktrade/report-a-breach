@@ -5,6 +5,7 @@ from core.forms import GenericForm
 from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 from report_a_suspected_breach.form_step_conditions import (
@@ -19,6 +20,11 @@ logger = logging.getLogger(__name__)
 class StartView(BaseFormView):
     form_class = forms.StartForm
     success_url = reverse_lazy("report_a_suspected_breach:email")
+
+    def dispatch(self, request, *args, **kwargs):
+        # refresh the session expiry timestamp. This is the start of the session
+        request.session[settings.SESSION_LAST_ACTIVITY_KEY] = timezone.now().isoformat()
+        return super().dispatch(request, *args, **kwargs)
 
 
 class WhatIsYourEmailAddressView(BaseFormView):

@@ -20,4 +20,8 @@ def is_debug_mode(request: HttpRequest) -> dict[str, bool]:
 
 def session_expiry_times(request: HttpRequest) -> dict[str, int]:
     """Add the session expiry time in seconds & minutes to the context."""
-    return {"session_expiry_seconds": settings.SESSION_COOKIE_AGE, "session_expiry_minutes": settings.SESSION_COOKIE_AGE / 60}
+    return {
+        "session_expiry_seconds": settings.SESSION_COOKIE_AGE,
+        "session_expiry_minutes": settings.SESSION_COOKIE_AGE // 60,
+        "session_expiry_hours": settings.SESSION_COOKIE_AGE // 60 // 60,
+    }

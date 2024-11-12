@@ -17,6 +17,25 @@
     {% endif %}
 {% endblock title %}
 
+{% block non_js_session_expiry_disclaimer %}
+    <div class="govuk-notification-banner hide-on-js-enabled show-on-js-disabled" role="region" aria-labelledby="govuk-notification-banner-title"
+         data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                Important
+            </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-body">
+                Your report will be deleted if you're inactive for <strong>{{ session_expiry_minutes }} minutes</strong>.
+            </p>
+            <p class="govuk-body">
+                We do this to protect your information.
+            </p>
+        </div>
+    </div>
+{% endblock non_js_session_expiry_disclaimer %}
+
 {% block column_content %}
     {% error_summary form %}
     <form method="post" enctype='multipart/form-data' novalidate>

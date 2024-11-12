@@ -215,6 +215,7 @@
                         <div class="govuk-grid-row">
                             {% block row_content %}
                                 <div class="govuk-grid-column-two-thirds">
+                                    {% block non_js_session_expiry_disclaimer %}{% endblock non_js_session_expiry_disclaimer %}
                                     {% block column_content %}
                                     {% endblock column_content %}
                                 </div>
