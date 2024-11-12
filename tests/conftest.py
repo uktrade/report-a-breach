@@ -1,5 +1,6 @@
 import pytest
 from core.sites import SiteName
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.test import Client, RequestFactory
 
@@ -31,6 +32,26 @@ def vasb_client(db):
     """
     vab_site = Site.objects.get(name=SiteName.view_a_suspected_breach)
     return get_test_client(vab_site.domain, http_host="view-a-suspected-breach")
+
+
+@pytest.fixture()
+def staff_user(db):
+    return User.objects.create_user(
+        "staff",
+        "staff@example.com",
+        is_active=True,
+        is_staff=True,
+    )
+
+
+@pytest.fixture()
+def vasb_client_logged_in(vasb_client, staff_user) -> Client:
+    """Client used to access the view-a-licence site.
+
+    A user is logged in with this client"""
+
+    vasb_client.force_login(staff_user)
+    return vasb_client
 
 
 @pytest.fixture()

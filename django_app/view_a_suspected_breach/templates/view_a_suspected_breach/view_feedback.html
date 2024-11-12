@@ -1,0 +1,74 @@
+{% extends "core/base.html" %}
+{% block cookie_banner %}{% endblock cookie_banner %}
+{% block title %}View Feedback for report a suspected breach of trade sanctions service{% endblock title %}
+{% block back_button %}{% endblock back_button %}
+{% block column_content %}
+    <div>
+        <h1 class="govuk-heading-l">
+            View feedback on the report a suspected breach of trade sanctions service
+        </h1>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    </div>
+    <form method="get" action="{% url 'view_a_suspected_breach:view_feedback' %}" id="filter_form">
+        {% csrf_token %}
+        <div class="govuk-form-group">
+            <label class="govuk-label" >Created at date minimum (inclusive)</label>
+            <input type="date" class="govuk-form" id="created_at_min" name="date_min">
+        </div>
+        <div class="govuk-form-group">
+            <label class="govuk-label">Created at date maximum (inclusive)</label>
+            <input type="date" class="form-control" id="created_at_min" name="date_max">
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+
+    </form>
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
+        <table class="govuk-table govuk-table--small-text-until-tablet">
+            <caption class="govuk-table__caption govuk-table__caption--m">Feedback</caption>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+
+                    <th scope="col" class="govuk-table__header"> ID </th>
+                    <th scope="col" class="govuk-table__header">Created at</th>
+                    <th scope="col" class="govuk-table__header">Modified at </th>
+                    <th scope="col" class="govuk-table__header">Rating</th>
+                    <th scope="col" class="govuk-table__header">Did you experience any issues? </th>
+                    <th scope="col" class="govuk-table__header">How could we improve the service? </th>
+                    <th scope="col" class="govuk-table__header">URL </th>
+                </tr>
+
+            </thead>
+            <tbody class="govuk-table__body">
+
+                {% for feedback_item in object_list %}
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">{{ feedback_item.id }}</td>
+                        <td class="govuk-table__cell">{{ feedback_item.created_at }}</td>
+                        <td class="govuk-table__cell">{{ feedback_item.modified_at }}</td>
+                        <td class="govuk-table__cell">{{ feedback_item.get_rating_display}} </td>
+                        <td class="govuk-table__cell">{{ feedback_item.get_did_you_experience_any_issues_display | linebreaksbr }}</td>
+                        <td class="govuk-table__cell">{{ feedback_item.how_we_could_improve_the_service }}</td>
+                        <td class="govuk-table__cell">{{ feedback_item.url }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endblock column_content %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
+        $(document).ready(function () {
+            $('body').on('click', '.read_more_button', function () {
+                $(this).closest('.text_truncator').find('.truncated_text').addClass('hidden');
+                $(this).closest('.text_truncator').find('.expanded_text').removeClass('hidden');
+            });
+            $('body').on('click', '.read_less_button', function () {
+                $(this).closest('.text_truncator').find('.truncated_text').removeClass('hidden');
+                $(this).closest('.text_truncator').find('.expanded_text').addClass('hidden');
+            })
+        })
+    </script>
+{% endblock extra_js %}
