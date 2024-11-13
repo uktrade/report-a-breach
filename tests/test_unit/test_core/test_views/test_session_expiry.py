@@ -42,6 +42,10 @@ def test_session_expired(rasb_client):
 
 
 def test_no_session_key(rasb_client):
+    session = rasb_client.session
+    session.clear()
+    session.save()
+
     assert dict(rasb_client.session) == {}
     response = rasb_client.post(
         reverse("report_a_suspected_breach:email"), follow=True, data={"reporter_email_address": "test@example.com"}
@@ -51,6 +55,10 @@ def test_no_session_key(rasb_client):
 
 
 def test_ping_session_view(rasb_client):
+    session = rasb_client.session
+    session.clear()
+    session.save()
+
     response = rasb_client.get(reverse("ping_session"))
     assert response.status_code == 200
     assert response.content == b"pong"

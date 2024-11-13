@@ -6,6 +6,9 @@ from django.utils import timezone
 
 
 def test_update_last_activity_session_timestamp(request_object):
+    session = request_object.session
+    session.clear()
+    session.save()
     assert not request_object.session.get(settings.SESSION_LAST_ACTIVITY_KEY)
     update_last_activity_session_timestamp(request_object)
 
