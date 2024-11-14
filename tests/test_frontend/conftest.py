@@ -37,7 +37,6 @@ class PlaywrightTestBase(TransactionTestCase):
 
     @classmethod
     def get_form_step_page(cls, form_step):
-        print(f"{cls.base_url}/{form_step}/")
         return f"{cls.base_url}/report_a_suspected_breach/{form_step}/"
 
     @classmethod

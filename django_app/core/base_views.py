@@ -1,5 +1,10 @@
+import datetime
+
 from django import forms
+from django.conf import settings
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, TemplateView
 from report_a_suspected_breach.utils import get_dirty_form_data
@@ -22,6 +27,23 @@ class BaseFormView(FormView):
         step_name = view_to_step_dict[self.__class__.__name__]
 
         return step_name
+
+    def post(self, request, *args, **kwargs):
+        # checking for session expiry
+        if last_activity := request.session.get(settings.SESSION_LAST_ACTIVITY_KEY, None):
+            now = timezone.now()
+            last_activity = datetime.datetime.fromisoformat(last_activity)
+            # if the last recorded activity was more than the session cookie age ago, we assume the session has expired
+            if now > (last_activity + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)):
+                return redirect(reverse("session_expired"))
+        else:
+            # if we don't have a last activity, we assume the session has expired
+            return redirect(reverse("session_expired"))
+
+        # now setting the last active to the current time
+        request.session[settings.SESSION_LAST_ACTIVITY_KEY] = timezone.now().isoformat()
+
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         # we want to assign the form to the view ,so we can access it in the get_success_url method
