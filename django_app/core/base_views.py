@@ -11,6 +11,9 @@ class BaseFormView(FormView):
     # do we want to redirect the user to the redirect_to query parameter page after this form is submitted?
     redirect_after_post = True
 
+    # is this view required for completing the journey
+    required_step = False
+
     @property
     def step_name(self) -> str:
         """Get the step name from the view class name."""

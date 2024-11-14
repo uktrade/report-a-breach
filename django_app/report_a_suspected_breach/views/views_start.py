@@ -19,11 +19,13 @@ logger = logging.getLogger(__name__)
 class StartView(BaseFormView):
     form_class = forms.StartForm
     success_url = reverse_lazy("report_a_suspected_breach:email")
+    required_step = True
 
 
 class WhatIsYourEmailAddressView(BaseFormView):
     form_class = forms.EmailForm
     success_url = reverse_lazy("report_a_suspected_breach:verify_email")
+    required_step = True
 
     def form_valid(self, form: forms.EmailForm) -> HttpResponse:
         reporter_email_address = form.cleaned_data["reporter_email_address"]
@@ -35,6 +37,7 @@ class WhatIsYourEmailAddressView(BaseFormView):
 @method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class EmailVerifyView(BaseFormView):
     form_class = forms.EmailVerifyForm
+    required_step = True
 
     def get_success_url(self) -> str:
         if show_name_and_business_you_work_for_page(self.request):

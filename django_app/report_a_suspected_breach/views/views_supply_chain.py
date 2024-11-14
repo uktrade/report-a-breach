@@ -11,6 +11,7 @@ from utils.companies_house import get_formatted_address
 
 class WhereWereTheGoodsSuppliedFromView(BaseFormView):
     form_class = forms.WhereWereTheGoodsSuppliedFromForm
+    required_step = True
 
     @property
     def redirect_after_post(self) -> bool:
@@ -260,3 +261,4 @@ class WereThereOtherAddressesInTheSupplyChainView(BaseFormView):
     success_url = reverse_lazy(
         "report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "sanctions_breach_details"}
     )
+    required_step = True

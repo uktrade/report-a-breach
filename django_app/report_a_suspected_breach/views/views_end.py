@@ -4,6 +4,7 @@ from core.base_views import BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
@@ -19,6 +20,8 @@ from utils.breach_report import get_breach_context_data
 from utils.notifier import send_email
 from utils.s3 import get_all_session_files
 from view_a_suspected_breach.utils import craft_view_a_suspected_breach_url
+
+from django_app.report_a_suspected_breach.utils import get_missing_data
 
 
 class CheckYourAnswersView(BaseTemplateView):
@@ -69,27 +72,38 @@ class DeclarationView(BaseFormView):
     template_name = "report_a_suspected_breach/form_steps/declaration.html"
     success_url = reverse_lazy("report_a_suspected_breach:complete")
 
-    def form_valid(self, form):
-        new_breach_object = Breach.create_from_session(self.request)
-        # Send confirmation email to the user
-        send_email(
-            email=new_breach_object.reporter_email_address,
-            template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
-            context={"user name": new_breach_object.reporter_full_name, "reference number": new_breach_object.reference},
-        )
-        # Send confirmation email to OTSI staff
-        view_application_url = craft_view_a_suspected_breach_url(
-            reverse("view_a_suspected_breach:breach_report", kwargs={"reference": new_breach_object.reference})
-        )
-        for email in settings.NEW_BREACH_REPORTED_ALERT_RECIPIENTS:
-            send_email(
-                email=email,
-                template_id=settings.OTSI_NEW_APPLICATION_TEMPLATE_ID,
-                context={"reference_number": new_breach_object.reference, "report_url": view_application_url},
-            )
+    def dispatch(self, request, *args, **kwargs):
+        missing_data = get_missing_data(self.request)
+        if missing_data:
+            return redirect(f"report_a_suspected_breach:{list(missing_data.keys())[0]}")
 
-        self.request.session["breach_id"] = str(new_breach_object.pk)
-        return super().form_valid(form)
+    def form_valid(self, form):
+
+        try:
+            new_breach_object = Breach.create_from_session(self.request)
+            # Send confirmation email to the user
+            send_email(
+                email=new_breach_object.reporter_email_address,
+                template_id=settings.EMAIL_USER_REPORT_CONFIRMATION_TEMPLATE_ID,
+                context={"user name": new_breach_object.reporter_full_name, "reference number": new_breach_object.reference},
+            )
+            # Send confirmation email to OTSI staff
+            view_application_url = craft_view_a_suspected_breach_url(
+                reverse("view_a_suspected_breach:breach_report", kwargs={"reference": new_breach_object.reference})
+            )
+            for email in settings.NEW_BREACH_REPORTED_ALERT_RECIPIENTS:
+                send_email(
+                    email=email,
+                    template_id=settings.OTSI_NEW_APPLICATION_TEMPLATE_ID,
+                    context={"reference_number": new_breach_object.reference, "report_url": view_application_url},
+                )
+
+            self.request.session["breach_id"] = str(new_breach_object.pk)
+            return super().form_valid(form)
+
+        except KeyError as e:
+            print(e)
+            return super().form_invalid(form)
 
 
 class CompleteView(BaseTemplateView):

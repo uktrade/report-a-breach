@@ -137,7 +137,6 @@ urlpatterns = (
 
 step_to_view_dict = {}
 view_to_step_dict = {}
-
 for url in urlpatterns:
 
     step_to_view_dict[url.name] = url.callback.view_class

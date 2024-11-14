@@ -9,6 +9,7 @@ from report_a_suspected_breach.forms import forms_business as forms
 
 class AreYouReportingCompaniesHouseBusinessView(BaseFormView):
     form_class = forms.AreYouReportingABusinessOnCompaniesHouseForm
+    required_step = True
 
     def get_success_url(self) -> str:
         is_companies_house_business = self.form.cleaned_data.get("business_registered_on_companies_house") in (
