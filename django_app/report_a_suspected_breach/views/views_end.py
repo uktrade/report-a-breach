@@ -29,6 +29,14 @@ class CheckYourAnswersView(BaseTemplateView):
 
     template_name = "report_a_suspected_breach/form_steps/check_your_answers.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        missing_data = get_missing_data(self.request)
+        if missing_data:
+            self.request.session["redirect_to_url"] = "report_a_suspected_breach:check_your_answers"
+            return redirect(f"report_a_suspected_breach:{list(missing_data.keys())[0]}")
+        else:
+            return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         """Collects all the nice form data and puts it into a dictionary for the summary page. We need to check if
         a lot of this data is present, as the user may have skipped some steps, so we import the form_step_conditions
@@ -75,7 +83,9 @@ class DeclarationView(BaseFormView):
     def dispatch(self, request, *args, **kwargs):
         missing_data = get_missing_data(self.request)
         if missing_data:
+            self.request.session["redirect_to_url"] = "report_a_suspected_breach:check_your_answers"
             return redirect(f"report_a_suspected_breach:{list(missing_data.keys())[0]}")
+            # return redirect(f"report_a_suspected_breach:{list(missing_data.keys())[0]}")
 
     def form_valid(self, form):
 

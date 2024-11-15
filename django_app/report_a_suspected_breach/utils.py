@@ -47,21 +47,33 @@ def get_all_cleaned_data(request: HttpRequest) -> dict:
     return all_cleaned_data
 
 
-def get_all_required_views() -> List[str]:
+def get_all_required_views(request: HttpRequest) -> List[str]:
     """Helper function to get all the required fields from the forms"""
+    from report_a_suspected_breach.form_step_conditions import (
+        show_check_company_details_page_condition,
+        show_name_and_business_you_work_for_page,
+    )
     from report_a_suspected_breach.urls import step_to_view_dict
 
     required_views = [
         step for step, view in step_to_view_dict.items() if getattr(view, "form_class", None) and view.required_step
     ]
-
+    if show_name_and_business_you_work_for_page(request):
+        required_views.insert(2, "name_and_business_you_work_for")
+    else:
+        required_views.insert(2, "name")
+    if show_check_company_details_page_condition(request):
+        required_views.insert(3, "do_you_know_the_registered_company_number")
+    else:
+        required_views.insert(3, "where_is_the_address_of_the_business_or_person")
+        required_views.insert(4, "business_or_person_details")  # Need kwargs in the success url
     return required_views
 
 
 def get_all_required_fields(request: HttpRequest) -> dict:
     """Helper function to get all the required fields from the views"""
     required_fields = {}
-    required_views = get_all_required_views()
+    required_views = get_all_required_views(request)
     for step_name in required_views:
         required_fields[step_name] = get_required_fields(request, step_name)
     return required_fields
@@ -71,8 +83,10 @@ def get_missing_data(request: HttpRequest) -> dict:
     cleaned_data = get_all_cleaned_data(request)
     required_fields = get_all_required_fields(request)
     missing_data = {}
+
     for step_name in required_fields:
         missing_step_data = set(required_fields[step_name]) - set(cleaned_data[step_name])
         if missing_step_data:
             missing_data[step_name] = missing_step_data
+
     return missing_data

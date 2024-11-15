@@ -43,7 +43,6 @@ class WhatIsYourEmailAddressView(BaseFormView):
 @method_decorator(ratelimit(key="ip", rate=settings.RATELIMIT, method="POST", block=False), name="post")
 class EmailVerifyView(BaseFormView):
     form_class = forms.EmailVerifyForm
-    required_step = True
 
     def get_success_url(self) -> str:
         if show_name_and_business_you_work_for_page(self.request):
