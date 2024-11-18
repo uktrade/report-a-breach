@@ -15,13 +15,15 @@
             Your reference number<br><strong>{{ reference }}</strong>
         </div>
     </div>
-    <!--   We have not! The confirmation template needs to be created in GovNotify and the send_email method used in the associated view -->
     {% if request.session.reporter_email_address %}
         <p class="govuk-body">We've sent a confirmation email to {{ reporter_email_address }}</p>
     {% else %}
         <p class="govuk-body">We have sent you a confirmation email.</p>
     {% endif %}
-    <p class="govuk-body hide-on-js-disabled show-on-js-enabled hide-on-print"><a class="govuk-link" onclick="window.print()" href=#>View and print your report</a></p>
+    <p class="govuk-body">
+        <a href="{% url 'download_application' %}?reference={{ request.session.licence_reference }}" class="govuk-link" target="_blank">Download and view application (opens in new tab)</a>
+    </p>
+        {#    <p class="govuk-body hide-on-js-disabled show-on-js-enabled hide-on-print"><a class="govuk-link" onclick="window.print()" href=#>View and print your report</a></p>#}
 
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">
