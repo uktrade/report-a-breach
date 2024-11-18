@@ -16,6 +16,7 @@ from django_ratelimit.exceptions import Ratelimited
 from playwright.sync_api import sync_playwright
 
 from .forms import CookiesConsentForm, HideCookiesForm
+from .utils import update_last_activity_session_timestamp
 
 
 class RedirectBaseDomainView(RedirectView):
@@ -100,6 +101,23 @@ class AccessibilityStatementView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["otsi_email"] = settings.OTSI_EMAIL
         return context
+
+
+class PingSessionView(View):
+    """Pings the session to keep it alive"""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        update_last_activity_session_timestamp(request)
+        return HttpResponse("pong")
+
+
+class SessionExpiredView(TemplateView):
+    template_name = "core/session_expired.html"
+
+    def get(self, request: HttpRequest, *args, **kwargs):
+        # the session should already be empty by definition but just in case, manually clear
+        request.session.flush()
+        return super().get(request, *args, **kwargs)
 
 
 class DownloadPDFView(TemplateView):

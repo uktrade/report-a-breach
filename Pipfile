@@ -37,6 +37,7 @@ django-ratelimit = "~=4.1.0"
 psycopg2-binary = "*"
 certifi = "*"
 cryptography = "~=43.0.3"
+django-permissions-policy = "*"
 playwright = "~=1.47.0"
 
 [dev-packages]
