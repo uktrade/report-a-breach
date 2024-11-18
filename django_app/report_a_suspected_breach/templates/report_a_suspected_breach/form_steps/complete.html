@@ -21,7 +21,7 @@
         <p class="govuk-body">We have sent you a confirmation email.</p>
     {% endif %}
     <p class="govuk-body">
-        <a href="{% url 'download_application' %}?reference={{ request.session.licence_reference }}" class="govuk-link" target="_blank">Download and view application (opens in new tab)</a>
+        <a href="{% url 'download_report' %}?reference={{ reference }}" class="govuk-link" target="_blank">Download and view report (opens in new tab)</a>
     </p>
         {#    <p class="govuk-body hide-on-js-disabled show-on-js-enabled hide-on-print"><a class="govuk-link" onclick="window.print()" href=#>View and print your report</a></p>#}
 
