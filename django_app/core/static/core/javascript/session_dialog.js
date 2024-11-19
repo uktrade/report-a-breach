@@ -72,7 +72,7 @@ function setup_session_dialog(session_expiry_seconds) {
         // callback function for final action after countdown
         onCounterEnd: function () {
             // session expired, reset it
-            window.location.replace("/session_expired")
+            window.location.replace("/report-deleted")
         }
     });
     countdown.start();

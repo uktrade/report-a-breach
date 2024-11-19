@@ -1,6 +1,7 @@
 from core.views import (
     AccessibilityStatementView,
     CookiesConsentView,
+    DownloadPDFView,
     HideCookiesView,
     PingSessionView,
     PrivacyNoticeView,
@@ -21,8 +22,9 @@ urlpatterns = [
     path("privacy-notice", PrivacyNoticeView.as_view(), name="privacy_notice"),
     path("reset_session/", ResetSessionView.as_view(), name="reset_session"),
     path("ping_session/", PingSessionView.as_view(), name="ping_session"),
-    path("session_expired/", SessionExpiredView.as_view(), name="session_expired"),
+    path("report-deleted/", SessionExpiredView.as_view(), name="session_expired"),
     path("throw_error/", lambda x: 1 / 0),
+    path("download_report/", DownloadPDFView.as_view(), name="download_report"),
     path("accessibility-statement", AccessibilityStatementView.as_view(), name="accessibility_statement"),
     path("auth/", include("authbroker_client.urls")),
 ]
