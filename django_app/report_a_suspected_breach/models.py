@@ -16,7 +16,6 @@ from report_a_suspected_breach.form_step_conditions import (
 from utils.s3 import get_all_session_files, store_document_in_permanent_bucket
 
 from .choices import TypeOfRelationshipChoices
-from .exceptions import EmailNotVerifiedException
 from .utils import get_all_cleaned_data
 
 if TYPE_CHECKING:
@@ -65,7 +64,7 @@ class Breach(BaseModel):
         return reference
 
     @classmethod
-    def create_from_session(cls, request: "HttpRequest") -> "Breach":
+    def create_from_session(cls, request: "HttpRequest", reporter_email_verification) -> "Breach":
         """Creates a Breach object from the data stored in current session"""
         cleaned_data = get_all_cleaned_data(request)
 
@@ -80,14 +79,6 @@ class Breach(BaseModel):
 
         # atomic transaction so that if any part of the process fails, the whole process is rolled back
         with transaction.atomic():
-            reporter_email_verification = ReporterEmailVerification.objects.filter(
-                reporter_session=request.session.session_key
-            ).latest("date_created")
-
-            if not reporter_email_verification.verified:
-                # the user hasn't verified their email address, don't let them submit
-                raise EmailNotVerifiedException()
-
             # Save Breach to Database
             new_breach = Breach.objects.create(
                 reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],

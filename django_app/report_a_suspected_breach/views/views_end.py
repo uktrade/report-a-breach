@@ -11,7 +11,7 @@ from report_a_suspected_breach.form_step_conditions import (
     show_name_and_business_you_work_for_page,
 )
 from report_a_suspected_breach.forms.forms_end import DeclarationForm
-from report_a_suspected_breach.models import Breach
+from report_a_suspected_breach.models import Breach, ReporterEmailVerification
 from report_a_suspected_breach.utils import (
     get_all_cleaned_data,
     get_cleaned_data_for_step,
@@ -85,12 +85,16 @@ class DeclarationView(BaseFormView):
         if missing_data:
             self.request.session["redirect_to_url"] = "report_a_suspected_breach:check_your_answers"
             return redirect(f"report_a_suspected_breach:{list(missing_data.keys())[0]}")
-            # return redirect(f"report_a_suspected_breach:{list(missing_data.keys())[0]}")
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
 
-        try:
-            new_breach_object = Breach.create_from_session(self.request)
+        reporter_email_verification = ReporterEmailVerification.objects.filter(
+            reporter_session=self.request.session.session_key
+        ).latest("date_created")
+        if reporter_email_verification.verified:
+            new_breach_object = Breach.create_from_session(self.request, reporter_email_verification)
             # Send confirmation email to the user
             send_email(
                 email=new_breach_object.reporter_email_address,
@@ -110,10 +114,10 @@ class DeclarationView(BaseFormView):
 
             self.request.session["breach_id"] = str(new_breach_object.pk)
             return super().form_valid(form)
-
-        except KeyError as e:
-            print(e)
-            return super().form_invalid(form)
+        else:
+            # the user hasn't verified their email address, redirect them to verify email
+            self.request.session["redirect_to_url"] = "report_a_suspected_breach:declaration"
+            return redirect("report_a_suspected_breach:email")
 
 
 class CompleteView(BaseTemplateView):

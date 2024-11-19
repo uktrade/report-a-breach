@@ -32,6 +32,7 @@ class WhatIsYourEmailAddressView(BaseFormView):
     form_class = forms.EmailForm
     success_url = reverse_lazy("report_a_suspected_breach:verify_email")
     required_step = True
+    redirect_after_post = False
 
     def form_valid(self, form: forms.EmailForm) -> HttpResponse:
         reporter_email_address = form.cleaned_data["reporter_email_address"]
