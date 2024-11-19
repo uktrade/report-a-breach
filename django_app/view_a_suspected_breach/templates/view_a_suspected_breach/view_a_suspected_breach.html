@@ -3,11 +3,14 @@
 {% load get_end_user_url %}
 {% block cookie_banner %}{% endblock cookie_banner %}
 {% block title %}View Suspected Breach Report{% endblock title %}
+{% comment %}
+        TODO: remove comment when DST-797 is complete
 {% block download_link %}
     <div class="govuk-grid-column-one-half govuk-!-text-align-right govuk-!-margin-top-3 hide-on-print">
         <a href="{% url 'download_report' %}?reference={{ breach.reference }}" class="govuk-link--muted govuk-body-s" target="_blank">Download and view report (opens in new tab)</a>
     </div>
 {% endblock download_link %}
+{% endcomment %}
 {% block form_content %}
     {% include "report_a_suspected_breach/partials/summary_report.html" %}
 {% endblock form_content %}
