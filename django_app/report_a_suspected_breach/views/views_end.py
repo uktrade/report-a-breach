@@ -15,13 +15,12 @@ from report_a_suspected_breach.models import Breach, ReporterEmailVerification
 from report_a_suspected_breach.utils import (
     get_all_cleaned_data,
     get_cleaned_data_for_step,
+    get_missing_data,
 )
 from utils.breach_report import get_breach_context_data
 from utils.notifier import send_email
 from utils.s3 import get_all_session_files
 from view_a_suspected_breach.utils import craft_view_a_suspected_breach_url
-
-from django_app.report_a_suspected_breach.utils import get_missing_data
 
 
 class CheckYourAnswersView(BaseTemplateView):
