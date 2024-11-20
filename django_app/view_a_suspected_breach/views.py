@@ -4,11 +4,13 @@ from typing import Any
 from core.sites import require_view_a_breach
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, RedirectView, TemplateView
+from feedback.models import FeedbackItem
 from report_a_suspected_breach.models import Breach
 from utils.breach_report import get_breach_context_data
 
@@ -92,3 +94,18 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
         context["back_button_text"] = "View all suspected breach reports"
         context.update(get_breach_context_data(self.breach))
         return context
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class ViewFeedbackView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
+    context_object_name = "feedback"
+    model = FeedbackItem
+    template_name = "view_a_suspected_breach/view_feedback.html"
+
+    def get_queryset(self) -> "QuerySet[FeedbackItem]":
+        queryset = super().get_queryset()
+        if date_min := self.request.GET.get("date_min"):
+            queryset = queryset.filter(created_at__date__gte=date_min)
+        if date_max := self.request.GET.get("date_max"):
+            queryset = queryset.filter(created_at__date__lte=date_max)
+        return queryset

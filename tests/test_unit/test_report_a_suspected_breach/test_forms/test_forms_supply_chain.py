@@ -30,11 +30,11 @@ class TestAboutTheEndUserForm:
     def test_invalid_website_url(self):
         form = AboutTheEndUserForm(data={"website": "https123://example.com"})
         assert not form.is_valid()
-        assert form.errors["website"][0] == "Enter a valid URL."
+        assert form.errors["website"][0] == "Enter website in the correct format, such as www.example.com or example.com"
 
         form = AboutTheEndUserForm(data={"website": "example"})
         assert not form.is_valid()
-        assert form.errors["website"][0] == "Enter a valid URL."
+        assert form.errors["website"][0] == "Enter website in the correct format, such as www.example.com or example.com"
 
 
 class TestZeroEndUsersForm:

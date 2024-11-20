@@ -114,6 +114,7 @@ CHUNK_UPLOADER_RAISE_EXCEPTION_ON_VIRUS_FOUND = False
 # MIDDLEWARE
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django_permissions_policy.PermissionsPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -124,7 +125,6 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
     "core.middleware.ReportASuspectedBreachCurrentSiteMiddleware",
     "django_ratelimit.middleware.RatelimitMiddleware",
-    # Security middleware
     "csp.middleware.CSPMiddleware",
     "core.middleware.SetPermittedCrossDomainPolicyHeaderMiddleware",
     "core.middleware.CacheControlMiddleware",
@@ -149,6 +149,7 @@ TEMPLATES = [
                 "core.context_processors.truncate_words_limit",
                 "core.context_processors.back_button",
                 "core.context_processors.is_debug_mode",
+                "core.context_processors.session_expiry_times",
             ],
         },
     },
@@ -299,6 +300,26 @@ CSP_REPORT_ONLY = env.csp_report_only
 # URL to send CSP violation reports to
 CSP_REPORT_URI = env.csp_report_uri
 
+# Permissions policy header
+PERMISSIONS_POLICY = {
+    "fullscreen": ["self"],
+    "accelerometer": [],
+    "ambient-light-sensor": [],
+    "autoplay": [],
+    "camera": [],
+    "display-capture": [],
+    "document-domain": [],
+    "encrypted-media": [],
+    "geolocation": [],
+    "gyroscope": [],
+    "interest-cohort": [],
+    "magnetometer": [],
+    "microphone": [],
+    "midi": [],
+    "payment": [],
+    "usb": [],
+}
+
 # Django Ratelimit
 RATELIMIT_VIEW = "core.views.rate_limited_view"
 RATELIMIT = "10/m"
@@ -321,7 +342,8 @@ CACHES = {
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Session cookie age is set to 40 minutes
-SESSION_COOKIE_AGE = 40 * 60
+SESSION_COOKIE_AGE = 7 * 60
+SESSION_LAST_ACTIVITY_KEY = "last_form_submission"
 
 OTSI_EMAIL = env.otsi_email
 PROTOCOL = "https://"

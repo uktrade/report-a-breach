@@ -58,7 +58,7 @@
     </div>
 
     <div class="moj-multi-file-upload">
-        <form id="main_file_upload_form" method="post" enctype='multipart/form-data' novalidate>
+        <form action="{{ request.get_full_path }}" id="main_file_upload_form" method="post" enctype='multipart/form-data' novalidate>
             {% csrf_token %}
             {% crispy form %}
         </form>

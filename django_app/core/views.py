@@ -7,12 +7,16 @@ from core.sites import (
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.generic import FormView, RedirectView, TemplateView
 from django_ratelimit.exceptions import Ratelimited
+from playwright.sync_api import sync_playwright
 
 from .forms import CookiesConsentForm, HideCookiesForm
+from .utils import update_last_activity_session_timestamp
 
 
 class RedirectBaseDomainView(RedirectView):
@@ -96,4 +100,49 @@ class AccessibilityStatementView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["otsi_email"] = settings.OTSI_EMAIL
+        return context
+
+
+class PingSessionView(View):
+    """Pings the session to keep it alive"""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        update_last_activity_session_timestamp(request)
+        return HttpResponse("pong")
+
+
+class SessionExpiredView(TemplateView):
+    template_name = "core/session_expired.html"
+
+    def get(self, request: HttpRequest, *args, **kwargs):
+        # the session should already be empty by definition but just in case, manually clear
+        request.session.flush()
+        return super().get(request, *args, **kwargs)
+
+
+class DownloadPDFView(TemplateView):
+    # TODO: update the template when DST-797 is complete
+    template_name = "core/report_pdf.html"
+
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+        context_data = self.get_context_data()
+        filename = f"report-{context_data['reference']}.pdf"
+        pdf_data = None
+        template_string = render_to_string(self.template_name, context=context_data)
+
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_content(mark_safe(template_string))
+            pdf_data = page.pdf(format="A4")
+            browser.close()
+
+        response = HttpResponse(pdf_data, content_type="application/pdf")
+        response["Content-Disposition"] = f"inline; filename={filename}"
+
+        return response
+
+    def get_context_data(self, *args: object, **kwargs: object) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["reference"] = self.request.GET.get("reference", "")
         return context
