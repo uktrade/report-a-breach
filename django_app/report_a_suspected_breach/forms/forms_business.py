@@ -11,6 +11,7 @@ from crispy_forms_gds.layout import (
     Size,
 )
 from django import forms
+from django_countries import countries
 from report_a_suspected_breach.exceptions import (
     CompaniesHouse500Error,
     CompaniesHouseException,
@@ -63,7 +64,8 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             "registered_company_number": {
                 "required": "Enter the registered company number",
                 "invalid": "Number not recognised with Companies House. Enter the correct registered company number. "
-                "This is usually an 8-digit number.",
+                # changed from 8 numbers to 8 charcaters
+                "This should be 8 characters long.",
             },
         }
 
@@ -107,15 +109,30 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 # we don't need to continue if the company number is missing
                 return cleaned_data
 
+            registered_company_number = registered_company_number.strip().upper()
+
             # todo: companies house have updated their API so an invalid number returns 500.
             #  Issue-tracker: https://forum.aws.chdev.org/t/non-existing-company-number-returns-500/8468
-            if registered_company_number.isdigit() and len(registered_company_number) == 8:
+
+            if len(registered_company_number) == 8 and registered_company_number.isalnum():
                 # Re-checking companies house API, so remove 500
                 self.request.session.pop("company_details_500", None)
                 try:
                     company_details = get_details_from_companies_house(registered_company_number)
                     cleaned_data["registered_company_number"] = company_details["company_number"]
                     cleaned_data["registered_company_name"] = company_details["company_name"]
+
+                    address = company_details["registered_office_address"]
+                    country = address.get("country")
+                    COUNTRY_DICT = dict(countries)
+
+                    if country in ["England", "Northern Ireland", "Scotland", "Wales", "United Kingdom", "England/Wales"]:
+                        address["country"] = "United Kingdom"
+                    elif country in COUNTRY_DICT.values():
+                        country_code = next((code for code, name in COUNTRY_DICT.items() if name == country), None)
+                        if country_code:
+                            address["country"] = COUNTRY_DICT[country_code]
+
                     cleaned_data["registered_office_address"] = get_formatted_address(
                         company_details["registered_office_address"]
                     )
