@@ -260,19 +260,6 @@
             <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Location of end-user {{ forloop.counter }}
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% get_country value.cleaned_data.country as country %}
-                        {% if country.name == "United Kingdom" %}
-                            The UK
-                        {% else %}
-                            Outside the UK
-                        {% endif %}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                         Name and address of end-user {{forloop.counter}}
                     </dt>
                     <dd class="govuk-summary-list__value">
