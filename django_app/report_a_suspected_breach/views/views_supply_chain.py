@@ -149,14 +149,16 @@ class EndUserAddedView(BaseFormView):
 
 class DeleteEndUserView(BaseFormView):
     def post(self, *args: object, **kwargs: object) -> HttpResponse:
-        redirect_to = redirect(reverse_lazy("report_a_suspected_breach:end_user_added"))
+        success_url = reverse_lazy("report_a_suspected_breach:end_user_added")
         if end_user_uuid := self.request.POST.get("end_user_uuid"):
             end_users = self.request.session.pop("end_users", None)
             end_users.pop(end_user_uuid, None)
             self.request.session["end_users"] = end_users
             if len(end_users) == 0:
-                redirect_to = redirect(reverse_lazy("report_a_suspected_breach:zero_end_users"))
-        return redirect_to
+                success_url = reverse_lazy("report_a_suspected_breach:zero_end_users")
+            if redirect_to := self.request.POST.get("success_url"):
+                success_url = reverse_lazy(f"report_a_suspected_breach:{redirect_to}")
+        return redirect(success_url)
 
 
 class ZeroEndUsersView(BaseFormView):
