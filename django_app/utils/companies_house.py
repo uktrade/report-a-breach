@@ -36,25 +36,3 @@ def get_details_from_companies_house(registration_number: str) -> dict[str, Any]
         raise CompaniesHouse500Error
 
     raise CompaniesHouseException(f"Companies House API request failed: {response.status_code}")
-
-
-def get_formatted_address(address_dict: dict[str, Any]) -> str:
-    """Get formatted, human-readable address from Companies House address dict."""
-    address_string = ""
-
-    if line_1 := address_dict.get("address_line_1"):
-        address_string += line_1
-
-    if line_2 := address_dict.get("address_line_2"):
-        address_string += f",\n {line_2}"
-
-    if town_or_city := address_dict.get("town_or_city"):
-        address_string += f",\n {town_or_city}"
-
-    if postal_code := address_dict.get("postal_code"):
-        address_string += f",\n {postal_code}"
-
-    if country := address_dict.get("country"):
-        address_string += f",\n {country}"
-
-    return address_string

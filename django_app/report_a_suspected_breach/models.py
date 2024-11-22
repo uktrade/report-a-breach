@@ -119,15 +119,12 @@ class Breach(BaseModel):
                 new_breach.sanctions_regimes_breached = declared_sanctions
 
             # Save breacher details to database
-            if not show_check_company_details_page_condition(request):
-                breacher_details = cleaned_data["business_or_person_details"]
-                PersonOrCompany.save_person_or_company(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
-
+            if show_check_company_details_page_condition(request):
+                breacher_details = cleaned_data["do_you_know_the_registered_company_number"]
             else:
-                companies_house_details = cleaned_data["do_you_know_the_registered_company_number"]
-                PersonOrCompany.save_companies_house_company(
-                    new_breach, companies_house_details, TypeOfRelationshipChoices.breacher
-                )
+                breacher_details = cleaned_data["business_or_person_details"]
+
+            PersonOrCompany.save_person_or_company(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
 
             # Save documents to permanent bucket and database
             UploadedDocument.save_documents(new_breach, request)
@@ -168,21 +165,6 @@ class PersonOrCompany(BaseModel):
             county=person_or_company.get("county"),
             postal_code=person_or_company.get("postal_code", ""),
             additional_contact_details=person_or_company.get("additional_contact_details"),
-            breach=breach,
-            type_of_relationship=relationship,
-        )
-
-    @classmethod
-    def save_companies_house_company(
-        cls, breach: Breach, companies_house_company: dict[str, str], relationship: TypeOfRelationshipChoices
-    ) -> "PersonOrCompany":
-        """Converts a company retrieved from Companies House API into a PersonOrCompany object
-        and saves it to the database."""
-        return cls.objects.create(
-            name=companies_house_company.get("registered_company_name"),
-            country="GB",
-            registered_company_number=companies_house_company.get("registered_company_number"),
-            registered_office_address=companies_house_company.get("registered_office_address"),
             breach=breach,
             type_of_relationship=relationship,
         )

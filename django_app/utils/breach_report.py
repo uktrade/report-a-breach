@@ -3,7 +3,7 @@ from typing import Any
 from django.forms.models import model_to_dict
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import Breach, PersonOrCompany
-from utils.companies_house import get_formatted_address
+from utils.address_formatter import get_formatted_address
 
 
 def get_breach_context_data(breach: Breach) -> dict[str, Any]:
