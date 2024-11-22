@@ -150,6 +150,7 @@ TEMPLATES = [
                 "core.context_processors.back_button",
                 "core.context_processors.is_debug_mode",
                 "core.context_processors.session_expiry_times",
+                "core.context_processors.sentry_configuration_options",
             ],
         },
     },
@@ -212,13 +213,17 @@ else:
 # SENTRY
 SENTRY_DSN = env.sentry_dsn
 SENTRY_ENVIRONMENT = env.sentry_environment
-if SENTRY_DSN and SENTRY_ENVIRONMENT:
+SENTRY_ENABLE_TRACING = env.sentry_enable_tracing
+SENTRY_TRACES_SAMPLE_RATE = env.sentry_traces_sample_rate
+SENTRY_ENABLED = SENTRY_DSN and SENTRY_ENVIRONMENT
+
+if SENTRY_ENABLED:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         environment=SENTRY_ENVIRONMENT,
         integrations=[DjangoIntegration()],
-        enable_tracing=env.sentry_enable_tracing,
-        traces_sample_rate=env.sentry_traces_sample_rate,
+        enable_tracing=SENTRY_ENABLE_TRACING,
+        traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
     )
 
 # Email Verification settings
@@ -264,6 +269,7 @@ CSP_SCRIPT_SRC = (
     "https://cdnjs.cloudflare.com",
     "https://www.googletagmanager.com",
     "https://*.google-analytics.com",
+    "https://browser.sentry-cdn.com",
 )
 
 # JS scripts can import other scripts, following the same rules as above
@@ -342,7 +348,7 @@ CACHES = {
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Session cookie age is set to 40 minutes
-SESSION_COOKIE_AGE = 7 * 60
+SESSION_COOKIE_AGE = 40 * 60
 SESSION_LAST_ACTIVITY_KEY = "last_form_submission"
 
 OTSI_EMAIL = env.otsi_email

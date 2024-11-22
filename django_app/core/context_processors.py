@@ -25,3 +25,14 @@ def session_expiry_times(request: HttpRequest) -> dict[str, int]:
         "session_expiry_minutes": settings.SESSION_COOKIE_AGE // 60,
         "session_expiry_hours": settings.SESSION_COOKIE_AGE // 60 // 60,
     }
+
+
+def sentry_configuration_options(request: HttpRequest) -> dict[str, str | float]:
+    """Add the Sentry configuration options to the context."""
+    return {
+        "SENTRY_ENABLED": settings.SENTRY_ENABLED,
+        "SENTRY_DSN": settings.SENTRY_DSN,
+        "SENTRY_ENVIRONMENT": settings.SENTRY_ENVIRONMENT,
+        "SENTRY_ENABLE_TRACING": settings.SENTRY_ENABLE_TRACING,
+        "SENTRY_TRACES_SAMPLE_RATE": settings.SENTRY_TRACES_SAMPLE_RATE,
+    }

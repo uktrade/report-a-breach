@@ -7,6 +7,22 @@
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
     <head>
+        {% if SENTRY_ENABLED %}
+            <script
+                src="https://browser.sentry-cdn.com/8.39.0/bundle.tracing.min.js"
+                integrity="sha384-GmCdCRO2s8VuYopAldiuHl/uns+EWDcLodj8AW810pK14r3vPQxoDNsMxnitCt18"
+                crossorigin="anonymous"
+                data-lazy="no"
+            ></script>
+            <script nonce="{{ request.csp_nonce }}">
+                Sentry.init({
+                    dsn: "{{ SENTRY_DSN }}",
+                    environment: "{{ SENTRY_ENVIRONMENT }}",
+                    enableTracing: {% if SENTRY_ENABLE_TRACING %}true{% else %}false{% endif %},
+                    tracesSampleRate: {{ SENTRY_TRACES_SAMPLE_RATE }},
+                });
+            </script>
+        {% endif %}
         {% if gtm_enabled %}
 			<!-- Google Tag Manager -->
             <script nonce="{{ request.csp_nonce }}">
@@ -204,7 +220,7 @@
                 <div class="govuk-grid-column-one-half">
                     <a class="govuk-back-link govuk-link--no-visited-state show-on-js-enabled hide-on-js-disabled"
                        href="javascript: window.history.go(-1)">{{ back_button_text }}</a>
-				{# JS-disabled back link #}
+					{# JS-disabled back link #}
                     {% if "HTTP_REFERER" in request.META %}
                         <a class="govuk-back-link govuk-link--no-visited-state hide-on-js-enabled show-on-js-disabled"
                            href="{{ back_button_link|default_if_none:"/" }}?start=true">{{ back_button_text }}</a>
@@ -213,7 +229,7 @@
                            href="{{ back_button_link|default_if_none:"/" }}?start=true">{{ back_button_text }}</a>
                     {% endif %}
                 </div>
-                {% block download_link %}{% endblock download_link%}
+                {% block download_link %}{% endblock download_link %}
             </div>
         {% endblock back_button %}
         {% block main %}
