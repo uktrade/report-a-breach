@@ -19,8 +19,15 @@ country_name_to_code = {name: code for code, name in countries}
 
 def turn_companies_house_into_normal_address_dict(address_dict: Dict[str, Any]) -> AddressData:
     new_address_dict = address_dict.copy()
+
     # companies house returns a whole country name, we need to convert it to a country code
-    new_address_dict["country"] = country_name_to_code[address_dict["country"]]
+    if country := address_dict.get("country"):
+        # special case for UK
+        if country in ["England", "Northern Ireland", "Scotland", "Wales", "United Kingdom", "England/Wales"]:
+            new_address_dict["country"] = "GB"
+        else:
+            new_address_dict["country"] = country_name_to_code[country]
+
     # companies house uses locality for town_or_city
     new_address_dict["town_or_city"] = address_dict["locality"]
 
