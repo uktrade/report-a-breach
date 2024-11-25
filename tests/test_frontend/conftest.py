@@ -1,6 +1,7 @@
 import os
 import re
 from unittest import mock
+from unittest.mock import MagicMock
 
 import notifications_python_client
 import pytest
@@ -10,6 +11,8 @@ from django.contrib.sites.models import Site
 from django.test import override_settings
 from django.test.testcases import LiveServerTestCase
 from playwright.sync_api import expect, sync_playwright
+
+# from report_a_suspected_breach.models import ReporterEmailVerification
 from utils import notifier
 
 from . import data
@@ -462,6 +465,34 @@ def patched_send_email(monkeypatch):
     """We don't want to send emails when running front-end tests"""
     mock_notifications_api_client = mock.create_autospec(notifications_python_client.notifications.NotificationsAPIClient)
     monkeypatch.setattr(notifier, "NotificationsAPIClient", mock_notifications_api_client)
+
+
+@pytest.fixture(autouse=True)
+def patched_verify_code(monkeypatch):
+    """Ensure the verify code is always the same for front end tests"""
+    mock_reporter_verification = MagicMock()
+    mock_objects = MagicMock()
+    verify_code = "012345"
+    # mock_reporter_verification = mock_reporter_verification
+
+    # mock_reporter_verification.return_value.__enter__.return_value = verify_code
+    # mock_reporter_verification.latest = mock_objects
+
+    # mock_reporter_verification.objects.filter().latest().return_value = mock_objects
+    # mock.objects.filter.latest.objects.filter().latest()
+    # ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
+    #     "date_created"
+    # )
+    mock_object = [
+        mock_reporter_verification,
+    ]
+    mock_objects.objects.return_value = mock_object
+    mock_reporter_verification.reporter_session = MagicMock()
+    mock_reporter_verification.objects.filter().latest().return_value.email_verification_code.return_value = verify_code
+    mock_reporter_verification.verified.return_value = True
+    mock_reporter_verification.save.return_value = None
+
+    monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification", mock_reporter_verification)
 
 
 # @pytest.fixture()

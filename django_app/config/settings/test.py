@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache.backends.dummy import DummyCache
 from django.core.files.uploadhandler import TemporaryFileUploadHandler
@@ -59,19 +61,19 @@ class TestingCache(DummyCache):
 CACHES = {"default": {"BACKEND": "config.settings.test.TestingCache"}}
 
 
-# def test_process_email_step(self, form: Form) -> dict[str, Any]:
-#     """Monkey-patching the process_email_step of the journey to always use the same verify code for testing."""
-#     from django.contrib.sessions.models import Session
-#     from report_a_suspected_breach.models import ReporterEmailVerification
-#
-#     verify_code = "012345"
-#     user_session = Session.objects.get(session_key=self.request.session.session_key)
-#     ReporterEmailVerification.objects.create(
-#         reporter_session=user_session,
-#         email_verification_code=verify_code,
-#     )
-#     print(verify_code)
-#     return self.get_form_step_data(form)
+def test_process_email_step(self, form: Form) -> dict[str, Any]:
+    """Monkey-patching the process_email_step of the journey to always use the same verify code for testing."""
+    from django.contrib.sessions.models import Session
+    from report_a_suspected_breach.models import ReporterEmailVerification
+
+    verify_code = "012345"
+    user_session = Session.objects.get(session_key=self.request.session.session_key)
+    ReporterEmailVerification.objects.create(
+        reporter_session=user_session,
+        email_verification_code=verify_code,
+    )
+    print(verify_code)
+    return self.get_form_step_data(form)
 
 
 def test_request_verify_code(self, form: Form) -> HttpResponse:
@@ -84,7 +86,7 @@ def test_request_verify_code(self, form: Form) -> HttpResponse:
     verify_code = "012345"
     user_session = Session.objects.get(session_key=self.request.session.session_key)
     ReporterEmailVerification.objects.create(
-        user_session=user_session,
+        reporter_session=user_session,
         email_verification_code=verify_code,
     )
 
