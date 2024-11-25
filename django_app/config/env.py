@@ -117,6 +117,11 @@ class LocalSettings(BaseSettings):
     localstack_port: int = 14566
 
 
+class TestSettings(LocalSettings):
+    headless: bool = False
+    save_videos: bool = False  # Save videos of the tests
+
+
 class DBTPlatformSettings(BaseSettings):
     in_build_step: bool = Field(alias="BUILD_STEP", default=False)
 

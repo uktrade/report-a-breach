@@ -1,5 +1,3 @@
-from typing import Any
-
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache.backends.dummy import DummyCache
 from django.core.files.uploadhandler import TemporaryFileUploadHandler
@@ -10,9 +8,11 @@ from .base import *  # noqa
 
 TEST_EMAIL_VERIFY_CODE = True
 
-HEADLESS = True
+HEADLESS = False
 
 BASE_FRONTEND_TESTING_URL = "http://report-a-suspected-breach:8000"
+
+SAVE_VIDEOS = False
 
 ENVIRONMENT = "test"
 
@@ -59,41 +59,33 @@ class TestingCache(DummyCache):
 CACHES = {"default": {"BACKEND": "config.settings.test.TestingCache"}}
 
 
-def test_process_email_step(self, form: Form) -> dict[str, Any]:
-    """Monkey-patching the process_email_step of the journey to always use the same verify code for testing."""
-    from django.contrib.sessions.models import Session
-    from report_a_suspected_breach.models import ReporterEmailVerification
+# def test_process_email_step(self, form: Form) -> dict[str, Any]:
+#     """Monkey-patching the process_email_step of the journey to always use the same verify code for testing."""
+#     from django.contrib.sessions.models import Session
+#     from report_a_suspected_breach.models import ReporterEmailVerification
+#
+#     verify_code = "012345"
+#     user_session = Session.objects.get(session_key=self.request.session.session_key)
+#     ReporterEmailVerification.objects.create(
+#         reporter_session=user_session,
+#         email_verification_code=verify_code,
+#     )
+#     print(verify_code)
+#     return self.get_form_step_data(form)
 
-    verify_code = "012345"
-    user_session = Session.objects.get(session_key=self.request.session.session_key)
-    ReporterEmailVerification.objects.create(
-        reporter_session=user_session,
-        email_verification_code=verify_code,
-    )
-    print(verify_code)
-    return self.get_form_step_data(form)
 
-
-def test_request_verify_form_valid(self, form: Form) -> HttpResponse:
+def test_request_verify_code(self, form: Form) -> HttpResponse:
     """Monkey-patching the form_valid of the request verify code view to always use the same verify code for testing."""
-    import logging
 
     from django.contrib.sessions.models import Session
     from report_a_suspected_breach.models import ReporterEmailVerification
     from report_a_suspected_breach.views.views_start import EmailVerifyView
 
-    logger = logging.getLogger(__name__)
-
-    reporter_email_address = self.request.session["reporter_email_address"]
-
-    verify_code = "987654"
+    verify_code = "012345"
     user_session = Session.objects.get(session_key=self.request.session.session_key)
-    if getattr(self.request, "limited", False):
-        logger.warning(f"User has been rate-limited: {reporter_email_address}")
-        return self.form_invalid(form)
     ReporterEmailVerification.objects.create(
-        reporter_session=user_session,
+        user_session=user_session,
         email_verification_code=verify_code,
     )
-    print(verify_code)
+
     return super(EmailVerifyView, self).form_valid(form)

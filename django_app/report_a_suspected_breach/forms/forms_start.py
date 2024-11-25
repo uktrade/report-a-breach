@@ -82,10 +82,9 @@ class EmailVerifyForm(BaseForm):
         verification_object = ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
             "date_created"
         )
-
-        self.verification_object = verification_object
         verify_code = verification_object.email_verification_code
         if email_verification_code != verify_code:
+            print(verify_code)
             raise forms.ValidationError(self.fields["email_verification_code"].error_messages["invalid"], code="invalid")
 
         # check if the user has submitted the verify code within the specified timeframe
@@ -101,7 +100,8 @@ class EmailVerifyForm(BaseForm):
                 raise forms.ValidationError(
                     self.fields["email_verification_code"].error_messages["invalid_after_expired"], code="invalid_after_expired"
                 )
-
+        verification_object.verified = True
+        verification_object.save()
         return email_verification_code
 
     def __init__(self, *args: object, **kwargs: object) -> None:
