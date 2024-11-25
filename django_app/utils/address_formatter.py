@@ -13,7 +13,7 @@ class AddressData(TypedDict):
     country: str  # ISO 3166-1 alpha-2 code
 
 
-# we place this outside the function as it's fairly costly and won't change
+# we place this outside the functions as it's fairly costly and won't change
 country_name_to_code = {name: code for code, name in countries}
 
 

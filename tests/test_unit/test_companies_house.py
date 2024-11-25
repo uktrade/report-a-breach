@@ -7,10 +7,10 @@ from report_a_suspected_breach.exceptions import (
     CompaniesHouseException,
 )
 
+from django_app.utils.address_formatter import get_formatted_address
 from django_app.utils.companies_house import (
     get_companies_house_basic_auth_token,
     get_details_from_companies_house,
-    get_formatted_address,
 )
 
 
