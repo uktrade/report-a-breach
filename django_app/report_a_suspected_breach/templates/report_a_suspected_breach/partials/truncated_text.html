@@ -3,21 +3,17 @@
 {% if text|wordcount > truncate_words_limit %}
     <div class="text_truncator">
         <div class="truncated_text hide-on-js-disabled">
-            <script nonce="{{ request.csp_nonce }}>
-                           {{ text|truncate_words_html_no_suffix:truncate_words_limit }}
-                           <div class="hide-on-js-disabled">
-                                                                               <a href="javascript:void(0);" class="read_more_button govuk-link">Read more</a>
-                                                                                                                                                                    </div>
-                                                                                                                                                                    </script>
-                                                                                                                                                                    </div>
-                                                                                                                                                                    <div class="expanded_text hidden show-on-js-disabled">
-                                                                                                                                                                                                                                             {{ text }}
-                                                                                                                                                                                                                                             <div class="hide-on-js-disabled">
-                                                                                                                                                                                                                                                                                                 <script nonce="{{ request.csp_nonce }}>
-                <a href="javascript:void(0);" class="read_less_button govuk-link">Read less</a>
-            </script>
+            {{ text|truncate_words_html_no_suffix:truncate_words_limit }}
+            <div class="hide-on-js-disabled">
+                <a href="javascript:void(0);" class="read_more_button govuk-link">Read more</a>
+            </div>
         </div>
-    </div>
+        <div class="expanded_text hidden show-on-js-disabled">
+            {{ text }}
+            <div class="hide-on-js-disabled">
+                <a href="javascript:void(0);" class="read_less_button govuk-link">Read less</a>
+            </div>
+        </div>
     </div>
     </div>
 {% else %}
