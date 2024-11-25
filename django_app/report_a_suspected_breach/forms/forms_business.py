@@ -64,7 +64,6 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             "registered_company_number": {
                 "required": "Enter the registered company number",
                 "invalid": "Number not recognised with Companies House. Enter the correct registered company number. "
-                # changed from 8 numbers to 8 charcaters
                 "This should be 8 characters long.",
             },
         }

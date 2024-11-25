@@ -197,9 +197,10 @@ class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
         if self.request.session.get("company_details", {}).get("do_you_know_the_registered_company_number", "") == "yes":
-            kwargs["address_string"] = self.request.session["company_details"].get("registered_office_address")
+            kwargs["address_string"] = self.request.session["company_details"].get("readable_address")
         else:
             kwargs["address_string"] = get_formatted_address(self.request.session["business_or_person_details"])
+
         return kwargs
 
     def get_success_url(self) -> str:

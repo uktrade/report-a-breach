@@ -52,7 +52,7 @@ class TestWhereWereTheGoodsMadeAvailableFromView:
         session = rasb_client.session
         session["company_details"] = {
             "do_you_know_the_registered_company_number": "yes",
-            "registered_office_address": "123 Fake Street, London, E1 4UD",
+            "readable_address": "123 Fake Street,\n test,\n E1 4UD,\n United Kingdom",
         }
         session.save()
 
@@ -61,14 +61,17 @@ class TestWhereWereTheGoodsMadeAvailableFromView:
             + "?redirect_to_url=report_a_suspected_breach:check_your_answers",
         )
         form = response.context["form"]
-        assert form.fields["where_were_the_goods_made_available_from"].choices[0].label == "123 Fake Street, London, E1 4UD"
+        assert (
+            form.fields["where_were_the_goods_made_available_from"].choices[0].label
+            == "123 Fake Street,\n test,\n E1 4UD,\n United Kingdom"
+        )
 
         session["company_details"] = {}
         session["business_or_person_details"] = {
             "address_line_1": "123 Fake Street",
             "address_line_2": "test",
             "postal_code": "E1 4UD",
-            "country": "England",
+            "country": "GB",
         }
         session.save()
 
