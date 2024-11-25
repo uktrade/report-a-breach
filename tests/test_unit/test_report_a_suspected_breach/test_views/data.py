@@ -35,6 +35,7 @@ cleaned_data = {
         "were_there_other_addresses_in_the_supply_chain": "yes",
         "other_addresses_in_the_supply_chain": "These are some other address details",
     },
+    "which_sanctions_regime": {"which_sanctions_regime": []},
     "tell_us_about_the_suspected_breach": {"tell_us_about_the_suspected_breach": "The breach was about accountancy"},
 }
 
