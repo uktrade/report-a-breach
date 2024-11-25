@@ -55,6 +55,19 @@ class TestDeleteEndUserView:
         assert response.url == reverse("report_a_suspected_breach:end_user_added")
         assert response.status_code == 302
 
+    def test_deleted_end_user_and_change_success_url(self, rasb_client):
+        request = RequestFactory().post("/")
+        request.session = rasb_client.session
+        request.session["end_users"] = data.end_users
+        request.session.save()
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:delete_end_user"),
+            data={"end_user_uuid": "end_user1", "success_url": "check_your_answers"},
+        )
+        assert len(rasb_client.session["end_users"]) == 2
+        assert response.url == reverse("report_a_suspected_breach:check_your_answers")
+        assert response.status_code == 302
+
 
 class TestZeroEndUsersView:
     def test_add_an_end_user_post(self, rasb_client):
