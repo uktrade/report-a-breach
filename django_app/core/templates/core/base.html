@@ -9,9 +9,7 @@
     <head>
         {% if SENTRY_ENABLED %}
             <script
-                src="https://browser.sentry-cdn.com/8.39.0/bundle.tracing.min.js"
-                integrity="sha384-GmCdCRO2s8VuYopAldiuHl/uns+EWDcLodj8AW810pK14r3vPQxoDNsMxnitCt18"
-                crossorigin="anonymous"
+                src="{% static 'core/javascript/sentry.min.js' %}"
                 data-lazy="no"
             ></script>
             <script nonce="{{ request.csp_nonce }}">

@@ -270,6 +270,7 @@ CSP_SCRIPT_SRC = (
     "https://www.googletagmanager.com",
     "https://*.google-analytics.com",
     "https://browser.sentry-cdn.com",
+    "https://raven.ci.uktrade.io",
 )
 
 # JS scripts can import other scripts, following the same rules as above
