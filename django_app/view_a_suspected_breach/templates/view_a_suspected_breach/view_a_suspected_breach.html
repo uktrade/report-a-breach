@@ -1,4 +1,4 @@
-{% extends "core/base_form_step.html" %}
+{% extends "core/base.html" %}
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load get_end_user_url %}
 {% block cookie_banner %}{% endblock cookie_banner %}
@@ -11,9 +11,9 @@
     </div>
 {% endblock download_link %}
 {% endcomment %}
-{% block form_content %}
+{% block column_content %}
     {% include "report_a_suspected_breach/partials/summary_report.html" %}
-{% endblock form_content %}
+{% endblock column_content %}
 
 
 {% block extra_js %}
@@ -28,8 +28,6 @@
                 $(this).closest('.text_truncator').find('.truncated_text').removeClass('hidden');
                 $(this).closest('.text_truncator').find('.expanded_text').addClass('hidden');
             })
-
-
         })
     </script>
 {% endblock extra_js %}
