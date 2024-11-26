@@ -276,9 +276,9 @@ CSP_SCRIPT_SRC = (
 CSP_CONNECT_SRC = CSP_SCRIPT_SRC
 
 # CSS elements with a src attribute can only be loaded from report-a-suspected-breach itself,
-# inline, e.g. <style> tags, or from Cloudflare
+# inline, e.g. <style> tags, Cloudflare, or Google
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "fonts.googleapis.com", "www.googletagmanager.com")
-# Images can only be loaded from report-a-suspected-breach itself, data URIs, and Cloudflare
+# Images can only be loaded from report-a-suspected-breach itself, data URIs, Cloudflare, Google
 CSP_FONT_SRC = ("'self'", "data:", "https://cdnjs.cloudflare.com", "fonts.gstatic.com")
 # Images can only be loaded from report-a-suspected-breach itself, data URIs, and Google Tag Manager
 CSP_IMG_SRC = ("'self'", "data:", "www.googletagmanager.com", "fonts.gstatic.com")
