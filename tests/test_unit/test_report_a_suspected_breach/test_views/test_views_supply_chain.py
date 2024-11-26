@@ -2,6 +2,10 @@ from django.http import HttpResponseRedirect
 from django.test import RequestFactory
 from django.urls import reverse, reverse_lazy
 
+from django_app.report_a_suspected_breach.views.views_supply_chain import (
+    AboutTheEndUserView,
+)
+
 from . import data
 
 
@@ -139,3 +143,55 @@ class TestZeroEndUsersView:
         assert response.status_code == expected_redirect.status_code
         assert response["content-type"] == expected_redirect["content-type"]
         assert response.url == expected_redirect.url
+
+
+class TestAboutTheEndUserView:
+    def test_get_form_kwargs_no_end_users(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session["end_users_location"] = {"end_user_1": {"is_uk_address": "True"}}
+        request_object.session["is_uk_address"] = True
+        request_object.session.save()
+        view = AboutTheEndUserView()
+        # UK Address
+        view.setup(request_object, in_the_uk=True)
+        response = view.get_form_kwargs()
+        assert response["form_h1_header"] == "End-user 1 details"
+        assert response["data"] is None
+
+    def test_get_form_kwargs_uk_address(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session["end_users"] = data.end_users
+        request_object.session["end_users_location"] = {"end_user_1": {"is_uk_address": "True"}}
+        request_object.session["is_uk_address"] = True
+        request_object.session.save()
+        view = AboutTheEndUserView()
+        # UK Address
+        view.setup(request_object, in_the_uk=True, end_user_uuid="end_user2")
+        response = view.get_form_kwargs()
+        assert response["form_h1_header"] == "End-user 2 details"
+        assert response["data"]["country"] == "GB"
+
+    def test_get_form_kwargs_non_uk_address(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session["end_users"] = data.end_users
+        request_object.session["end_users_location"] = {"end_user_2": {"is_uk_address": False}}
+        request_object.session["is_uk_address"] = False
+        request_object.session.save()
+        request_object.GET = {"end_user_uuid": "end_user3"}
+        view = AboutTheEndUserView()
+        view.setup(request_object, in_the_uk=False, end_user_uuid="end_user3")
+        response = view.get_form_kwargs()
+        assert response["form_h1_header"] == "End-user 3 details"
+        assert response["data"]["country"] == "NZ"
+
+    def test_get_form_kwargs_add_another_end_user(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session["end_users"] = data.end_users
+        request_object.session["end_users_location"] = {"end_user_1": {"is_uk_address": True}}
+        request_object.session["is_uk_address"] = True
+        request_object.session.save()
+        view = AboutTheEndUserView()
+        view.setup(request_object, in_the_uk=True, end_user_uuid="end_user4")
+        response = view.get_form_kwargs()
+        assert response["form_h1_header"] == "End-user 4 details"
+        assert response["data"] is None
