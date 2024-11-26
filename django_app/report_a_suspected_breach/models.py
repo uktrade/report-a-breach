@@ -167,6 +167,7 @@ class PersonOrCompany(BaseModel):
             additional_contact_details=person_or_company.get("additional_contact_details"),
             breach=breach,
             type_of_relationship=relationship,
+            registered_company_number=person_or_company.get("registered_company_number"),
         )
 
     name = models.TextField()

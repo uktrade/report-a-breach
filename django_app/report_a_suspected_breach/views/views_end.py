@@ -106,8 +106,10 @@ class CompleteView(BaseTemplateView):
         if breach_object.reporter_session != self.request.session._get_session_from_db():
             raise SuspiciousOperation("User does not have access to this breach object.")
 
-        # Requirement to clear the session post submission hence making this page single view.
-        self.request.session.flush()
+        # Successfully saved to DB - clear session ready for new application.
+        # only do this if we're not in debug mode, sometimes nice to back and re-submit
+        if not settings.DEBUG:
+            self.request.session.flush()
 
         context.update(get_breach_context_data(breach_object))
         return context
