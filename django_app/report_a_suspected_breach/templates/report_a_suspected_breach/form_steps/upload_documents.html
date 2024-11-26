@@ -7,7 +7,7 @@
 {% endblock extra_css %}
 
 {% block extra_js %}
-    <script src="{% static "core/javascript/moj-multi-file-upload.js" %}"></script>
+    <script src="{% static "core/javascript/moj-multi-file-upload.js" %}" nonce="{{request.csp_nonce}}"></script>
     <script nonce="{{request.csp_nonce}}">
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
