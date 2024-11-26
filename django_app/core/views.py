@@ -35,18 +35,20 @@ class CookiesConsentView(FormView):
     template_name = "core/cookies_consent.html"
     form_class = CookiesConsentForm
 
+    def dispatch(self, request, *args, **kwargs):
+        # storing where we want to redirect
+        # the user back to the page they were on before they were shown the cookie consent form
+        if redirect_back_to := self.request.GET.get("redirect_back_to"):
+            self.request.session["redirect_back_to"] = redirect_back_to
+        return super().dispatch(request, *args, **kwargs)
+
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
-        initial_dict = {}
 
         if current_cookies_policy := self.request.COOKIES.get("accepted_ga_cookies"):
-            initial_dict["accept_cookies"] = current_cookies_policy == "true"
+            initial_dict = {"accept_cookies": current_cookies_policy == "true"}
             kwargs["initial"] = initial_dict
-
-        # redirect the user back to the page they were on before they were shown the cookie consent form
-        if redirect_back_to := self.request.GET.get("redirect_back_to"):
-            self.request.session["redirect_back_to"] = redirect_back_to
 
         return kwargs
 
@@ -57,7 +59,15 @@ class CookiesConsentView(FormView):
         if "came_from_cookies_page" in self.request.GET:
             response = redirect(reverse("cookies_consent") + "?cookies_set=true")
         else:
-            response = redirect(self.request.session.get("redirect_back_to", "/") + "?cookies_set=true")
+            redirect_url = self.request.session.get("redirect_back_to", "/")
+
+            # checking if the redirect url already has a query string
+            if "?" in redirect_url:
+                redirect_url += "&"
+            else:
+                redirect_url += "?"
+            redirect_url += "cookies_set=true"
+            response = redirect(redirect_url)
 
         # regardless of their choice, we set a cookie to say they've made a choice
         response.set_cookie("cookie_preferences_set", "true", max_age=cookie_max_age)
