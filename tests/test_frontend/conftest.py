@@ -473,22 +473,16 @@ def patched_verify_code(monkeypatch):
     mock_reporter_verification = MagicMock()
     mock_objects = MagicMock()
     verify_code = "012345"
-    # mock_reporter_verification = mock_reporter_verification
 
-    # mock_reporter_verification.return_value.__enter__.return_value = verify_code
+    mock_reporter_verification.return_value.__enter__.return_value = mock_objects
     # mock_reporter_verification.latest = mock_objects
 
-    # mock_reporter_verification.objects.filter().latest().return_value = mock_objects
-    # mock.objects.filter.latest.objects.filter().latest()
-    # ReporterEmailVerification.objects.filter(reporter_session=self.request.session.session_key).latest(
-    #     "date_created"
-    # )
     mock_object = [
         mock_reporter_verification,
     ]
     mock_objects.objects.return_value = mock_object
     mock_reporter_verification.reporter_session = MagicMock()
-    mock_reporter_verification.objects.filter().latest().return_value.email_verification_code.return_value = verify_code
+    mock_reporter_verification.email_verification_code.return_value = verify_code
     mock_reporter_verification.verified.return_value = True
     mock_reporter_verification.save.return_value = None
 
