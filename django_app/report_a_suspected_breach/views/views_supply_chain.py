@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from report_a_suspected_breach.forms import forms_supply_chain as forms
-from utils.companies_house import get_formatted_address
+from utils.address_formatter import get_formatted_address
 
 
 class WhereWereTheGoodsSuppliedFromView(BaseFormView):
@@ -23,9 +23,11 @@ class WhereWereTheGoodsSuppliedFromView(BaseFormView):
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
         if self.request.session.get("company_details", {}).get("do_you_know_the_registered_company_number", "") == "yes":
-            kwargs["address_string"] = self.request.session["company_details"].get("registered_office_address")
+            address_string = self.request.session["company_details"].get("readable_address")
         else:
-            kwargs["address_string"] = get_formatted_address(self.request.session["business_or_person_details"])
+            address_string = get_formatted_address(self.request.session["business_or_person_details"])
+
+        kwargs["address_string"] = address_string
         return kwargs
 
     def get_success_url(self) -> str:
@@ -195,9 +197,10 @@ class WhereWereTheGoodsMadeAvailableFromView(BaseFormView):
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
         if self.request.session.get("company_details", {}).get("do_you_know_the_registered_company_number", "") == "yes":
-            kwargs["address_string"] = self.request.session["company_details"].get("registered_office_address")
+            kwargs["address_string"] = self.request.session["company_details"].get("readable_address")
         else:
             kwargs["address_string"] = get_formatted_address(self.request.session["business_or_person_details"])
+
         return kwargs
 
     def get_success_url(self) -> str:
