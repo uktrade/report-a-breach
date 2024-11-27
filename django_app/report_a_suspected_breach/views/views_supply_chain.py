@@ -104,10 +104,10 @@ class AboutTheEndUserView(BaseFormView):
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
 
-        kwargs["data"] = None
         kwargs["form_h1_header"] = "End-user 1 details"
         # restore the form data from the end_user_uuid, if it exists
         if self.request.method == "GET":
+            kwargs["data"] = None
             if end_user_uuid := self.kwargs.get("end_user_uuid", None):
                 if end_users := self.request.session.get("end_users", {}):
                     if end_users_dict := end_users.get(end_user_uuid, None):
