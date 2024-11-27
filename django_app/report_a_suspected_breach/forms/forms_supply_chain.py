@@ -143,7 +143,6 @@ class WhereWereTheGoodsMadeAvailableToForm(BaseForm):
 
 
 class AboutTheEndUserForm(BasePersonBusinessDetailsForm):
-    form_h1_header = "About the end-user"
     labels = {
         "name_of_person": "Name of person",
         "name_of_business": "Name of business",

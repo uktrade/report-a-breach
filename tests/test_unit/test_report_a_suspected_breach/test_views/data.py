@@ -73,7 +73,10 @@ cleaned_companies_house_data = {
 }
 
 end_users = {
-    "end_user1": {"cleaned_data": {"name": "End User1", "country": "AX", "address_line_1": "AL1", "town_or_city": "Town"}},
+    "end_user1": {
+        "cleaned_data": {"name": "End User1", "country": "AX", "address_line_1": "AL1", "town_or_city": "Town"},
+        "dirty_data": {"name": "End User1", "country": "AX", "address_line_1": "AL1", "town_or_city": "Town"},
+    },
     "end_user2": {
         "cleaned_data": {
             "name": "End User2",
@@ -81,9 +84,19 @@ end_users = {
             "country": "GB",
             "address_line_1": "Line 1",
             "town_or_city": "City",
-        }
+        },
+        "dirty_data": {
+            "name": "End User2",
+            "website": "http://fdas.com",
+            "country": "GB",
+            "address_line_1": "Line 1",
+            "town_or_city": "City",
+        },
     },
-    "end_user3": {"cleaned_data": {"name": "End User3", "address_line_1": "Address 1", "town_or_city": "town3", "country": "NZ"}},
+    "end_user3": {
+        "cleaned_data": {"name": "End User3", "address_line_1": "Address 1", "town_or_city": "town3", "country": "NZ"},
+        "dirty_data": {"name": "End User3", "address_line_1": "Address 1", "town_or_city": "town3", "country": "NZ"},
+    },
 }
 
 
