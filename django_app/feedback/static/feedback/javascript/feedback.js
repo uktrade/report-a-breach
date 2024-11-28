@@ -1,8 +1,11 @@
-document.addEventListener("DOMContentLoaded", function() {
+// Reset form on page reload
+$(window).bind("pageshow", function(event) {
+    $("#main-content").find("form")[0].reset()
+
     // hide the optional question by default
     $('.optional_question').hide()
 
-    $(document).on("change", "input[name='rating']", function(){
+    $(document).on("change", "input[name='rating']", function () {
         // on change of a rating
         let rating_value = $(this).val()
         if (rating_value <= 4) {
@@ -11,8 +14,4 @@ document.addEventListener("DOMContentLoaded", function() {
             $('.optional_question').hide()
         }
     })
-
-    // on page load, show/hide the optional question based on the rating which may have already been
-    // selected by the user on a previous screen
-    $("input[name='rating']:checked").trigger('change')
-})
+});
