@@ -340,5 +340,4 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 40 * 60
 SESSION_LAST_ACTIVITY_KEY = "last_form_submission"
 
-OTSI_EMAIL = env.otsi_email
 PROTOCOL = "https://"
