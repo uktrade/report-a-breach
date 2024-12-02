@@ -17,10 +17,11 @@ from report_a_suspected_breach.exceptions import (
 )
 from report_a_suspected_breach.forms.base_forms import BasePersonBusinessDetailsForm
 from report_a_suspected_breach.models import Breach, PersonOrCompany
-from utils.companies_house import (
-    get_details_from_companies_house,
+from utils.address_formatter import (
     get_formatted_address,
+    turn_companies_house_into_normal_address_dict,
 )
+from utils.companies_house import get_details_from_companies_house
 
 Field.template = "core/custom_fields/field.html"
 
@@ -63,7 +64,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
             "registered_company_number": {
                 "required": "Enter the registered company number",
                 "invalid": "Number not recognised with Companies House. Enter the correct registered company number. "
-                "This is usually an 8-digit number.",
+                "This should be 8 characters long.",
             },
         }
 
@@ -107,18 +108,24 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 # we don't need to continue if the company number is missing
                 return cleaned_data
 
+            registered_company_number = registered_company_number.strip().upper()
+
             # todo: companies house have updated their API so an invalid number returns 500.
             #  Issue-tracker: https://forum.aws.chdev.org/t/non-existing-company-number-returns-500/8468
-            if registered_company_number.isdigit() and len(registered_company_number) == 8:
+
+            if len(registered_company_number) == 8 and registered_company_number.isalnum():
                 # Re-checking companies house API, so remove 500
                 self.request.session.pop("company_details_500", None)
                 try:
                     company_details = get_details_from_companies_house(registered_company_number)
                     cleaned_data["registered_company_number"] = company_details["company_number"]
                     cleaned_data["registered_company_name"] = company_details["company_name"]
-                    cleaned_data["registered_office_address"] = get_formatted_address(
-                        company_details["registered_office_address"]
-                    )
+
+                    # converting the companies house address dict into 'normal' format and also flattening the
+                    # dictionary so the address keys are on the top-level key structure
+                    clean_address = turn_companies_house_into_normal_address_dict(company_details["registered_office_address"])
+                    cleaned_data.update(clean_address)
+                    cleaned_data["readable_address"] = get_formatted_address(clean_address)
                 except CompaniesHouseException:
                     self.add_error(
                         "registered_company_number",
@@ -128,7 +135,6 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                     )
                 except CompaniesHouse500Error:
                     self.request.session["company_details_500"] = True
-                    self.request.session.modified = True
             else:
                 self.add_error(
                     "registered_company_number",

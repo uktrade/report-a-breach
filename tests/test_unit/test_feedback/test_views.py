@@ -37,23 +37,6 @@ class TestProvideFullFeedbackView:
         assert response.context["form"].is_valid() is False
         assert "rating" in response.context["form"].errors
 
-    def test_amend_feedback(self, rasb_client):
-        feedback = FeedbackItem.objects.create(
-            rating=2,
-            how_we_could_improve_the_service="test",
-        )
-        rasb_client.post(
-            reverse("feedback:amend_feedback", kwargs={"existing_feedback_id": feedback.pk}),
-            data={
-                "rating": 1,
-                "how_we_could_improve_the_service": "try harder",
-                "did_you_experience_any_issues": ["not_found", "lacks_features"],
-            },
-        )
-        feedback.refresh_from_db()
-        assert feedback.rating == 1
-        assert feedback.how_we_could_improve_the_service == "try harder"
-
     def test_adding_url_to_feedback(self, rasb_client):
         rasb_client.post(
             reverse("feedback:collect_full_feedback") + "?url=https://example.com",

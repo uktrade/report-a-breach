@@ -9,9 +9,7 @@
     <head>
         {% if SENTRY_ENABLED %}
             <script
-                src="https://browser.sentry-cdn.com/8.39.0/bundle.tracing.min.js"
-                integrity="sha384-GmCdCRO2s8VuYopAldiuHl/uns+EWDcLodj8AW810pK14r3vPQxoDNsMxnitCt18"
-                crossorigin="anonymous"
+                src="{% static 'core/javascript/sentry.min.js' %}"
                 data-lazy="no"
             ></script>
             <script nonce="{{ request.csp_nonce }}">
@@ -70,7 +68,7 @@
                                 </div>
                                 <div class="govuk-button-group">
                                     <form method="post"
-                                          action="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">
+                                          action="{% url 'cookies_consent' %}?redirect_back_to={{ request.get_full_path|urlencode }}">
                                         {% csrf_token %}
                                         <button type="submit" class="govuk-button" data-module="govuk-button"
                                                 name="do_you_want_to_accept_analytics_cookies" value="True">
@@ -81,7 +79,7 @@
                                             Reject analytics cookies
                                         </button>
                                         <a class="govuk-link"
-                                           href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">View
+                                           href="{% url 'cookies_consent' %}?redirect_back_to={{ request.get_full_path|urlencode }}">View
                                             cookies</a>
                                     </form>
                                 </div>
@@ -90,7 +88,7 @@
                     {% endif %}
                     {% if "cookies_set" in request.GET %}
                         <form method="post"
-                              action="{% url 'hide_cookies' %}?banner=True&redirect_back_to={{ request.path }}">
+                              action="{% url 'hide_cookies' %}?banner=True&redirect_back_to={{ request.get_full_path|urlencode }}">
                             {% csrf_token %}
                             <div class="govuk-cookie-banner" data-nosnippet role="region"
                                  aria-label="Cookies on Report a Suspected Breach of Trade Sanctions">
@@ -101,12 +99,12 @@
                                                 {% if request.COOKIES.accepted_ga_cookies == "true" %}
                                                     <p class="govuk-body">You’ve accepted analytics cookies. You can <a
                                                         class="govuk-link"
-                                                        href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">change
+                                                        href="{% url 'cookies_consent' %}?redirect_back_to={{ request.get_full_path|urlencode }}">change
                                                         your cookie settings</a> at any time.</p>
                                                 {% elif request.COOKIES.accepted_ga_cookies == "false" %}
                                                     <p class="govuk-body">You’ve rejected analytics cookies. You can <a
                                                         class="govuk-link"
-                                                        href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">change
+                                                        href="{% url 'cookies_consent' %}?redirect_back_to={{ request.get_full_path|urlencode }}">change
                                                         your cookie settings</a> at any time.</p>
                                                 {% endif %}
                                             </div>
@@ -260,7 +258,7 @@
                         <ul class="govuk-footer__inline-list">
                             <li class="govuk-footer__inline-list-item hide-on-print">
                                 <a class="govuk-footer__link"
-                                   href="{% url 'cookies_consent' %}?redirect_back_to={{ request.path }}">Cookies</a>
+                                   href="{% url 'cookies_consent' %}?redirect_back_to={{ request.get_full_path|urlencode }}">Cookies</a>
                             </li>
                             <li class="govuk-footer__inline-list-item hide-on-print">
                                 <a class="govuk-footer__link"
@@ -305,8 +303,8 @@
                     </div>
                 </div>
             </div>
-            <script src="{% static 'core/javascript/jquery-3.7.1.js' %}"></script>
-            <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"></script>
+            <script src="{% static 'core/javascript/jquery-3.7.1.js' %}" nonce="{{ request.csp_nonce }}"></script>
+            <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}" nonce="{{ request.csp_nonce }}"></script>
             <script type="module" nonce="{{ request.csp_nonce }}">
                 import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"
 

@@ -3,7 +3,7 @@ from typing import Any
 
 from core.forms import BaseModelForm
 from django import forms
-from utils.companies_house import get_formatted_address
+from utils.address_formatter import get_formatted_address
 
 
 class BasePersonBusinessDetailsForm(BaseModelForm):
