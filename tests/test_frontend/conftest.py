@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test import override_settings
 from django.test.testcases import LiveServerTestCase
+from django.utils import timezone
 from playwright.sync_api import expect, sync_playwright
 
 # from report_a_suspected_breach.models import ReporterEmailVerification
@@ -470,23 +471,15 @@ def patched_send_email(monkeypatch):
 @pytest.fixture(autouse=True)
 def patched_verify_code(monkeypatch):
     """Ensure the verify code is always the same for front end tests"""
-    mock_reporter_verification = MagicMock()
+    mock_verification_object = MagicMock()
+    mock_verification_object.email_verification_code = "012345"
+    mock_verification_object.date_created = timezone.now()
+    mock_verification_object.verified = False
+
     mock_objects = MagicMock()
-    verify_code = "012345"
+    mock_objects.filter.return_value.latest.return_value = mock_verification_object
 
-    mock_reporter_verification.return_value.__enter__.return_value = mock_objects
-    # mock_reporter_verification.latest = mock_objects
-
-    mock_object = [
-        mock_reporter_verification,
-    ]
-    mock_objects.objects.return_value = mock_object
-    mock_reporter_verification.reporter_session = MagicMock()
-    mock_reporter_verification.email_verification_code.return_value = verify_code
-    mock_reporter_verification.verified.return_value = True
-    mock_reporter_verification.save.return_value = None
-
-    monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification", mock_reporter_verification)
+    monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification.objects", mock_objects)
 
 
 # @pytest.fixture()
