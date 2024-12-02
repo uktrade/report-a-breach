@@ -480,8 +480,3 @@ def patched_verify_code(monkeypatch):
     mock_objects.filter.return_value.latest.return_value = mock_verification_object
 
     monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification.objects", mock_objects)
-
-
-# @pytest.fixture()
-# def sample_upload_file():
-#     return [{"name": "test.txt", "mimeType": "text/plain", "buffer": b"test"}]

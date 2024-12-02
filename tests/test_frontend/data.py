@@ -1,3 +1,5 @@
+from sanctions_regimes.report_a_breach import active_regimes
+
 EMAIL_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
 UK_ADDRESS_DETAILS = {
     "name": "business",
@@ -64,7 +66,7 @@ NON_UK_SUPPLIER_ADDRESS_DETAILS = {
     "country": "DE",
 }
 
-SANCTIONS = ["The Oscars", "Fireplaces", "Other regime"]
+SANCTIONS = [sanction["name"] for sanction in active_regimes]
 
 FILES = ["./tests/test_frontend/testfiles/testfile.pdf"]
 
