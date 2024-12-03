@@ -194,5 +194,4 @@ elif "COPILOT_ENVIRONMENT_NAME" in os.environ:
     # Deployed on DBT Platform
     env = DBTPlatformSettings()
 else:
-    # Deployed on GOV.PaaS
     raise ValueError("Unknown environment")
