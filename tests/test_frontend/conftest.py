@@ -1,5 +1,7 @@
 import os
 import re
+import uuid
+from datetime import timedelta
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -7,13 +9,13 @@ import notifications_python_client
 import pytest
 from core.sites import SiteName
 from django.conf import settings
+from django.contrib.sessions.models import Session
 from django.contrib.sites.models import Site
 from django.test import override_settings
 from django.test.testcases import LiveServerTestCase
 from django.utils import timezone
 from playwright.sync_api import expect, sync_playwright
-
-# from report_a_suspected_breach.models import ReporterEmailVerification
+from report_a_suspected_breach.models import ReporterEmailVerification
 from utils import notifier
 
 from . import data
@@ -160,15 +162,15 @@ class PlaywrightTestBase(LiveServerTestCase):
         #
         page.get_by_role("heading", name="Declaration").click()
         page.get_by_label("I agree and accept").check()
-        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("button", name="Submit").click()
         #
         # Complete Page
         #
         page.get_by_role("heading", name="Submission complete").click()
         page.get_by_text("Your reference number").click()
         page.get_by_role("heading", name="What happens next").click()
-        page.get_by_text("We have sent you a").click()
-        page.get_by_role("link", name="View and print your report").click()
+        page.get_by_text("We've sent a confirmation").click()
+        page.get_by_role("link", name="View and print your report")
         page.get_by_text("What did you think of this service? (takes 30 seconds)").click()
         page.get_by_role("link", name="What did you think of this").click()
 
@@ -375,22 +377,18 @@ class PlaywrightTestBase(LiveServerTestCase):
             page.get_by_label("Business you work for").fill("DBT")
             page.get_by_role("button", name="Continue").click()
 
-    def create_breach(self, breach_details):
-        new_browser = self.playwright.chromium.launch(headless=True)
-        context = new_browser.new_context()
-        page = context.new_page()
-        page.goto(self.base_url)
+    def create_breach(self, page, breach_details):
         page.get_by_role("link", name="Reset session").click()
 
         # Tasklist
-        page.get_by_role("heading", name="Report a suspected breach of trade sanctions").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="Your details").click()
 
         # 1. Your Details
         self.create_reporter_details(page, breach_details["reporter_relationship"])
 
         # Tasklist
-        page.get_by_role("heading", name="Report a suspected breach of trade sanctions").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="2. About the person or").click()
 
         # 2. About the person or business you're reporting
@@ -402,14 +400,14 @@ class PlaywrightTestBase(LiveServerTestCase):
         elif breach_details["breacher_location"] == "companies_house":
             self.create_companies_house_details(page)
         # Tasklist
-        page.get_by_role("heading", name="Report a suspected breach of trade sanctions").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="Overview of the suspected breach").click()
 
         # 3. Overview of the suspected breach
         self.overview_of_breach(page, breach_details["exact_date"], breach_details["sanctions"])
 
         # Tasklist
-        page.get_by_role("heading", name="Report a suspected breach of trade sanctions").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="The supply chain").click()
 
         if breach_details["supplier_location"] == "uk":
@@ -417,7 +415,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         elif breach_details["supplier_location"] == "non_uk":
             self.create_non_uk_supplier(page)
 
-        expect(page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
+        expect(page).to_have_url(re.compile(r".*/location-of-end-user"))
         if breach_details.get("end_users", False):
             for end_user in breach_details["end_users"][:-1]:
                 self.create_end_user(page, end_user_details=data.END_USERS[end_user])
@@ -440,6 +438,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         #
         # Upload Documents Page
         #
+        self.page.get_by_role("link", name="Sanctions breach details").click()
         self.upload_documents_page(page)
         page.get_by_role("button", name="Continue").click()
 
@@ -455,10 +454,8 @@ class PlaywrightTestBase(LiveServerTestCase):
         #
         # Tasklist
         #
-        page.get_by_role("heading", name="Report a suspected breach of trade sanctions").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="Continue").click()
-
-        return page
 
 
 @pytest.fixture(autouse=True)
@@ -471,12 +468,17 @@ def patched_send_email(monkeypatch):
 @pytest.fixture(autouse=True)
 def patched_verify_code(monkeypatch):
     """Ensure the verify code is always the same for front end tests"""
-    mock_verification_object = MagicMock()
-    mock_verification_object.email_verification_code = "012345"
-    mock_verification_object.date_created = timezone.now()
-    mock_verification_object.verified = False
+    verify_code = "012345"
+    test_session_key = uuid.uuid4()
+    user_session = Session.objects.create(session_key=test_session_key, expire_date=timezone.now() + timedelta(days=1))
+    patched_email_verification_obj = ReporterEmailVerification.objects.create(
+        reporter_session=user_session,
+        email_verification_code=verify_code,
+    )
+
+    monkeypatch.setattr("utils.notifier.verify_email", patched_email_verification_obj)
 
     mock_objects = MagicMock()
-    mock_objects.filter.return_value.latest.return_value = mock_verification_object
+    mock_objects.filter.return_value.latest.return_value = patched_email_verification_obj
 
     monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification.objects", mock_objects)

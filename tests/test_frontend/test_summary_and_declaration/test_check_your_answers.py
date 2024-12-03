@@ -1,67 +1,69 @@
-# import re
-#
-# from playwright.sync_api import expect
-#
-# from .. import conftest, data
-#
-# breach_details_owner = {
-#     "reporter_relationship": "I'm an owner",
-#     "breacher_location": "uk",
-#     "supplier_location": "uk",
-#     "exact_date": True,
-#     "sanctions": ["The Oscars", "Fireplaces"],
-#     "end_users": [],
-# }
-#
-# breach_details_third_party = {
-#     "reporter_relationship": "I work for a third party",
-#     "breacher_location": "non_uk",
-#     "supplier_location": "non_uk",
-#     "exact_date": False,
-#     "sanctions": ["I do not know"],
-# }
-#
-# breach_details_companies_house = {
-#     "reporter_relationship": "I work for a third party",
-#     "breacher_location": "companies_house",
-#     "supplier_location": "uk",
-#     "exact_date": True,
-#     "sanctions": ["I do not know"],
-# }
-#
-#
-# class TestCheckYourAnswersYourDetails(conftest.PlaywrightTestBase):
-#     """
-#     Tests for check your answers page, specific to the your details section
-#     """
-#
-#     def test_business_work_for_show_condition(self):
-#         self.page = self.create_breach(breach_details_third_party)
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         expect(self.page.get_by_text("Business you work for", exact=True)).to_be_visible()
-#
-#     def test_business_you_work_for_do_not_show_condition(self):
-#         self.page = self.create_breach(breach_details_owner)
-#         expect(self.page.get_by_text("Business you work for", exact=True)).not_to_be_visible()
-#
-#     def test_can_change_reporter_full_name(self):
-#         self.page = self.create_breach(breach_details_owner)
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         self.page.locator("form div").filter(has_text="Full name John smith Change").get_by_role("link").click()
-#         expect(self.page).to_have_url(re.compile(r".*/name/.*"))
-#         self.page.get_by_label("What is your full name?").fill("Jane Doe")
-#         self.page.get_by_role("button", name="Continue").click()
-#         expect(self.page).to_have_url(re.compile(r".*/summary"))
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="Your details").click()
-#         self.page.get_by_text("Full name", exact=True).click()
-#         expect(self.page.get_by_text("Jane Doe")).to_be_visible()
-#         expect(self.page.get_by_text("John smith")).not_to_be_visible()
-#         self.page.get_by_role("button", name="Continue").click()
-#         self.declaration_and_complete_page(self.page)
-#
+import re
+
+from playwright.sync_api import expect
+
+from .. import conftest
+
+breach_details_owner = {
+    "reporter_relationship": "I'm an owner",
+    "breacher_location": "uk",
+    "supplier_location": "uk",
+    "exact_date": True,
+    "sanctions": ["The Yemen", "The Zimbabwe"],
+    "end_users": [],
+}
+
+breach_details_third_party = {
+    "reporter_relationship": "I work for a third party",
+    "breacher_location": "non_uk",
+    "supplier_location": "non_uk",
+    "exact_date": False,
+    "sanctions": ["I do not know"],
+}
+
+breach_details_companies_house = {
+    "reporter_relationship": "I work for a third party",
+    "breacher_location": "companies_house",
+    "supplier_location": "uk",
+    "exact_date": True,
+    "sanctions": ["I do not know"],
+}
+
+
+class TestCheckYourAnswersYourDetails(conftest.PlaywrightTestBase):
+    """
+    Tests for check your answers page, specific to the your details section
+    """
+
+    def test_business_work_for_show_condition(self):
+        self.page.goto(self.base_url)
+        self.create_breach(self.page, breach_details_third_party)
+        self.page.get_by_role("heading", name="Check your answers").click()
+        expect(self.page.get_by_text("Person or business you're reporting")).to_be_visible()
+
+    def test_can_change_reporter_full_name(self):
+        self.page.goto(self.base_url)
+        self.create_breach(self.page, breach_details_owner)
+        self.page.get_by_role("heading", name="Check your answers").click()
+        self.page.get_by_role("heading", name="Your details").click()
+        self.page.get_by_text("Full name", exact=True).click()
+        self.page.get_by_text("John Smith", exact=True).click()
+        self.page.get_by_role("link", name="Change your full name").click()
+        expect(self.page).to_have_url(re.compile(r".*/your-name"))
+        self.page.get_by_label("What is your full name?").fill("Jane Doe")
+        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
+        self.page.get_by_role("heading", name="Check your answers").click()
+        self.page.get_by_role("heading", name="Your details").click()
+        self.page.get_by_text("Full name", exact=True).click()
+        expect(self.page.get_by_text("Jane Doe")).to_be_visible()
+        expect(self.page.get_by_text("John Smith")).not_to_be_visible()
+        # self.page.keyboard.down("End")
+        self.page.get_by_role("link", name="Continue").click()
+        self.declaration_and_complete_page(self.page)
+
+
+# #
 #     def test_can_change_name_and_business_reporter_works_for(self):
 #         self.page = self.create_breach(breach_details_third_party)
 #         self.page.get_by_role("heading", name="Check your answers").click()
