@@ -67,11 +67,6 @@ class RequestVerifyCodeView(BaseFormView):
     template_name = "report_a_suspected_breach/form_steps/request_verify_code.html"
     success_url = reverse_lazy("report_a_suspected_breach:verify_email")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["otsi_email"] = settings.OTSI_EMAIL
-        return context
-
     def form_valid(self, form: GenericForm) -> HttpResponse:
         reporter_email_address = self.request.session["reporter_email_address"]
         if getattr(self.request, "limited", False):
