@@ -4,7 +4,6 @@ from core.sites import (
     is_report_a_suspected_breach_site,
     is_view_a_suspected_breach_site,
 )
-from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -106,11 +105,6 @@ class PrivacyNoticeView(TemplateView):
 
 class AccessibilityStatementView(TemplateView):
     template_name = "core/accessibility_statement.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["otsi_email"] = settings.OTSI_EMAIL
-        return context
 
 
 class PingSessionView(View):
