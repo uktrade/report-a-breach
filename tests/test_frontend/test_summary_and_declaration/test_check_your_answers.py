@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from .. import conftest
+from .. import conftest, data
 
 breach_details_owner = {
     "reporter_relationship": "I'm an owner",
@@ -370,47 +370,37 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
 
+    def test_can_add_another_end_user(self):
+        self.page.goto(self.base_url)
+        breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.create_breach(self.page, breach_details_owner)
+        self.page.get_by_role("heading", name="Check your answers").click()
+        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
+        self.page.get_by_role("link", name="Add another end-user end-user").click()
+        expect(self.page).to_have_url(re.compile(r".*/location-of-end-user"))
+        self.page = self.create_end_user(self.page, data.END_USERS["end_user4"])
+        expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
+        expect(self.page.get_by_text("End User4")).to_be_visible()
+        self.page.get_by_role("link", name="Continue").click()
+        self.declaration_and_complete_page(self.page)
 
-#     def test_can_add_another_end_user(self):
-#         self.page.goto(self.base_url)
-#         breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
-#         self.create_breach(self.page, breach_details_owner)
-#         self.page.get_by_role("heading", name="Check your answers").click()
-#         self.page.get_by_role("heading", name="The supply chain", exact=True).click()
-#         expect(self.page.get_by_text("The UK", exact=True)).to_have_count(2)
-#         expect(self.page.get_by_text("Outside the UK", exact=True)).to_have_count(2)
-#         self.page.get_by_role("link", name="Add another end-user end-user").click()
-#         expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
-#         self.page = self.create_end_user(self.page, data.END_USERS["end_user4"])
-#         expect(self.page).to_have_url(re.compile(r".*/end_user_added/*"))
-#         self.page.get_by_label("No").check()
-#         self.page.get_by_role("button", name="Continue").click()
-#         expect(self.page).to_have_url(re.compile(r".*/summary/*"))
-#         expect(self.page.get_by_text("The UK", exact=True)).to_have_count(2)
-#         expect(self.page.get_by_text("Outside the UK", exact=True)).to_have_count(3)
-#         expect(self.page.get_by_text("End User4")).to_be_visible()
-#         self.page.get_by_role("button", name="Continue").click()
-#         self.declaration_and_complete_page(self.page)
-#
-#
-# class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
-#     """
-#     Tests for check your answers page, specific to the sanctions breach details section
-#     """
-#
-#     # todo - change uploaded documents
-#
-#     def test_can_change_summary_of_the_breach(self):
-#         self.page.goto(self.base_url)
-#         self.create_breach(self.page, breach_details_owner)
-#         self.page.get_by_text("Summary of the breach", exact=True).click()
-#         expect(self.page.get_by_text("Happened a month ago")).to_be_visible()
-#         self.page.get_by_role("link", name="Change summary of the breach").click()
-#         expect(self.page).to_have_url(re.compile(r".*/tell_us_about_the_suspected_breach/.*"))
-#         self.page.get_by_label("Give a summary of the breach").fill("Occured last year")
-#         self.page.get_by_role("button", name="Continue").click()
-#         expect(self.page).to_have_url(re.compile(r".*/summary"))
-#         expect(self.page.get_by_text("Happened a month ago")).not_to_be_visible()
-#         expect(self.page.get_by_text("Occured last year")).to_be_visible()
-#         self.page.get_by_role("button", name="Continue").click()
-#         self.declaration_and_complete_page(self.page)
+
+class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
+    """
+    Tests for check your answers page, specific to the sanctions breach details section
+    """
+
+    def test_can_change_summary_of_the_breach(self):
+        self.page.goto(self.base_url)
+        self.create_breach(self.page, breach_details_owner)
+        self.page.get_by_text("Summary of the breach", exact=True).click()
+        expect(self.page.get_by_text("Happened a month ago")).to_be_visible()
+        self.page.get_by_role("link", name="Change summary of the breach").click()
+        expect(self.page).to_have_url(re.compile(r".*/summary-of-breach"))
+        self.page.get_by_label("Give a summary of the breach").fill("Occurred last year")
+        self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
+        expect(self.page.get_by_text("Happened a month ago")).not_to_be_visible()
+        expect(self.page.get_by_text("Occurred last year")).to_be_visible()
+        self.page.get_by_role("link", name="Continue").click()
+        self.declaration_and_complete_page(self.page)
