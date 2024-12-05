@@ -97,7 +97,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         return f"http://{self.base_host}:{self.server_thread.port}"
 
     def get_form_step_page(self, form_step):
-        return f"{self.base_url}/report_a_suspected_breach/{form_step}/"
+        return f"{self.base_url}/report/{form_step}"
 
     @staticmethod
     def email_details(page, details=data.EMAIL_DETAILS):
