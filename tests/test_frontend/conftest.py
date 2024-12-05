@@ -210,10 +210,8 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_text("Registered company name").click()
         page.get_by_text("BOCIOC M LIMITED").click()
         page.get_by_text("Registered office address").click()
-        page.get_by_text("Avocet Close, CV23 0WU").click()
-        page.locator("dd").filter(has_text="Changeregistered company").click()
+        page.get_by_text("52 Avocet Close, Rugby, CV23 0WU").click()
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("heading", name="Report a suspected breach of trade sanctions").click()
 
     def create_uk_breacher(self, page):
         page.get_by_role("heading", name="Are you reporting a business").click()
@@ -339,7 +337,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_role("button", name="Continue").click()
 
         # About the End User
-        page.get_by_role("heading", name="About the end-user").click()
+        page.get_by_role("heading", name="End-user").click()
         page.get_by_role("heading", name="Name and digital contact").click()
         page.get_by_label("Name of person (optional)").fill(end_user_details["name"])
         page.get_by_label("Name of business (optional)").fill(end_user_details["business"])
@@ -470,7 +468,8 @@ def patched_verify_code(monkeypatch):
     """Ensure the verify code is always the same for front end tests"""
     verify_code = "012345"
     test_session_key = uuid.uuid4()
-    user_session = Session.objects.create(session_key=test_session_key, expire_date=timezone.now() + timedelta(days=1))
+    expire_date = timezone.now() + timedelta(minutes=10)
+    user_session = Session.objects.create(session_key=test_session_key, expire_date=expire_date)
     patched_email_verification_obj = ReporterEmailVerification.objects.create(
         reporter_session=user_session,
         email_verification_code=verify_code,
