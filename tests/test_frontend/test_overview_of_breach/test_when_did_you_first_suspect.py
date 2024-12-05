@@ -29,6 +29,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         self.page.get_by_label("Exact date").check()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/sanctions-regime-breached"))
+        self.page.get_by_role("link", name="Reset session").click()
 
     def test_future_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -51,6 +52,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="The date you first suspected the breach must be in the past")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        self.page.get_by_role("link", name="Reset session").click()
 
     def test_incorrect_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -73,6 +75,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="The date you first suspected the breach must be a real date")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        self.page.get_by_role("link", name="Reset session").click()
 
     def test_no_exact_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -89,6 +92,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter the date you first suspected")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        self.page.get_by_role("link", name="Reset session").click()
 
     def test_no_approx_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -105,6 +109,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter the date you first suspected")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        self.page.get_by_role("link", name="Reset session").click()
 
     def test_no_input_returns_error(self):
         self.page.goto(self.base_url)
@@ -119,3 +124,4 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Select whether the date you entered")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        self.page.get_by_role("link", name="Reset session").click()

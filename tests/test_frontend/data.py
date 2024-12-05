@@ -8,7 +8,7 @@ UK_ADDRESS_DETAILS = {
     "address_line_2": "A2",
     "town": "Town",
     "county": "County",
-    "postcode": "AA0 0AA",
+    "postcode": "AA00AA",
 }
 
 NON_UK_ADDRESS_DETAILS = {
@@ -30,7 +30,7 @@ UK_BREACHER_ADDRESS_DETAILS = {
     "address_line_2": "Breach Avenue",
     "town": "Breach Town",
     "county": "Breach County",
-    "postcode": "BB0 0BB",
+    "postcode": "BB00BB",
 }
 
 NON_UK_BREACHER_ADDRESS_DETAILS = {
@@ -51,7 +51,7 @@ UK_SUPPLIER_ADDRESS_DETAILS = {
     "address_line_2": "Supply Lane",
     "town": "Supply Town",
     "county": "Supply County",
-    "postcode": "SU0 0SU",
+    "postcode": "SU00SU",
 }
 
 NON_UK_SUPPLIER_ADDRESS_DETAILS = {
@@ -82,7 +82,7 @@ END_USERS = {
         "address_line_2": "AL2",
         "town_or_city": "Town",
         "county": "Lothian",
-        "postcode": "EU1 2EU",
+        "postcode": "EU12EU",
         "additional_contact_details": "",
     },
     "end_user2": {

@@ -86,6 +86,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         )
 
         # close the page
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.close()
 
     @property
@@ -119,17 +120,11 @@ class PlaywrightTestBase(LiveServerTestCase):
         # UK Address Details Page
         page.get_by_label("Name of business or person").click()
         page.get_by_label("Name of business or person").fill(details["name"])
-        page.get_by_label("Name of business or person").press("Tab")
         page.get_by_label("Website address").fill(details["website"])
-        page.get_by_label("Website address").press("Tab")
         page.get_by_label("Address line 1").fill(details["address_line_1"])
-        page.get_by_label("Address line 1").press("Tab")
         page.get_by_label("Address line 2").fill(details["address_line_2"])
-        page.get_by_label("Address line 2").press("Tab")
         page.get_by_label("Town or city").fill(details["town"])
-        page.get_by_label("Town or city").press("Tab")
         page.get_by_label("County").fill(details["county"])
-        page.get_by_label("County").press("Tab")
         page.get_by_label("Postcode").fill(details["postcode"])
         page.get_by_role("button", name="Continue").click()
 
@@ -138,21 +133,13 @@ class PlaywrightTestBase(LiveServerTestCase):
         # NON UK Address Details Page
         page.get_by_label("Name of business or person").click()
         page.get_by_label("Name of business or person").fill(details["name"])
-        page.get_by_label("Name of business or person").press("Tab")
         page.get_by_label("Website address").fill(details["website"])
-        page.get_by_label("Website address").press("Tab")
         page.get_by_label("Country").select_option(details["country"])
-        page.get_by_label("Country").press("Tab")
         page.get_by_label("Address line 1").fill(details["address_line_1"])
-        page.get_by_label("Address line 1").press("Tab")
         page.get_by_label("Address line 2").fill(details["address_line_2"])
-        page.get_by_label("Address line 2").press("Tab")
         page.get_by_label("Address line 3").fill(details["address_line_3"])
-        page.get_by_label("Address line 3").press("Tab")
         page.get_by_label("Address line 4").fill(details["address_line_4"])
-        page.get_by_label("Address line 4").press("Tab")
         page.get_by_label("Town or city").fill(details["town"])
-        page.get_by_label("Town or city").press("Tab")
         page.get_by_role("button", name="Continue").click()
 
     @staticmethod
@@ -323,7 +310,7 @@ class PlaywrightTestBase(LiveServerTestCase):
 
     @staticmethod
     def no_end_users(page):
-        page.get_by_role("heading", name="Where were the goods,").click()
+        page.get_by_role("heading", name="Where were the goods").click()
         page.get_by_text("This is the address of the").click()
         page.get_by_label("I do not know", exact=True).check()
         page.get_by_role("button", name="Continue").click()
