@@ -6,7 +6,7 @@
         <h1 class="govuk-heading-l">Report a suspected breach of trade sanctions</h1>
         <ul class="govuk-task-list">
             {% for task in tasklist %}
-                <li class="govuk-task-list__item govuk-task-list__item--with-link ">
+                <li class="govuk-task-list__item {% if task.can_start %}govuk-task-list__item--with-link{% endif %}">
                     <div class="govuk-task-list__name-and-hint">
                         <a class="{% if task.can_start %}govuk-link govuk-task-list__link{% else %}govuk-body mb-1{% endif %}"
                            {% if task.can_start %}href="{{ task.url }}?start=true"{% endif %}
