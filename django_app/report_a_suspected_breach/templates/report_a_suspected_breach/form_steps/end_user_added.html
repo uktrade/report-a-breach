@@ -11,10 +11,9 @@
     {% for id, end_user in request.session.end_users.items %}
         <div class="action-wrapper">
             <div>
-                <h3 class="govuk-heading-m" style="float:left;">End-user {{ forloop.counter }} </h3>
+                <h2 class="govuk-heading-m" style="float:left;">End-user {{ forloop.counter }} </h2>
                 <ul class="govuk-summary-card__actions">
                     {% if is_made_available_journey %}
-                        <h2 class="govuk-visually-hidden">Change Link for End user {{ forloop.counter }}</h2>
                         <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
 
                             <a class="govuk-link" style="font-size: 19px; text-align:right"
@@ -22,7 +21,6 @@
                                 class="govuk-visually-hidden"> End-user {{forloop.counter}} details </span></a>
                         </dd>
                     {% else %}
-                        <h2 class="govuk-visually-hidden"></h2>
                         <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
 
                             <a class="govuk-link" style="font-size: 19px; text-align:right"
