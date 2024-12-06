@@ -24,7 +24,6 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Select the sanctions regime you suspect has been breached")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/sanctions-regime-breached"))
-        self.page.get_by_role("link", name="Reset session").click()
 
     def test_can_select_multiple_sanctions_regimes(self):
         self.page.goto(self.base_url)
@@ -43,7 +42,6 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("The Russia (Sanctions) (EU Exit)")).to_be_checked()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/goods-services-description"))
-        self.page.get_by_role("link", name="Reset session").click()
 
     def test_i_do_not_know_regime(self):
         self.page.goto(self.base_url)
@@ -63,4 +61,3 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("I do not know")).to_be_checked()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/goods-services-description"))
-        self.page.get_by_role("link", name="Reset session").click()
