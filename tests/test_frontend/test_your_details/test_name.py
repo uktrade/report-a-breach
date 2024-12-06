@@ -12,6 +12,7 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
 
     def test_correct_details_goes_to_business_details_page(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -22,10 +23,10 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         self.page.get_by_label("Business you work for").fill("Business")
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/about_the_person_or_business"))
-        self.page.get_by_role("link", name="Reset session").click()
 
     def test_no_name_raises_error(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -36,10 +37,10 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter your full name")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/your-details"))
-        self.page.get_by_role("link", name="Reset session").click()
 
     def test_no_business_raises_error(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -50,7 +51,6 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter the name of the business you work for")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/your-details"))
-        self.page.get_by_role("link", name="Reset session").click()
 
 
 class TestName(conftest.PlaywrightTestBase):
