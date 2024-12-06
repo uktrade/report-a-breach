@@ -79,9 +79,6 @@ class BaseSettings(PydanticBaseSettings):
     csp_report_only: bool = True
     csp_report_uri: str | None = None
 
-    # Application-specific settings
-    otsi_email: str = "email@example.com"
-
     @computed_field
     @property
     def redis_url(self) -> str:

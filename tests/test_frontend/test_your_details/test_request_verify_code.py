@@ -1,7 +1,8 @@
 import re
 
-from django.conf import settings
 from playwright.sync_api import expect
+
+from django_app.config import settings
 
 from .. import conftest
 
