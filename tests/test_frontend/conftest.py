@@ -468,3 +468,43 @@ def patched_verify_code(monkeypatch):
     mock_objects.filter.return_value.latest.return_value = patched_email_verification_obj
 
     monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification.objects", mock_objects)
+
+
+# @pytest.fixture(scope="session")
+# def browser():
+#     os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+#     playwright = sync_playwright().start()
+#     browser_instance = playwright.firefox.launch(headless=settings.HEADLESS)
+#
+#     yield browser_instance
+#
+#     browser_instance.close()
+#     playwright.stop()
+#
+# @pytest.fixture(scope="function")
+# def page(browser):
+#     if settings.SAVE_VIDEOS:
+#         page_instance = browser.new_page(record_video_dir="video-test-results/")
+#     else:
+#         page_instance = browser.new_page()
+#
+#     yield page_instance
+#     page_instance.close()
+#
+# @pytest.fixture(scope="function", autouse=True)
+# def reset_sites(live_server):
+#     first_site = Site.objects.first()
+#     original_port = first_site.domain.split(":")[-1] if first_site else None
+#
+#     Site.objects.all().delete()
+#     yield
+#
+#     # recreating with the new port
+#     Site.objects.create(
+#         name=SiteName.report_a_suspected_breach,
+#         domain=f"{SiteName.report_a_suspected_breach}:{original_port}",
+#     )
+#     Site.objects.create(
+#         name=SiteName.view_a_suspected_breach,
+#         domain=f"{SiteName.view_a_suspected_breach}:{original_port}",
+#     )
