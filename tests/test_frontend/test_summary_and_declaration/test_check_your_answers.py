@@ -325,8 +325,9 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
 
     def test_can_change_location_of_end_user(self):
         self.page.goto(self.base_url)
-        breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
-        self.create_breach(self.page, breach_details_owner)
+        breach = breach_details_owner.copy()
+        breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.create_breach(self.page, breach)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="The supply chain", exact=True).click()
         self.page.get_by_role("heading", name="End-user 1").click()
@@ -349,8 +350,9 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
 
     def test_can_change_name_and_address_of_end_user(self):
         self.page.goto(self.base_url)
-        breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
-        self.create_breach(self.page, breach_details_owner)
+        breach = breach_details_owner.copy()
+        breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.create_breach(self.page, breach)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="The supply chain", exact=True).click()
         self.page.get_by_role("heading", name="End-user 1").click()
@@ -372,8 +374,9 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
 
     def test_can_add_another_end_user(self):
         self.page.goto(self.base_url)
-        breach_details_owner["end_users"] = ["end_user1", "end_user2", "end_user3"]
-        self.create_breach(self.page, breach_details_owner)
+        breach = breach_details_owner.copy()
+        breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.create_breach(self.page, breach)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="The supply chain", exact=True).click()
         self.page.get_by_role("link", name="Add another end-user end-user").click()
