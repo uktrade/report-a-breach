@@ -126,7 +126,7 @@ class TestAboutTheSupplierUKAddress(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(r".*/supplier-details/"))
 
     def test_incorrect_uk_postcode_returns_error(self):
-        supplier_address = data.UK_SUPPLIER_ADDRESS_DETAILS
+        supplier_address = data.UK_SUPPLIER_ADDRESS_DETAILS.copy()
         supplier_address["postcode"] = "AA"
         self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Your details").click()

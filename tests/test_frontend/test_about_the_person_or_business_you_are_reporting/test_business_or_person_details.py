@@ -45,7 +45,7 @@ class TestAboutThePersonOrBusinessUKAddress(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Reset session").click()
 
     def test_incorrect_uk_postcode_returns_error(self):
-        breacher_address = data.UK_BREACHER_ADDRESS_DETAILS
+        breacher_address = data.UK_BREACHER_ADDRESS_DETAILS.copy()
         breacher_address["postcode"] = "AA"
         self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Your details").click()

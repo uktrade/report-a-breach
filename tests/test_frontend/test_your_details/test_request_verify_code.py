@@ -2,8 +2,6 @@ import re
 
 from playwright.sync_api import expect
 
-from django_app.config import settings
-
 from .. import conftest
 
 CORRECT_CODE_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
@@ -27,7 +25,6 @@ class TestRequestVerifyCode(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Not received an email or code not working").click()
         self.page.get_by_text("Still having issues?").click()
         self.page.get_by_text("If you're still having").click()
-        self.page.get_by_role("link", name=settings.OTSI_EMAIL)
         self.page.get_by_role("link", name="Reset session").click()
 
     def test_request_verify_incorrect_code_raises_error(self):
