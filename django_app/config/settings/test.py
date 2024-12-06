@@ -72,7 +72,6 @@ def test_process_email_step(self, form: Form) -> dict[str, Any]:
         reporter_session=user_session,
         email_verification_code=verify_code,
     )
-    print(verify_code)
     return self.get_form_step_data(form)
 
 
@@ -85,7 +84,6 @@ def test_request_verify_code(self, form: Form) -> HttpResponse:
 
     verify_code = "012345"
     user_session = Session.objects.get(session_key=self.request.session.session_key)
-    print(user_session)
     ReporterEmailVerification.objects.create(
         reporter_session=user_session,
         email_verification_code=verify_code,
