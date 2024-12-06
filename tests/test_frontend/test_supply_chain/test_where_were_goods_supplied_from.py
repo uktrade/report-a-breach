@@ -12,6 +12,7 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
 
     def test_no_input_returns_error(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -32,6 +33,7 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
 
     def test_uk_options_returns_uk_address_capture(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -48,6 +50,7 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
 
     def test_non_uk_options_returns_non_uk_address_capture(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -65,6 +68,7 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
 
     def test_i_do_not_know_returns_supplied_to(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -79,6 +83,7 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
 
     def test_not_supplied_yet_returns_made_available_from(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -93,6 +98,7 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
 
     def test_breacher_is_supplier_returns_supplied_to(self):
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()

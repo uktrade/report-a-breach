@@ -84,7 +84,6 @@ class EmailVerifyForm(BaseForm):
         )
         verify_code = verification_object.email_verification_code
         if email_verification_code != verify_code:
-            print(verify_code)
             raise forms.ValidationError(self.fields["email_verification_code"].error_messages["invalid"], code="invalid")
 
         # check if the user has submitted the verify code within the specified timeframe

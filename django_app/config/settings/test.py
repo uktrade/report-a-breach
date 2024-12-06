@@ -63,15 +63,25 @@ CACHES = {"default": {"BACKEND": "config.settings.test.TestingCache"}}
 
 def test_process_email_step(self, form: Form) -> dict[str, Any]:
     """Monkey-patching the process_email_step of the journey to always use the same verify code for testing."""
+    import logging
+
     from django.contrib.sessions.models import Session
     from report_a_suspected_breach.models import ReporterEmailVerification
 
+    logger = logging.getLogger(__name__)
+
+    reporter_email_address = self.request.session["reporter_email_address"]
+
     verify_code = "012345"
     user_session = Session.objects.get(session_key=self.request.session.session_key)
+    if getattr(self.request, "limited", False):
+        logger.warning(f"User has been rate-limited: {reporter_email_address}")
+        return self.form_invalid(form)
     ReporterEmailVerification.objects.create(
         reporter_session=user_session,
         email_verification_code=verify_code,
     )
+    print(verify_code)
     return self.get_form_step_data(form)
 
 
