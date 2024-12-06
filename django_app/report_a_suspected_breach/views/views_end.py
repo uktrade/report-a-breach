@@ -14,6 +14,7 @@ from report_a_suspected_breach.models import Breach
 from report_a_suspected_breach.utils import (
     get_all_cleaned_data,
     get_cleaned_data_for_step,
+    get_form,
 )
 from utils.breach_report import get_breach_context_data
 from utils.notifier import send_email
@@ -34,8 +35,8 @@ class CheckYourAnswersView(BaseTemplateView):
         context = super().get_context_data(**kwargs)
 
         all_cleaned_data = get_all_cleaned_data(self.request)
-
         context["form_data"] = all_cleaned_data
+        context["start_form"] = get_form(self.request, "start")
         context["is_company_obtained_from_companies_house"] = show_check_company_details_page_condition(self.request)
         context["is_third_party_relationship"] = show_name_and_business_you_work_for_page(self.request)
         context["is_made_available_journey"] = self.request.session.get("made_available_journey")

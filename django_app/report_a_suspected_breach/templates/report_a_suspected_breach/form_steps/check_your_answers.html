@@ -32,6 +32,19 @@
                 {% endif %}
             </dd>
         </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Professional relationship with the business or person being reported
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{  start_form.instance.get_reporter_professional_relationship_display }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% url 'report_a_suspected_breach:start' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                    class="govuk-visually-hidden">your professional relationship</span></a>
+            </dd>
+        </div>
         {% if is_third_party_relationship %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">

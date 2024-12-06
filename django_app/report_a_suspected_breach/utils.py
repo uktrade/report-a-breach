@@ -30,3 +30,15 @@ def get_all_cleaned_data(request: HttpRequest) -> dict:
         all_cleaned_data[step_name] = get_cleaned_data_for_step(request, step_name)
 
     return all_cleaned_data
+
+
+def get_form(request: HttpRequest, step_name: str) -> dict:
+    from report_a_suspected_breach.urls import step_to_view_dict
+
+    view_class = step_to_view_dict[step_name]
+    form_class = view_class.form_class
+    form = form_class(get_dirty_form_data(request, step_name), request=request)
+    if form.is_valid():
+        return form
+    else:
+        return {}
