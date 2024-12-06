@@ -49,8 +49,9 @@ class EmailVerifyView(BaseFormView):
             return reverse_lazy("report_a_suspected_breach:name")
 
     def form_valid(self, form: forms.EmailVerifyForm) -> HttpResponse:
-        form.verification_object.verified = True
-        form.verification_object.save()
+        reporter_email = form.cleaned_data["email"]
+        self.request.session["reporter_email_address"] = reporter_email
+        verify_email(reporter_email, self.request)
         return super().form_valid(form)
 
     def form_invalid(self, form: forms.EmailVerifyForm) -> HttpResponse:

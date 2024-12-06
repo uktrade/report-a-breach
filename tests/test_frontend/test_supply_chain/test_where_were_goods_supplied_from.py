@@ -11,7 +11,7 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
     """
 
     def test_no_input_returns_error(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -26,13 +26,13 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         expect(
             self.page.get_by_role(
                 "link",
-                name="Select if the goods, services, technological assistance or technology were supplied from",
+                name="Select where the goods, services, technological assistance or technology were supplied from",
             )
         ).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_from"))
+        expect(self.page).to_have_url(re.compile(r".*/location-where-supplied-from"))
 
     def test_uk_options_returns_uk_address_capture(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -44,12 +44,12 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Where were the goods,").click()
         self.page.get_by_label("The UK", exact=True).check()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/about_the_supplier"))
+        expect(self.page).to_have_url(re.compile(r".*/supplier-details"))
         expect(self.page.get_by_label("Postcode")).to_be_visible()
         expect(self.page.get_by_label("County (optional)")).to_be_visible()
 
     def test_non_uk_options_returns_non_uk_address_capture(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -61,13 +61,13 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Where were the goods,").click()
         self.page.get_by_label("Outside the UK").check()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/about_the_supplier"))
+        expect(self.page).to_have_url(re.compile(r".*/supplier-details"))
         expect(self.page.get_by_label("Address line 3 (optional)")).to_be_visible()
         expect(self.page.get_by_label("Address line 4 (optional)")).to_be_visible()
         expect(self.page.get_by_label("Country")).to_be_visible()
 
     def test_i_do_not_know_returns_supplied_to(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -79,10 +79,10 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Where were the goods,").click()
         self.page.get_by_label("I do not know").check()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to"))
+        expect(self.page).to_have_url(re.compile(r".*/location-of-end-user"))
 
-    def test_not_supplied_yet_returns_made_available_to(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+    def test_not_supplied_yet_returns_made_available_from(self):
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -94,10 +94,10 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Where were the goods,").click()
         self.page.get_by_label("They have not been supplied yet").check()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_made_available_from"))
+        expect(self.page).to_have_url(re.compile(r".*/location-where-made-available-from"))
 
     def test_breacher_is_supplier_returns_supplied_to(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -109,4 +109,4 @@ class TestWhereWereTheGoodsSuppliedFrom(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Where were the goods,").click()
         self.page.get_by_label("Germany Lane, Germany Avenue, Germany Town, Germany").check()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to"))
+        expect(self.page).to_have_url(re.compile(r".*/location-of-end-user"))

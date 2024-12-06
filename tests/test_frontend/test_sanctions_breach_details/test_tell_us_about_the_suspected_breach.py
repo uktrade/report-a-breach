@@ -11,7 +11,7 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
     """
 
     def test_no_input_returns_error(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -27,16 +27,18 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_text("Give all addresses").click()
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/sanctions_breach_details"))
+        self.page.get_by_role("link", name="Sanctions breach details").click()
         self.upload_documents_page(self.page)
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_text("Give a summary of the breach", exact=True).click()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter a summary of the breach")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/tell_us_about_the_suspected_breach"))
+        expect(self.page).to_have_url(re.compile(r".*/summary-of-breach"))
 
     def test_correct_input_goes_to_summary(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
         self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
@@ -52,6 +54,8 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_text("Give all addresses").click()
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
+        expect(self.page).to_have_url(re.compile(r".*/sanctions_breach_details"))
+        self.page.get_by_role("link", name="Sanctions breach details").click()
         self.upload_documents_page(self.page)
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_text("Give a summary of the breach", exact=True).click()

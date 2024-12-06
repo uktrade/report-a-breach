@@ -7,11 +7,10 @@ class ReportBreachWebServiceConfig(AppConfig):
     name = "report_a_suspected_breach"
 
     def ready(self) -> None:
-
         if settings.ENVIRONMENT == "test":
             # if we're running on a test environment, we want to override the process_email_step method, so we always use the same
             # code for testing and don't send any emails
-            from config.settings.test import test_request_verify_form_valid
+            from config.settings.test import test_request_verify_code
             from report_a_suspected_breach.views.views_start import EmailVerifyView
 
-            EmailVerifyView.form_valid = test_request_verify_form_valid
+            EmailVerifyView.form_valid = test_request_verify_code
