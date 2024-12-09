@@ -1,1 +1,0 @@
-default_app_config = "django_app.report_a_suspected_breach.apps.ReportBreachWebServiceConfig"

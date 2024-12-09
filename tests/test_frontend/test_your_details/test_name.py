@@ -10,8 +10,9 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
     Tests for name and business you work for page
     """
 
-    def test_correct_details_goes_to_taslkist_page(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+    def test_correct_details_goes_to_business_details_page(self):
+        self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -21,10 +22,11 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         self.page.get_by_label("Business you work for").click()
         self.page.get_by_label("Business you work for").fill("Business")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/are_you_reporting_a_business_on_companies_house"))
+        expect(self.page).to_have_url(re.compile(r".*/about_the_person_or_business"))
 
     def test_no_name_raises_error(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -34,10 +36,11 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_label("There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter your full name")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/name_and_business_you_work_for"))
+        expect(self.page).to_have_url(re.compile(r".*/your-details"))
 
     def test_no_business_raises_error(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -47,7 +50,7 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_label("There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter the name of the business you work for")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/name_and_business_you_work_for"))
+        expect(self.page).to_have_url(re.compile(r".*/your-details"))
 
 
 class TestName(conftest.PlaywrightTestBase):
@@ -56,7 +59,8 @@ class TestName(conftest.PlaywrightTestBase):
     """
 
     def test_correct_details_goes_to_taslkist_page(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I'm an owner, officer or")
         self.verify_email_details(self.page)
@@ -64,10 +68,11 @@ class TestName(conftest.PlaywrightTestBase):
         self.page.get_by_label("What is your full name?").click()
         self.page.get_by_label("What is your full name?").fill("John Smith")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/are_you_reporting_a_business_on_companies_house"))
+        expect(self.page).to_have_url(re.compile(r".*/about_the_person_or_business"))
 
     def test_no_name_raises_error(self):
-        self.page.goto("http://report-a-suspected-breach:8000/report_a_suspected_breach/")
+        self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I'm an owner, officer or")
         self.verify_email_details(self.page)
@@ -75,4 +80,4 @@ class TestName(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_label("There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter your full name")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/name"))
+        expect(self.page).to_have_url(re.compile(r".*/your-name"))

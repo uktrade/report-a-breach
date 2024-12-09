@@ -39,8 +39,7 @@ def send_email(email: str, context: dict[str, Any], template_id: str, reference:
     except HTTPError as err:
         # something has gone wrong, let's fail silently and report the error
         sentry_sdk.capture_exception(err)
-
-    return False
+        return False
 
 
 def get_context(extra_context: dict | None = None) -> dict[str, Any]:

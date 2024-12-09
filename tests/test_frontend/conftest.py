@@ -1,137 +1,168 @@
 import os
 import re
+import uuid
+from datetime import timedelta
+from unittest import mock
+from unittest.mock import MagicMock
 
+import notifications_python_client
 import pytest
+from core.sites import SiteName
 from django.conf import settings
-from django.test.testcases import TransactionTestCase
+from django.contrib.sessions.models import Session
+from django.contrib.sites.models import Site
+from django.test import override_settings
+from django.test.testcases import LiveServerTestCase
+from django.utils import timezone
 from playwright.sync_api import expect, sync_playwright
+from report_a_suspected_breach.models import ReporterEmailVerification
+from utils import notifier
 
 from . import data
 
 
-class PlaywrightTestBase(TransactionTestCase):
-    create_new_test_breach = True
-    base_url = settings.BASE_FRONTEND_TESTING_URL
+@override_settings(DEBUG=True)
+class PlaywrightTestBase(LiveServerTestCase):
+    """Base class for Playwright tests. Sets up the Playwright browser, page per test, and deals with the Site objects."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
         super().setUpClass()
+
+        # starting playwright stuff
         cls.playwright = sync_playwright().start()
-        cls.browser = cls.playwright.chromium.launch(headless=settings.HEADLESS)
+
+        cls.browser = cls.playwright.firefox.launch(headless=settings.HEADLESS)
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         cls.browser.close()
         cls.playwright.stop()
 
         super().tearDownClass()
 
     def setUp(self) -> None:
-        """Create a new page for each test"""
-        self.page = self.browser.new_page()
+        #  Create a new page for each test
+        if settings.SAVE_VIDEOS:
+            self.page = self.browser.new_page(record_video_dir="video-test-results/")
+        else:
+            self.page = self.browser.new_page()
+
+        # need to re-create the Site objects to match the new port of the live server,
+        # first we just need to get the original port
+        first_site = Site.objects.first()
+        self.original_port = first_site.domain.split(":")[-1]
+
+        # deleting
+        Site.objects.all().delete()
+
+        # recreating with the new port
+        Site.objects.create(
+            name=SiteName.report_a_suspected_breach,
+            domain=f"{SiteName.report_a_suspected_breach}:{self.server_thread.port}",
+        )
+        Site.objects.create(
+            name=SiteName.view_a_suspected_breach,
+            domain=f"{SiteName.view_a_suspected_breach}:{self.server_thread.port}",
+        )
 
     def tearDown(self) -> None:
-        """Close the page after each test"""
+        if settings.SAVE_VIDEOS:
+            # Rename the video in the test results directory, so it's readable
+            # 1231239190wei9cwice023r239230.webm -> video-test-results/ClassName-test_method.webm
+            old_name = self.page.video.path()
+            os.replace(old_name, settings.ROOT_DIR / f"video-test-results/{type(self).__name__}-{self._testMethodName}.webm")
+
+        # resetting the Site objects to their original state
+        Site.objects.all().delete()
+        Site.objects.create(
+            name=SiteName.report_a_suspected_breach,
+            domain=f"{SiteName.report_a_suspected_breach}:{self.original_port}",
+        )
+        Site.objects.create(
+            name=SiteName.view_a_suspected_breach,
+            domain=f"{SiteName.view_a_suspected_breach}:{self.original_port}",
+        )
+
+        # close the page
+        self.page.get_by_role("link", name="Reset session").click()
         self.page.close()
 
-    @classmethod
-    def get_form_step_page(cls, form_step):
-        return f"{cls.base_url}/report_a_suspected_breach/{form_step}/"
+    @property
+    def base_host(self) -> str:
+        return settings.REPORT_A_SUSPECTED_BREACH_DOMAIN.split(":")[0]
 
-    @classmethod
-    def email_details(cls, page, details=data.EMAIL_DETAILS):
-        page.get_by_label("What is your email address?").click()
+    @property
+    def base_url(self) -> str:
+        return f"http://{self.base_host}:{self.server_thread.port}"
+
+    def get_form_step_page(self, form_step):
+        return f"{self.base_url}/report/{form_step}"
+
+    @staticmethod
+    def email_details(page, details=data.EMAIL_DETAILS):
         page.get_by_label("What is your email address?").fill(details["email"])
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def verify_email(cls, page, details=data.EMAIL_DETAILS):
+    @staticmethod
+    def verify_email(page, details=data.EMAIL_DETAILS):
         page.get_by_role("heading", name="We've sent you an email").click()
         page.get_by_label("Enter the 6 digit security").fill(details["verify_code"])
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def verify_email_details(cls, page, details=data.EMAIL_DETAILS):
-        #
-        # Email page
-        #
-        page = cls.email_details(page, details)
-        #
-        # Verify page
-        #
-        page = cls.verify_email(page, details)
+    def verify_email_details(self, page):
+        self.email_details(page)
+        self.verify_email(page)
 
-        return page
-
-    @classmethod
-    def fill_uk_address_details(cls, page, details=data.UK_ADDRESS_DETAILS):
+    @staticmethod
+    def fill_uk_address_details(page, details=data.UK_ADDRESS_DETAILS):
         # UK Address Details Page
         page.get_by_label("Name of business or person").click()
         page.get_by_label("Name of business or person").fill(details["name"])
-        page.get_by_label("Name of business or person").press("Tab")
         page.get_by_label("Website address").fill(details["website"])
-        page.get_by_label("Website address").press("Tab")
         page.get_by_label("Address line 1").fill(details["address_line_1"])
-        page.get_by_label("Address line 1").press("Tab")
         page.get_by_label("Address line 2").fill(details["address_line_2"])
-        page.get_by_label("Address line 2").press("Tab")
         page.get_by_label("Town or city").fill(details["town"])
-        page.get_by_label("Town or city").press("Tab")
         page.get_by_label("County").fill(details["county"])
-        page.get_by_label("County").press("Tab")
         page.get_by_label("Postcode").fill(details["postcode"])
         page.get_by_role("button", name="Continue").click()
 
-        return page
-
-    @classmethod
-    def fill_non_uk_address_details(cls, page, details=data.NON_UK_ADDRESS_DETAILS):
+    @staticmethod
+    def fill_non_uk_address_details(page, details=data.NON_UK_ADDRESS_DETAILS):
         # NON UK Address Details Page
         page.get_by_label("Name of business or person").click()
         page.get_by_label("Name of business or person").fill(details["name"])
-        page.get_by_label("Name of business or person").press("Tab")
         page.get_by_label("Website address").fill(details["website"])
-        page.get_by_label("Website address").press("Tab")
         page.get_by_label("Country").select_option(details["country"])
-        page.get_by_label("Country").press("Tab")
         page.get_by_label("Address line 1").fill(details["address_line_1"])
-        page.get_by_label("Address line 1").press("Tab")
         page.get_by_label("Address line 2").fill(details["address_line_2"])
-        page.get_by_label("Address line 2").press("Tab")
         page.get_by_label("Address line 3").fill(details["address_line_3"])
-        page.get_by_label("Address line 3").press("Tab")
         page.get_by_label("Address line 4").fill(details["address_line_4"])
-        page.get_by_label("Address line 4").press("Tab")
         page.get_by_label("Town or city").fill(details["town"])
-        page.get_by_label("Town or city").press("Tab")
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def declaration_and_complete_page(cls, page):
+    @staticmethod
+    def declaration_and_complete_page(page):
         #
         # Declaration Page
         #
         page.get_by_role("heading", name="Declaration").click()
         page.get_by_label("I agree and accept").check()
-        page.get_by_role("button", name="Continue").click()
+        page.get_by_role("button", name="Submit").click()
         #
         # Complete Page
         #
         page.get_by_role("heading", name="Submission complete").click()
         page.get_by_text("Your reference number").click()
         page.get_by_role("heading", name="What happens next").click()
-        page.get_by_text("We have sent you a").click()
-        page.get_by_role("link", name="View and print your report").click()
+        page.get_by_text("We've sent a confirmation").click()
+        page.get_by_role("link", name="View and print your report")
         page.get_by_text("What did you think of this service? (takes 30 seconds)").click()
         page.get_by_role("link", name="What did you think of this").click()
-        return page
 
-    @classmethod
-    def upload_documents_page(cls, page, files=data.FILES):
+    @staticmethod
+    def upload_documents_page(page, files=data.FILES):
         #
         # Upload Documents Page
         #
@@ -140,20 +171,18 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_text("Drag and drop files here or").click()
         page.get_by_text("Choose files").click()
         page.get_by_label("Upload a file").set_input_files(files)
-        return page
 
-    @classmethod
-    def reporter_professional_relationship(cls, page, reporter_professional_relationship):
+    @staticmethod
+    def reporter_professional_relationship(page, reporter_professional_relationship):
         #
         # Start page
         #
         page.get_by_role("heading", name="What is your professional").click()
         page.get_by_label(reporter_professional_relationship).check()
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_companies_house_details(cls, page):
+    @staticmethod
+    def create_companies_house_details(page):
         page.get_by_role("heading", name="Are you reporting a business").click()
         page.get_by_label("Yes").check()
         page.get_by_role("button", name="Continue").click()
@@ -168,14 +197,10 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_text("Registered company name").click()
         page.get_by_text("BOCIOC M LIMITED").click()
         page.get_by_text("Registered office address").click()
-        page.get_by_text("Avocet Close, CV23 0WU").click()
-        page.locator("dd").filter(has_text="Changeregistered company").click()
+        page.get_by_text("52 Avocet Close, Rugby, CV23 0WU").click()
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("heading", name="Task list").click()
-        return page
 
-    @classmethod
-    def create_uk_breacher(cls, page):
+    def create_uk_breacher(self, page):
         page.get_by_role("heading", name="Are you reporting a business").click()
         page.get_by_label("No", exact=True).check()
         page.get_by_role("button", name="Continue").click()
@@ -183,11 +208,9 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("In the UK").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="Business or person details").click()
-        page = cls.fill_uk_address_details(page, details=data.UK_BREACHER_ADDRESS_DETAILS)
-        return page
+        self.fill_uk_address_details(page, details=data.UK_BREACHER_ADDRESS_DETAILS)
 
-    @classmethod
-    def create_non_uk_breacher(cls, page):
+    def create_non_uk_breacher(self, page):
         page.get_by_role("heading", name="Are you reporting a business").click()
         page.get_by_label("No", exact=True).check()
         page.get_by_role("button", name="Continue").click()
@@ -195,11 +218,10 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Outside the UK").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="Business or person details").click()
-        page = cls.fill_non_uk_address_details(page, details=data.NON_UK_BREACHER_ADDRESS_DETAILS)
-        return page
+        self.fill_non_uk_address_details(page, details=data.NON_UK_BREACHER_ADDRESS_DETAILS)
 
-    @classmethod
-    def create_suspected_data(cls, page, exact):
+    @staticmethod
+    def create_suspected_data(page, exact):
         page.get_by_role("heading", name="Date you first suspected the").click()
         page.get_by_role("heading", name="Enter the exact date or an").click()
         page.get_by_label("Day").click()
@@ -216,8 +238,8 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_role("button", name="Continue").click()
         return page
 
-    @classmethod
-    def create_sanctions(cls, page, sanctions):
+    @staticmethod
+    def create_sanctions(page, sanctions):
         page.get_by_role("heading", name="Which sanctions regimes do").click()
         page.get_by_text("Select all that apply").click()
         for sanction in sanctions:
@@ -225,55 +247,46 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_role("button", name="Continue").click()
         return page
 
-    @classmethod
-    def overview_of_breach(cls, page, exact=True, sanctions=data.SANCTIONS):
-        page = cls.create_suspected_data(page, exact)
-        page = cls.create_sanctions(page, sanctions)
+    def overview_of_breach(self, page, exact=True, sanctions=data.SANCTIONS):
+        self.create_suspected_data(page, exact)
+        self.create_sanctions(page, sanctions)
         page.get_by_label("What were the goods or").click()
         page.get_by_label("What were the goods or").fill("Accountancy goods")
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_uk_supplier(cls, page, details=data.UK_SUPPLIER_ADDRESS_DETAILS):
+    def create_uk_supplier(self, page, details=data.UK_SUPPLIER_ADDRESS_DETAILS):
         # Where Were the Goods Supplied From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="About the supplier").click()
-        page = cls.fill_uk_address_details(page, details=details)
+        self.fill_uk_address_details(page, details=details)
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_non_uk_supplier(cls, page, details=data.NON_UK_SUPPLIER_ADDRESS_DETAILS):
+    def create_non_uk_supplier(self, page, details=data.NON_UK_SUPPLIER_ADDRESS_DETAILS):
         # Where Were the Goods Supplied From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("Outside the UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="About the supplier").click()
-        page = cls.fill_non_uk_address_details(page, details=details)
+        self.fill_non_uk_address_details(page, details=details)
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_breacher_as_supplier(cls, page, breacher_address):
+    @staticmethod
+    def create_breacher_as_supplier(page, breacher_address):
         # Where Were the Goods Supplied From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label(breacher_address).check()
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_unknown_supplier(cls, page):
+    @staticmethod
+    def create_unknown_supplier(page):
         # Where Were the Goods Supplied From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("I do not know", exact=True).check()
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_uk_made_available_supplier(cls, page, details=data.UK_SUPPLIER_ADDRESS_DETAILS):
+    def create_uk_made_available_supplier(self, page, details=data.UK_SUPPLIER_ADDRESS_DETAILS):
         # Where Were the Goods Made Available From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("They have not been supplied").check()
@@ -281,12 +294,10 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="About the supplier").click()
-        page = cls.fill_uk_address_details(page, details=details)
+        self.fill_uk_address_details(page, details=details)
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_non_uk_made_available_supplier(cls, page, details=data.NON_UK_SUPPLIER_ADDRESS_DETAILS):
+    def create_non_uk_made_available_supplier(self, page, details=data.NON_UK_SUPPLIER_ADDRESS_DETAILS):
         # Where Were the Goods Made Available From Page
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_label("They have not been supplied").check()
@@ -294,19 +305,18 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_label("Outside the UK").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="About the supplier").click()
-        page = cls.fill_non_uk_address_details(page, details=details)
+        self.fill_non_uk_address_details(page, details=details)
         page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def no_end_users(cls, page):
-        page.get_by_role("heading", name="Where were the goods,").click()
+    @staticmethod
+    def no_end_users(page):
+        page.get_by_role("heading", name="Where were the goods").click()
         page.get_by_text("This is the address of the").click()
         page.get_by_label("I do not know", exact=True).check()
         page.get_by_role("button", name="Continue").click()
 
-    @classmethod
-    def create_end_user(cls, page, end_user_details):
+    @staticmethod
+    def create_end_user(page, end_user_details):
         # Where were the goods supplied to (end user page)
         page.get_by_role("heading", name="Where were the goods,").click()
         page.get_by_text("This is the address of the").click()
@@ -314,7 +324,7 @@ class PlaywrightTestBase(TransactionTestCase):
         page.get_by_role("button", name="Continue").click()
 
         # About the End User
-        page.get_by_role("heading", name="About the end-user").click()
+        page.get_by_role("heading", name="End-user").click()
         page.get_by_role("heading", name="Name and digital contact").click()
         page.get_by_label("Name of person (optional)").fill(end_user_details["name"])
         page.get_by_label("Name of business (optional)").fill(end_user_details["business"])
@@ -335,15 +345,13 @@ class PlaywrightTestBase(TransactionTestCase):
 
         return page
 
-    @classmethod
-    def create_reporter_details(cls, page, relationship):
+    def create_reporter_details(self, page, relationship):
         # Start page
-        page = cls.reporter_professional_relationship(page, relationship)
+        self.reporter_professional_relationship(page, relationship)
         # Email Verify
-        page = cls.verify_email_details(page)
+        self.verify_email_details(page)
         # Name
         if relationship in ["I'm an owner", "I'm acting"]:
-            page.get_by_label("What is your full name?").click()
             page.get_by_label("What is your full name?").fill("John Smith")
             page.get_by_role("button", name="Continue").click()
         elif relationship in ["I work for a third party", "No professional relationship"]:
@@ -353,59 +361,53 @@ class PlaywrightTestBase(TransactionTestCase):
             page.get_by_label("Business you work for").click()
             page.get_by_label("Business you work for").fill("DBT")
             page.get_by_role("button", name="Continue").click()
-        return page
 
-    @classmethod
-    def create_breach(cls, breach_details):
-        new_browser = cls.playwright.chromium.launch(headless=True)
-        context = new_browser.new_context()
-        page = context.new_page()
-        page.goto(cls.base_url)
+    def create_breach(self, page, breach_details):
         page.get_by_role("link", name="Reset session").click()
 
         # Tasklist
-        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="Your details").click()
 
         # 1. Your Details
-        page = cls.create_reporter_details(page, breach_details["reporter_relationship"])
+        self.create_reporter_details(page, breach_details["reporter_relationship"])
 
         # Tasklist
-        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="2. About the person or").click()
 
         # 2. About the person or business you're reporting
 
         if breach_details["breacher_location"] == "uk":
-            page = cls.create_uk_breacher(page)
+            self.create_uk_breacher(page)
         elif breach_details["breacher_location"] == "non_uk":
-            page = cls.create_non_uk_breacher(page)
+            self.create_non_uk_breacher(page)
         elif breach_details["breacher_location"] == "companies_house":
-            page = cls.create_companies_house_details(page)
+            self.create_companies_house_details(page)
         # Tasklist
-        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="Overview of the suspected breach").click()
 
         # 3. Overview of the suspected breach
-        page = cls.overview_of_breach(page, breach_details["exact_date"], breach_details["sanctions"])
+        self.overview_of_breach(page, breach_details["exact_date"], breach_details["sanctions"])
 
         # Tasklist
-        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="The supply chain").click()
 
         if breach_details["supplier_location"] == "uk":
-            page = cls.create_uk_supplier(page)
+            self.create_uk_supplier(page)
         elif breach_details["supplier_location"] == "non_uk":
-            page = cls.create_non_uk_supplier(page)
+            self.create_non_uk_supplier(page)
 
-        expect(page).to_have_url(re.compile(r".*/where_were_the_goods_supplied_to/.*"))
+        expect(page).to_have_url(re.compile(r".*/location-of-end-user"))
         if breach_details.get("end_users", False):
             for end_user in breach_details["end_users"][:-1]:
-                page = cls.create_end_user(page, end_user_details=data.END_USERS[end_user])
+                self.create_end_user(page, end_user_details=data.END_USERS[end_user])
                 # Add more End User
                 page.get_by_label("Yes").check()
                 page.get_by_role("button", name="Continue").click()
-            page = cls.create_end_user(page, end_user_details=data.END_USERS[breach_details["end_users"][-1]])
+            self.create_end_user(page, end_user_details=data.END_USERS[breach_details["end_users"][-1]])
 
         # Do not add another End User
         page.get_by_label("No").check()
@@ -421,7 +423,8 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Upload Documents Page
         #
-        page = cls.upload_documents_page(page)
+        self.page.get_by_role("link", name="Sanctions breach details").click()
+        self.upload_documents_page(page)
         page.get_by_role("button", name="Continue").click()
 
         #
@@ -436,12 +439,32 @@ class PlaywrightTestBase(TransactionTestCase):
         #
         # Tasklist
         #
-        page.get_by_role("heading", name="Task list").click()
+        page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="Continue").click()
 
-        return page
+
+@pytest.fixture(autouse=True)
+def patched_send_email(monkeypatch):
+    """We don't want to send emails when running front-end tests"""
+    mock_notifications_api_client = mock.create_autospec(notifications_python_client.notifications.NotificationsAPIClient)
+    monkeypatch.setattr(notifier, "NotificationsAPIClient", mock_notifications_api_client)
 
 
-@pytest.fixture()
-def sample_upload_file():
-    return [{"name": "test.txt", "mimeType": "text/plain", "buffer": b"test"}]
+@pytest.fixture(autouse=True)
+def patched_verify_code(monkeypatch):
+    """Ensure the verify code is always the same for front end tests"""
+    verify_code = "012345"
+    test_session_key = uuid.uuid4()
+    expire_date = timezone.now() + timedelta(minutes=10)
+    user_session = Session.objects.create(session_key=test_session_key, expire_date=expire_date)
+    patched_email_verification_obj = ReporterEmailVerification.objects.create(
+        reporter_session=user_session,
+        email_verification_code=verify_code,
+    )
+
+    monkeypatch.setattr("utils.notifier.verify_email", patched_email_verification_obj)
+
+    mock_objects = MagicMock()
+    mock_objects.filter.return_value.latest.return_value = patched_email_verification_obj
+
+    monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification.objects", mock_objects)

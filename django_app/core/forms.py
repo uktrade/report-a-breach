@@ -26,11 +26,6 @@ class BaseForm(forms.Form):
     # the submit button text
     submit_button_text = "Continue"
 
-    class Media:
-        css = {
-            "all": ["form.css"],
-        }
-
     def __init__(self, *args: object, **kwargs: object) -> None:
         self.request = kwargs.pop("request", None)
         self.form_h1_header = kwargs.pop("form_h1_header", self.form_h1_header)
