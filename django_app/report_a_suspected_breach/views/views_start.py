@@ -49,7 +49,7 @@ class EmailVerifyView(BaseFormView):
             return reverse_lazy("report_a_suspected_breach:name")
 
     def form_valid(self, form: forms.EmailVerifyForm) -> HttpResponse:
-        reporter_email = form.cleaned_data["email"]
+        reporter_email = form.cleaned_data["reporter_email_address"]
         self.request.session["reporter_email_address"] = reporter_email
         verify_email(reporter_email, self.request)
         return super().form_valid(form)
