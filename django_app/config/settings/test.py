@@ -100,3 +100,6 @@ def test_request_verify_code(self, form: Form) -> HttpResponse:
     )
 
     return super(EmailVerifyView, self).form_valid(form)
+
+
+os.environ["AWS_ENDPOINT_URL"] = f"http://localhost:{env.localstack_port}"

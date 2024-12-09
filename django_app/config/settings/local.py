@@ -1,13 +1,17 @@
+import sys
+
 from .base import *  # noqa
 
 ENVIRONMENT = "local"
 
 # DJANGO DEBUG TOOLBAR
-INSTALLED_APPS += ["debug_toolbar"]
+ENABLE_DEBUG_TOOLBAR = DEBUG and "test" not in sys.argv
+if ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS += ["debug_toolbar"]
 
-MIDDLEWARE += [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-]
+    MIDDLEWARE += [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ]
 
 INTERNAL_IPS = [
     "127.0.0.1",
