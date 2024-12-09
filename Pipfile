@@ -39,6 +39,8 @@ certifi = "*"
 cryptography = "~=43.0.3"
 django-permissions-policy = "*"
 playwright = "~=1.47.0"
+ddtrace = "*"
+django-requestlogs = "*"
 
 [dev-packages]
 black = "~=24.3"
