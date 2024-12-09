@@ -15,11 +15,6 @@ class TestWhatIsYourEmailAddressView:
     def test_post(self, rasb_client):
         request_object = RequestFactory().get("/")
         request_object.session = rasb_client.session
-        request_session = Session.objects.get(session_key=request_object.session.session_key)
-        reporter_object = ReporterEmailVerification.objects.create(
-            reporter_session=request_session, email_verification_code="012345", verified=True
-        )
-        reporter_object.save()
         view = WhatIsYourEmailAddressView()
         view.setup(request_object)
         data = {"reporter_email_address": "test@123.com"}
