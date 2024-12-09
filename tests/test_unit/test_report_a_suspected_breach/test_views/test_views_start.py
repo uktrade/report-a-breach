@@ -20,7 +20,7 @@ class TestWhatIsYourEmailAddressView:
         data = {"reporter_email_address": "test@123.com"}
         response = view.post(request_object, data)
 
-        assert response.status_code == 200
+        assert response.context["form"].is_valid()
 
 
 class TestEmailVerifyCodeView:
