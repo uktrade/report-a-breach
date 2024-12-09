@@ -17,7 +17,6 @@ class TestWhatIsYourEmailAddressView:
         response = rasb_client.post(
             reverse("report_a_suspected_breach:email"),
             data={"reporter_email_address": "test@123.com"},
-            follow=True,
         )
         # view = WhatIsYourEmailAddressView()
         # view.setup(request_object)
