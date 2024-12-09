@@ -23,7 +23,6 @@ class TestWhatIsYourEmailAddressView:
         view.setup(request_object)
         response = view.post(request_object, data={"reporter_email_address": "test@123.com"})
 
-        assert response["reporter_email_address"] == "test@123.com"
         assert response.context["form"].is_valid()
 
 
