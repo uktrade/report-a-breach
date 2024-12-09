@@ -23,9 +23,8 @@ class TestWhatIsYourEmailAddressView:
             data=data,
         )
 
-        # response = view.post(request_object, data)
-        print(response)
-        assert response.context["form"].is_valid()
+        assert response.status_code == 302
+        assert response.url == reverse("report_a_suspected_breach:verify_email")
 
 
 class TestEmailVerifyCodeView:
