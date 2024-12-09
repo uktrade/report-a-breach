@@ -18,12 +18,12 @@ class TestWhatIsYourEmailAddressView:
         view = WhatIsYourEmailAddressView()
         view.setup(request_object)
         data = {"reporter_email_address": "test@123.com"}
-        # response = rasb_client.post(
-        #     reverse("report_a_suspected_breach:email"),
-        #     data={"reporter_email_address": "test@123.com"},
-        # )
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:email"),
+            data=data,
+        )
 
-        response = view.post(request_object, data)
+        # response = view.post(request_object, data)
         print(response)
         assert response.context["form"].is_valid()
 
