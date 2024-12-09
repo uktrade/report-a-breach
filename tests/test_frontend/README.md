@@ -6,8 +6,6 @@ To run the end-to-end tests for report a breach, start the django server using t
 To run end-to-end tests only:\
 `pipenv run pytest tests/test_frontend`\
 
-Currently, end-to-end test must be run as testfiles separately
-e.g. `pipenv run pytest tests/test_frontend/test_supply_chain/test_about_the_supplier` as there are some issues when they are run as a full test-suite.
 
 ## Test structure
 Tests are currently organised in folders corresponding to the sections of the tasklist. Within each folder, each view/form wizard step of report-a-suspected-breach will have it's own testfile.
