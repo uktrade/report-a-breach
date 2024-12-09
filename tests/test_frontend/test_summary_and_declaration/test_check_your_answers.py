@@ -1,5 +1,6 @@
 import re
 
+from django.urls import reverse
 from playwright.sync_api import expect
 
 from .. import conftest, data
@@ -128,6 +129,18 @@ class TestCheckYourAnswersPersonOrBusinessYouAreReporting(conftest.PlaywrightTes
         expect(self.page.get_by_text("Breach Lane, Breach Avenue, Another Town, United Kingdom")).to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
+
+    def test_breacher_details_uk_non_uk_url_creation(self):
+        """tests that the correct url is created based on the breacher location"""
+        self.page.goto(self.base_url)
+        self.create_breach(self.page, breach_details_third_party)
+        self.page.get_by_role("link", name="Change person or business website").click()
+        assert reverse("report_a_suspected_breach:business_or_person_details", kwargs={"is_uk_address": "False"}) in self.page.url
+
+        self.page.goto(self.base_url)
+        self.create_breach(self.page, breach_details_owner)
+        self.page.get_by_role("link", name="Change person or business website").click()
+        assert reverse("report_a_suspected_breach:business_or_person_details", kwargs={"is_uk_address": "True"}) in self.page.url
 
     def test_can_change_non_uk_breacher_details(self):
         self.page.goto(self.base_url)

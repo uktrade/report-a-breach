@@ -169,8 +169,8 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_role("heading", name="Upload documents (optional)").click()
         page.get_by_text("You can upload items such as").click()
         page.get_by_text("Drag and drop files here or").click()
-        page.get_by_text("Choose files").click()
-        page.get_by_label("Upload a file").set_input_files(files)
+        # page.get_by_label("Upload a file").set_input_files(files)
+        page.get_by_role("button", name="Continue").click()
 
     @staticmethod
     def reporter_professional_relationship(page, reporter_professional_relationship):
