@@ -31,8 +31,11 @@ def turn_companies_house_into_normal_address_dict(address_dict: Dict[str, Any]) 
         # companies house doesn't always return a country, so we just assume GB if it's missing
         new_address_dict["country"] = "GB"
 
-    # companies house uses locality for town_or_city
-    new_address_dict["town_or_city"] = address_dict["locality"]
+    # companies house uses locality for town_or_city (only sometimes though...)
+    try:
+        new_address_dict["town_or_city"] = address_dict["locality"]
+    except KeyError:
+        pass
 
     return new_address_dict
 
