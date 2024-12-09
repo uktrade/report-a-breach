@@ -5,23 +5,26 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.test import RequestFactory
 from django.urls import reverse
 from report_a_suspected_breach.models import ReporterEmailVerification, Session
-from report_a_suspected_breach.views.views_start import (  # WhatIsYourEmailAddressView,
+from report_a_suspected_breach.views.views_start import (
     EmailVerifyView,
+    WhatIsYourEmailAddressView,
 )
 
 
 class TestWhatIsYourEmailAddressView:
     def test_post(self, rasb_client):
-        # request_object = RequestFactory().get("/")
-        # request_object.session = rasb_client.session
-        response = rasb_client.post(
-            reverse("report_a_suspected_breach:email"),
-            data={"reporter_email_address": "test@123.com"},
-        )
-        # view = WhatIsYourEmailAddressView()
-        # view.setup(request_object)
-        # response = view.post(request_object, data={"reporter_email_address": "test@123.com"})
+        request_object = RequestFactory().get("/")
+        request_object.session = rasb_client.session
+        view = WhatIsYourEmailAddressView()
+        view.setup(request_object)
+        data = {"reporter_email_address": "test@123.com"}
+        # response = rasb_client.post(
+        #     reverse("report_a_suspected_breach:email"),
+        #     data={"reporter_email_address": "test@123.com"},
+        # )
 
+        response = view.post(request_object, data)
+        print(response)
         assert response.context["form"].is_valid()
 
 
