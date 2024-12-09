@@ -33,7 +33,12 @@ class PlaywrightTestBase(LiveServerTestCase):
         # starting playwright stuff
         cls.playwright = sync_playwright().start()
 
-        cls.browser = cls.playwright.firefox.launch(headless=settings.HEADLESS)
+        # playwright on CirlceCI exhibits some tricky behaviour whereby the HEADLESS argument is passed as a string
+        # instead of a bool. CircleCI should always be headless anyway
+        if "CIRCLECI" in os.environ:
+            cls.browser = cls.playwright.firefox.launch(headless=True)
+        else:
+            cls.browser = cls.playwright.firefox.launch(headless=settings.HEADLESS)
 
     @classmethod
     def tearDownClass(cls) -> None:
