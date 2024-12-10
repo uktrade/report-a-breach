@@ -18,6 +18,8 @@ from playwright.sync_api import expect, sync_playwright
 from report_a_suspected_breach.models import ReporterEmailVerification
 from utils import notifier
 
+from django_app.report_a_suspected_breach.exceptions import CompaniesHouseException
+
 from . import data
 
 
@@ -507,6 +509,6 @@ def patched_get_details_from_companies_house(monkeypatch):
             return other_company_details
 
         else:
-            raise KeyError(test_str)
+            raise CompaniesHouseException("Companies House API request failed: 400")
 
     monkeypatch.setattr("utils.companies_house.get_details_from_companies_house", mock_get_details_from_companies_house)

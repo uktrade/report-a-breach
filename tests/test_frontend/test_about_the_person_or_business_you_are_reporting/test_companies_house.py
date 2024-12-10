@@ -131,7 +131,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Do you know the registered").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_label("Registered company number").click()
-        self.page.get_by_label("Registered company number").fill("12345678")
+        self.page.get_by_label("Registered company number").fill("00000001")
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/check-company-details"))
 
