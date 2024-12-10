@@ -71,6 +71,6 @@ class TestCheckCompanyDetails(conftest.PlaywrightTestBase):
         self.page.get_by_text("Registered company name").click()
         self.page.get_by_text("BISSOT PROPERTY MANAGEMENT LTD").click()
         self.page.get_by_text("Registered office address").click()
-        self.page.get_by_text("20-22 Wenlock Road, London").click()
+        self.page.get_by_text("20-22 Wenlock Road, N1 7GU, London").click()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/overview_of_the_suspected_breach/"))

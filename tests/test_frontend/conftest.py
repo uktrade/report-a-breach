@@ -496,7 +496,7 @@ def patched_get_details_from_companies_house(monkeypatch):
             "registered_office_address": {
                 "address_line_1": "20-22 Wenlock Road",
                 "locality": "London",
-                "postal_code": "CV23 0WU",
+                "postal_code": "N1 7GU",
                 "country": "England",
             },
         }
