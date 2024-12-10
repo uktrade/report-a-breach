@@ -195,7 +195,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_role("heading", name="Do you know the registered").click()
         page.get_by_label("Yes").check()
         page.get_by_label("Registered company number").click()
-        page.get_by_label("Registered company number").fill("12345678")
+        page.get_by_label("Registered company number").fill("00000001")
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="Check company details").click()
         page.get_by_text("Registered company number", exact=True).click()
