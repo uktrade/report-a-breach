@@ -93,7 +93,6 @@ class PlaywrightTestBase(LiveServerTestCase):
         )
 
         # close the page
-        # self.page.get_by_role("link", name="Reset session").click()
         self.page.close()
 
     @property
