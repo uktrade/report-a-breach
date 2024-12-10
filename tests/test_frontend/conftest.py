@@ -199,7 +199,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="Check company details").click()
         page.get_by_text("Registered company number", exact=True).click()
-        page.get_by_text("12345678").click()
+        page.get_by_text("00000001").click()
         page.get_by_text("Registered company name").click()
         page.get_by_text("BOCIOC M LIMITED").click()
         page.get_by_text("Registered office address").click()
