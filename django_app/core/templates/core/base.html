@@ -11,6 +11,7 @@
             <script
                 src="{% static 'core/javascript/sentry.min.js' %}"
                 data-lazy="no"
+                nonce="{{ request.csp_nonce }}"
             ></script>
             <script nonce="{{ request.csp_nonce }}">
                 Sentry.init({
