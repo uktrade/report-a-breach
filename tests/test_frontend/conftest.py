@@ -473,3 +473,40 @@ def patched_verify_code(monkeypatch):
     mock_objects.filter.return_value.latest.return_value = patched_email_verification_obj
 
     monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification.objects", mock_objects)
+
+
+@pytest.fixture(autouse=True)
+def patched_get_details_from_companies_house(monkeypatch):
+    def mock_get_details_from_companies_house(test_str):
+        test_company_details = {
+            "company_number": "00000001",
+            "company_name": "BOCIOC M LIMITED",
+            "registered_office_address": {
+                "address_line_1": "52 Avocet Close",
+                "locality": "Rugby",
+                "postal_code": "CV23 0WU",
+                "country": "England",
+            },
+        }
+
+        other_company_details = {
+            "company_number": "00000002",
+            "company_name": "BISSOT PROPERTY MANAGEMENT LTD",
+            "registered_office_address": {
+                "address_line_1": "20-22 Wenlock Road",
+                "locality": "London",
+                "postal_code": "CV23 0WU",
+                "country": "England",
+            },
+        }
+
+        if test_str == test_company_details["company_number"]:
+            return test_company_details
+
+        elif test_str == other_company_details["company_number"]:
+            return other_company_details
+
+        else:
+            raise KeyError(test_str)
+
+    monkeypatch.setattr("utils.companies_house.get_details_from_companies_house", mock_get_details_from_companies_house)
