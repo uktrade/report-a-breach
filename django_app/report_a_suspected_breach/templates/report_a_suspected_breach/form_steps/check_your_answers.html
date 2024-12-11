@@ -148,7 +148,7 @@
                             class="govuk-visually-hidden">person or business address</span></a>
                     {% else %}
                         <a class="govuk-link"
-                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=True %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=False %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                             class="govuk-visually-hidden">person or business address</span></a>
                     {% endif %}
                 {% endif %}
