@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from .. import conftest
+from .. import conftest, data
 
 
 class TestUploadDocuments(conftest.PlaywrightTestBase):
@@ -32,7 +32,6 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Upload documents (optional)").click()
         self.page.get_by_text("You can upload items such as").click()
         self.page.get_by_text("Drag and drop files here or").click()
-        self.page.get_by_text("Choose files").click()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/summary-of-breach"))
 
@@ -54,7 +53,7 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_role("link", name="Sanctions breach details").click()
-        self.upload_documents_page(self.page, files=["./tests/test_frontend/testfiles/testfile.pdf"])
+        self.upload_documents_page(self.page)
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/summary-of-breach"))
 
@@ -76,7 +75,7 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_role("link", name="Sanctions breach details").click()
-        self.upload_documents_page(self.page, files=["./tests/test_frontend/testfiles/missing_filetype"])
+        self.upload_documents_page(self.page, files=data.MISSING_FILE_TYPE)
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("button", name="Continue")).to_be_visible()
         expect(self.page).to_have_url(re.compile(r".*/upload-documents"))
