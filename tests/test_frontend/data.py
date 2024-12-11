@@ -1,3 +1,5 @@
+import os
+
 from sanctions_regimes.report_a_breach import active_regimes
 
 EMAIL_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
@@ -68,8 +70,8 @@ NON_UK_SUPPLIER_ADDRESS_DETAILS = {
 
 SANCTIONS = [sanction["name"] for sanction in active_regimes]
 
-FILES = ["./tests/test_frontend/testfiles/testfile.pdf"]
-
+FILES = [os.path.join(os.path.dirname(__file__), "testfiles/testfile.pdf")]
+MISSING_FILE_TYPE = [os.path.join(os.path.dirname(__file__), "testfiles/missing_filetype")]
 
 END_USERS = {
     "end_user1": {

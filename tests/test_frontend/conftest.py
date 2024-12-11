@@ -18,6 +18,8 @@ from playwright.sync_api import expect, sync_playwright
 from report_a_suspected_breach.models import ReporterEmailVerification
 from utils import notifier
 
+from django_app.report_a_suspected_breach.exceptions import CompaniesHouseException
+
 from . import data
 
 
@@ -33,7 +35,12 @@ class PlaywrightTestBase(LiveServerTestCase):
         # starting playwright stuff
         cls.playwright = sync_playwright().start()
 
-        cls.browser = cls.playwright.firefox.launch(headless=settings.HEADLESS)
+        # playwright on CirlceCI exhibits some tricky behaviour whereby the HEADLESS argument is passed as a string
+        # instead of a bool. CircleCI should always be headless anyway
+        if "CIRCLECI" in os.environ:
+            cls.browser = cls.playwright.firefox.launch(headless=True)
+        else:
+            cls.browser = cls.playwright.firefox.launch(headless=settings.HEADLESS)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -86,7 +93,6 @@ class PlaywrightTestBase(LiveServerTestCase):
         )
 
         # close the page
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.close()
 
     @property
@@ -169,8 +175,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_role("heading", name="Upload documents (optional)").click()
         page.get_by_text("You can upload items such as").click()
         page.get_by_text("Drag and drop files here or").click()
-        page.get_by_text("Choose files").click()
-        page.get_by_label("Upload a file").set_input_files(files)
+        page.get_by_label("Choose files").set_input_files(files)
 
     @staticmethod
     def reporter_professional_relationship(page, reporter_professional_relationship):
@@ -189,15 +194,15 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_role("heading", name="Do you know the registered").click()
         page.get_by_label("Yes").check()
         page.get_by_label("Registered company number").click()
-        page.get_by_label("Registered company number").fill("12345678")
+        page.get_by_label("Registered company number").fill("00000001")
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("heading", name="Check company details").click()
         page.get_by_text("Registered company number", exact=True).click()
-        page.get_by_text("12345678").click()
+        page.get_by_text("00000001").click()
         page.get_by_text("Registered company name").click()
-        page.get_by_text("BOCIOC M LIMITED").click()
+        page.get_by_text("Test Company Name").click()
         page.get_by_text("Registered office address").click()
-        page.get_by_text("52 Avocet Close, Rugby, CV23 0WU").click()
+        page.get_by_text("52 Test St, Test City, CV12 3MD").click()
         page.get_by_role("button", name="Continue").click()
 
     def create_uk_breacher(self, page):
@@ -468,3 +473,40 @@ def patched_verify_code(monkeypatch):
     mock_objects.filter.return_value.latest.return_value = patched_email_verification_obj
 
     monkeypatch.setattr("report_a_suspected_breach.forms.forms_start.ReporterEmailVerification.objects", mock_objects)
+
+
+@pytest.fixture(autouse=True)
+def patched_get_details_from_companies_house(monkeypatch):
+    def mock_get_details_from_companies_house(test_str):
+        test_company_details = {
+            "company_number": "00000001",
+            "company_name": "Test Company Name",
+            "registered_office_address": {
+                "address_line_1": "52 Test St",
+                "locality": "Test City",
+                "postal_code": "CV12 3MD",
+                "country": "England",
+            },
+        }
+
+        other_company_details = {
+            "company_number": "00000002",
+            "company_name": "Other Company Name",
+            "registered_office_address": {
+                "address_line_1": "20-22 Test Road",
+                "locality": "Test town",
+                "postal_code": "EX11 2MD",
+                "country": "England",
+            },
+        }
+
+        if test_str == test_company_details["company_number"]:
+            return test_company_details
+
+        elif test_str == other_company_details["company_number"]:
+            return other_company_details
+
+        else:
+            raise CompaniesHouseException("Companies House API request failed: 400")
+
+    monkeypatch.setattr("utils.companies_house.get_details_from_companies_house", mock_get_details_from_companies_house)
