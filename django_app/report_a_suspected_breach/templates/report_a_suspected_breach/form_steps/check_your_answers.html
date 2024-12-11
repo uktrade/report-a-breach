@@ -92,9 +92,15 @@
             <dd class="govuk-summary-list__actions">
                 {% if is_company_obtained_from_companies_house %}
                 {% else %}
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">person or business name</span></a>
+                    {% if form_data.business_or_person_details.country == "GB" %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=True %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business name</span></a>
+                    {% else %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=False %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business name</span></a>
+                    {% endif %}
                 {% endif %}
             </dd>
         </div>
@@ -110,9 +116,15 @@
                         class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">person or business website</span></a>
+                    {% if form_data.business_or_person_details.country == "GB" %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=True %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business website</span></a>
+                    {% else %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=False %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business website</span></a>
+                    {% endif %}
                 </dd>
             </div>
         {% endif %}
@@ -130,9 +142,15 @@
             <dd class="govuk-summary-list__actions">
                 {% if is_company_obtained_from_companies_house %}
                 {% else %}
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">person or business address</span></a>
+                    {% if form_data.business_or_person_details.country == "GB" %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=True %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business address</span></a>
+                    {% else %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=False %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business address</span></a>
+                    {% endif %}
                 {% endif %}
             </dd>
         </div>

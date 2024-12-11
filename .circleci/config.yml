@@ -81,6 +81,7 @@ jobs:
             DATABASE_URI: "psql://postgres:password@127.0.0.1:5432/report_a_suspected_breach"
             AWS_DEFAULT_REGION: eu-west-2
             AWS_ENDPOINT_URL: http://localhost:4566
+            LOCALSTACK_PORT: 4566
             TEMPORARY_S3_BUCKET_NAME: temporary-document-bucket
             TEMPORARY_S3_BUCKET_ACCESS_KEY_ID: test
             TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY: test
