@@ -14,7 +14,11 @@ from django.contrib.sites.models import Site
 from django.test import override_settings
 from django.test.testcases import LiveServerTestCase
 from django.utils import timezone
+from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
 from playwright.sync_api import expect, sync_playwright
+from report_a_suspected_breach.forms.forms_documents_and_details import (
+    UploadDocumentsForm,
+)
 from report_a_suspected_breach.models import ReporterEmailVerification
 from utils import notifier
 
@@ -510,3 +514,16 @@ def patched_get_details_from_companies_house(monkeypatch):
             raise CompaniesHouseException("Companies House API request failed: 400")
 
     monkeypatch.setattr("utils.companies_house.get_details_from_companies_house", mock_get_details_from_companies_house)
+
+
+@pytest.fixture
+def patched_clean_document(monkeypatch):
+    mock_document = MagicMock()
+    mock_document.readline.side_effect = VirusFoundInFileException
+    original_clean_document = UploadDocumentsForm.clean_document
+
+    def mock_clean_document(self):
+        self.cleaned_data["document"] = [mock_document]
+        return original_clean_document(self)
+
+    monkeypatch.setattr(UploadDocumentsForm, "clean_document", mock_clean_document)
