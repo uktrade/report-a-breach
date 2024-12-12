@@ -75,7 +75,17 @@ class Breach(BaseModel):
             ]
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
-            reporter_name_of_business_you_work_for = ""
+            if (
+                cleaned_data.get("do_you_know_the_registered_company_number", {}).get(
+                    "do_you_know_the_registered_company_number", ""
+                )
+                == "yes"
+            ):
+                reporter_name_of_business_you_work_for = cleaned_data["do_you_know_the_registered_company_number"][
+                    "registered_company_name"
+                ]
+            else:
+                reporter_name_of_business_you_work_for = cleaned_data["business_or_person_details"]["name"]
 
         # atomic transaction so that if any part of the process fails, the whole process is rolled back
         with transaction.atomic():
@@ -153,7 +163,11 @@ class PersonOrCompany(BaseModel):
         """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
         return cls.objects.create(
             name=person_or_company.get("name", ""),
-            name_of_business=person_or_company.get("name_of_business"),
+            name_of_business=(
+                person_or_company["registered_company_name"]
+                if person_or_company.get("do_you_know_the_registered_company_number", False)
+                else person_or_company.get("name_of_business")
+            ),
             website=person_or_company.get("website"),
             email=person_or_company.get("email"),
             address_line_1=person_or_company.get("address_line_1"),
@@ -174,11 +188,11 @@ class PersonOrCompany(BaseModel):
     name_of_business = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     website = models.CharField(null=True, blank=True, max_length=512)
-    address_line_1 = models.TextField()
+    address_line_1 = models.TextField(null=True, blank=True)
     address_line_2 = models.TextField(null=True, blank=True)
     address_line_3 = models.TextField(null=True, blank=True)
     address_line_4 = models.TextField(null=True, blank=True)
-    town_or_city = models.TextField()
+    town_or_city = models.TextField(null=True, blank=True)
     country = CountryField(blank_label="Select country")
     county = models.TextField(null=True, blank=True)
     postal_code = models.TextField()
