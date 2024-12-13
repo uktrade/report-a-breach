@@ -59,7 +59,11 @@
                     Name
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ breacher.name }}
+                    {% if breacher.name %}
+                        {{ breacher.name }}
+                    {% else %}
+                        {{ breacher.name_of_business }}
+                    {% endif %}
                 </dd>
             </div>
             {% if breacher.website %}
