@@ -15,7 +15,7 @@ from report_a_suspected_breach.form_step_conditions import (
 )
 from utils.s3 import get_all_session_files, store_document_in_permanent_bucket
 
-from .choices import TypeOfRelationshipChoices
+from .choices import ReporterProfessionalRelationshipChoices, TypeOfRelationshipChoices
 from .exceptions import EmailNotVerifiedException
 from .utils import get_all_cleaned_data
 
@@ -76,7 +76,8 @@ class Breach(BaseModel):
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
             if (
-                cleaned_data.get("do_you_know_the_registered_company_number", {}).get(
+                cleaned_data["start"]["reporter_professional_relationship"] == ReporterProfessionalRelationshipChoices.owner
+                and cleaned_data.get("do_you_know_the_registered_company_number", {}).get(
                     "do_you_know_the_registered_company_number", ""
                 )
                 == "yes"
