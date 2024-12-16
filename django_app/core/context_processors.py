@@ -36,3 +36,12 @@ def sentry_configuration_options(request: HttpRequest) -> dict[str, str | float]
         "SENTRY_ENABLE_TRACING": settings.SENTRY_ENABLE_TRACING,
         "SENTRY_TRACES_SAMPLE_RATE": settings.SENTRY_TRACES_SAMPLE_RATE,
     }
+
+
+def environment_information(request: HttpRequest) -> dict[str, str]:
+    """Add the current environment & branch to the context."""
+    return {
+        "current_environment": settings.ENVIRONMENT,
+        "current_branch": settings.CURRENT_BRANCH,
+        "current_tag": settings.CURRENT_TAG,
+    }

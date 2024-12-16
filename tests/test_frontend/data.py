@@ -70,9 +70,9 @@ NON_UK_SUPPLIER_ADDRESS_DETAILS = {
 
 SANCTIONS = [sanction["name"] for sanction in active_regimes]
 
-FILES = [os.path.join(os.path.dirname(__file__), "testfiles/testfile.pdf")]
-MISSING_FILE_TYPE = [os.path.join(os.path.dirname(__file__), "testfiles/missing_filetype")]
-MALWARE_FILE_TYPE = [os.path.join(os.path.dirname(__file__), "testfiles/mock_malware_file.txt")]
+FILES = [os.path.join(os.path.dirname(__file__), "test_report_a_suspected_breach/testfiles/testfile.pdf")]
+MISSING_FILE_TYPE = [os.path.join(os.path.dirname(__file__), "test_report_a_suspected_breach/testfiles/missing_filetype")]
+MALWARE_FILE_TYPE = [os.path.join(os.path.dirname(__file__), "test_report_a_suspected_breach/testfiles/mock_malware_file.txt")]
 
 END_USERS = {
     "end_user1": {

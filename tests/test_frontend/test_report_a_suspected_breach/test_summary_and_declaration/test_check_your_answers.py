@@ -3,7 +3,7 @@ import re
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from .. import conftest, data
+from tests.test_frontend import conftest, data
 
 breach_details_owner = {
     "reporter_relationship": "I'm an owner",
