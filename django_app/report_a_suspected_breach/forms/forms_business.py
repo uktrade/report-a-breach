@@ -120,14 +120,13 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                     company_details = get_details_from_companies_house(registered_company_number)
                     cleaned_data["registered_company_number"] = company_details["company_number"]
                     cleaned_data["registered_company_name"] = company_details["company_name"]
+                    cleaned_data["name"] = company_details["company_name"]
 
                     # converting the companies house address dict into 'normal' format and also flattening the
                     # dictionary so the address keys are on the top-level key structure
                     clean_address = turn_companies_house_into_normal_address_dict(company_details["registered_office_address"])
                     cleaned_data.update(clean_address)
-                    readable_address = get_formatted_address(clean_address)
-                    cleaned_data["readable_address"] = readable_address
-                    cleaned_data["registered_office_address"] = readable_address
+                    cleaned_data["readable_address"] = get_formatted_address(clean_address)
                 except CompaniesHouseException:
                     self.add_error(
                         "registered_company_number",

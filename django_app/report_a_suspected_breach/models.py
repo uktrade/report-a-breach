@@ -183,7 +183,6 @@ class PersonOrCompany(BaseModel):
             breach=breach,
             type_of_relationship=relationship,
             registered_company_number=person_or_company.get("registered_company_number"),
-            registered_office_address=person_or_company.get("registered_office_address"),
         )
 
     name = models.TextField()
