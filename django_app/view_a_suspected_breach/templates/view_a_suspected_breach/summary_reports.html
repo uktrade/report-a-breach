@@ -42,11 +42,7 @@
                     Business or person suspected of breaching sanctions:
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {% if breach_report.breacher.name %}
-                        {{ breach_report.breacher.name }}
-                    {% else %}
-                        {{ breach_report.breacher.name_of_business }}
-                    {% endif %}
+                    {{ breach_report.breacher.name }}
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
