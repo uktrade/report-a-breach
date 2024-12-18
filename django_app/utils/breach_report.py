@@ -14,7 +14,7 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     if breacher := PersonOrCompany.objects.filter(
         breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.breacher
     ).first():
-        breacher_address = get_formatted_address(model_to_dict(breacher))
+        breacher_address = breacher.get_readable_address()
         breach_context["breacher"] = breacher
         breach_context["breacher_address"] = breacher_address
 
