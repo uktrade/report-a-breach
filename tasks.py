@@ -14,6 +14,11 @@ def unittest(context: Any) -> None:
 
 
 @task
+def testserver(context: Any) -> None:
+    context.run("pipenv run python django_app/manage.py runserver --settings=config.settings.test")
+
+
+@task
 def frontend_tests(context: Any) -> None:
     context.run("pipenv run pytest tests/test_frontend")
 
