@@ -308,7 +308,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="End-user 1").click()
         self.page.get_by_role("heading", name="End-user 2").click()
         self.page.get_by_role("heading", name="End-user 3").click()
-        expect(self.page.get_by_text("End User1 AL1, AL2, Town")).to_be_visible()
+        expect(self.page.get_by_text("AL1, AL2, Town")).to_be_visible()
 
         self.page.get_by_text("End-user 1 Change").get_by_role("link", name="Change").click()
         expect(self.page).to_have_url(re.compile(r".location-of-end-user"))
@@ -318,8 +318,8 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_label("Country").select_option("AS")
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
-        expect(self.page.get_by_text("End User1 AL1, AL2, Town", exact=True)).not_to_be_visible()
-        expect(self.page.get_by_text("End User1 AL1, AL2, Town, American Samoa")).to_be_visible()
+        expect(self.page.get_by_text("AL1, AL2, Town", exact=True)).not_to_be_visible()
+        expect(self.page.get_by_text("AL1, AL2, Town, American Samoa")).to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
 

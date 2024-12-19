@@ -50,8 +50,20 @@
                 <dd class="govuk-summary-list__value">
                     {% if end_user.cleaned_data.name_of_person %}
                         {{ end_user.cleaned_data.name_of_person }}
-                    {% elif end_user.cleaned_data.name_of_business %}
+                    {% else %}
+                        Not provided
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Business
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {% if end_user.cleaned_data.name_of_business %}
                         {{ end_user.cleaned_data.name_of_business }}
+                    {% else %}
+                        Not provided
                     {% endif %}
                 </dd>
             </div>
@@ -60,7 +72,11 @@
                     Address
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ end_user.cleaned_data.readable_address }}
+                    {% if end_user.cleaned_data.readable_address %}
+                        {{ end_user.cleaned_data.readable_address }}
+                    {% else %}
+                        Not provided
+                    {% endif %}
                 </dd>
             </div>
         </dl>
