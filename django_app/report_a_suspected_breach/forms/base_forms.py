@@ -51,6 +51,11 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
     def __init__(self, *args: object, **kwargs: object) -> None:
         self.is_uk_address = kwargs.pop("is_uk_address", False)
         super().__init__(*args, **kwargs)
+        if self.data and self.data.get("country") == "GB":
+            # if we're reloading this form with previously entered data, we can work backwards to set the
+            # is_uk_address flag
+            self.is_uk_address = True
+
         if self.is_uk_address:
             self.fields["country"].initial = "GB"
             self.fields["country"].widget = forms.HiddenInput()
