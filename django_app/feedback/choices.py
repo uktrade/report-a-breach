@@ -1,3 +1,6 @@
+from typing import List
+
+from core.choices import BaseChoices
 from django.db import models
 
 
@@ -9,7 +12,11 @@ class RatingChoices(models.IntegerChoices):
     VERY_SATISFIED = 5, "Very satisfied"
 
 
-class DidYouExperienceAnyIssues(models.TextChoices):
+class DidYouExperienceAnyIssues(BaseChoices):
+    @classmethod
+    def inactive_choices(cls) -> List[str]:
+        return ["no"]
+
     NO = "no", "I did not experience any issues"
     NOT_FOUND = "not_found", "I did not find what I was looking for"
     DIFFICULT = "difficult", "I found it difficult to navigate"

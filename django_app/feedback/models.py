@@ -12,6 +12,8 @@ class FeedbackItem(BaseModel):
     )
     how_we_could_improve_the_service = models.TextField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
+    user_name = models.CharField(max_length=255, null=True, blank=True)
+    user_email = models.EmailField(null=True, blank=True)
 
     def get_did_you_experience_any_issues_display(self) -> list[str]:
         display = []
