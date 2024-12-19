@@ -78,7 +78,8 @@ class Breach(BaseModel):
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
             if (
-                cleaned_data["start"]["reporter_professional_relationship"] == ReporterProfessionalRelationshipChoices.owner
+                cleaned_data["start"]["reporter_professional_relationship"]
+                in [ReporterProfessionalRelationshipChoices.owner, ReporterProfessionalRelationshipChoices.acting]
                 and cleaned_data.get("do_you_know_the_registered_company_number", {}).get(
                     "do_you_know_the_registered_company_number", ""
                 )
