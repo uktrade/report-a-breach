@@ -449,7 +449,7 @@ class PlaywrightTestBase(LiveServerTestCase):
         # Tasklist
         #
         page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
-        page.get_by_role("link", name="Continue").click()
+        page.get_by_role("link", name="Review and submit").click()
 
 
 @pytest.fixture(autouse=True)
