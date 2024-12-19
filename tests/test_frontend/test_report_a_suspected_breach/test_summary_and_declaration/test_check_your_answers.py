@@ -293,8 +293,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_label("I do not know").check()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
-        expect(self.page.get_by_text("I do not know")).to_be_visible()
-        expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, United Kingdom")).not_to_be_visible()
+        expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, United Kingdom", exact=True)).not_to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
 

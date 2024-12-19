@@ -211,9 +211,13 @@
                 Name and address of supplier
             </dt>
             <dd class="govuk-summary-list__value">
-                {{ form_data.about_the_supplier.name }}
-                <br> <br>
-                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.about_the_supplier.readable_address|linebreaksbr %}
+                {% if form_data.where_were_the_goods_supplied_from.where_were_the_goods_supplied_from == "i_do_not_know" %}
+                    I do not know
+                {% else %}
+                    {{ form_data.about_the_supplier.name }}
+                    <br> <br>
+                    {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.about_the_supplier.readable_address|linebreaksbr %}
+                {% endif %}
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link"
