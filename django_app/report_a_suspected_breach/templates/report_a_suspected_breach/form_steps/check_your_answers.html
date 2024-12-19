@@ -307,13 +307,13 @@
     <dl class="govuk-summary-list">
         {% if is_made_available_journey %}
             <a class="govuk-link"
-               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">Add another
-                end-user<span
+               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">{% if form_data.end_users %}Add another
+                end-user{% else %}Add an end-user{% endif %}<span
                     class="govuk-visually-hidden">end-user</span></a>
         {% else %}
             <a class="govuk-link"
-               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">Add another
-                end-user<span
+               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">{% if form_data.end_users %}Add another
+                end-user{% else %}Add an end-user{% endif %}<span
                     class="govuk-visually-hidden">end-user</span></a>
         {% endif %}
     </dl>
