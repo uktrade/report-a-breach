@@ -282,50 +282,12 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
     Tests for check your answers page, specific to the supply chain section
     """
 
-    def test_can_change_location_of_supplier(self):
-        self.page.goto(self.base_url)
-        self.create_breach(self.page, breach_details_owner)
-        self.page.get_by_role("heading", name="Check your answers").click()
-        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
-        self.page.get_by_role("heading", name="Supplier").click()
-        self.page.get_by_text("Location of supplier", exact=True).click()
-        self.page.get_by_role("link", name="Change location of supplier").click()
-        expect(self.page).to_have_url(re.compile(r".*/location-where-supplied-from"))
-        self.page.get_by_label("Outside the UK").check()
-        self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/supplier-details"))
-        self.page.get_by_label("Country").select_option("VE")
-        self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
-        expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, Venezuela")).to_be_visible()
-
-        self.page.get_by_role("link", name="Continue").click()
-        self.declaration_and_complete_page(self.page)
-
-    def test_can_change_to_unknown_location_of_supplier(self):
-        self.page.goto(self.base_url)
-        self.create_breach(self.page, breach_details_owner)
-        self.page.get_by_role("heading", name="Check your answers").click()
-        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
-        self.page.get_by_role("heading", name="Supplier").click()
-        self.page.get_by_text("Location of supplier", exact=True).click()
-        self.page.get_by_role("link", name="Change location of supplier").click()
-        expect(self.page).to_have_url(re.compile(r".*/location-where-supplied-from"))
-        self.page.get_by_label("I do not know").check()
-        self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
-        expect(self.page.get_by_text("I do not know")).to_be_visible()
-        expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, United Kingdom")).not_to_be_visible()
-        self.page.get_by_role("link", name="Continue").click()
-        self.declaration_and_complete_page(self.page)
-
     def test_can_change_name_and_address_of_supplier_to_unknown(self):
         self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="The supply chain", exact=True).click()
         self.page.get_by_role("heading", name="Supplier").click()
-        self.page.get_by_text("Location of supplier", exact=True).click()
         self.page.get_by_role("link", name="Change name and address of supplier").click()
         expect(self.page).to_have_url(re.compile(r".*/location-where-supplied-from"))
         self.page.get_by_label("I do not know").check()
