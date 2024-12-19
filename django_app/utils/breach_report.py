@@ -1,9 +1,7 @@
 from typing import Any
 
-from django.forms.models import model_to_dict
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import Breach, PersonOrCompany
-from utils.address_formatter import get_formatted_address
 
 
 def get_breach_context_data(breach: Breach) -> dict[str, Any]:
@@ -14,7 +12,7 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     if breacher := PersonOrCompany.objects.filter(
         breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.breacher
     ).first():
-        breacher_address = get_formatted_address(model_to_dict(breacher))
+        breacher_address = breacher.get_readable_address()
         breach_context["breacher"] = breacher
         breach_context["breacher_address"] = breacher_address
 
@@ -22,7 +20,7 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
     if supplier := PersonOrCompany.objects.filter(
         breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.supplier
     ).first():
-        supplier_address = get_formatted_address(model_to_dict(supplier))
+        supplier_address = supplier.get_readable_address()
         breach_context["supplier"] = supplier
         breach_context["supplier_address"] = supplier_address
 
