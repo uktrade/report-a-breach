@@ -5,7 +5,7 @@ from django.urls import reverse
 from tests.factories import FeedbackFactory
 
 
-class TestViewFeedbackView:
+class TestViewAllFeedbackView:
     def test_get_queryset(self, vasb_client_logged_in):
         FeedbackFactory.create_batch(3)
         response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_feedback"))

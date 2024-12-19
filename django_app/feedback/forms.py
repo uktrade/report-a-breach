@@ -68,8 +68,8 @@ class FeedbackForm(BaseModelForm):
             ),
             Fieldset(
                 HTMLTemplate("feedback/participate_in_user_research.html"),
-                Field.text("user_name"),
-                Field.text("user_email"),
+                Field.text("user_name", label_size=Size.SMALL),
+                Field.text("user_email", label_size=Size.SMALL),
                 css_class="optional_question",
             ),
             HTMLTemplate("feedback/feedback_disclaimer.html"),
