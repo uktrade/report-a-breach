@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from .. import conftest
+from tests.test_frontend import conftest
 
 INCORRECT_CODE_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "987654"}
 EMPTY_CODE_DETAILS = {"email": "test@didigtal.gov.uk", "verify_code": ""}

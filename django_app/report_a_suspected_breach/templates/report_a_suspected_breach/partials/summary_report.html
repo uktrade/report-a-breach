@@ -54,36 +54,35 @@
                     {{ breacher.registered_company_number }}
                 </dd>
             </div>
+        {% endif %}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Name
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ breacher.name }}
+            </dd>
+        </div>
+        {% if breacher.website %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Name
+                    Website
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ breacher.name }}
-                </dd>
-            </div>
-            {% if breacher.website %}
-
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Website
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        <a class="govuk-link"
-                           href="{{ form_data.about_the_supplier.website }}">{{ breacher.website }}<span
-                            class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
-                    </dd>
-                </div>
-            {% endif %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Address
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ breacher_address | linebreaksbr }}
+                    <a class="govuk-link"
+                       href="{{ form_data.about_the_supplier.website }}">{{ breacher.website }}<span
+                        class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
                 </dd>
             </div>
         {% endif %}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Address
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ breacher_address | linebreaksbr }}
+            </dd>
+        </div>
     </dl>
     <h2 class="govuk-heading-m">Overview of the breach</h2>
     <dl class="govuk-summary-list">

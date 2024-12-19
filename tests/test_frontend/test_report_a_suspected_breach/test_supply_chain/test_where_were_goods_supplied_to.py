@@ -2,12 +2,12 @@ import re
 
 from playwright.sync_api import expect
 
-from .. import conftest
+from tests.test_frontend import conftest
 
 
-class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
+class TestWhereWereTheGoodsSuppliedTo(conftest.PlaywrightTestBase):
     """
-    Tests for where were the goods made available to page
+    Tests for where were the goods supplied to page
     """
 
     def test_no_input_returns_error(self):
@@ -20,17 +20,17 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
         self.page.get_by_role("link", name="The supply chain").click()
-        self.create_uk_made_available_supplier(self.page)
+        self.create_uk_supplier(self.page)
         self.page.get_by_role("heading", name="Where were the goods,").click()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(
             self.page.get_by_role(
                 "link",
-                name="Select if the goods, services, technology or technical assistance were made available to the UK",
+                name="Select if the goods, services, technology or technical assistance were supplied to the UK",
             )
         ).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/location-where-goods-services-made-available-to"))
+        expect(self.page).to_have_url(re.compile(r".*/location-of-end-user"))
 
     def test_uk_option_returns_uk_address_capture(self):
         self.page.goto(self.base_url)

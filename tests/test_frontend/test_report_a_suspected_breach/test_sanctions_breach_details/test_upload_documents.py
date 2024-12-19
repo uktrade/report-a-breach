@@ -3,7 +3,7 @@ import re
 import pytest
 from playwright.sync_api import expect
 
-from .. import conftest, data
+from tests.test_frontend import conftest, data
 
 
 class TestUploadDocuments(conftest.PlaywrightTestBase):

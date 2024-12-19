@@ -33,3 +33,5 @@ ROOT_URLCONF = "core.debug_urls"
 # we need to override AWS_ENDPOINT_URL environment variable to use localstack
 os.environ["AWS_ENDPOINT_URL"] = f"http://localhost:{env.localstack_port}"
 PROTOCOL = "http://"
+
+CURRENT_BRANCH = env.git_current_branch

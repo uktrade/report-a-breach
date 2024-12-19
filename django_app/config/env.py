@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from dbt_copilot_python.database import database_url_from_env
 from dbt_copilot_python.network import setup_allowed_hosts
@@ -79,6 +80,10 @@ class BaseSettings(PydanticBaseSettings):
     csp_report_only: bool = True
     csp_report_uri: str | None = None
 
+    # Information about the current environment
+    current_branch: str = Field(alias="GIT_BRANCH", default="unknown")
+    current_tag: str = Field(alias="GIT_TAG", default="")
+
     @computed_field
     @property
     def redis_url(self) -> str:
@@ -112,6 +117,15 @@ class LocalSettings(BaseSettings):
     database_uri: str = Field(alias="DATABASE_URL")
     profiling_enabled: bool = False
     localstack_port: int = 14566
+
+    @computed_field
+    @property
+    def git_current_branch(self) -> str:
+        current_branch = subprocess.run(["git", "branch", "--show-current"], capture_output=True)
+        if current_branch.returncode == 0:
+            return current_branch.stdout.decode("utf-8").replace("\n", "")
+        else:
+            return "unknown"
 
 
 class TestSettings(LocalSettings):
