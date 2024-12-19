@@ -41,14 +41,15 @@ class TaskListView(TemplateView):
                 "help_text": "Upload documents and give any additional information",
                 "url": reverse_lazy("report_a_suspected_breach:upload_documents"),
             },
+            {
+                "title": "Review and submit",
+                "key": "review_and_submit",
+                "help_text": "Check your answers before you submit your report",
+                "url": reverse_lazy("report_a_suspected_breach:check_your_answers"),
+            },
         ]
 
         current_task_name = kwargs.get("current_task_name", "reporter_details")
-
-        if current_task_name == "summary":
-            context["show_continue_button"] = True
-        else:
-            context["show_continue_button"] = False
 
         seen_current_task = False
         for task in tasklist:
