@@ -13,7 +13,7 @@ def get_s3_client_from_storage(s3_storage: S3Boto3Storage) -> Any:
     return s3_storage.bucket.meta.client
 
 
-def generate_presigned_url(s3_storage: Any, s3_file_object: Any) -> str:
+def generate_presigned_url(s3_storage: Any, s3_file_object: str) -> str:
     """Generates a Presigned URL for the s3 object."""
 
     s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
