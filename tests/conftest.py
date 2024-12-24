@@ -2,6 +2,7 @@ from unittest import mock
 
 import notifications_python_client
 import pytest
+from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.sites import SiteName
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ from tests.factories import (
     BreachFactory,
     BreachWith2SanctionsFactory,
     BreachWithCompaniesHouseFactory,
+    UploadedDocumentFactory,
 )
 from tests.helpers import get_test_client
 
@@ -107,3 +109,32 @@ def patched_send_email(monkeypatch):
     """We don't want to send emails when running tests"""
     mock_notifications_api_client = mock.create_autospec(notifications_python_client.notifications.NotificationsAPIClient)
     monkeypatch.setattr(notifier, "NotificationsAPIClient", mock_notifications_api_client)
+
+
+@pytest.fixture()
+def uploaded_document_object(db):
+    return UploadedDocumentFactory()
+
+
+@pytest.fixture()
+def delete_all_permanent_bucket_files():
+    """Fixture to delete all files in the permanent bucket. Both before and after tests"""
+    for obj in PermanentDocumentStorage().bucket.objects.all():
+        obj.delete()
+
+    yield
+
+    for obj in PermanentDocumentStorage().bucket.objects.all():
+        obj.delete()
+
+
+@pytest.fixture()
+def delete_all_temporary_bucket_files():
+    """Fixture to delete all files in the temporary bucket. Both before and after tests"""
+    for obj in TemporaryDocumentStorage().bucket.objects.all():
+        obj.delete()
+
+    yield
+
+    for obj in TemporaryDocumentStorage().bucket.objects.all():
+        obj.delete()
