@@ -96,8 +96,6 @@ class TestSameBreacherSupplierPath(PlaywrightTestBase):
         assert breach.reporter_name_of_business_you_work_for == "Test Company Name"
         assert len(breach.reference) == 6
 
-        assert breach.unknown_sanctions_regime
-        assert not breach.other_sanctions_regime
         assert breach.sanctions_regimes_breached == ["Unknown Regime"]
 
         assert breach.when_did_you_first_suspect == datetime.date(2014, 1, 1)

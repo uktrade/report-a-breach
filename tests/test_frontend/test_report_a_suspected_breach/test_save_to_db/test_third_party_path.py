@@ -113,8 +113,6 @@ class TestThirdPartyPath(PlaywrightTestBase):
         assert breach.reporter_email_address == "test@example.com"
         assert breach.reporter_name_of_business_you_work_for == "DBT"
 
-        assert breach.other_sanctions_regime
-        assert not breach.unknown_sanctions_regime
         assert breach.sanctions_regimes_breached == ["Other Regime"]
 
         assert breach.when_did_you_first_suspect == datetime.date(2013, 1, 1)
