@@ -6,6 +6,7 @@ from core.models import BaseModel
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.sessions.models import Session
 from django.db import models, transaction
+from django.forms import model_to_dict
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from django_countries.fields import CountryField
 from report_a_suspected_breach.form_step_conditions import (
@@ -13,9 +14,10 @@ from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
     show_name_and_business_you_work_for_page,
 )
+from utils.address_formatter import get_formatted_address
 from utils.s3 import get_all_session_files, store_document_in_permanent_bucket
 
-from .choices import TypeOfRelationshipChoices
+from .choices import ReporterProfessionalRelationshipChoices, TypeOfRelationshipChoices
 from .exceptions import EmailNotVerifiedException
 from .utils import get_all_cleaned_data
 
@@ -75,7 +77,18 @@ class Breach(BaseModel):
             ]
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
-            reporter_name_of_business_you_work_for = ""
+            if (
+                cleaned_data["start"]["reporter_professional_relationship"] == ReporterProfessionalRelationshipChoices.owner
+                and cleaned_data.get("do_you_know_the_registered_company_number", {}).get(
+                    "do_you_know_the_registered_company_number", ""
+                )
+                == "yes"
+            ):
+                reporter_name_of_business_you_work_for = cleaned_data["do_you_know_the_registered_company_number"][
+                    "registered_company_name"
+                ]
+            else:
+                reporter_name_of_business_you_work_for = cleaned_data["business_or_person_details"]["name"]
 
         # atomic transaction so that if any part of the process fails, the whole process is rolled back
         with transaction.atomic():
@@ -153,7 +166,11 @@ class PersonOrCompany(BaseModel):
         """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
         return cls.objects.create(
             name=person_or_company.get("name", ""),
-            name_of_business=person_or_company.get("name_of_business"),
+            name_of_business=(
+                person_or_company["registered_company_name"]
+                if person_or_company.get("do_you_know_the_registered_company_number", False)
+                else person_or_company.get("name_of_business")
+            ),
             website=person_or_company.get("website"),
             email=person_or_company.get("email"),
             address_line_1=person_or_company.get("address_line_1"),
@@ -192,6 +209,14 @@ class PersonOrCompany(BaseModel):
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
     registered_office_address = models.CharField(null=True, blank=True)
+
+    def get_readable_address(self) -> str:
+        """Returns a formatted address string for the address fields of this model instance."""
+        if self.registered_office_address:
+            #  If we have registered_office_address, use that instead of the address fields
+            return self.registered_office_address
+        else:
+            return get_formatted_address(model_to_dict(self))
 
 
 class UploadedDocument(BaseModel):

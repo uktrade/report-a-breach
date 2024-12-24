@@ -48,3 +48,18 @@ class TestProvideFullFeedbackView:
         )
         feedback_object = FeedbackItem.objects.get()
         assert feedback_object.url == "https://example.com"
+
+    def test_adding_user_name_email_to_feedback(self, rasb_client):
+        rasb_client.post(
+            reverse("feedback:collect_full_feedback") + "?url=https://example.com",
+            data={
+                "rating": 1,
+                "how_we_could_improve_the_service": "try harder",
+                "did_you_experience_any_issues": ["not_found", "lacks_features"],
+                "user_name": "Sally",
+                "user_email": "sally@example.com",
+            },
+        )
+        feedback_object = FeedbackItem.objects.get()
+        assert feedback_object.user_name == "Sally"
+        assert feedback_object.user_email == "sally@example.com"

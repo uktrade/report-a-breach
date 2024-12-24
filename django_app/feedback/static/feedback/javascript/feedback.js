@@ -14,4 +14,6 @@ $(window).bind("pageshow", function(event) {
             $('.optional_question').hide()
         }
     })
+
+    $("input[name='rating']:checked").trigger("change")
 });

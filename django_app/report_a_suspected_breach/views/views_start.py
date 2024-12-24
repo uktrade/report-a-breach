@@ -67,12 +67,6 @@ class EmailVerifyView(BaseFormView):
         else:
             return reverse_lazy("report_a_suspected_breach:name")
 
-    def form_valid(self, form: forms.EmailVerifyForm) -> HttpResponse:
-        reporter_email = form.cleaned_data["email"]
-        self.request.session["reporter_email_address"] = reporter_email
-        verify_email(reporter_email, self.request)
-        return super().form_valid(form)
-
     def form_invalid(self, form: forms.EmailVerifyForm) -> HttpResponse:
         if form.has_error("email_verification_code", "expired"):
             # we need to send the code again

@@ -151,6 +151,7 @@ TEMPLATES = [
                 "core.context_processors.is_debug_mode",
                 "core.context_processors.session_expiry_times",
                 "core.context_processors.sentry_configuration_options",
+                "core.context_processors.environment_information",
             ],
         },
     },
@@ -293,7 +294,7 @@ CSP_INCLUDE_NONCE_IN = ["script-src"]
 CSP_REPORT_ONLY = env.csp_report_only
 
 # URL to send CSP violation reports to
-CSP_REPORT_URI = env.csp_report_uri
+# CSP_REPORT_URI = env.csp_report_uri
 
 # Permissions policy header
 PERMISSIONS_POLICY = {
@@ -341,3 +342,7 @@ SESSION_COOKIE_AGE = 40 * 60
 SESSION_LAST_ACTIVITY_KEY = "last_form_submission"
 
 PROTOCOL = "https://"
+
+# Information about the current environment
+CURRENT_BRANCH = env.current_branch
+CURRENT_TAG = env.current_tag

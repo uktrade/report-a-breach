@@ -92,9 +92,15 @@
             <dd class="govuk-summary-list__actions">
                 {% if is_company_obtained_from_companies_house %}
                 {% else %}
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">person or business name</span></a>
+                    {% if form_data.business_or_person_details.country == "GB" %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=True %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business name</span></a>
+                    {% else %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=False %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business name</span></a>
+                    {% endif %}
                 {% endif %}
             </dd>
         </div>
@@ -110,9 +116,15 @@
                         class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">person or business website</span></a>
+                    {% if form_data.business_or_person_details.country == "GB" %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=True %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business website</span></a>
+                    {% else %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=False %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business website</span></a>
+                    {% endif %}
                 </dd>
             </div>
         {% endif %}
@@ -130,9 +142,15 @@
             <dd class="govuk-summary-list__actions">
                 {% if is_company_obtained_from_companies_house %}
                 {% else %}
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=form_data.business_or_person_details.is_uk_address %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">person or business address</span></a>
+                    {% if form_data.business_or_person_details.country == "GB" %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=True %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business address</span></a>
+                    {% else %}
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:business_or_person_details' is_uk_address=False %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">person or business address</span></a>
+                    {% endif %}
                 {% endif %}
             </dd>
         </div>
@@ -188,54 +206,25 @@
     <h2 class="govuk-heading-m">The supply chain</h2>
     <h3 class="govuk-heading-s">Supplier</h3>
     <dl class="govuk-summary-list">
-        {% if form_data.where_were_the_goods_supplied_from.where_were_the_goods_supplied_from == "i_do_not_know" %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Location of supplier
-                </dt>
-                <dd class="govuk-summary-list__value">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Name and address of supplier
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {% if form_data.where_were_the_goods_supplied_from.where_were_the_goods_supplied_from == "i_do_not_know" %}
                     I do not know
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">location of supplier</span></a>
-                </dd>
-        {% else %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Location of supplier
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% get_country form_data.about_the_supplier.country as country %}
-                    {% if country.name == "United Kingdom" %}
-                        The UK
-                    {% else %}
-                        Outside the UK
-                    {% endif %}
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">location of supplier</span></a>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Name and address of supplier
-                </dt>
-                <dd class="govuk-summary-list__value">
+                {% else %}
                     {{ form_data.about_the_supplier.name }}
                     <br> <br>
                     {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.about_the_supplier.readable_address|linebreaksbr %}
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">name and address of supplier</span></a>
-                </dd>
-            </div>
-        {% endif %}
+                {% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                    class="govuk-visually-hidden">name and address of supplier</span></a>
+            </dd>
+        </div>
     </dl>
     {% if form_data.end_users %}
         {% for end_user, value in form_data.end_users.items %}

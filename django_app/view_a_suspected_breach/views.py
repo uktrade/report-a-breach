@@ -97,10 +97,10 @@ class ViewASuspectedBreachView(LoginRequiredMixin, ActiveUserRequiredMixin, Deta
 
 
 @method_decorator(require_view_a_breach(), name="dispatch")
-class ViewFeedbackView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
+class ViewAllFeedbackView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
     context_object_name = "feedback"
     model = FeedbackItem
-    template_name = "view_a_suspected_breach/view_feedback.html"
+    template_name = "view_a_suspected_breach/view_all_feedback.html"
 
     def get_queryset(self) -> "QuerySet[FeedbackItem]":
         queryset = super().get_queryset()
@@ -109,3 +109,10 @@ class ViewFeedbackView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
         if date_max := self.request.GET.get("date_max"):
             queryset = queryset.filter(created_at__date__lte=date_max)
         return queryset
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class ViewFeedbackView(LoginRequiredMixin, ActiveUserRequiredMixin, DetailView):
+    model = FeedbackItem
+    template_name = "view_a_suspected_breach/view_feedback.html"
+    context_object_name = "feedback"
