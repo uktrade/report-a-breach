@@ -5,10 +5,10 @@ from django.urls import reverse
 from tests.factories import FeedbackFactory
 
 
-class TestViewFeedbackView:
+class TestViewAllFeedbackView:
     def test_get_queryset(self, vasb_client_logged_in):
         FeedbackFactory.create_batch(3)
-        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_feedback"))
+        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_all_feedback"))
         objects = response.context["object_list"]
         assert objects.count() == 3
 
@@ -24,7 +24,7 @@ class TestViewFeedbackView:
         # date_max query parameter
         query_params = {"date_max": datetime.datetime.now().date() - datetime.timedelta(days=1)}
 
-        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_feedback"), data=query_params)
+        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_all_feedback"), data=query_params)
         objects = response.context["object_list"]
         assert objects.count() == 2
         object_ids = list(objects.values_list("id", flat=True))
@@ -35,7 +35,7 @@ class TestViewFeedbackView:
         # date_min query parameter
         query_params = {"date_min": datetime.datetime.now().date() - datetime.timedelta(days=5)}
 
-        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_feedback"), data=query_params)
+        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_all_feedback"), data=query_params)
         objects = response.context["object_list"]
         assert objects.count() == 2
         object_ids = list(objects.values_list("id", flat=True))
@@ -50,7 +50,7 @@ class TestViewFeedbackView:
             "date_min": datetime.datetime.now().date() - datetime.timedelta(days=6),
         }
 
-        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_feedback"), data=query_params)
+        response = vasb_client_logged_in.get(reverse("view_a_suspected_breach:view_all_feedback"), data=query_params)
         objects = response.context["object_list"]
         assert objects.count() == 1
         object_ids = list(objects.values_list("id", flat=True))

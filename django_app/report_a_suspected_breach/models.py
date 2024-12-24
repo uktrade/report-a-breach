@@ -5,6 +5,7 @@ from core.models import BaseModel
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.sessions.models import Session
 from django.db import models, transaction
+from django.forms import model_to_dict
 from django.http import HttpRequest
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from django_countries.fields import CountryField
@@ -13,6 +14,7 @@ from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
     show_name_and_business_you_work_for_page,
 )
+from utils.address_formatter import get_formatted_address
 from utils.s3 import get_all_session_files, store_document_in_permanent_bucket
 
 from . import choices
@@ -221,6 +223,14 @@ class PersonOrCompany(BaseModel):
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
     registered_office_address = models.CharField(null=True, blank=True)
+
+    def get_readable_address(self) -> str:
+        """Returns a formatted address string for the address fields of this model instance."""
+        if self.registered_office_address:
+            #  If we have registered_office_address, use that instead of the address fields
+            return self.registered_office_address
+        else:
+            return get_formatted_address(model_to_dict(self))
 
 
 class UploadedDocument(BaseModel):
