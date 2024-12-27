@@ -49,8 +49,18 @@ class BasePersonBusinessDetailsForm(BaseModelForm):
     )
 
     def __init__(self, *args: object, **kwargs: object) -> None:
+        if "is_uk_address" in kwargs:
+            explicit_address_passed = True
+        else:
+            explicit_address_passed = False
         self.is_uk_address = kwargs.pop("is_uk_address", False)
         super().__init__(*args, **kwargs)
+        if not explicit_address_passed and self.data and self.data.get("country") == "GB":
+            # if we're reloading this form with previously entered data, and we haven't explicitly set the
+            # `is_uk_address` flag we can work backwards to set the is_uk_address flag correctly. This is useful for
+            # retrieving the form from get_all_cleaned_data()
+            self.is_uk_address = True
+
         if self.is_uk_address:
             self.fields["country"].initial = "GB"
             self.fields["country"].widget = forms.HiddenInput()

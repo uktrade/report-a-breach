@@ -117,3 +117,11 @@ class FeedbackFactory(factory.django.DjangoModelFactory):
     rating = ModelFieldLazyChoice(FeedbackItem, "rating")
     did_you_experience_any_issues = ArrayFieldLazyChoice(FeedbackItem, "did_you_experience_any_issues")
     how_we_could_improve_the_service = factory.Faker("text")
+
+
+class UploadedDocumentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.UploadedDocument"
+
+    breach = factory.SubFactory(BreachFactory)
+    file = factory.django.FileField(filename="test.txt")
