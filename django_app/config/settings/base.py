@@ -56,8 +56,8 @@ THIRD_PARTY_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + OUR_APPS + THIRD_PARTY_APPS
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_form", "gds")
-CRISPY_TEMPLATE_PACK = "gds"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap3", "bootstrap4", "uni_form", "core/report-a-breach-gds")
+CRISPY_TEMPLATE_PACK = "core/report-a-breach-gds"
 
 # AWS
 AWS_S3_REGION_NAME = env.aws_default_region
