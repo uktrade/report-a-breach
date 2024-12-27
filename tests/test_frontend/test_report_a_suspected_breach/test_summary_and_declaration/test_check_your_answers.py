@@ -121,12 +121,12 @@ class TestCheckYourAnswersPersonOrBusinessYouAreReporting(conftest.PlaywrightTes
         expect(self.page.get_by_text("Website", exact=True)).to_have_count(0)
         # Change address
         expect(self.page).to_have_url(re.compile(r".*/check-your-answers"))
-        expect(self.page.get_by_text("Breach Lane, Breach Avenue, Breach Town, United Kingdom")).to_be_visible()
+        expect(self.page.get_by_text("Breach Lane, Breach Avenue, Breach Town, BB00BB, United Kingdom")).to_be_visible()
         self.page.get_by_role("link", name="Change person or business address").click()
         self.page.get_by_label("Town or city").click()
         self.page.get_by_label("Town or city").fill("Another Town")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page.get_by_text("Breach Lane, Breach Avenue, Another Town, United Kingdom")).to_be_visible()
+        expect(self.page.get_by_text("Breach Lane, Breach Avenue, Another Town, BB00BB, United Kingdom")).to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
 
