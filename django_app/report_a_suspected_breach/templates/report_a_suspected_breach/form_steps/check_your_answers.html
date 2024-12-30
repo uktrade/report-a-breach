@@ -260,14 +260,27 @@
             <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Name and address of end-user {{forloop.counter}}
+                        Name
                     </dt>
                     <dd class="govuk-summary-list__value">
                         {{ value.cleaned_data.name_of_person }}
-                        <br><br>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                        Business
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ value.cleaned_data.name_of_business }}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                        Address
+                    </dt>
+                    <dd class="govuk-summary-list__value">
                         {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.readable_address|linebreaksbr %}
                     </dd>
-
                 </div>
                 {% if value.cleaned_data.website %}
                     <div class="govuk-summary-list__row">
