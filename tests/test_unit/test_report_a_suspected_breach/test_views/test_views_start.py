@@ -29,6 +29,14 @@ class TestStartView:
         assert response.status_code == 302
         assert response.url == reverse("report_a_suspected_breach:email")
 
+        # now changing the answer and checking that redirect to returns False
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:start") + "?redirect_to_url=report_a_suspected_breach:check_your_answers",
+            data={"reporter_professional_relationship": "owner"},
+        )
+        assert response.status_code == 302
+        assert response.url == reverse("report_a_suspected_breach:email")
+
     def test_success_url(self, rasb_client):
         response = rasb_client.post(
             reverse("report_a_suspected_breach:start"), data={"reporter_professional_relationship": "owner"}
