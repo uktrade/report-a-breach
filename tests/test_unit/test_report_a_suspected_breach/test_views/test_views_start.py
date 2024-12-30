@@ -11,6 +11,43 @@ from report_a_suspected_breach.views.views_start import (
 )
 
 
+class TestStartView:
+    def test_redirect_after_post(self, rasb_client):
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:start") + "?redirect_to_url=report_a_suspected_breach:check_your_answers",
+            data={"reporter_professional_relationship": "owner"},
+        )
+
+        assert response.status_code == 302
+        assert response.url == reverse("report_a_suspected_breach:check_your_answers")
+
+        # now changing the answer and checking that redirect to returns False
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:start") + "?redirect_to_url=report_a_suspected_breach:check_your_answers",
+            data={"reporter_professional_relationship": "third_party"},
+        )
+        assert response.status_code == 302
+        assert response.url == reverse("report_a_suspected_breach:email")
+
+    def test_success_url(self, rasb_client):
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:start"), data={"reporter_professional_relationship": "owner"}
+        )
+
+        assert response.status_code == 302
+        assert response.url == reverse("report_a_suspected_breach:email")
+
+        # now checking for when the user has already provided their email
+        session = rasb_client.session
+        session["reporter_email_address"] = "test@example.com"
+        session.save()
+
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:start"), data={"reporter_professional_relationship": "owner"}
+        )
+        assert response.url == reverse("report_a_suspected_breach:name")
+
+
 class TestWhatIsYourEmailAddressView:
     def test_post(self, rasb_client):
         request_object = RequestFactory().get("/")
