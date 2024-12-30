@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
+from report_a_suspected_breach.choices import ReporterProfessionalRelationshipChoices
 from report_a_suspected_breach.form_step_conditions import (
     show_name_and_business_you_work_for_page,
 )
@@ -19,12 +20,44 @@ logger = logging.getLogger(__name__)
 
 class StartView(BaseFormView):
     form_class = forms.StartForm
-    success_url = reverse_lazy("report_a_suspected_breach:email")
 
     def dispatch(self, request, *args, **kwargs):
         # refresh the session expiry timestamp. This is the start of the session
         update_last_activity_session_timestamp(request)
         return super().dispatch(request, *args, **kwargs)
+
+    @property
+    def redirect_after_post(self):
+        # checking if the user has changed the answer to the question, if so we want to take them to the relevant
+        # sub-journey that they have selected, rather than redirecting them
+        if self.form.cleaned_data["reporter_professional_relationship"] in [
+            ReporterProfessionalRelationshipChoices.owner.value,
+            ReporterProfessionalRelationshipChoices.acting.value,
+        ]:
+            if self.changed_fields.get("reporter_professional_relationship") in [
+                ReporterProfessionalRelationshipChoices.third_party.value,
+                ReporterProfessionalRelationshipChoices.no_professional_relationship.value,
+            ]:
+                return False
+        if self.form.cleaned_data["reporter_professional_relationship"] in [
+            ReporterProfessionalRelationshipChoices.third_party.value,
+            ReporterProfessionalRelationshipChoices.no_professional_relationship.value,
+        ]:
+            if self.changed_fields.get("reporter_professional_relationship") in [
+                ReporterProfessionalRelationshipChoices.owner.value,
+                ReporterProfessionalRelationshipChoices.acting.value,
+            ]:
+                return False
+        return True
+
+    def get_success_url(self):
+        if "reporter_email_address" in self.request.session:
+            # Checking if the user has already provided their email, if so then they don't have to do it again
+            if show_name_and_business_you_work_for_page(self.request):
+                return reverse_lazy("report_a_suspected_breach:name_and_business_you_work_for")
+            else:
+                return reverse_lazy("report_a_suspected_breach:name")
+        return reverse_lazy("report_a_suspected_breach:email")
 
 
 class WhatIsYourEmailAddressView(BaseFormView):
