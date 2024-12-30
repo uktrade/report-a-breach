@@ -1,5 +1,6 @@
 from typing import List
 
+from core.choices import BaseChoices
 from django.db import models
 
 
@@ -11,7 +12,7 @@ class RatingChoices(models.IntegerChoices):
     VERY_SATISFIED = 5, "Very satisfied"
 
 
-class DidYouExperienceAnyIssues(models.TextChoices):
+class DidYouExperienceAnyIssues(BaseChoices):
     @classmethod
     def inactive_choices(cls) -> List[str]:
         return ["no"]
