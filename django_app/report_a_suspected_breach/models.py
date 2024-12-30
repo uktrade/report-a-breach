@@ -1,11 +1,12 @@
 import uuid
-from typing import TYPE_CHECKING
 
 from core.document_storage import PermanentDocumentStorage, TemporaryDocumentStorage
 from core.models import BaseModel
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.sessions.models import Session
 from django.db import models, transaction
+from django.forms import model_to_dict
+from django.http import HttpRequest
 from django_chunk_upload_handlers.clam_av import validate_virus_check_result
 from django_countries.fields import CountryField
 from report_a_suspected_breach.form_step_conditions import (
@@ -13,16 +14,14 @@ from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
     show_name_and_business_you_work_for_page,
 )
+from utils.address_formatter import get_formatted_address
 from utils.s3 import get_all_session_files, store_document_in_permanent_bucket
 
-from .choices import TypeOfRelationshipChoices
-from .exceptions import EmailNotVerifiedException
-from .utils import get_all_cleaned_data
-
-if TYPE_CHECKING:
-    from django.http import HttpRequest
-
 from . import choices
+from .choices import ReporterProfessionalRelationshipChoices, TypeOfRelationshipChoices
+from .exceptions import EmailNotVerifiedException
+from .types import BreacherDetails, ReporterDetails
+from .utils import get_all_cleaned_data
 
 
 class Breach(BaseModel):
@@ -64,10 +63,10 @@ class Breach(BaseModel):
         self.save()
         return reference
 
-    @classmethod
-    def create_from_session(cls, request: "HttpRequest") -> "Breach":
-        """Creates a Breach object from the data stored in current session"""
-        cleaned_data = get_all_cleaned_data(request)
+    @staticmethod
+    def get_reporter_details(cleaned_data: dict, request: HttpRequest) -> ReporterDetails:
+        """Extracts reporter details from cleaned data and request session."""
+
         if show_name_and_business_you_work_for_page(request):
             reporter_full_name = cleaned_data["name_and_business_you_work_for"]["reporter_full_name"]
             reporter_name_of_business_you_work_for = cleaned_data["name_and_business_you_work_for"][
@@ -75,13 +74,50 @@ class Breach(BaseModel):
             ]
         else:
             reporter_full_name = cleaned_data["name"]["reporter_full_name"]
-            reporter_name_of_business_you_work_for = ""
+            if (
+                cleaned_data["start"]["reporter_professional_relationship"]
+                in [ReporterProfessionalRelationshipChoices.owner, ReporterProfessionalRelationshipChoices.acting]
+                and cleaned_data.get("do_you_know_the_registered_company_number", {}).get(
+                    "do_you_know_the_registered_company_number", ""
+                )
+                == "yes"
+            ):
+                reporter_name_of_business_you_work_for = cleaned_data["do_you_know_the_registered_company_number"][
+                    "registered_company_name"
+                ]
+            else:
+                reporter_name_of_business_you_work_for = cleaned_data["business_or_person_details"]["name"]
+
+        return ReporterDetails(
+            full_name=reporter_full_name,
+            name_of_business_you_work_for=reporter_name_of_business_you_work_for,
+            professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
+            email_address=cleaned_data["email"]["reporter_email_address"],
+        )
+
+    @staticmethod
+    def get_email_verification_object(request: HttpRequest) -> "ReporterEmailVerification":
+        """Get the latest email verification object for the current session"""
+        return ReporterEmailVerification.objects.filter(reporter_session=request.session.session_key).latest("date_created")
+
+    @staticmethod
+    def get_breacher_details(request: HttpRequest, cleaned_data: dict) -> BreacherDetails:
+        """Get the breacher details from the session"""
+        if show_check_company_details_page_condition(request):
+            breacher_details = cleaned_data["do_you_know_the_registered_company_number"]
+        else:
+            breacher_details = cleaned_data["business_or_person_details"]
+        return breacher_details
+
+    @classmethod
+    def create_from_session(cls, request: "HttpRequest") -> "Breach":
+        """Creates a Breach object from the data stored in current session"""
+        cleaned_data = get_all_cleaned_data(request)
+        reporter = cls.get_reporter_details(cleaned_data, request)
 
         # atomic transaction so that if any part of the process fails, the whole process is rolled back
         with transaction.atomic():
-            reporter_email_verification = ReporterEmailVerification.objects.filter(
-                reporter_session=request.session.session_key
-            ).latest("date_created")
+            reporter_email_verification = cls.get_email_verification_object(request)
 
             if not reporter_email_verification.verified:
                 # the user hasn't verified their email address, don't let them submit
@@ -89,11 +125,11 @@ class Breach(BaseModel):
 
             # Save Breach to Database
             new_breach = Breach.objects.create(
-                reporter_professional_relationship=cleaned_data["start"]["reporter_professional_relationship"],
-                reporter_email_address=cleaned_data["email"]["reporter_email_address"],
                 reporter_email_verification=reporter_email_verification,
-                reporter_full_name=reporter_full_name,
-                reporter_name_of_business_you_work_for=reporter_name_of_business_you_work_for,
+                reporter_professional_relationship=reporter["professional_relationship"],
+                reporter_email_address=reporter["email_address"],
+                reporter_full_name=reporter["full_name"],
+                reporter_name_of_business_you_work_for=reporter["name_of_business_you_work_for"],
                 when_did_you_first_suspect=cleaned_data["when_did_you_first_suspect"]["when_did_you_first_suspect"],
                 is_the_date_accurate=cleaned_data["when_did_you_first_suspect"]["is_the_date_accurate"],
                 what_were_the_goods=cleaned_data["what_were_the_goods"]["what_were_the_goods"],
@@ -110,20 +146,11 @@ class Breach(BaseModel):
                     "tell_us_about_the_suspected_breach"
                 ],
                 reporter_session=request.session._get_session_from_db(),
+                sanctions_regimes_breached=cleaned_data["which_sanctions_regime"]["which_sanctions_regime"],
             )
 
-            if declared_sanctions := cleaned_data["which_sanctions_regime"]["which_sanctions_regime"]:
-                new_breach.unknown_sanctions_regime = "Unknown Regime" in declared_sanctions
-                new_breach.other_sanctions_regime = "Other Regime" in declared_sanctions
-
-                new_breach.sanctions_regimes_breached = declared_sanctions
-
             # Save breacher details to database
-            if show_check_company_details_page_condition(request):
-                breacher_details = cleaned_data["do_you_know_the_registered_company_number"]
-            else:
-                breacher_details = cleaned_data["business_or_person_details"]
-
+            breacher_details = cls.get_breacher_details(request, cleaned_data)
             PersonOrCompany.save_person_or_company(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
 
             # Save documents to permanent bucket and database
@@ -153,7 +180,11 @@ class PersonOrCompany(BaseModel):
         """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
         return cls.objects.create(
             name=person_or_company.get("name", ""),
-            name_of_business=person_or_company.get("name_of_business"),
+            name_of_business=(
+                person_or_company["registered_company_name"]
+                if person_or_company.get("do_you_know_the_registered_company_number", False)
+                else person_or_company.get("name_of_business")
+            ),
             website=person_or_company.get("website"),
             email=person_or_company.get("email"),
             address_line_1=person_or_company.get("address_line_1"),
@@ -192,6 +223,14 @@ class PersonOrCompany(BaseModel):
     )
     registered_company_number = models.CharField(max_length=20, null=True, blank=True)
     registered_office_address = models.CharField(null=True, blank=True)
+
+    def get_readable_address(self) -> str:
+        """Returns a formatted address string for the address fields of this model instance."""
+        if self.registered_office_address:
+            #  If we have registered_office_address, use that instead of the address fields
+            return self.registered_office_address
+        else:
+            return get_formatted_address(model_to_dict(self))
 
 
 class UploadedDocument(BaseModel):

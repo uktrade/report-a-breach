@@ -54,36 +54,35 @@
                     {{ breacher.registered_company_number }}
                 </dd>
             </div>
+        {% endif %}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Name
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ breacher.name }}
+            </dd>
+        </div>
+        {% if breacher.website %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Name
+                    Website
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ breacher.name }}
-                </dd>
-            </div>
-            {% if breacher.website %}
-
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Website
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        <a class="govuk-link"
-                           href="{{ form_data.about_the_supplier.website }}">{{ breacher.website }}<span
-                            class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
-                    </dd>
-                </div>
-            {% endif %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Address
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ breacher_address | linebreaksbr }}
+                    <a class="govuk-link"
+                       href="{{ form_data.about_the_supplier.website }}">{{ breacher.website }}<span
+                        class="govuk-visually-hidden">{# todo - hidden copy #}</span></a>
                 </dd>
             </div>
         {% endif %}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Address
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ breacher_address | linebreaksbr }}
+            </dd>
+        </div>
     </dl>
     <h2 class="govuk-heading-m">Overview of the breach</h2>
     <dl class="govuk-summary-list">
@@ -167,25 +166,38 @@
             <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Location of end-user {{ forloop.counter }}
+                        Name
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% if end_user.country.name == "United Kingdom" %}
-                            The UK
+                        {% if end_user.name %}
+                            {{ end_user.name }}
                         {% else %}
-                            Outside the UK
+                            Not provided
                         {% endif %}
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Name and address of end-user {{forloop.counter}}
+                        Business
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {{ end_user.name }}<br><br>
-                        {{end_user.name_of_business}}
-                        <br><br>
-                        {% include "report_a_suspected_breach/partials/truncated_text.html" with text=end_user.address|linebreaksbr %}
+                        {% if end_user.name_of_business %}
+                            {{ end_user.name_of_business }}
+                        {% else %}
+                            Not provided
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                        Address
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if end_user.address %}
+                            {% include "report_a_suspected_breach/partials/truncated_text.html" with text=end_user.address|linebreaksbr %}
+                        {% else %}
+                            Not provided
+                        {% endif %}
                     </dd>
                 </div>
                 {% if end_user.website %}
