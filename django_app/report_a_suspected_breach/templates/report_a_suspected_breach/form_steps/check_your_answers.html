@@ -206,54 +206,25 @@
     <h2 class="govuk-heading-m">The supply chain</h2>
     <h3 class="govuk-heading-s">Supplier</h3>
     <dl class="govuk-summary-list">
-        {% if form_data.where_were_the_goods_supplied_from.where_were_the_goods_supplied_from == "i_do_not_know" %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Location of supplier
-                </dt>
-                <dd class="govuk-summary-list__value">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                Name and address of supplier
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {% if form_data.where_were_the_goods_supplied_from.where_were_the_goods_supplied_from == "i_do_not_know" %}
                     I do not know
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">location of supplier</span></a>
-                </dd>
-        {% else %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Location of supplier
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% get_country form_data.about_the_supplier.country as country %}
-                    {% if country.name == "United Kingdom" %}
-                        The UK
-                    {% else %}
-                        Outside the UK
-                    {% endif %}
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">location of supplier</span></a>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Name and address of supplier
-                </dt>
-                <dd class="govuk-summary-list__value">
+                {% else %}
                     {{ form_data.about_the_supplier.name }}
                     <br> <br>
                     {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.about_the_supplier.readable_address|linebreaksbr %}
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link"
-                       href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">name and address of supplier</span></a>
-                </dd>
-            </div>
-        {% endif %}
+                {% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link"
+                   href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_from' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                    class="govuk-visually-hidden">name and address of supplier</span></a>
+            </dd>
+        </div>
     </dl>
     {% if form_data.end_users %}
         {% for end_user, value in form_data.end_users.items %}
@@ -289,14 +260,27 @@
             <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Name and address of end-user {{forloop.counter}}
+                        Name
                     </dt>
                     <dd class="govuk-summary-list__value">
                         {{ value.cleaned_data.name_of_person }}
-                        <br><br>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                        Business
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ value.cleaned_data.name_of_business }}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                        Address
+                    </dt>
+                    <dd class="govuk-summary-list__value">
                         {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.readable_address|linebreaksbr %}
                     </dd>
-
                 </div>
                 {% if value.cleaned_data.website %}
                     <div class="govuk-summary-list__row">
@@ -336,13 +320,13 @@
     <dl class="govuk-summary-list">
         {% if is_made_available_journey %}
             <a class="govuk-link"
-               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">Add another
-                end-user<span
+               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">{% if form_data.end_users %}Add another
+                end-user{% else %}Add an end-user{% endif %}<span
                     class="govuk-visually-hidden">end-user</span></a>
         {% else %}
             <a class="govuk-link"
-               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">Add another
-                end-user<span
+               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to' %}?add_another_end_user=yes&redirect_to_url=report_a_suspected_breach:check_your_answers">{% if form_data.end_users %}Add another
+                end-user{% else %}Add an end-user{% endif %}<span
                     class="govuk-visually-hidden">end-user</span></a>
         {% endif %}
     </dl>

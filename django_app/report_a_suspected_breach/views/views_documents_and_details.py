@@ -115,4 +115,6 @@ class DownloadDocumentView(View):
 
 class TellUsAboutTheSuspectedBreachView(BaseFormView):
     form_class = forms.TellUsAboutTheSuspectedBreachForm
-    success_url = reverse_lazy("report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "summary"})
+    success_url = reverse_lazy(
+        "report_a_suspected_breach:tasklist_with_current_task", kwargs={"current_task_name": "review_and_submit"}
+    )

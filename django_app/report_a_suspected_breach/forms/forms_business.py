@@ -120,6 +120,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                     company_details = get_details_from_companies_house(registered_company_number)
                     cleaned_data["registered_company_number"] = company_details["company_number"]
                     cleaned_data["registered_company_name"] = company_details["company_name"]
+                    cleaned_data["name"] = company_details["company_name"]
 
                     # converting the companies house address dict into 'normal' format and also flattening the
                     # dictionary so the address keys are on the top-level key structure

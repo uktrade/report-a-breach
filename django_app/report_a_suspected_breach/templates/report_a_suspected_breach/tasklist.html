@@ -37,11 +37,5 @@
                 </li>
             {% endfor %}
         </ul>
-        {% if show_continue_button %}
-            <a href="{% url 'report_a_suspected_breach:check_your_answers' %}" class="govuk-button"
-               data-module="govuk-button">
-                Continue
-            </a>
-        {% endif %}
     </div>
 {% endblock row_content %}
