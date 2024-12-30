@@ -100,8 +100,6 @@ class TestThirdPartyPath(PlaywrightTestBase):
         page.get_by_label("Give a summary of the breach").click()
         page.get_by_label("Give a summary of the breach").fill("suummary fo the breach")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="Continue").click()
-        page.get_by_role("link", name="Continue").click()
         page.get_by_label("I agree and accept").check()
         page.get_by_role("button", name="Submit").click()
 
