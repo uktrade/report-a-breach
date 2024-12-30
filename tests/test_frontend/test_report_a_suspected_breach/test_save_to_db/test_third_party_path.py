@@ -98,8 +98,10 @@ class TestThirdPartyPath(PlaywrightTestBase):
         page.get_by_role("link", name="Sanctions breach details").click()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Give a summary of the breach").click()
-        page.get_by_label("Give a summary of the breach").fill("suummary fo the breach")
+        page.get_by_label("Give a summary of the breach").fill("summary of the breach")
         page.get_by_role("button", name="Continue").click()
+        page.get_by_role("link", name="Review and submit").click()
+        page.get_by_role("link", name="Continue").click()
         page.get_by_label("I agree and accept").check()
         page.get_by_role("button", name="Submit").click()
 
@@ -118,7 +120,7 @@ class TestThirdPartyPath(PlaywrightTestBase):
 
         assert breach.what_were_the_goods == "what were the goods"
         assert breach.where_were_the_goods_supplied_from == "different_uk_address"
-        assert breach.tell_us_about_the_suspected_breach == "suummary fo the breach"
+        assert breach.tell_us_about_the_suspected_breach == "summary of the breach"
 
         entities = breach.personorcompany_set.all()
         assert entities.count() == 3  # 1 end-user, 1 breacher, 1 supplier
