@@ -62,4 +62,4 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_label("Give a summary of the breach").click()
         self.page.get_by_label("Give a summary of the breach").fill("Summary of breach")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/summary"))
+        expect(self.page).to_have_url(re.compile(r".*/review_and_submit"))
