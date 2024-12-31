@@ -10,7 +10,7 @@ def s3_check() -> bool:
     """
     client = boto3.client("s3")
 
-    bucket_names = ["temporary-document-bucket", "permanent-document-bucket"]
+    bucket_names = ["report-a-breach-temporary-dev", "report-a-breach-permanent-dev"]
 
     try:
         for bucket_name in bucket_names:
