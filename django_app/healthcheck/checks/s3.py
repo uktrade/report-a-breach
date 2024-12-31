@@ -1,16 +1,16 @@
 import boto3
 import sentry_sdk
-
-# from django_app.config import settings
+from django.conf import settings
 
 
 def s3_check() -> bool:
     """
-    Performs a check on the S3 connection
+    Check if the S3 bucket exists and ensure the app can access it.
+    https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/s3/client/head_bucket.html
     """
     client = boto3.client("s3")
 
-    bucket_names = ["report-a-breach-temporary-dev", "report-a-breach-permanent-dev"]
+    bucket_names = [settings.TEMPORARY_S3_BUCKET_NAME, settings.PERMANENT_S3_BUCKET_NAME]
 
     try:
         for bucket_name in bucket_names:
