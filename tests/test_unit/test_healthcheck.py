@@ -14,7 +14,7 @@ def setup():
 
 
 @patch("healthcheck.checks.s3.boto3")
-def test_successful_healthcheck(rasb_client, mock_s3_client):
+def test_successful_healthcheck(mock_s3_client, rasb_client):
     mock_s3_client.head_bucket.return_value = {"test": True}
     response = rasb_client.get(reverse("healthcheck:healthcheck_ping"))
     content = get_response_content(response)
