@@ -24,13 +24,17 @@ def frontend_tests(context: Any) -> None:
 
 
 @task
-def makemigrations(context: Any, app: str = "report_a_suspected_breach") -> None:
+def makemigrations(context: Any, app: str | None = None) -> None:
     print("Running manage.py makemigrations")
-    context.run(f"pipenv run python django_app/manage.py makemigrations {app}")
+    if app:
+        command = f"pipenv run python django_app/manage.py makemigrations {app}"
+    else:
+        command = "pipenv run python django_app/manage.py makemigrations"
+    context.run(command)
 
 
 @task
-def migrate(context: Any, app: str = None) -> None:
+def migrate(context: Any, app: str | None = None) -> None:
     print("Running manage.py migrate")
     if app:
         command = f"pipenv run python django_app/manage.py migrate {app}"
