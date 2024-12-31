@@ -215,12 +215,14 @@
                         <span class="govuk-phase-banner__text">
                             This is a new service
 						{# don't show the feedback text whilst on a feedback page #}
+                            – Help us improve it and
                             {% if request.resolver_match.app_name != "feedback" %}
-                                – Help us improve it and
                                 <a class="govuk-link" target="_blank"
                                    href="{% url 'feedback:collect_full_feedback' %}?url={% get_feedback_url request %}">
                                     give your feedback (opens in a new tab).
                                 </a>
+                            {% else %}
+                                give your feedback
                             {% endif %}
                         </span>
                     </p>

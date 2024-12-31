@@ -17,7 +17,7 @@ urlpatterns = [
     path("view/", include("view_a_suspected_breach.urls")),
     path("cookies-policy", CookiesConsentView.as_view(), name="cookies_consent"),
     path("hide_cookies", HideCookiesView.as_view(), name="hide_cookies"),
-    path("feedback/", include("feedback.urls")),
+    path("give-feedback/", include("feedback.urls")),
     path("healthcheck/", include("healthcheck.urls")),
     path("privacy-notice", PrivacyNoticeView.as_view(), name="privacy_notice"),
     path("reset_session/", ResetSessionView.as_view(), name="reset_session"),
