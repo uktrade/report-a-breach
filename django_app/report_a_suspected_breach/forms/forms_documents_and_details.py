@@ -32,6 +32,8 @@ class UploadDocumentsForm(BaseForm):
 
     def clean_document(self) -> list[UploadedDocument]:
         documents = self.cleaned_data.get("document")
+        if len(documents) > 10:
+            raise forms.ValidationError("You can only select up to 10 files at the same time", code="too_many")
         for document in documents:
 
             # does the document contain a virus?
