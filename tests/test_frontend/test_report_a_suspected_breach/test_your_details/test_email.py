@@ -11,8 +11,6 @@ class TestEmail(conftest.PlaywrightTestBase):
     """
 
     def test_correct_email_goes_to_verify_page(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "owner")
         self.page.get_by_role("button", name="Continue").click()
@@ -22,8 +20,6 @@ class TestEmail(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SECURITY_CODE}"))
 
     def test_no_email_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "owner")
         self.page.get_by_role("button", name="Continue").click()
@@ -34,8 +30,6 @@ class TestEmail(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.EMAIL_ADDRESS}"))
 
     def test_incorrect_format_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "owner")
         self.page.get_by_role("button", name="Continue").click()

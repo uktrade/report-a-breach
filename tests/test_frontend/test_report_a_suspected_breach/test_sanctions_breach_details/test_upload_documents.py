@@ -12,8 +12,6 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
     """
 
     def test_no_input_goes_to_suspected_breach(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -37,8 +35,6 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SUMMARY_OF_BREACH}"))
 
     def test_correct_files_goes_to_suspected_breach(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -59,8 +55,6 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SUMMARY_OF_BREACH}"))
 
     def test_incorrect_filetype_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -83,8 +77,6 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
 
     @pytest.mark.usefixtures("patched_clean_document")
     def test_malware_file_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()

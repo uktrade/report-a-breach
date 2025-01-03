@@ -37,13 +37,11 @@ class TestCheckYourAnswersYourDetails(conftest.PlaywrightTestBase):
     """
 
     def test_business_work_for_show_condition(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_third_party)
         self.page.get_by_role("heading", name="Check your answers").click()
         expect(self.page.get_by_text("Person or business you're reporting")).to_be_visible()
 
     def test_can_change_reporter_full_name(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Your details").click()
@@ -63,7 +61,6 @@ class TestCheckYourAnswersYourDetails(conftest.PlaywrightTestBase):
         self.declaration_and_complete_page(self.page)
 
     def test_can_change_name_and_business_reporter_works_for(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_third_party)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Your details").click()
@@ -100,7 +97,6 @@ class TestCheckYourAnswersPersonOrBusinessYouAreReporting(conftest.PlaywrightTes
     """
 
     def test_can_change_uk_breacher_details(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Person or Business you're reporting").click()
@@ -132,18 +128,17 @@ class TestCheckYourAnswersPersonOrBusinessYouAreReporting(conftest.PlaywrightTes
 
     def test_breacher_details_uk_non_uk_url_creation(self):
         """tests that the correct url is created based on the breacher location"""
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_third_party)
         self.page.get_by_role("link", name="Change person or business website").click()
         assert reverse("report_a_suspected_breach:business_or_person_details", kwargs={"is_uk_address": "False"}) in self.page.url
 
         self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_role("link", name="Change person or business website").click()
         assert reverse("report_a_suspected_breach:business_or_person_details", kwargs={"is_uk_address": "True"}) in self.page.url
 
     def test_can_change_non_uk_breacher_details(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_third_party)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Person or Business you're reporting").click()
@@ -177,7 +172,6 @@ class TestCheckYourAnswersPersonOrBusinessYouAreReporting(conftest.PlaywrightTes
         self.declaration_and_complete_page(self.page)
 
     def test_can_change_companies_house_details(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_companies_house)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Person or business you're").click()
@@ -218,7 +212,6 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
     """
 
     def test_can_change_date_first_suspected_breach(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="Overview of the breach").click()
@@ -240,7 +233,6 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
         self.declaration_and_complete_page(self.page)
 
     def test_can_change_sanctions_regimes_breached(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_text("Sanctions regimes breached").click()
         expect(self.page.get_by_text("The Yemen")).to_be_visible()
@@ -261,7 +253,6 @@ class TestCheckYourAnswersOverviewOfTheBreach(conftest.PlaywrightTestBase):
         self.declaration_and_complete_page(self.page)
 
     def test_can_change_what_were_the_goods(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_text("What were the goods or").click()
         expect(self.page.get_by_text("Accountancy goods")).to_be_visible()
@@ -283,7 +274,6 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
     """
 
     def test_can_change_name_and_address_of_supplier_to_unknown(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_role("heading", name="Check your answers").click()
         self.page.get_by_role("heading", name="The supply chain", exact=True).click()
@@ -299,7 +289,6 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.declaration_and_complete_page(self.page)
 
     def test_can_change_location_of_end_user(self):
-        self.page.goto(self.base_url)
         breach = breach_details_owner.copy()
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
         self.create_breach(self.page, breach)
@@ -324,7 +313,6 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.declaration_and_complete_page(self.page)
 
     def test_can_change_name_and_address_of_end_user(self):
-        self.page.goto(self.base_url)
         breach = breach_details_owner.copy()
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
         self.create_breach(self.page, breach)
@@ -348,7 +336,6 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.declaration_and_complete_page(self.page)
 
     def test_can_add_another_end_user(self):
-        self.page.goto(self.base_url)
         breach = breach_details_owner.copy()
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
         self.create_breach(self.page, breach)
@@ -369,7 +356,6 @@ class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
     """
 
     def test_can_change_summary_of_the_breach(self):
-        self.page.goto(self.base_url)
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_text("Summary of the breach", exact=True).click()
         expect(self.page.get_by_text("Happened a month ago")).to_be_visible()

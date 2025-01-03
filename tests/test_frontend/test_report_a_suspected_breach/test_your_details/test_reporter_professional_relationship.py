@@ -11,8 +11,6 @@ class TestReporterProfessionalRelationship(conftest.PlaywrightTestBase):
     """
 
     def test_reporter_professional_relationship(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.PROFESSIONAL_RELATIONSHIP}"))
         self.page.get_by_role("heading", name="What is your professional").click()
@@ -21,8 +19,6 @@ class TestReporterProfessionalRelationship(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.EMAIL_ADDRESS}"))
 
     def test_no_relationship_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.PROFESSIONAL_RELATIONSHIP}"))
         self.page.get_by_role("heading", name="What is your professional").click()

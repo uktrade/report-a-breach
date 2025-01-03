@@ -11,8 +11,6 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
     """
 
     def test_no_input_returns_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -33,8 +31,6 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.LOCATION_MADE_AVAILABLE_TO}"))
 
     def test_uk_option_returns_uk_address_capture(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -51,8 +47,6 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("County (optional)")).to_be_visible()
 
     def test_non_uk_option_returns_non_uk_address_capture(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -70,8 +64,6 @@ class TestWhereWereTheGoodsMadeAvailableTo(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("Country")).to_be_visible()
 
     def test_i_do_not_know_returns_other_addresses_in_supply_chain(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()

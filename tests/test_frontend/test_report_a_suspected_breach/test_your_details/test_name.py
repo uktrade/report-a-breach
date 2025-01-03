@@ -11,8 +11,6 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
     """
 
     def test_correct_details_goes_to_business_details_page(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -25,8 +23,6 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.ABOUT_PERSON_OR_BUSINESS}"))
 
     def test_no_name_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -39,8 +35,6 @@ class TestNameAndBusinessYouWorkFor(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.YOUR_DETAILS}"))
 
     def test_no_business_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I work for a third party")
         self.verify_email_details(self.page)
@@ -59,8 +53,6 @@ class TestName(conftest.PlaywrightTestBase):
     """
 
     def test_correct_details_goes_to_taslkist_page(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I'm an owner, officer or")
         self.verify_email_details(self.page)
@@ -71,8 +63,6 @@ class TestName(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.ABOUT_PERSON_OR_BUSINESS}"))
 
     def test_no_name_raises_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.reporter_professional_relationship(self.page, "I'm an owner, officer or")
         self.verify_email_details(self.page)

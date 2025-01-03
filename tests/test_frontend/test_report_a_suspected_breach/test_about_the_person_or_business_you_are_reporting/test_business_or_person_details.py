@@ -11,8 +11,6 @@ class TestAboutThePersonOrBusinessUKAddress(conftest.PlaywrightTestBase):
     """
 
     def test_correct_input_returns_next_step_in_task_list(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -20,8 +18,6 @@ class TestAboutThePersonOrBusinessUKAddress(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.OVERVIEW_OF_BREACH}"))
 
     def test_no_input_returns_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -47,8 +43,6 @@ class TestAboutThePersonOrBusinessUKAddress(conftest.PlaywrightTestBase):
     def test_incorrect_uk_postcode_returns_error(self):
         breacher_address = data.UK_BREACHER_ADDRESS_DETAILS.copy()
         breacher_address["postcode"] = "AA"
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -73,8 +67,6 @@ class TestAboutThePersonOrBusinessNonUKAddress(conftest.PlaywrightTestBase):
     """
 
     def test_correct_input_returns_when_did_you_suspect(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -82,8 +74,6 @@ class TestAboutThePersonOrBusinessNonUKAddress(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.OVERVIEW_OF_BREACH}"))
 
     def test_no_input_returns_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()

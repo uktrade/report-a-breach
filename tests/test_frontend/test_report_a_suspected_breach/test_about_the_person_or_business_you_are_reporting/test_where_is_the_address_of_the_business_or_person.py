@@ -11,8 +11,6 @@ class TestWhereIsTheAddressOfTheBusinessOrPerson(conftest.PlaywrightTestBase):
     """
 
     def test_no_input_returns_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -32,8 +30,6 @@ class TestWhereIsTheAddressOfTheBusinessOrPerson(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*{url_paths.ADDRESS_BUSINESS_OR_PERSON}"))
 
     def test_uk_option_returns_uk_address_capture(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -49,8 +45,6 @@ class TestWhereIsTheAddressOfTheBusinessOrPerson(conftest.PlaywrightTestBase):
         expect(self.page.get_by_label("County (optional)")).to_be_visible()
 
     def test_non_uk_option_returns_non_uk_address_capture(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()

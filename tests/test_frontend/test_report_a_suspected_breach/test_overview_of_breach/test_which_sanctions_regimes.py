@@ -11,8 +11,6 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
     """
 
     def test_no_input_returns_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -26,8 +24,6 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SANCTIONS_REGIMES_BREACHED}"))
 
     def test_can_select_multiple_sanctions_regimes(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -44,8 +40,6 @@ class TestWhichSanctionsRegimes(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.GOODS_SERVICES_DESCRIPTION}"))
 
     def test_i_do_not_know_regime(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
