@@ -46,7 +46,7 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         page.get_by_label("What were the goods or").click()
         page.get_by_label("What were the goods or").fill("what were the goods")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="The supply chain").click()
+        page.get_by_role("link", name="People and businesses involved").click()
         page.get_by_label("They have not been supplied").check()
         page.get_by_role("button", name="Continue").click()
         page.locator("[name='where_were_the_goods_made_available_from']").first.click()
