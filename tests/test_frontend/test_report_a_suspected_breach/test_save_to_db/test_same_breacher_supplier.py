@@ -47,7 +47,7 @@ class TestSameBreacherSupplierPath(PlaywrightTestBase):
         page.get_by_label("What were the goods or").click()
         page.get_by_label("What were the goods or").fill("this isa. short description")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="The supply chain").click()
+        page.get_by_role("link", name="People and businesses involved").click()
         page.locator("[name='where_were_the_goods_supplied_from']").first.click()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("The UK", exact=True).check()
