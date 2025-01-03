@@ -404,7 +404,7 @@ class PlaywrightTestBase(LiveServerTestCase):
 
         # Tasklist
         page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
-        page.get_by_role("link", name="The supply chain").click()
+        page.get_by_role("link", name="People and businesses involved").click()
 
         if breach_details["supplier_location"] == "uk":
             self.create_uk_supplier(page)
@@ -424,11 +424,11 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_label("No").check()
         page.get_by_role("button", name="Continue").click()
 
-        # Were There Other Addresses in the Supply Chain Page
-        page.get_by_role("heading", name="Were there any other").click()
+        # Were any other people or businesses involved in the trade page
+        page.get_by_role("heading", name="Were any other people or businesses").click()
         page.get_by_label("Yes").check()
-        page.get_by_text("Give all addresses").click()
-        page.get_by_label("Give all addresses").fill("Addr supply chain")
+        page.get_by_text("Give all names and addresses").click()
+        page.get_by_label("Give all names and addresses").fill("Addr supply chain")
         page.get_by_role("button", name="Continue").click()
 
         #
