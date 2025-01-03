@@ -11,7 +11,6 @@ class TestOwnerPath(PlaywrightTestBase):
         assert Breach.objects.all().count() == 0
 
         page = self.page
-        page.goto(self.base_url)
         page.get_by_role("link", name="Your details").click()
         page.get_by_label("I'm an owner, officer or").check()
         page.get_by_role("button", name="Continue").click()
