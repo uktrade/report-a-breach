@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from tests.test_frontend import conftest
+from tests.test_frontend import conftest, url_paths
 
 
 class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
@@ -27,7 +27,7 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_text("Give all addresses").click()
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/sanctions_breach_details"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SANCTIONS_DETAILS}"))
         self.page.get_by_role("link", name="Sanctions breach details").click()
         self.upload_documents_page(self.page)
         self.page.get_by_role("button", name="Continue").click()
@@ -35,7 +35,7 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter a summary of the breach")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/summary-of-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SUMMARY_OF_BREACH}"))
 
     def test_correct_input_goes_to_summary(self):
         self.page.goto(self.base_url)
@@ -54,7 +54,7 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_text("Give all addresses").click()
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/sanctions_breach_details"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SANCTIONS_DETAILS}"))
         self.page.get_by_role("link", name="Sanctions breach details").click()
         self.upload_documents_page(self.page)
         self.page.get_by_role("button", name="Continue").click()
@@ -62,4 +62,4 @@ class TestTellUsAboutTheSuspectedBreach(conftest.PlaywrightTestBase):
         self.page.get_by_label("Give a summary of the breach").click()
         self.page.get_by_label("Give a summary of the breach").fill("Summary of breach")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/review_and_submit"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.REVIEW_AND_SUBMIT}"))

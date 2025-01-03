@@ -54,7 +54,7 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Name of person (optional)").click()
-        page.get_by_label("Name of person (optional)").fill("end user 1 - made available too")
+        page.get_by_label("Name of person (optional)").fill("end user 1 - made available to")
         page.get_by_label("Name of business (optional)").click()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("No").check()
@@ -92,4 +92,4 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         assert breacher.town_or_city == "Test City"
 
         end_user = entities.get(type_of_relationship="recipient")
-        assert end_user.name == "end user 1 - made available too"
+        assert end_user.name == "end user 1 - made available to"

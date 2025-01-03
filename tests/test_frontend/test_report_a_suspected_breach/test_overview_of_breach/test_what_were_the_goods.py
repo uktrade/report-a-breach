@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from tests.test_frontend import conftest, data
+from tests.test_frontend import conftest, data, url_paths
 
 
 class TestWhatWereTheGoods(conftest.PlaywrightTestBase):
@@ -28,7 +28,7 @@ class TestWhatWereTheGoods(conftest.PlaywrightTestBase):
                 "link", name="Enter a short description of the goods, services, technological assistance or technology"
             )
         ).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/goods-services-description"))
+        expect(self.page).to_have_url(re.compile(rf".*{url_paths.GOODS_SERVICES_DESCRIPTION}"))
 
     def test_correct_input_goes_to_where_were_the_goods_supplied_from(self):
         self.page.goto(self.base_url)
@@ -43,4 +43,4 @@ class TestWhatWereTheGoods(conftest.PlaywrightTestBase):
         self.page.get_by_label("What were the goods or").click()
         self.page.get_by_label("What were the goods or").fill("Description")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/supply_chain/"))
+        expect(self.page).to_have_url(re.compile(rf".*{url_paths.SUPPLY_CHAIN}"))

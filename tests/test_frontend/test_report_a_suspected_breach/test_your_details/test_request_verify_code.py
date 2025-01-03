@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from tests.test_frontend import conftest
+from tests.test_frontend import conftest, url_paths
 
 CORRECT_CODE_DETAILS = {"email": "test@digital.gov.uk", "verify_code": "012345"}
 EMPTY_CODE_DETAILS = {"email": "test@didigtal.gov.uk", "verify_code": ""}
@@ -37,13 +37,13 @@ class TestRequestVerifyCode(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_role("heading", name="We've sent you an email")
         self.page.get_by_role("link", name="Not received an email or code not working").click()
-        expect(self.page).to_have_url(re.compile(r".*/request-new-code"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.REQUEST_CODE}"))
         self.page.get_by_role("heading", name="Request a new code").click()
         self.page.get_by_role("button", name="Request a new code").click()
         self.page.get_by_role("heading", name="We've sent you an email").click()
         self.page.get_by_label("Enter the 6 digit security").fill(INCORRECT_CODE_DETAILS["verify_code"])
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/enter-security-code"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SECURITY_CODE}"))
         expect(self.page.get_by_label("There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Code is incorrect. Enter the 6 digit")).to_be_visible()
 
@@ -61,7 +61,7 @@ class TestRequestVerifyCode(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="We've sent you an email").click()
         self.page.get_by_label("Enter the 6 digit security").fill("")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/enter-security-code"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SECURITY_CODE}"))
         expect(self.page.get_by_label("There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter the 6 digit security code")).to_be_visible()
 
@@ -79,4 +79,4 @@ class TestRequestVerifyCode(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="We've sent you an email").click()
         self.page.get_by_label("Enter the 6 digit security").fill(CORRECT_CODE_DETAILS["verify_code"])
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/your-name"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.YOUR_NAME}"))

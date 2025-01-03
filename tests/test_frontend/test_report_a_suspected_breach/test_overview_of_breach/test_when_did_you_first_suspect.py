@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from tests.test_frontend import conftest
+from tests.test_frontend import conftest, url_paths
 
 
 class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
@@ -29,7 +29,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         self.page.get_by_role("heading", name="Is the date you entered exact").click()
         self.page.get_by_label("Exact date").check()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/sanctions-regime-breached"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SANCTIONS_REGIMES_BREACHED}"))
 
     def test_future_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -52,7 +52,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="The date you first suspected the breach must be in the past")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.DATE_OF_BREACH}"))
 
     def test_incorrect_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -75,7 +75,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="The date you first suspected the breach must be a real date")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.DATE_OF_BREACH}"))
 
     def test_no_exact_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -92,7 +92,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter the date you first suspected")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.DATE_OF_BREACH}"))
 
     def test_no_approx_date_returns_error(self):
         self.page.goto(self.base_url)
@@ -109,7 +109,7 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter the date you first suspected")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.DATE_OF_BREACH}"))
 
     def test_no_input_returns_error(self):
         self.page.goto(self.base_url)
@@ -124,4 +124,4 @@ class TestWhenDidYouFirstSuspect(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Select whether the date you entered")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/date-you-first-suspected-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.DATE_OF_BREACH}"))

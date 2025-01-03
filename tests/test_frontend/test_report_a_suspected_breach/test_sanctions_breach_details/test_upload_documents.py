@@ -3,7 +3,7 @@ import re
 import pytest
 from playwright.sync_api import expect
 
-from tests.test_frontend import conftest, data
+from tests.test_frontend import conftest, data, url_paths
 
 
 class TestUploadDocuments(conftest.PlaywrightTestBase):
@@ -28,13 +28,13 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.page.get_by_text("Give all addresses").click()
         self.page.get_by_label("Give all addresses").fill("Addr supply chain")
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/sanctions_breach_details"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SANCTIONS_DETAILS}"))
         self.page.get_by_role("link", name="Sanctions breach details").click()
         self.page.get_by_role("heading", name="Upload documents (optional)").click()
         self.page.get_by_text("You can upload items such as").click()
         self.page.get_by_text("Drag and drop files here or").click()
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/summary-of-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SUMMARY_OF_BREACH}"))
 
     def test_correct_files_goes_to_suspected_breach(self):
         self.page.goto(self.base_url)
@@ -56,7 +56,7 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Sanctions breach details").click()
         self.upload_documents_page(self.page)
         self.page.get_by_role("button", name="Continue").click()
-        expect(self.page).to_have_url(re.compile(r".*/summary-of-breach"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.SUMMARY_OF_BREACH}"))
 
     def test_incorrect_filetype_raises_error(self):
         self.page.goto(self.base_url)
@@ -79,7 +79,7 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.upload_documents_page(self.page, files=data.MISSING_FILE_TYPE)
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("button", name="Continue")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/upload-documents"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.UPLOAD_DOCUMENTS}"))
 
     @pytest.mark.usefixtures("patched_clean_document")
     def test_malware_file_raises_error(self):
@@ -105,4 +105,4 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         expect(self.page.get_by_role("link", name="The selected file contains a virus")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_text("mock_malware_file.txt")).not_to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/upload-documents"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.UPLOAD_DOCUMENTS}"))
