@@ -93,6 +93,31 @@ class TestUploadDocumentsForm:
         assert "document" in form.errors
         assert form.errors.as_data()["document"][0].code == "too_many"
 
+    def test_more_than_ten_uploaded_files(self, request_object):
+        good_file = SimpleUploadedFile("good.pdf", b"%PDF-test_pdf")
+
+        form = UploadDocumentsForm(
+            files={
+                "document": [
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,
+                    good_file,  # 11
+                ]
+            },
+            request=request_object,
+        )
+        assert not form.is_valid()
+        assert "document" in form.errors
+        assert form.errors.as_data()["document"][0].code == "too_many"
+
     def test_invalid_extension_file_name_escaped(self, request_object):
         bad_file = SimpleUploadedFile("<img src=xonerror=alert(document.domain)>gif.gif", b"GIF8")
 
