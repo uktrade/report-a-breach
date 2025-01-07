@@ -128,13 +128,16 @@ jobs:
 
         - run:
             name: Run front-end tests
-            parallelism: 4
             # we don't run frontend tests with coverage as only unit tests should affect coverage
             command: |
               sudo tee -a /etc/hosts \<<<'127.0.0.1 report-a-suspected-breach'
-              pipenv run playwright install --with-deps firefox
-              TEST_FILES=$(find tests/test_frontend -name "*.py")
-              pipenv run pytest $(circleci tests split $TEST_FILES) --browser firefox --junitxml=test-results/frontend/results.xml --create-db
+              pytest \
+              --ignore tests/test_unit \
+              --browser firefox  \
+              --circleci-parallelize \
+              --maxprocesses=4 \
+              --junitxml=test-results/frontend/results.xml
+              --create-db
 
         - store_test_results:
             path: test-results
