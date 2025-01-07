@@ -362,6 +362,14 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
 
+    def test_empty_address_business_name_doesnt_display(self):
+        self.page.goto(self.base_url)
+        breach = breach_details_owner.copy()
+        breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.create_breach(self.page, breach)
+        assert self.page.get_by_test_id("end-user-2").text_content().count("Not provided") == 2
+        assert self.page.get_by_test_id("end-user-3").text_content().count("Not provided") == 0
+
 
 class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
     """

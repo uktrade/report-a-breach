@@ -57,7 +57,11 @@ def get_formatted_address(address_dict: AddressData) -> str:
         address_string += f",\n {postal_code}"
 
     if country_code := address_dict.get("country"):
-        country = countries.name(country_code)
-        address_string += f",\n {country}"
+        if address_string:
+            # we only want to add the country if the address string already contains something, as country is added
+            # by the backend in UK cases, so we end up with something strange-looking like
+            # , United Kingdom
+            country = countries.name(country_code)
+            address_string += f",\n {country}"
 
     return address_string
