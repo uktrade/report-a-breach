@@ -138,7 +138,6 @@ jobs:
               --browser firefox  \
               --circleci-parallelize \
               --junitxml=test-results/frontend/results.xml
-              --create-db
 
         - store_test_results:
             path: test-results
