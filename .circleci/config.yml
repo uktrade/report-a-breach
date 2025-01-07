@@ -95,7 +95,7 @@ jobs:
             POSTGRES_PASSWORD: password
         - image: localstack/localstack
 
-      parallelism: 10
+
 
       steps:
         - checkout
@@ -130,6 +130,7 @@ jobs:
 
         - run:
             name: Run front-end tests
+            parallelism: 5
             # we don't run frontend tests with coverage as only unit tests should affect coverage
             command: |
               sudo tee -a /etc/hosts \<<<'127.0.0.1 report-a-suspected-breach'
