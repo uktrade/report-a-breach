@@ -95,8 +95,6 @@ jobs:
             POSTGRES_PASSWORD: password
         - image: localstack/localstack
 
-
-
       steps:
         - checkout
         - add_ssh_keys:
