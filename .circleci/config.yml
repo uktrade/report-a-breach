@@ -95,6 +95,8 @@ jobs:
             POSTGRES_PASSWORD: password
         - image: localstack/localstack
 
+      parallelism: 10
+
       steps:
         - checkout
         - add_ssh_keys:
