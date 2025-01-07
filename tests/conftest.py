@@ -138,3 +138,8 @@ def delete_all_temporary_bucket_files():
 
     for obj in TemporaryDocumentStorage().bucket.objects.all():
         obj.delete()
+
+
+@pytest.fixture()
+def use_include_private_urls(settings):
+    settings.INCLUDE_PRIVATE_URLS = False
