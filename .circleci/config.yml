@@ -131,7 +131,8 @@ jobs:
             # we don't run frontend tests with coverage as only unit tests should affect coverage
             command: |
               sudo tee -a /etc/hosts \<<<'127.0.0.1 report-a-suspected-breach'
-              pytest \
+              pipenv run playwright install --with-deps firefox
+              pipenv run pytest \
               --ignore tests/test_unit \
               --browser firefox  \
               --circleci-parallelize \
