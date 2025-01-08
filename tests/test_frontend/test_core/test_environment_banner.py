@@ -23,9 +23,12 @@ class TestEnvironmentBanner(PlaywrightTestBase):
         expect(self.page.get_by_test_id("environment_banner")).to_be_visible()
         expect(self.page.get_by_text("Environment: local")).to_be_visible()
 
-    @override_settings(ENVIRONMENT="local", DEBUG=True, CURRENT_BRANCH="test-branch", CURRENT_TAG="v1.0.0")
+    @override_settings(
+        ENVIRONMENT="local", DEBUG=True, CURRENT_BRANCH="test-branch", CURRENT_TAG="v1.0.0", CURRENT_COMMIT="123456"
+    )
     def test_banner_content(self):
         self.page.goto(self.base_url)
         expect(self.page.get_by_text("Environment: local")).to_be_visible()
         expect(self.page.get_by_text("Branch: test-branch")).to_be_visible()
         expect(self.page.get_by_text("Tag: v1.0.0")).to_be_visible()
+        expect(self.page.get_by_text("Commit: 123456")).to_be_visible()
