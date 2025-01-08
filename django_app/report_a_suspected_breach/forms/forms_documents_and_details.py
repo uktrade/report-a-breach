@@ -4,7 +4,7 @@ from core.document_storage import TemporaryDocumentStorage
 from core.forms import BaseForm, BaseModelForm
 from core.utils import get_mime_type
 from crispy_forms_gds.helper import FormHelper
-from crispy_forms_gds.layout import Field, Layout
+from crispy_forms_gds.layout import Field, Layout, Size
 from django import forms
 from django_chunk_upload_handlers.clam_av import VirusFoundInFileException
 from report_a_suspected_breach.fields import MultipleFileField
@@ -18,7 +18,7 @@ class UploadDocumentsForm(BaseForm):
     revalidate_on_done = False
     document = MultipleFileField(
         label="Upload a file",
-        help_text="Maximum individual file size 100MB. Maximum number of uploads 10",
+        help_text="Maximum individual file size 100MB. Maximum number of uploads 10.",
         required=False,
     )
 
@@ -28,6 +28,7 @@ class UploadDocumentsForm(BaseForm):
         self.fields["document"].widget.attrs["name"] = "document"
         # redefining this to remove the 'Continue' button from the helper
         self.helper = FormHelper()
+        self.helper.label_size = Size.SMALL
         self.helper.layout = Layout("document")
 
     def clean_document(self) -> list[UploadedDocument]:
