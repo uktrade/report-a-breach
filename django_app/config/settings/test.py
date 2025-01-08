@@ -18,6 +18,8 @@ SAVE_VIDEOS = False
 
 ENVIRONMENT = "test"
 
+INCLUDE_PRIVATE_URLS = True
+
 
 class TestUploadHandler(TemporaryFileUploadHandler):
     def new_file(self, *args, **kwargs):
