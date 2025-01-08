@@ -315,6 +315,7 @@ PERMISSIONS_POLICY = {
     "payment": [],
     "usb": [],
 }
+SESSION_COOKIE_HTTPONLY = True
 
 # Django Ratelimit
 RATELIMIT_VIEW = "core.views.rate_limited_view"
