@@ -4,8 +4,8 @@ from playwright.sync_api import expect
 from tests.test_frontend.conftest import PlaywrightTestBase
 
 
-class TestEnvironmentBanner(PlaywrightTestBase):
-    """Tests the non-production banner appears"""
+class TestEnvironmentBannerProduction(PlaywrightTestBase):
+    """Tests the production banner doesn't appear"""
 
     @override_settings(ENVIRONMENT="production", DEBUG=False)
     def test_banner_does_not_appear_on_production(self):
@@ -16,6 +16,10 @@ class TestEnvironmentBanner(PlaywrightTestBase):
     def test_banner_does_not_appear_debug_true(self):
         self.page.goto(self.base_url)
         expect(self.page.get_by_test_id("environment_banner")).to_be_hidden()
+
+
+class TestEnvironmentBannerNonProduction(PlaywrightTestBase):
+    """Tests the non-production banner appears"""
 
     @override_settings(ENVIRONMENT="local", DEBUG=True)
     def test_banner_appears(self):
