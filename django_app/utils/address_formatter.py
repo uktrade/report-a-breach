@@ -35,7 +35,7 @@ def turn_companies_house_into_normal_address_dict(address_dict: Dict[str, Any]) 
     try:
         new_address_dict["town_or_city"] = address_dict["locality"]
     except KeyError:
-        pass
+        new_address_dict["town_or_city"] = ""
 
     return new_address_dict
 
