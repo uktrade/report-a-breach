@@ -284,6 +284,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.CHECK_YOUR_ANSWERS}"))
         expect(self.page.get_by_text("I do not know")).to_be_visible()
+        expect(self.page.get_by_text("Other people or businesses involved in this trade")).to_be_visible()
         expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, United Kingdom")).not_to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
