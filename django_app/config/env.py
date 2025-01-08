@@ -85,6 +85,7 @@ class BaseSettings(PydanticBaseSettings):
     # Information about the current environment
     current_branch: str = Field(alias="GIT_BRANCH", default="unknown")
     current_tag: str = Field(alias="GIT_TAG", default="")
+    current_commit: str = Field(alias="GIT_COMMIT", default="")
 
     @computed_field
     @property
@@ -126,6 +127,15 @@ class LocalSettings(BaseSettings):
         current_branch = subprocess.run(["git", "branch", "--show-current"], capture_output=True)
         if current_branch.returncode == 0:
             return current_branch.stdout.decode("utf-8").replace("\n", "")
+        else:
+            return "unknown"
+
+    @computed_field
+    @property
+    def git_current_commit(self) -> str:
+        current_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True)
+        if current_commit.returncode == 0:
+            return current_commit.stdout.decode("utf-8").replace("\n", "")
         else:
             return "unknown"
 
