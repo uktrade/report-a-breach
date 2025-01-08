@@ -30,9 +30,9 @@ class TaskListView(TemplateView):
                 "url": reverse_lazy("report_a_suspected_breach:when_did_you_first_suspect"),
             },
             {
-                "title": "The supply chain",
+                "title": "People and businesses involved",
                 "key": "supply_chain",
-                "help_text": "Contact details for the supplier, end-user and anyone else in the supply chain",
+                "help_text": "Contact details for the supplier, end-user and anyone else involved in the trade",
                 "url": reverse_lazy("report_a_suspected_breach:where_were_the_goods_supplied_from"),
             },
             {

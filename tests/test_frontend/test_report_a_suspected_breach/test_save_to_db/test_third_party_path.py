@@ -11,7 +11,6 @@ class TestThirdPartyPath(PlaywrightTestBase):
         assert Breach.objects.all().count() == 0
 
         page = self.page
-        page.goto(self.base_url)
         page.get_by_role("link", name="Your details").click()
         page.get_by_label("I work for a third party with").check()
         page.get_by_role("button", name="Continue").click()
@@ -65,7 +64,7 @@ class TestThirdPartyPath(PlaywrightTestBase):
         page.get_by_label("What were the goods or").click()
         page.get_by_label("What were the goods or").fill("what were the goods")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="The supply chain").click()
+        page.get_by_role("link", name="People and businesses involved").click()
         page.get_by_text("The UK", exact=True).click()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Name of business or person").click()

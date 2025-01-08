@@ -273,14 +273,20 @@ class WereThereOtherAddressesInTheSupplyChainForm(BaseModelForm):
         model = Breach
         fields = ("were_there_other_addresses_in_the_supply_chain", "other_addresses_in_the_supply_chain")
         labels = {
-            "were_there_other_addresses_in_the_supply_chain": "Were there any other addresses in the supply chain?",
-            "other_addresses_in_the_supply_chain": "Give all addresses",
+            "were_there_other_addresses_in_the_supply_chain": "Were any other people or businesses involved in the trade?",
+            "other_addresses_in_the_supply_chain": "Give all names and addresses",
         }
         error_messages = {
             "were_there_other_addresses_in_the_supply_chain": {
-                "required": "Select yes if there were any other addresses in the supply chain"
+                "required": "Select yes if there were any other people or businesses involved in the trade"
             },
-            "other_addresses_in_the_supply_chain": {"required": "Enter other addresses in the supply chain"},
+            "other_addresses_in_the_supply_chain": {
+                "required": "Enter names and addresses of other people or businesses involved in the trade"
+            },
+        }
+        help_texts = {
+            "were_there_other_addresses_in_the_supply_chain": "Examples include if the goods were sent via a consignee, "
+            "or if the services were brokered via a third party"
         }
 
     def __init__(self, *args: object, **kwargs: object) -> None:
