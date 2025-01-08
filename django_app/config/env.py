@@ -83,6 +83,7 @@ class BaseSettings(PydanticBaseSettings):
     # Information about the current environment
     current_branch: str = Field(alias="GIT_BRANCH", default="unknown")
     current_tag: str = Field(alias="GIT_TAG", default="")
+    current_commit: str = Field(alias="GIT_COMMIT", default="")
 
     @computed_field
     @property
