@@ -36,3 +36,5 @@ PROTOCOL = "http://"
 
 CURRENT_BRANCH = env.git_current_branch
 CURRENT_COMMIT = env.git_current_commit
+
+INCLUDE_PRIVATE_URLS = True
