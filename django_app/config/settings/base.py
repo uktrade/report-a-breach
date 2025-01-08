@@ -238,6 +238,8 @@ GTM_ID = env.gtm_id
 REPORT_A_SUSPECTED_BREACH_DOMAIN = env.report_a_suspected_breach_domain
 VIEW_A_SUSPECTED_BREACH_DOMAIN = env.view_a_suspected_breach_domain
 
+INCLUDE_PRIVATE_URLS = env.include_private_urls
+
 # Authentication - SSO
 AUTHENTICATION_BACKENDS = [
     "view_a_suspected_breach.authbrokers.BreachPortalAuth",
@@ -347,3 +349,4 @@ PROTOCOL = "https://"
 # Information about the current environment
 CURRENT_BRANCH = env.current_branch
 CURRENT_TAG = env.current_tag
+CURRENT_COMMIT = env.current_commit
