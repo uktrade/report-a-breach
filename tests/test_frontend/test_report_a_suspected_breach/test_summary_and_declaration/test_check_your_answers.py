@@ -284,7 +284,6 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.CHECK_YOUR_ANSWERS}"))
         expect(self.page.get_by_text("I do not know")).to_be_visible()
-        expect(self.page.get_by_text("Other people or businesses involved in this trade")).to_be_visible()
         expect(self.page.get_by_text("Supply Street, Supply Lane, Supply Town, United Kingdom")).not_to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
@@ -310,6 +309,15 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.CHECK_YOUR_ANSWERS}"))
         expect(self.page.get_by_text("AL1, AL2, Town", exact=True)).not_to_be_visible()
         expect(self.page.get_by_text("AL1, AL2, Town, American Samoa")).to_be_visible()
+        self.page.get_by_role("link", name="Continue").click()
+        self.declaration_and_complete_page(self.page)
+
+    def test_no_others_in_the_supply_chain(self):
+        breach = breach_details_owner.copy()
+        breach["no_others_in_supply_chain"] = True
+        self.create_breach(self.page, breach)
+        self.page.get_by_role("heading", name="Check your answers").click()
+        expect(self.page.get_by_text("Other people or businesses involved in this trade")).to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
 
