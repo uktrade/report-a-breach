@@ -36,10 +36,12 @@ def test_sentry_configuration_options(request_object):
     ENVIRONMENT="test",
     CURRENT_BRANCH="test-branch",
     CURRENT_TAG="v1.0.0",
+    CURRENT_COMMIT="123456",
 )
 def test_environment_information(request_object):
     assert environment_information(request_object) == {
-        "current_environment": "test",
-        "current_branch": "test-branch",
-        "current_tag": "v1.0.0",
+        "CURRENT_ENVIRONMENT": "test",
+        "CURRENT_BRANCH": "test-branch",
+        "CURRENT_TAG": "v1.0.0",
+        "CURRENT_COMMIT": "123456",
     }
