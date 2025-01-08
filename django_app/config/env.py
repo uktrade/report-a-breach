@@ -51,7 +51,7 @@ class BaseSettings(PydanticBaseSettings):
     permanent_s3_bucket_name: str = "permanent-document-bucket"
     presigned_url_expiry_seconds: int = 3600
 
-    include_private_urls: str = False
+    include_private_urls: bool = False
 
     # Django sites
     report_a_suspected_breach_domain: str = "report-a-suspected-breach"
