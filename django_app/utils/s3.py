@@ -30,20 +30,21 @@ def generate_presigned_url(s3_storage: Any, s3_file_object: str) -> str:
 def get_all_session_files(s3_storage: S3Boto3Storage, session: SessionBase) -> dict[str, Any]:
     """Gets all files that a user has uploaded in a session."""
     s3_client = get_s3_client_from_storage(s3_storage=s3_storage)
-    response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=session.session_key)
     session_files = {}
+    if not session.is_empty():
+        response = s3_client.list_objects_v2(Bucket=s3_storage.bucket.name, Prefix=session.session_key)
 
-    user_uploaded_files = get_user_uploaded_files(session)
-    for content in response.get("Contents", []):
-        key = content["Key"]
-        file_name = key.rpartition("/")[2]
+        user_uploaded_files = get_user_uploaded_files(session)
+        for content in response.get("Contents", []):
+            key = content["Key"]
+            file_name = key.rpartition("/")[2]
 
-        # checking that a file with this name was uploaded in the session
-        if file_name in user_uploaded_files:
-            session_files[key] = {
-                "file_name": file_name,
-                "url": reverse("report_a_suspected_breach:download_document", kwargs={"file_name": file_name}),
-            }
+            # checking that a file with this name was uploaded in the session
+            if file_name in user_uploaded_files:
+                session_files[key] = {
+                    "file_name": file_name,
+                    "url": reverse("report_a_suspected_breach:download_document", kwargs={"file_name": file_name}),
+                }
     return session_files
 
 

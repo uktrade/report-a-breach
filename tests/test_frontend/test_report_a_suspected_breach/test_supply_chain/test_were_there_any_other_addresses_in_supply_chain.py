@@ -2,7 +2,7 @@ import re
 
 from playwright.sync_api import expect
 
-from tests.test_frontend import conftest
+from tests.test_frontend import conftest, url_paths
 
 
 class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase):
@@ -11,8 +11,6 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
     """
 
     def test_no_input_returns_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -26,11 +24,9 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Select yes if there were any")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/other-addresses-in-supply-chain"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.OTHER_ADDRESSES_SUPPLY_CHAIN}"))
 
     def test_yes_and_no_input_returns_error(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -46,11 +42,9 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
         expect(self.page.get_by_role("link", name="Enter names and addresses of other people")).to_be_visible()
-        expect(self.page).to_have_url(re.compile(r".*/other-addresses-in-supply-chain"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.OTHER_ADDRESSES_SUPPLY_CHAIN}"))
 
     def test_yes_and_correct_input_returns_upload_documents(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -66,11 +60,9 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
         self.page.get_by_label("Give all names and addresses").fill("Address 3 in Supply chain")
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_role("link", name="Sanctions breach details").click()
-        expect(self.page).to_have_url(re.compile(r".*/upload-documents"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.UPLOAD_DOCUMENTS}"))
 
     def test_no_returns_upload_documents(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -84,11 +76,9 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
         self.page.get_by_label("No", exact=True).check()
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_role("link", name="Sanctions breach details").click()
-        expect(self.page).to_have_url(re.compile(r".*/upload-documents"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.UPLOAD_DOCUMENTS}"))
 
     def test_i_do_not_know_returns_upload_documents(self):
-        self.page.goto(self.base_url)
-        self.page.get_by_role("link", name="Reset session").click()
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
         self.page.get_by_role("link", name="2. About the person or").click()
@@ -102,4 +92,4 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
         self.page.get_by_label("I do not know").check()
         self.page.get_by_role("button", name="Continue").click()
         self.page.get_by_role("link", name="Sanctions breach details").click()
-        expect(self.page).to_have_url(re.compile(r".*/upload-documents"))
+        expect(self.page).to_have_url(re.compile(rf".*/{url_paths.UPLOAD_DOCUMENTS}"))
