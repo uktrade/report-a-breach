@@ -78,6 +78,10 @@ class PlaywrightTestBase(LiveServerTestCase):
             domain=f"{SiteName.view_a_suspected_breach}:{self.server_thread.port}",
         )
 
+        # navigate to the base url and reset the session
+        self.page.goto(self.base_url)
+        self.page.get_by_role("link", name="Reset session").click()
+
     def tearDown(self) -> None:
         if settings.SAVE_VIDEOS:
             # Rename the video in the test results directory, so it's readable
@@ -372,8 +376,6 @@ class PlaywrightTestBase(LiveServerTestCase):
             page.get_by_role("button", name="Continue").click()
 
     def create_breach(self, page, breach_details):
-        page.get_by_role("link", name="Reset session").click()
-
         # Tasklist
         page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
         page.get_by_role("link", name="Your details").click()

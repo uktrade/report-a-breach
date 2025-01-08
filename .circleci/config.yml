@@ -132,7 +132,13 @@ jobs:
             command: |
               sudo tee -a /etc/hosts \<<<'127.0.0.1 report-a-suspected-breach'
               pipenv run playwright install --with-deps firefox
-              pipenv run pytest tests/test_frontend --browser firefox --junitxml=test-results/frontend/results.xml --create-db
+              pipenv run pytest \
+              --ignore tests/test_unit \
+              --browser firefox  \
+              --circleci-parallelize \
+              --maxprocesses=4 \
+              -n=auto \
+              --junitxml=test-results/frontend/results.xml
 
         - store_test_results:
             path: test-results
