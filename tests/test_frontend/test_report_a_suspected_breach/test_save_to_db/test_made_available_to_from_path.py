@@ -9,7 +9,6 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         assert Breach.objects.all().count() == 0
 
         page = self.page
-        page.goto(self.base_url)
         page.get_by_role("link", name="Your details").click()
         page.get_by_label("I do not have a professional").check()
         page.get_by_role("button", name="Continue").click()
@@ -46,7 +45,7 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         page.get_by_label("What were the goods or").click()
         page.get_by_label("What were the goods or").fill("what were the goods")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="The supply chain").click()
+        page.get_by_role("link", name="People and businesses involved").click()
         page.get_by_label("They have not been supplied").check()
         page.get_by_role("button", name="Continue").click()
         page.locator("[name='where_were_the_goods_made_available_from']").first.click()
@@ -54,7 +53,7 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Name of person (optional)").click()
-        page.get_by_label("Name of person (optional)").fill("end user 1 - made available too")
+        page.get_by_label("Name of person (optional)").fill("end user 1 - made available to")
         page.get_by_label("Name of business (optional)").click()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("No").check()
@@ -92,4 +91,4 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         assert breacher.town_or_city == "Test City"
 
         end_user = entities.get(type_of_relationship="recipient")
-        assert end_user.name == "end user 1 - made available too"
+        assert end_user.name == "end user 1 - made available to"

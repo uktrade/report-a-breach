@@ -11,7 +11,6 @@ class TestOwnerPath(PlaywrightTestBase):
         assert Breach.objects.all().count() == 0
 
         page = self.page
-        page.goto(self.base_url)
         page.get_by_role("link", name="Your details").click()
         page.get_by_label("I'm an owner, officer or").check()
         page.get_by_role("button", name="Continue").click()
@@ -59,7 +58,7 @@ class TestOwnerPath(PlaywrightTestBase):
         page.get_by_label("What were the goods or").click()
         page.get_by_label("What were the goods or").fill("this is a short description, what were the goods")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="The supply chain").click()
+        page.get_by_role("link", name="People and businesses involved").click()
         page.get_by_label("The UK", exact=True).check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Name of business or person").click()
@@ -118,8 +117,8 @@ class TestOwnerPath(PlaywrightTestBase):
         page.get_by_label("No").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Yes").check()
-        page.get_by_label("Give all addresses").click()
-        page.get_by_label("Give all addresses").fill("other addresses")
+        page.get_by_label("Give all names and addresses").click()
+        page.get_by_label("Give all names and addresses").fill("other addresses")
         page.get_by_role("button", name="Continue").click()
         page.get_by_role("link", name="Sanctions breach details").click()
         page.get_by_role("button", name="Continue").click()
