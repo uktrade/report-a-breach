@@ -167,10 +167,11 @@
             <div class="govuk-phase-banner hide-on-print" data-testid="environment_banner" style="background-color: orange;">
                 <p class="govuk-phase-banner__content" style="margin: 0 auto;">
                     <span class="govuk-phase-banner__text">
-                        Environment: <strong>{{ current_environment }}</strong><br>
-                        Branch: <strong>{{ current_branch }}</strong><br>
+                        Environment: <strong>{{ CURRENT_ENVIRONMENT }}</strong><br>
+                        Branch: <strong>{{ CURRENT_BRANCH }}</strong><br>
+                        Commit: <strong>{{ CURRENT_COMMIT }}</strong><br>
                         {% if current_tag %}
-                            Tag: <strong>{{ current_tag }}</strong>
+                            Tag: <strong>{{ CURRENT_TAG }}</strong>
                         {% endif %}
                     </span>
                 </p>

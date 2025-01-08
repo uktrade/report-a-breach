@@ -127,6 +127,15 @@ class LocalSettings(BaseSettings):
         else:
             return "unknown"
 
+    @computed_field
+    @property
+    def git_current_commit(self) -> str:
+        current_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True)
+        if current_commit.returncode == 0:
+            return current_commit.stdout.decode("utf-8").replace("\n", "")
+        else:
+            return "unknown"
+
 
 class TestSettings(LocalSettings):
     headless: bool = False
