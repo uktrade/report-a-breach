@@ -193,15 +193,16 @@
                         Address
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {% if end_user.address %}
-                            {% include "report_a_suspected_breach/partials/truncated_text.html" with text=end_user.address|linebreaksbr %}
-                        {% else %}
-                            Not provided
-                        {% endif %}
+                        {% with readable_address=end_user.get_readable_address %}
+                            {% if readable_address %}
+                                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=readable_address|linebreaksbr %}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        {% endwith %}
                     </dd>
                 </div>
                 {% if end_user.website %}
-
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                             Website
