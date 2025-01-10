@@ -276,7 +276,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
     def test_can_change_name_and_address_of_supplier_to_unknown(self):
         self.create_breach(self.page, breach_details_owner)
         self.page.get_by_role("heading", name="Check your answers").click()
-        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
+        self.page.get_by_role("heading", name="People and businesses involved", exact=True).click()
         self.page.get_by_role("heading", name="Supplier").click()
         self.page.get_by_role("link", name="Change name and address of supplier").click()
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.LOCATION_SUPPLIED_FROM}"))
@@ -293,7 +293,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
         self.create_breach(self.page, breach)
         self.page.get_by_role("heading", name="Check your answers").click()
-        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
+        self.page.get_by_role("heading", name="People and businesses involved", exact=True).click()
         self.page.get_by_role("heading", name="End-user 1").click()
         self.page.get_by_role("heading", name="End-user 2").click()
         self.page.get_by_role("heading", name="End-user 3").click()
@@ -326,7 +326,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
         self.create_breach(self.page, breach)
         self.page.get_by_role("heading", name="Check your answers").click()
-        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
+        self.page.get_by_role("heading", name="People and businesses involved", exact=True).click()
         self.page.get_by_role("heading", name="End-user 1").click()
         self.page.get_by_role("heading", name="End-user 2").click()
         self.page.get_by_role("heading", name="End-user 3").click()
@@ -349,7 +349,7 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
         self.create_breach(self.page, breach)
         self.page.get_by_role("heading", name="Check your answers").click()
-        self.page.get_by_role("heading", name="The supply chain", exact=True).click()
+        self.page.get_by_role("heading", name="People and businesses involved", exact=True).click()
         self.page.get_by_role("link", name="Add another end-user end-user").click()
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.LOCATION_END_USER}"))
         self.page = self.create_end_user(self.page, data.END_USERS["end_user4"])
@@ -357,6 +357,14 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         expect(self.page.get_by_text("End User4")).to_be_visible()
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
+
+    def test_empty_address_business_name_doesnt_display(self):
+        self.page.goto(self.base_url)
+        breach = breach_details_owner.copy()
+        breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
+        self.create_breach(self.page, breach)
+        assert self.page.get_by_test_id("end-user-2").text_content().count("Not provided") == 2
+        assert self.page.get_by_test_id("end-user-3").text_content().count("Not provided") == 0
 
 
 class TestCheckYourAnswersSanctionsBreachDetails(conftest.PlaywrightTestBase):
