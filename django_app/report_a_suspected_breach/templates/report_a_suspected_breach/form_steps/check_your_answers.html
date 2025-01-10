@@ -203,7 +203,7 @@
             </dd>
         </div>
     </dl>
-    <h2 class="govuk-heading-m">The supply chain</h2>
+    <h2 class="govuk-heading-m">People and businesses involved</h2>
     <h3 class="govuk-heading-s">Supplier</h3>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
@@ -343,11 +343,11 @@
         {% endif %}
     </dl>
     {% if form_data.were_there_other_addresses_in_the_supply_chain.were_there_other_addresses_in_the_supply_chain  == "yes" %}
-        <h2 class="govuk-heading-m">Other addresses in the supply chain</h2>
+        <h3 class="govuk-heading-m">Other people or businesses involved in this trade</h3>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    Address
+                    Names and addresses
                 </dt>
                 <dd class="govuk-summary-list__value">
                     {% include "report_a_suspected_breach/partials/truncated_text.html" with text=form_data.were_there_other_addresses_in_the_supply_chain.other_addresses_in_the_supply_chain|linebreaksbr %}
@@ -355,7 +355,7 @@
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link"
                        href="{% url 'report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                        class="govuk-visually-hidden">other addresses in supply chain</span></a>
+                        class="govuk-visually-hidden">Change names and addresses of other people or businesses involved in this trade</span></a>
                 </dd>
             </div>
         </dl>

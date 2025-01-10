@@ -1,14 +1,6 @@
-import sys
-from importlib import import_module, reload
-
-from django.conf import settings
 from django.test import override_settings
 
-
-def reload_urlconf():
-    if settings.ROOT_URLCONF in sys.modules:
-        reload(sys.modules[settings.ROOT_URLCONF])
-    return import_module(settings.ROOT_URLCONF)
+from tests.helpers import reload_urlconf
 
 
 @override_settings(ROOT_URLCONF="core.debug_urls")
