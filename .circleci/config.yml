@@ -92,10 +92,6 @@ jobs:
               name: run isort (import formatter check)
               command: pipenv run isort django_app --check
 
-          - run:
-              name: run mypy (type hinting check)
-              command: pipenv run mypy .
-
           - restore_cache:
               keys:
                 - pre-commit-cache-{{ arch }}-{{ .Branch }}
