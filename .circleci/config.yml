@@ -109,7 +109,7 @@ jobs:
     run_frontend_tests:
       <<: *django_server_configuration
 
-      parallelism: 5
+      parallelism: 10
 
       steps:
         - attach_workspace:
