@@ -2,31 +2,71 @@ version: 2.1
 
 orbs:
   codecov: codecov/codecov@4.1.0
+  aws-cli: circleci/aws-cli@5.1
 
-commands:
-  install_dependencies:
-    description: "Install Python dependencies"
-    steps:
-      - run:
-         name: Install Python dependencies
-         command: |
-             pip install pipenv && pipenv install --dev
-
-  restore_dependency_cache:
-    description: "Restore dependency cache."
-    steps:
-      - restore_cache:
-          key: deps2-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-
-  save_dependency_cache:
-    description: "Save dependency cache."
-    steps:
-      - save_cache:
-          key: deps2-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-          paths:
-            - "/home/circleci/.local/share/virtualenvs/project-zxI9dQ-Q"
+# we share the django server configuration between the run_unit_tests and run_frontend_tests jobs
+django_server_configuration: &django_server_configuration
+  docker:
+    - image: cimg/python:3.11.7
+      environment:
+        DJANGO_SETTINGS_MODULE: config.settings.test
+        DJANGO_DEBUG: "True"
+        DJANGO_SECRET_KEY: "CircleCI"
+        DATABASE_URI: "psql://postgres:password@127.0.0.1:5432/report_a_suspected_breach"
+        AWS_DEFAULT_REGION: eu-west-2
+        AWS_ENDPOINT_URL: http://localhost:4566
+        LOCALSTACK_PORT: 4566
+        TEMPORARY_S3_BUCKET_NAME: temporary-document-bucket
+        TEMPORARY_S3_BUCKET_ACCESS_KEY_ID: test
+        TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY: test
+        PERMANENT_S3_BUCKET_NAME: permanent-document-bucket
+        PERMANENT_S3_BUCKET_ACCESS_KEY_ID: test
+        PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY: test
+        HEADLESS: true
+        DJANGO_ALLOW_ASYNC_UNSAFE: true
+        SAVE_VIDEOS: true
+    - image: cimg/postgres:16.1
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_DB: report_a_suspected_breach
+        POSTGRES_PASSWORD: password
+    - image: localstack/localstack
 
 jobs:
+    install_dependencies:
+      docker:
+        - image: cimg/python:3.11.7
+          environment:
+            PIPENV_VENV_IN_PROJECT: true
+            PIPENV_CACHE_DIR: /home/circleci/.cache/pipenv
+      steps:
+          - checkout
+
+          - run: git submodule sync
+
+          - run: git submodule update --init
+
+          - run:
+              name: get python version
+              command: python --version > python_version.txt
+
+          - restore_cache:
+              key: deps2-{{ checksum "Pipfile.lock" }}-{{ checksum "python_version.txt" }}
+
+          - run:
+              name: Install dependencies
+              command: pip install pipenv && pipenv install --dev
+
+          - save_cache:
+              key: deps2-{{ checksum "Pipfile.lock" }}-{{ checksum "python_version.txt" }}
+              paths:
+                - "/home/circleci/.cache/pipenv"
+
+          - persist_to_workspace:
+              root: .
+              paths:
+                - .
+
     code_hygiene:
         docker:
             - image: cimg/python:3.11.7
@@ -37,19 +77,12 @@ jobs:
             CIRCLECI: "True"
             DATABASE_URL: ""
         steps:
-          - checkout
-          - add_ssh_keys:
-              fingerprints:
-                - "SHA256:srykW79sztyym4YTZsVCiRPRG+qY+pjtVETeJbYdAHw"
+          - attach_workspace:
+              at: .
+
           - run:
-              name: Install git submodules
-              command: git submodule init && git submodule update
-          - restore_dependency_cache
-          - install_dependencies
-          - save_dependency_cache
-          - run :
-              name: Install dependencies
-              command: pip install pipenv && pipenv install --dev
+              name: activate virtualenv
+              command: echo "source .venv/bin/activate" >> $BASH_ENV;
 
           - run:
               name: run black (code formatting check)
@@ -58,6 +91,10 @@ jobs:
           - run:
               name: run isort (import formatter check)
               command: pipenv run isort django_app --check
+
+          - run:
+              name: run mypy (type hinting check)
+              command: pipenv run mypy .
 
           - restore_cache:
               keys:
@@ -71,41 +108,64 @@ jobs:
               key: pre-commit-cache-{{ arch }}-{{ .Branch }}
               paths:
                 - ~/.cache/pre-commit
-    run_tests:
-      docker:
-        - image: cimg/python:3.11.7
-          environment:
-            DJANGO_SETTINGS_MODULE: config.settings.test
-            DJANGO_DEBUG: "True"
-            DJANGO_SECRET_KEY: "CircleCI"
-            DATABASE_URI: "psql://postgres:password@127.0.0.1:5432/report_a_suspected_breach"
-            AWS_DEFAULT_REGION: eu-west-2
-            AWS_ENDPOINT_URL: http://localhost:4566
-            LOCALSTACK_PORT: 4566
-            TEMPORARY_S3_BUCKET_NAME: temporary-document-bucket
-            TEMPORARY_S3_BUCKET_ACCESS_KEY_ID: test
-            TEMPORARY_S3_BUCKET_SECRET_ACCESS_KEY: test
-            PERMANENT_S3_BUCKET_NAME: permanent-document-bucket
-            PERMANENT_S3_BUCKET_ACCESS_KEY_ID: test
-            PERMANENT_S3_BUCKET_SECRET_ACCESS_KEY: test
-        - image: cimg/postgres:16.1
-          environment:
-            POSTGRES_USER: postgres
-            POSTGRES_DB: report_a_suspected_breach
-            POSTGRES_PASSWORD: password
-        - image: localstack/localstack
+
+
+    run_frontend_tests:
+      <<: *django_server_configuration
+
+      parallelism: 5
 
       steps:
-        - checkout
-        - add_ssh_keys:
-            fingerprints:
-              - "SHA256:srykW79sztyym4YTZsVCiRPRG+qY+pjtVETeJbYdAHw"
+        - attach_workspace:
+            at: .
+
         - run:
-            name: Install git submodules
-            command: git submodule init && git submodule update
-        - restore_dependency_cache
-        - install_dependencies
-        - save_dependency_cache
+            name: activate virtualenv
+            command: echo "source .venv/bin/activate" >> $BASH_ENV;
+
+        - aws-cli/setup
+
+        - run:
+            name: Create S3 Buckets
+            command: |
+              pipenv run awslocal s3 mb s3://temporary-document-bucket
+              pipenv run awslocal s3 mb s3://permanent-document-bucket
+              pipenv run awslocal s3api put-bucket-cors --bucket temporary-document-bucket --cors-configuration file://./aws/cors.json
+              pipenv run awslocal s3api put-bucket-cors --bucket permanent-document-bucket --cors-configuration file://./aws/cors.json
+
+        - run:
+            name: Run front-end tests
+            # we don't run frontend tests with coverage as only unit tests should affect coverage.
+            command: |
+              sudo tee -a /etc/hosts \<<<'127.0.0.1 report-a-suspected-breach'
+              sudo tee -a /etc/hosts \<<<'127.0.0.1 view-a-suspected-breach'
+              pipenv run playwright install --with-deps firefox
+              pipenv run pytest \
+                tests/test_frontend \
+                --browser firefox \
+                --junitxml=test-results/frontend/results.xml \
+                --create-db \
+                --circleci-parallelize
+
+        - store_artifacts:
+            # save the frontend test videos
+            path: video-test-results
+
+        - store_test_results:
+            path: test-results/frontend
+
+    run_unit_tests:
+      <<: *django_server_configuration
+
+      steps:
+        - attach_workspace:
+            at: .
+
+        - run:
+            name: activate virtualenv
+            command: echo "source .venv/bin/activate" >> $BASH_ENV;
+
+        - aws-cli/setup
 
         - run:
             name: Create S3 Buckets
@@ -122,33 +182,29 @@ jobs:
         - run:
             name: Run tests and save coverage report
             command: |
-              pipenv run pytest tests/test_unit --cov=django_app --cov-branch --cov-report=json --junitxml=test-results/unit-test-results.xml
+              pipenv run pytest \
+              tests/test_unit \
+              --cov=django_app \
+              --cov-branch \
+              --cov-report=json \
+              --junitxml=test-results/unit/results.xml \
+              --create-db
 
         - codecov/upload
 
-        - run:
-            name: Run front-end tests
-            # we don't run frontend tests with coverage as only unit tests should affect coverage
-            command: |
-              sudo tee -a /etc/hosts \<<<'127.0.0.1 report-a-suspected-breach'
-              pipenv run playwright install --with-deps firefox
-              pipenv run pytest \
-              --ignore tests/test_unit \
-              --browser firefox  \
-              --circleci-parallelize \
-              --maxprocesses=4 \
-              -n=auto \
-              --junitxml=test-results/frontend/results.xml
-
         - store_test_results:
-            path: test-results
-
-        - store_artifacts:
-            # save the frontend test videos
-            path: video-test-results
+            path: test-results/unit
 
 workflows:
   build_and_test:
     jobs:
-      - code_hygiene
-      - run_tests
+      - install_dependencies
+      - code_hygiene:
+          requires:
+            - install_dependencies
+      - run_unit_tests:
+          requires:
+            - install_dependencies
+      - run_frontend_tests:
+          requires:
+            - install_dependencies
