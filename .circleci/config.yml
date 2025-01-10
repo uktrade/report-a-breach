@@ -149,7 +149,7 @@ jobs:
 
         - store_artifacts:
             # save the frontend test videos
-            path: video-test-results
+            path: ./video-test-results
 
         - store_test_results:
             path: test-results/frontend

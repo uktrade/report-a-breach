@@ -61,7 +61,7 @@ exclude = '''
   | tests-reports
   | venv
   | .env
-  | sanctions_regimes/*
+  | sanctions_regimes
 )/
 '''
 
