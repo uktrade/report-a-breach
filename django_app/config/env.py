@@ -215,9 +215,12 @@ if "CIRCLECI" in os.environ:
     env = LocalSettings.model_construct(
         **{key if key == "DATABASE_URL" else key.casefold(): value for key, value in os.environ.items()}
     )
-elif os.environ.get("DJANGO_SETTINGS_MODULE", "") in ["config.settings.local", "config.settings.test"]:
+elif os.environ.get("DJANGO_SETTINGS_MODULE", "") == "config.settings.local":
     # Local development
     env = LocalSettings()
+elif os.environ.get("DJANGO_SETTINGS_MODULE", "") == "config.settings.test":
+    # Testing
+    env = TestSettings()  # type: ignore[call-arg]
 elif "COPILOT_ENVIRONMENT_NAME" in os.environ:
     # Deployed on DBT Platform
     env = DBTPlatformSettings()
