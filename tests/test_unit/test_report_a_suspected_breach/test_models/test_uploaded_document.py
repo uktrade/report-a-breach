@@ -17,7 +17,7 @@ def test_save_documents(
 ):
     patched_user_uploaded_files.return_value = ["test1.png", "test2.png"]
 
-    # first let's upload some files to s3
+    # first let's upload some files to s3.
     tmp_file_1 = tempfile.NamedTemporaryFile()
     tmp_file_1.write(b"test1")
     tmp_file_1.seek(0)
