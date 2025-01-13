@@ -312,6 +312,15 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         self.page.get_by_role("link", name="Continue").click()
         self.declaration_and_complete_page(self.page)
 
+    def test_no_others_in_the_supply_chain(self):
+        breach = breach_details_owner.copy()
+        breach["no_others_in_supply_chain"] = True
+        self.create_breach(self.page, breach)
+        self.page.get_by_role("heading", name="Check your answers").click()
+        expect(self.page.get_by_text("Other people or businesses involved in this trade")).to_be_visible()
+        self.page.get_by_role("link", name="Continue").click()
+        self.declaration_and_complete_page(self.page)
+
     def test_can_change_name_and_address_of_end_user(self):
         breach = breach_details_owner.copy()
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
