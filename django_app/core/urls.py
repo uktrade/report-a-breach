@@ -1,3 +1,5 @@
+import logging
+
 from core.views import (
     AccessibilityStatementView,
     CookiesConsentView,
@@ -9,15 +11,15 @@ from core.views import (
     ResetSessionView,
     SessionExpiredView,
 )
+from django.conf import settings
 from django.urls import include, path
 
-urlpatterns = [
+public_urls = [
     path("", RedirectBaseDomainView.as_view(), name="initial_redirect_view"),
     path("report/", include("report_a_suspected_breach.urls")),
-    path("view/", include("view_a_suspected_breach.urls")),
     path("cookies-policy", CookiesConsentView.as_view(), name="cookies_consent"),
     path("hide_cookies", HideCookiesView.as_view(), name="hide_cookies"),
-    path("feedback/", include("feedback.urls")),
+    path("give-feedback/", include("feedback.urls")),
     path("healthcheck/", include("healthcheck.urls")),
     path("privacy-notice", PrivacyNoticeView.as_view(), name="privacy_notice"),
     path("reset_session/", ResetSessionView.as_view(), name="reset_session"),
@@ -28,3 +30,14 @@ urlpatterns = [
     path("accessibility-statement", AccessibilityStatementView.as_view(), name="accessibility_statement"),
     path("auth/", include("authbroker_client.urls")),
 ]
+
+private_urls = [
+    path("view/", include("view_a_suspected_breach.urls")),
+]
+
+if settings.INCLUDE_PRIVATE_URLS:
+    logging.info("Include private urls")
+    urlpatterns = public_urls + private_urls
+else:
+    logging.info("Excluding private urls")
+    urlpatterns = public_urls

@@ -87,6 +87,9 @@ class PlaywrightTestBase(LiveServerTestCase):
             # Rename the video in the test results directory, so it's readable
             # 1231239190wei9cwice023r239230.webm -> video-test-results/ClassName-test_method.webm
             old_name = self.page.video.path()
+            output_directory = settings.ROOT_DIR / "video-test-results"
+            if not output_directory.is_dir():
+                output_directory.mkdir()
             os.replace(old_name, settings.ROOT_DIR / f"video-test-results/{type(self).__name__}-{self._testMethodName}.webm")
 
         # resetting the Site objects to their original state
@@ -425,11 +428,16 @@ class PlaywrightTestBase(LiveServerTestCase):
         page.get_by_role("button", name="Continue").click()
 
         # Were any other people or businesses involved in the trade page
-        page.get_by_role("heading", name="Were any other people or businesses").click()
-        page.get_by_label("Yes").check()
-        page.get_by_text("Give all names and addresses").click()
-        page.get_by_label("Give all names and addresses").fill("Addr supply chain")
-        page.get_by_role("button", name="Continue").click()
+        if breach_details.get("no_others_in_supply_chain", False):
+            page.get_by_role("heading", name="Were any other people or businesses").click()
+            page.get_by_label("No", exact=True).check()
+            page.get_by_role("button", name="Continue").click()
+        else:
+            page.get_by_role("heading", name="Were any other people or businesses").click()
+            page.get_by_label("Yes").check()
+            page.get_by_text("Give all names and addresses").click()
+            page.get_by_label("Give all names and addresses").fill("Addr supply chain")
+            page.get_by_role("button", name="Continue").click()
 
         #
         # Upload Documents Page

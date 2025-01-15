@@ -2,6 +2,14 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load countries %}
 {% block title %}Check your answers{% endblock title %}
+{% block extra_css %}
+    <style>
+        .change_business_details_link {
+            font-size: 19px;
+            text-align: right;
+        }
+    </style>
+{% endblock extra_css %}
 {% block column_content %}
     <div>
         <h1 class="govuk-heading-l">
@@ -228,86 +236,98 @@
     </dl>
     {% if form_data.end_users %}
         {% for end_user, value in form_data.end_users.items %}
-            <div class="action-wrapper">
-                <h3 class="govuk-heading-s" style="float:left">End-user {{ forloop.counter }}</h3>
-                <dl class="govuk-summary-card__actions">
-                    <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
-
-                        {% if is_made_available_journey %}
-                            <a class="govuk-link" style="font-size: 19px; text-align:right"
-                               href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                                class="govuk-visually-hidden">end-user {{forloop.counter}} details</span></a>
-                        {% else %}
-                            <a class="govuk-link" style="font-size: 19px; text-align:right"
-                               href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
-                                class="govuk-visually-hidden">end-user {{forloop.counter}} details</span></a>
-                        {% endif %}
-                    </dd>
-                    <dd class="govuk-summary-list__action">
-                        <form id="delete_end_user_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
-                              action="{% url 'report_a_suspected_breach:delete_end_user' %}?end_user_uuid={{ end_user }}&success_url=check_your_answers">
-                            <input type="hidden" name="end_user_uuid" value="{{ end_user }}">
-                            <input type="hidden" name="success_url" value = "check_your_answers">
-                            {% csrf_token %}
-                            <button type="submit" class="govuk-link button-that-looks-like-link" form="delete_end_user_form_{{ forloop.counter }}">
-                                Remove<span
-                                    class="govuk-visually-hidden">end-user {{forloop.counter}} details</span>
-                            </button>
-                        </form>
-                    </dd>
+            <div data-testid="end-user-{{ forloop.counter }}">
+                <div class="action-wrapper">
+                    <h3 class="govuk-heading-s fl-left">End-user {{ forloop.counter }}</h3>
+                    <dl class="govuk-summary-card__actions">
+                        <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
+                            {% if is_made_available_journey %}
+                                <a class="govuk-link change_business_details_link"
+                                   href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                                    class="govuk-visually-hidden">end-user {{forloop.counter}} details</span></a>
+                            {% else %}
+                                <a class="govuk-link change_business_details_link"
+                                   href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                                    class="govuk-visually-hidden">end-user {{forloop.counter}} details</span></a>
+                            {% endif %}
+                        </dd>
+                        <dd class="govuk-summary-list__action">
+                            <form id="delete_end_user_form_{{ forloop.counter }}" method="post" enctype='multipart/form-data' novalidate
+                                  action="{% url 'report_a_suspected_breach:delete_end_user' %}?end_user_uuid={{ end_user }}&success_url=check_your_answers">
+                                <input type="hidden" name="end_user_uuid" value="{{ end_user }}">
+                                <input type="hidden" name="success_url" value = "check_your_answers">
+                                {% csrf_token %}
+                                <button type="submit" class="govuk-link button-that-looks-like-link" form="delete_end_user_form_{{ forloop.counter }}">
+                                    Remove<span class="govuk-visually-hidden">end-user {{forloop.counter}} details</span>
+                                </button>
+                            </form>
+                        </dd>
+                    </dl>
+                </div>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Name
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% if value.cleaned_data.name_of_person %}
+                                {{ value.cleaned_data.name_of_person }}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Business
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% if value.cleaned_data.name_of_business %}
+                                {{ value.cleaned_data.name_of_business }}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Address
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% if value.cleaned_data.readable_address %}
+                                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.readable_address|linebreaksbr %}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        </dd>
+                    </div>
+                    {% if value.cleaned_data.website %}
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                                Website
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                <a class="govuk-link"
+                                   href="{{ value.cleaned_data.website }}">{{ value.cleaned_data.website }}<span
+                                    class="govuk-visually-hidden"></span></a>
+                            </dd>
+                        </div>
+                    {% endif %}
+                    {% if value.cleaned_data.additional_contact_details %}
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                                Additional contact information
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.additional_contact_details|linebreaksbr %}
+                            </dd>
+                        </div>
+                    {% endif %}
                 </dl>
             </div>
-            <dl class="govuk-summary-list">
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Name
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ value.cleaned_data.name_of_person }}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Business
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ value.cleaned_data.name_of_business }}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                        Address
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.readable_address|linebreaksbr %}
-                    </dd>
-                </div>
-                {% if value.cleaned_data.website %}
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                            Website
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            <a class="govuk-link"
-                               href="{{ value.cleaned_data.website }}">{{ value.cleaned_data.website }}<span
-                                class="govuk-visually-hidden"></span></a>
-                        </dd>
-                    </div>
-                {% endif %}
-                {% if value.cleaned_data.additional_contact_details %}
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                            Additional contact information
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            {% include "report_a_suspected_breach/partials/truncated_text.html" with text=value.cleaned_data.additional_contact_details|linebreaksbr %}
-                        </dd>
-                    </div>
-                {% endif %}
-            </dl>
         {% endfor %}
     {% else %}
-        <h3 class="govuk-heading-s" style="float:left">End-users</h3>
+        <h3 class="govuk-heading-s fl-left">End-users</h3>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
@@ -347,6 +367,21 @@
                 </dd>
             </div>
         </dl>
+    {% else %}
+        <h3 class="govuk-heading-s fl-left">Other people or businesses involved in this trade</h3>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                    {% if form_data.were_there_other_addresses_in_the_supply_chain.were_there_other_addresses_in_the_supply_chain == "no" %} No {% else %} I do not know
+                        </dt>
+                    {% endif %}
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link"
+                           href="{% url 'report_a_suspected_breach:were_there_other_addresses_in_the_supply_chain' %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
+                            class="govuk-visually-hidden">other addresses in supply chain</span></a>
+                    </dd>
+                </div>
+            </dl>
     {% endif %}
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">

@@ -58,6 +58,10 @@ def get_formatted_address(address_dict: AddressData) -> str:
 
     if country_code := address_dict.get("country"):
         country = countries.name(country_code)
-        address_string += f",\n {country}"
+        if address_string:
+            # sometimes we only have the country, so we don't want to add a comma
+            address_string += f",\n {country}"
+        else:
+            address_string += country
 
     return address_string
