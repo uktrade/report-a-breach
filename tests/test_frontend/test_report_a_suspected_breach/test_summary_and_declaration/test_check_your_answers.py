@@ -363,7 +363,8 @@ class TestCheckYourAnswersTheSupplyChain(conftest.PlaywrightTestBase):
         breach = breach_details_owner.copy()
         breach["end_users"] = ["end_user1", "end_user2", "end_user3"]
         self.create_breach(self.page, breach)
-        assert self.page.get_by_test_id("end-user-2").text_content().count("Not provided") == 2
+        assert self.page.get_by_test_id("end-user-2").text_content().count("Not provided") == 1
+        assert "Uganda" in self.page.get_by_test_id("end-user-2").text_content()
         assert self.page.get_by_test_id("end-user-3").text_content().count("Not provided") == 0
 
 

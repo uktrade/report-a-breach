@@ -10,11 +10,9 @@ from .base import *  # noqa
 
 TEST_EMAIL_VERIFY_CODE = True
 
-HEADLESS = False
+HEADLESS = env.headless
 
-BASE_FRONTEND_TESTING_URL = "http://report-a-suspected-breach:8000"
-
-SAVE_VIDEOS = False
+SAVE_VIDEOS = env.save_videos
 
 ENVIRONMENT = "test"
 
