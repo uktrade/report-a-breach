@@ -25,7 +25,7 @@ class TestThirdPartyPath(PlaywrightTestBase):
         page.get_by_label("Business you work for").click()
         page.get_by_label("Business you work for").fill("DBT")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="2. About the person or").click()
+        page.get_by_role("link", name="2. Name and address of the person or").click()
         page.get_by_label("I do not know").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("No").check()

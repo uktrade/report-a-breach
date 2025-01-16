@@ -13,7 +13,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
     def test_no_input_returns_error(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
@@ -27,7 +27,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
     def test_select_yes_returns_do_you_know_registered_company_number(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
@@ -36,7 +36,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
     def test_no_returns_business_or_person_details(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("No", exact=True).check()
         self.page.get_by_role("button", name="Continue").click()
@@ -45,7 +45,7 @@ class TestAreYouReportingABusinessOnCompaniesHouse(conftest.PlaywrightTestBase):
     def test_i_do_not_know_returns_business_or_person_details(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("I do not know").check()
         self.page.get_by_role("button", name="Continue").click()
@@ -63,7 +63,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
     def test_no_input_returns_error(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
@@ -77,7 +77,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
     def test_yes_and_no_input_returns_error(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
@@ -91,7 +91,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
     def test_yes_and_wrong_input_returns_error(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
@@ -108,7 +108,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
     def test_yes_and_correct_input_returns_check_company_details(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
@@ -122,7 +122,7 @@ class TestDoYouKnowTheRegisteredCompanyNumber(conftest.PlaywrightTestBase):
     def test_no_returns_address_details_page(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
