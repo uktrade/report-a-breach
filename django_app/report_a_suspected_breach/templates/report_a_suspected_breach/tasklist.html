@@ -21,6 +21,8 @@
                             <p id="{{ task.key }}_hint" class="govuk-task-list__hint">
                                 {{ task.help_text }}
                             </p>
+                        {% else %}
+                            <p></p>
                         {% endif %}
                     </div>
                     <div
