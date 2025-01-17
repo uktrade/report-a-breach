@@ -87,6 +87,9 @@ class PlaywrightTestBase(LiveServerTestCase):
             # Rename the video in the test results directory, so it's readable
             # 1231239190wei9cwice023r239230.webm -> video-test-results/ClassName-test_method.webm
             old_name = self.page.video.path()
+            output_directory = settings.ROOT_DIR / "video-test-results"
+            if not output_directory.is_dir():
+                output_directory.mkdir()
             os.replace(old_name, settings.ROOT_DIR / f"video-test-results/{type(self).__name__}-{self._testMethodName}.webm")
 
         # resetting the Site objects to their original state
@@ -385,9 +388,9 @@ class PlaywrightTestBase(LiveServerTestCase):
 
         # Tasklist
         page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
-        page.get_by_role("link", name="2. About the person or").click()
+        page.get_by_role("link", name="2. Name and address of the person or").click()
 
-        # 2. About the person or business you're reporting
+        # 2. Name and address of the person or business you're reporting
 
         if breach_details["breacher_location"] == "uk":
             self.create_uk_breacher(page)

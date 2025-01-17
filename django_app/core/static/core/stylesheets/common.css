@@ -62,3 +62,11 @@ dialog {
 dialog::backdrop {
   background: rgba(0, 0 ,0 ,0.8);
 }
+
+.fl-left {
+    float: left;
+}
+
+.fl-right {
+    float: right;
+}

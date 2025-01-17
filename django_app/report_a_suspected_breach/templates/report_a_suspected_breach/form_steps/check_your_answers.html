@@ -2,6 +2,14 @@
 {% load crispy_forms_tags crispy_forms_gds %}
 {% load countries %}
 {% block title %}Check your answers{% endblock title %}
+{% block extra_css %}
+    <style>
+        .change_business_details_link {
+            font-size: 19px;
+            text-align: right;
+        }
+    </style>
+{% endblock extra_css %}
 {% block column_content %}
     <div>
         <h1 class="govuk-heading-l">
@@ -230,15 +238,15 @@
         {% for end_user, value in form_data.end_users.items %}
             <div data-testid="end-user-{{ forloop.counter }}">
                 <div class="action-wrapper">
-                    <h3 class="govuk-heading-s" style="float:left">End-user {{ forloop.counter }}</h3>
+                    <h3 class="govuk-heading-s fl-left">End-user {{ forloop.counter }}</h3>
                     <dl class="govuk-summary-card__actions">
                         <dd class="govuk-summary-list__action govuk-!-font-weight-regular">
                             {% if is_made_available_journey %}
-                                <a class="govuk-link" style="font-size: 19px; text-align:right"
+                                <a class="govuk-link change_business_details_link"
                                    href="{% url 'report_a_suspected_breach:where_were_the_goods_made_available_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                                     class="govuk-visually-hidden">end-user {{forloop.counter}} details</span></a>
                             {% else %}
-                                <a class="govuk-link" style="font-size: 19px; text-align:right"
+                                <a class="govuk-link change_business_details_link"
                                    href="{% url 'report_a_suspected_breach:where_were_the_goods_supplied_to_end_user_uuid' end_user_uuid=end_user %}?redirect_to_url=report_a_suspected_breach:check_your_answers">Change<span
                                     class="govuk-visually-hidden">end-user {{forloop.counter}} details</span></a>
                             {% endif %}
@@ -319,7 +327,7 @@
             </div>
         {% endfor %}
     {% else %}
-        <h3 class="govuk-heading-s" style="float:left">End-users</h3>
+        <h3 class="govuk-heading-s fl-left">End-users</h3>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
@@ -343,7 +351,7 @@
         {% endif %}
     </dl>
     {% if form_data.were_there_other_addresses_in_the_supply_chain.were_there_other_addresses_in_the_supply_chain  == "yes" %}
-        <h3 class="govuk-heading-m">Other people or businesses involved in this trade</h3>
+        <h3 class="govuk-heading-s">Other people or businesses involved in this trade</h3>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
@@ -360,7 +368,7 @@
             </div>
         </dl>
     {% else %}
-        <h3 class="govuk-heading-s" style="float:left">Other people or businesses involved in this trade</h3>
+        <h3 class="govuk-heading-s fl-left">Other people or businesses involved in this trade</h3>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">

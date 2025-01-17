@@ -23,7 +23,7 @@ class TestSameBreacherSupplierPath(PlaywrightTestBase):
         page.get_by_label("What is your full name?").click()
         page.get_by_label("What is your full name?").fill("Chris ")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="2. About the person or").click()
+        page.get_by_role("link", name="2. Name and address of the person or").click()
         page.get_by_label("Yes").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Yes").check()
