@@ -84,6 +84,9 @@ class HideCookiesView(FormView):
 
     def form_valid(self, form: HideCookiesForm) -> HttpResponse:
         referrer_url = self.request.GET.get("redirect_back_to", "/")
+        if "cookies_set" in referrer_url:
+            referrer_url = referrer_url.replace("?cookies_set", "?removed_cookies_set")
+            referrer_url = referrer_url.replace("&cookies_set", "&removed_cookies_set")
         return redirect(referrer_url)
 
 
