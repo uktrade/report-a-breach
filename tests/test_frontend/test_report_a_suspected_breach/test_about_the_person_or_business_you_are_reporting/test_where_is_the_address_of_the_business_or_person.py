@@ -13,7 +13,7 @@ class TestWhereIsTheAddressOfTheBusinessOrPerson(conftest.PlaywrightTestBase):
     def test_no_input_returns_error(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("No", exact=True).check()
         self.page.get_by_role("button", name="Continue").click()
@@ -32,7 +32,7 @@ class TestWhereIsTheAddressOfTheBusinessOrPerson(conftest.PlaywrightTestBase):
     def test_uk_option_returns_uk_address_capture(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("No", exact=True).check()
         self.page.get_by_role("button", name="Continue").click()
@@ -47,7 +47,7 @@ class TestWhereIsTheAddressOfTheBusinessOrPerson(conftest.PlaywrightTestBase):
     def test_non_uk_option_returns_non_uk_address_capture(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. About the person or").click()
+        self.page.get_by_role("link", name="2. Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("No", exact=True).check()
         self.page.get_by_role("button", name="Continue").click()

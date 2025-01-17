@@ -388,9 +388,9 @@ class PlaywrightTestBase(LiveServerTestCase):
 
         # Tasklist
         page.get_by_role("heading", name="Report a suspected breach of trade sanctions", exact=True).click()
-        page.get_by_role("link", name="2. About the person or").click()
+        page.get_by_role("link", name="2. Name and address of the person or").click()
 
-        # 2. About the person or business you're reporting
+        # 2. Name and address of the person or business you're reporting
 
         if breach_details["breacher_location"] == "uk":
             self.create_uk_breacher(page)
