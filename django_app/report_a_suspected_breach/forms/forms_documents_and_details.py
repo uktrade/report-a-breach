@@ -30,6 +30,7 @@ class UploadDocumentsForm(BaseForm):
         self.helper = FormHelper()
         self.helper.label_size = Size.SMALL
         self.helper.layout = Layout("document")
+        self.invalid_file_types = []
 
     def clean_document(self) -> list[UploadedDocument]:
         documents = self.cleaned_data.get("document")
@@ -119,6 +120,13 @@ class UploadDocumentsForm(BaseForm):
                 raise forms.ValidationError("The selected file must be smaller than 100 MB", code="too_large")
 
         return documents
+
+    # def is_valid(self) -> bool:
+    #     valid = super().is_valid()
+    #     self.form.errors.code
+    #     if "invalid_file_type" in self.form.errors.code:
+    #         valid = False
+    #     return valid
 
 
 class TellUsAboutTheSuspectedBreachForm(BaseModelForm):

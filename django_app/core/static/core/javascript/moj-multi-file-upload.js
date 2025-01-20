@@ -31,9 +31,14 @@ $.MultiFileUpload = function (params) {
 $.MultiFileUpload.prototype.setupDropzone = function () {
     this.fileInput.wrap('<div class="moj-multi-file-upload__dropzone" />');
     this.dropzone = this.container.find('.moj-multi-file-upload__dropzone');
+        const validExtensions = [""];
+    this.invalidFilesCount = 0;
     this.dropzone.on('dragover', $.proxy(this, 'onDragOver'));
     this.dropzone.on('dragleave', $.proxy(this, 'onDragLeave'));
-    this.dropzone.on('drop', $.proxy(this, 'onDrop'));
+    this.dropzone.on('drop', $.proxy(this, function(event) {
+        event.preventDefault();
+        const files = event.originalEvent.dataTransfer.
+    }));
 };
 
 $.MultiFileUpload.prototype.setupLabel = function () {
