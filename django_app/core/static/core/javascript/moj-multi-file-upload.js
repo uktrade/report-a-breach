@@ -31,14 +31,9 @@ $.MultiFileUpload = function (params) {
 $.MultiFileUpload.prototype.setupDropzone = function () {
     this.fileInput.wrap('<div class="moj-multi-file-upload__dropzone" />');
     this.dropzone = this.container.find('.moj-multi-file-upload__dropzone');
-        const validExtensions = [""];
-    this.invalidFilesCount = 0;
     this.dropzone.on('dragover', $.proxy(this, 'onDragOver'));
     this.dropzone.on('dragleave', $.proxy(this, 'onDragLeave'));
-    this.dropzone.on('drop', $.proxy(this, function(event) {
-        event.preventDefault();
-        const files = event.originalEvent.dataTransfer.
-    }));
+    this.dropzone.on('drop', $.proxy(this, 'onDrop'));
 };
 
 $.MultiFileUpload.prototype.setupLabel = function () {
@@ -241,6 +236,20 @@ $.MultiFileUpload.prototype.uploadFile = function (file) {
     });
 };
 
+$.MultiFileUpload.prototype.hasErrors = function () {
+    return this.container.find('error').length > 0;
+};
+
+$.MultiFileUpload.prototype.updateContinueButtonState = function () {
+    const continueButton = $('#govuk-button');
+    if (this.hasErrors()) {
+        continueButton.prop('disabled', true);
+    }
+    else {
+        continueButton.prop('disabled', false);
+    }
+}
+
 $.MultiFileUpload.prototype.onFileDeleteClick = function (e) {
     e.preventDefault(); // if user refreshes page and then deletes
     var delete_link = $(e.currentTarget);
@@ -270,6 +279,9 @@ $.MultiFileUpload.prototype.onFileDeleteClick = function (e) {
                     this.feedbackContainer.addClass('moj-hidden');
                 }
             }
+
+            this.updateContinueButtonState();
+
             this.params.fileDeleteHook(this, response);
         }, this)
     });

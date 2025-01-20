@@ -43,6 +43,10 @@ p{% extends "core/base_form_step.html" %}
                     multi_file_upload.feedbackContainer.removeClass('moj-hidden');
                     multi_file_upload.uploadFiles(e.currentTarget.files);
                 }
+
+                if (multi_file_upload.hasErrors()) {
+                    multi_file_upload.updateContinueButtonState()
+                }
             });
         })
 
