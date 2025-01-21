@@ -13,7 +13,7 @@ class TestCheckCompanyDetails(conftest.PlaywrightTestBase):
     def test_details_match(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. Name and address of the person or").click()
+        self.page.get_by_role("link", name="Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
@@ -36,7 +36,7 @@ class TestCheckCompanyDetails(conftest.PlaywrightTestBase):
     def test_can_change_details(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. Name and address of the person or").click()
+        self.page.get_by_role("link", name="Name and address of the person or").click()
         self.page.get_by_role("heading", name="Are you reporting a business").click()
         self.page.get_by_label("Yes").check()
         self.page.get_by_role("button", name="Continue").click()
