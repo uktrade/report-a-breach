@@ -65,10 +65,6 @@ class CheckYourAnswersView(BaseTemplateView):
         return context
 
 
-def get_view_a_licence_application_url(reference):
-    pass
-
-
 class DeclarationView(BaseFormView):
     form_class = DeclarationForm
     template_name = "report_a_suspected_breach/form_steps/declaration.html"
