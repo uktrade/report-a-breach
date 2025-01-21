@@ -18,7 +18,7 @@ class TaskListView(TemplateView):
         tasklist = [
             {"title": "Your details", "key": "reporter_details", "url": reverse_lazy("report_a_suspected_breach:start")},
             {
-                "title": "2. Name and address of the person or business you're reporting",
+                "title": "Name and address of the person or business you're reporting",
                 "key": "about_the_person_or_business",
                 "help_text": "",
                 "url": reverse_lazy("report_a_suspected_breach:are_you_reporting_a_business_on_companies_house"),

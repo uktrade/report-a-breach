@@ -23,7 +23,7 @@ class TestMadeAvailableToFromPath(PlaywrightTestBase):
         page.get_by_label("Full name").press("Tab")
         page.get_by_label("Business you work for").fill("DBT")
         page.get_by_role("button", name="Continue").click()
-        page.get_by_role("link", name="2. Name and address of the person or").click()
+        page.get_by_role("link", name="Name and address of the person or").click()
         page.get_by_label("Yes").check()
         page.get_by_role("button", name="Continue").click()
         page.get_by_label("Yes").check()

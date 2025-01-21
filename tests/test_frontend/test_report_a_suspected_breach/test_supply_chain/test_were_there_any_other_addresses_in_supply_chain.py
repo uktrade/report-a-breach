@@ -13,7 +13,7 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
     def test_no_input_returns_error(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. Name and address of the person or").click()
+        self.page.get_by_role("link", name="Name and address of the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
@@ -29,7 +29,7 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
     def test_yes_and_no_input_returns_error(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. Name and address of the person or").click()
+        self.page.get_by_role("link", name="Name and address of the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
@@ -47,7 +47,7 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
     def test_yes_and_correct_input_returns_upload_documents(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. Name and address of the person or").click()
+        self.page.get_by_role("link", name="Name and address of the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
@@ -65,7 +65,7 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
     def test_no_returns_upload_documents(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. Name and address of the person or").click()
+        self.page.get_by_role("link", name="Name and address of the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)
@@ -81,7 +81,7 @@ class TestWereThereAnyOtherAddressesInTheSupplyChain(conftest.PlaywrightTestBase
     def test_i_do_not_know_returns_upload_documents(self):
         self.page.get_by_role("link", name="Your details").click()
         self.create_reporter_details(self.page, "I'm an owner")
-        self.page.get_by_role("link", name="2. Name and address of the person or").click()
+        self.page.get_by_role("link", name="Name and address of the person or").click()
         self.create_non_uk_breacher(self.page)
         self.page.get_by_role("link", name="Overview of the suspected breach").click()
         self.overview_of_breach(self.page)

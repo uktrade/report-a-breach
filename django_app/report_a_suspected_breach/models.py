@@ -125,7 +125,7 @@ class Breach(BaseModel):
 
             # Save Breach to Database
             new_breach = Breach.objects.create(
-                reporter_email_verification=reporter_email_verification,
+                # reporter_email_verification=reporter_email_verification,
                 reporter_professional_relationship=reporter["professional_relationship"],
                 reporter_email_address=reporter["email_address"],
                 reporter_full_name=reporter["full_name"],
