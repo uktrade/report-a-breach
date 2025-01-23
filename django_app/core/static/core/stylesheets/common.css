@@ -42,6 +42,18 @@
     margin-bottom: 1rem;
 }
 
+.mt-0 {
+    margin-top: 0;
+}
+
+.mt-1 {
+    margin-top: 1rem;
+}
+
+.mt-2 {
+    margin-top: 2rem;
+}
+
 @media print {
     .hide-on-print {
         display: none !important;
