@@ -237,7 +237,8 @@ $.MultiFileUpload.prototype.uploadFile = function (file) {
 };
 
 $.MultiFileUpload.prototype.hasErrors = function () {
-    return this.container.find('error').length > 0;
+    console.log(this.container.find('.moj-multi-file-upload__error'));
+    return this.container.find('.moj-multi-file-upload__error');
 };
 
 $.MultiFileUpload.prototype.updateContinueButtonState = function () {

@@ -1,4 +1,4 @@
-p{% extends "core/base_form_step.html" %}
+{% extends "core/base_form_step.html" %}
 {% load crispy_forms_tags crispy_forms_gds static %}
 {% block title %}Upload documents{% endblock title %}
 
@@ -19,7 +19,6 @@ p{% extends "core/base_form_step.html" %}
                 deleteUrl: "{% url 'report_a_suspected_breach:delete_documents' %}"
             });
 
-
             // add an event handler for the file upload inputs that are dynamically generated when an upload error occurs
             $(document).on('change', '.file-upload-error-input', function (e) {
                 e.stopPropagation()
@@ -28,6 +27,11 @@ p{% extends "core/base_form_step.html" %}
                 // find out who triggered me
                 let file_upload_row = $(this).closest('.moj-multi-file-upload__row')
                 let row_id = file_upload_row.attr('id')
+
+                if (multi_file_upload.hasErrors()) {
+                    multi_file_upload.updateContinueButtonState()
+                }
+                console.log(multi_file_upload.hasErrors())
 
                 // delete the corresponding error summary list element
                 multi_file_upload.deleteErrorSummaryListElement(row_id)
@@ -44,9 +48,6 @@ p{% extends "core/base_form_step.html" %}
                     multi_file_upload.uploadFiles(e.currentTarget.files);
                 }
 
-                if (multi_file_upload.hasErrors()) {
-                    multi_file_upload.updateContinueButtonState()
-                }
             });
         })
 
