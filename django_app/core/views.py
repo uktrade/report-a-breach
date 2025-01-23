@@ -153,3 +153,7 @@ class DownloadPDFView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["reference"] = self.request.GET.get("reference", "")
         return context
+
+
+class HelpAndSupportView(TemplateView):
+    template_name = "core/help_and_support.html"
