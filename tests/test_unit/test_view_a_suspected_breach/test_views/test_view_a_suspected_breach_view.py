@@ -1,8 +1,10 @@
+import datetime
 from unittest.mock import patch
 
 from core.sites import SiteName
 from django.contrib.auth.models import User
 from django.test import RequestFactory
+from django.urls import reverse
 from report_a_suspected_breach.choices import TypeOfRelationshipChoices
 from report_a_suspected_breach.models import PersonOrCompany
 from view_a_suspected_breach.views import ViewASuspectedBreachView
@@ -99,3 +101,11 @@ class TestViewASuspectedBreachView:
         assert response.context["breacher"] == breacher
         assert response.context["supplier"].name == breacher.name
         assert set(response.context["recipients"]) == set(recipients)
+
+    def test_date_submitted_in_template(self, vasb_client_logged_in, breach_object):
+        breach_object.created_at = datetime.datetime(2021, 1, 1, 12, 23, 0)
+        breach_object.save()
+        response = vasb_client_logged_in.get(
+            reverse("view_a_suspected_breach:breach_report", kwargs={"reference": breach_object.reference})
+        )
+        assert "Submitted on: 01 January 2021 at 12.23 p.m." in response.content.decode()
