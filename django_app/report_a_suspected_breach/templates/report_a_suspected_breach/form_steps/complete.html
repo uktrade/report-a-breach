@@ -20,14 +20,13 @@
     {% else %}
         <p class="govuk-body">We have sent you a confirmation email.</p>
     {% endif %}
-    {% comment %}
-        TODO: remove comment when DST-797 is complete
     <p class="govuk-body">
         <a href="{% url 'download_report' %}?reference={{ reference }}" class="govuk-link" target="_blank">Download and view report (opens in new tab)</a>
     </p>
-    {% endcomment %}
-    <p class="govuk-body hide-on-js-disabled show-on-js-enabled hide-on-print"><a class="govuk-link" onclick="window.print()" href=#>View and print your report</a></p>
 
+{% comment %}
+    <p class="govuk-body hide-on-js-disabled show-on-js-enabled hide-on-print"><a class="govuk-link" onclick="window.print()" href=#>View and print your report</a></p>
+{% endcomment %}
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">
         We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for Business and Trade (DBT).

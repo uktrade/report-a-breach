@@ -1,6 +1,6 @@
 {% extends "core/base.html" %}
 {% block title %}
-    Complete
+    Report a suspected breach of trade sanctions: submission complete
 {% endblock title %}
 {% block cookie_banner %}
 {% endblock cookie_banner %}
@@ -9,20 +9,61 @@
     {% block phase_banner %}{% endblock phase_banner %}
     {% block back_button %}{% endblock back_button %}
     <div class="govuk-panel govuk-panel--confirmation">
-        <h1 class="govuk-panel__title">Submission complete</h1>
+        <h1 class="govuk-panel__title">Report a suspected breach of trade sanctions: submission complete</h1>
+
+        <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
         <div class="govuk-panel__body">
-            Your reference number
-            <br>
-            <strong>{{ reference }}</strong>
+            We've sent a confirmation email to {{ email }}</div>
+
+        <h2 class="govuk-heading-m">Your details</h2>
+        <div class="govuk-panel__body">
+            <strong>Full name:</strong> {{ name }}<br>
+            <strong>Email:</strong> {{ email }}<br>
+            <strong>Professional relationship with the business or person being reported:</strong> {{ relationship }}<br>
+        </div>
+
+        <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
+        <div class="govuk-panel__body">
+            <strong>Registered business number:</strong> {{ registered_company_number }}<br>
+            <strong>Name:</strong> {{ name }}<br>
+            <strong>Website:</strong> {{ website }}<br>
+            <strong>Address:</strong> {{ address }}<br></div>
+
+        <h2 class="govuk-heading-m">Overview of the breach</h2>
+        <div class="govuk-panel__body">
+            <strong>When did you first suspect the breach?</strong> {{ when_did_you_suspect }}<br>
+            <strong>Sanctions regime breached:</strong> {{ sanctions_breached }}<br>
+            <strong>What were the goods or services?</strong> {{ what_were_the_goods }}<br>
+        </div>
+
+        <h2 class="govuk-heading-m">People and businesses involved</h2>
+        <h3 class="govuk-heading-s">Supplier</h3>
+        <div class="govuk-panel__body"><strong>Name and address of supplier:</strong> {{ supplier_details }}<br></div>
+
+        {% for end_user in end_users %}
+        <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
+        <div class="govuk-panel__body">
+            <strong>Name:</strong> {{ end_user.name }}<br>
+            <strong>Business:</strong> {{ end_user.business }}<br>
+            <strong>Address:</strong> {{ end_user.address }}<br>
+            <strong>Additional contact information:</strong> {{ end_user.contact_info }}
+
+            <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
+            <strong>Names and addresses:</strong> {{ end_users.other_addresses }}<br>
+        </div>
+
+        <h2 class="govuk-heading-m">Sanctions breach details</h2>
+        <div class="govuk-panel__body">
+            <strong>Upload supporting documents:</strong> {{ supporting_documents }}<br>
+            <strong>Summary of the breach:</strong> {{ breach_summary }}<br>
+        </div>
+
+        <h2 class="govuk-heading-m">What happens next</h2>
+        <div class="govuk-panel__body">
+            We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for Business and Trade (DBT).<br>
+
+            OTSI will contact you once they've reviewed your report.
         </div>
     </div>
-    <p class="govuk-body">We have sent you a confirmation email.</p>
-
-    <h2 class="govuk-heading-m">What happens next</h2>
-    <p class="govuk-body">
-        We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for
-        Business and Trade (DBT).
-    </p>
-    <p class="govuk-body">OTSI will contact you once they've reviewed your report.</p>
 {% endblock column_content %}
 {% block footer %}{% endblock footer %}
