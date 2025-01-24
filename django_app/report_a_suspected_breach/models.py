@@ -111,7 +111,7 @@ class Breach(BaseModel):
 
     @classmethod
     def create_from_session(cls, request: "HttpRequest") -> "Breach":
-        """Creates a Breach object from the data stored in current session"""
+        """Creates a Breach object from the data stored in current session."""
         cleaned_data = get_all_cleaned_data(request)
         reporter = cls.get_reporter_details(cleaned_data, request)
 
