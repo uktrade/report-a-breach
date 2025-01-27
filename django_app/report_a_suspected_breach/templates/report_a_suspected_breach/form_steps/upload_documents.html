@@ -28,11 +28,6 @@
                 let file_upload_row = $(this).closest('.moj-multi-file-upload__row')
                 let row_id = file_upload_row.attr('id')
 
-                if (multi_file_upload.hasErrors()) {
-                    multi_file_upload.updateContinueButtonState()
-                }
-                console.log(multi_file_upload.hasErrors())
-
                 // delete the corresponding error summary list element
                 multi_file_upload.deleteErrorSummaryListElement(row_id)
 
