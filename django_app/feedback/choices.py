@@ -7,7 +7,7 @@ from django.db import models
 class RatingChoices(models.IntegerChoices):
     VERY_SATISFIED = 5, "Very satisfied"
     SATISFIED = 4, "Satisfied"
-    NEUTRAL = 3, "Neutral"
+    NEUTRAL = 3, "Neither satisfied nor dissatisfied"
     DISSATISFIED = 2, "Dissatisfied"
     VERY_DISSATISFIED = 1, "Very dissatisfied"
 

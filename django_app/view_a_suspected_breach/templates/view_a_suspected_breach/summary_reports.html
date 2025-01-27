@@ -50,7 +50,7 @@
                     Submitted on:
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ breach_report.breach.created_at }}
+                    {{ breach_report.breach.created_at|date:"d F Y \a\t g.i a" }}
                 </dd>
             </div>
 
