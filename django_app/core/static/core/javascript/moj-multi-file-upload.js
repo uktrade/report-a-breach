@@ -121,7 +121,7 @@ $.MultiFileUpload.prototype.getErrorHtml = function (response) {
 };
 
 
-$.MultiFileUpload.prototype.getErrorSummaryHtml = function (error, input_id) {
+$.MultiFileUpload.prototype.getErrorSummaryHtml = function (error) {
     var html = ''
 
     html += '<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1"  data-module="govuk-error-summary">'
@@ -129,7 +129,7 @@ $.MultiFileUpload.prototype.getErrorSummaryHtml = function (error, input_id) {
     html += '<div class="govuk-error-summary__body">'
     html += '<ul class="govuk-list govuk-error-summary__list">'
 
-    html += this.getErrorSummaryListElementHtml(error, input_id)
+    html += this.getErrorSummaryListElementHtml(error, first_error = true)
 
     html += '</ul>'
     html += '</div>'
@@ -138,8 +138,14 @@ $.MultiFileUpload.prototype.getErrorSummaryHtml = function (error, input_id) {
     return html
 };
 
-$.MultiFileUpload.prototype.getErrorSummaryListElementHtml = function (error, input_id) {
-    return '<li><a href="#' + input_id + '">' + error + '</a></li>'
+$.MultiFileUpload.prototype.getErrorSummaryListElementHtml = function (error, first_error=false) {
+    let new_line_error = error.replace(/\n/g, "<br />");
+    if (first_error) {
+        return '<li>' + new_line_error + '</li>'
+    } else {
+        // there are other errors in the summary box already, add some <br> tags to create separation
+        return '<br><li>' + new_line_error + '</li>'
+    }
 };
 
 
@@ -173,6 +179,13 @@ $.MultiFileUpload.prototype.getDeleteButtonHtml = function (file_name) {
     return html;
 };
 
+$.MultiFileUpload.prototype.deleteRowContainerIfNoFilesUploaded = function () {
+    // hide the feedback container if there are no more rows
+    if (this.feedbackContainer.find('.moj-multi-file-upload__row').length === 0) {
+        this.feedbackContainer.addClass('moj-hidden');
+    }
+};
+
 $.MultiFileUpload.prototype.uploadFile = function (file) {
     this.params.uploadFileEntryHook(this, file);
     var formData = new FormData();
@@ -195,26 +208,21 @@ $.MultiFileUpload.prototype.uploadFile = function (file) {
             if (response.success) {
                 item.find('.moj-multi-file-upload__message').html(this.getSuccessHtml(response.file_name, response.file_url));
                 this.status.html("Success");
-
+                item.find('.moj-multi-file-upload__actions').append(this.getDeleteButtonHtml(response.file_name));
             } else {
-                item.find('.moj-multi-file-upload__message').html(this.getErrorHtml(response));
-
-                let id = item.attr("id")
-                if (typeof id === 'undefined' || id === false) {
-                    id = generateGuid()
-                    item.prop("id", id)
-                }
+                item.remove()
+                this.deleteRowContainerIfNoFilesUploaded()
 
                 // Error summary handling
                 if ($('.govuk-error-summary__list').length) {
                     // We have an error summary box already
-                    $('.govuk-error-summary__list').last().append(this.getErrorSummaryListElementHtml(response.error, id));
+                    $('.govuk-error-summary__list').last().append(this.getErrorSummaryListElementHtml(response.error, first_error = false));
                 } else {
                     // We need to create an error summary box
-                    $('.govuk-grid-column-two-thirds').last().prepend(this.getErrorSummaryHtml(response.error, id))
+                    $('.govuk-grid-column-two-thirds').last().prepend(this.getErrorSummaryHtml(response.error))
                 }
             }
-            item.find('.moj-multi-file-upload__actions').append(this.getDeleteButtonHtml(response.file_name));
+
             this.params.uploadFileExitHook(this, file, response);
         }, this),
         error: $.proxy(function (jqXHR, textStatus, errorThrown) {
@@ -241,16 +249,6 @@ $.MultiFileUpload.prototype.hasErrors = function () {
     return this.container.find('.moj-multi-file-upload__error');
 };
 
-$.MultiFileUpload.prototype.updateContinueButtonState = function () {
-    const continueButton = $('#govuk-button');
-    if (this.hasErrors()) {
-        continueButton.prop('disabled', true);
-    }
-    else {
-        continueButton.prop('disabled', false);
-    }
-}
-
 $.MultiFileUpload.prototype.onFileDeleteClick = function (e) {
     e.preventDefault(); // if user refreshes page and then deletes
     var delete_link = $(e.currentTarget);
@@ -266,24 +264,11 @@ $.MultiFileUpload.prototype.onFileDeleteClick = function (e) {
         success: $.proxy(function (response) {
             if (response.error) {
                 // handle error
-            } else { // delete the row
-                let parent_row = delete_link.parents('.moj-multi-file-upload__row').remove();
-
-                // first check if there were any error summaries associated with this row, if so, delete them
-                if (parent_row.find('input.file-upload-error-input').length) {
-                    let row_id = parent_row.attr('id')
-                    this.deleteErrorSummaryListElement(row_id)
-                }
-
-                // hide the feedback container if there are no more rows
-                if (this.feedbackContainer.find('.moj-multi-file-upload__row').length === 0) {
-                    this.feedbackContainer.addClass('moj-hidden');
-                }
+            } else {
+                // delete the row
+                delete_link.parents('.moj-multi-file-upload__row').remove();
+                this.deleteRowContainerIfNoFilesUploaded()
             }
-
-            this.updateContinueButtonState();
-
-            this.params.fileDeleteHook(this, response);
         }, this)
     });
 };
