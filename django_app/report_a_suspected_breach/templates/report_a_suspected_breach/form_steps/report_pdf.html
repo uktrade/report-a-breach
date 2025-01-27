@@ -8,84 +8,133 @@
     {% block skip_link %}{% endblock skip_link %}
     {% block phase_banner %}{% endblock phase_banner %}
     {% block back_button %}{% endblock back_button %}
-    <div class="govuk-panel govuk-panel--confirmation">
-        <h1 class="govuk-panel__title">Report a suspected breach of trade sanctions: submission complete</h1>
-
-        <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
-        <div class="govuk-panel__body">
-            We've sent a confirmation email to {{ breach.reporter_email_address }}</div>
-
-        <h2 class="govuk-heading-m">Your details</h2>
-        <div class="govuk-panel__body">
-            <strong>Full name:</strong> {{ breach.reporter_full_name }}<br>
-            <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
-            <strong>Professional relationship with the business or person being reported:</strong> {{ breach.reporter_professional_relationship }}<br>
-        </div>
-
-        <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
-        <div class="govuk-panel__body">
-            <strong>Registered business number:</strong> {{ breacher.registered_company_number }}<br>
-            <strong>Name:</strong> {{ breacher.name_of_business }}<br>
-            <strong>Website:</strong> {{ breacher.website }}<br>
-            <strong>Address:</strong> {{ breacher_address }}<br></div>
-
-        <h2 class="govuk-heading-m">Overview of the breach</h2>
-        <div class="govuk-panel__body">
-            <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
-            {{ breach.when_did_you_first_suspect }}<br>
-            <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
-                {{ regime }}
-                {% if not forloop.last %}
-                    <br><br>
-                {% endif %}
-            {% endfor %}
-            {% if breach.unknown_sanctions_regime %}
-                Unknown regime<br>
-            {% endif %}
-            {% if breach.other_sanctions_regime %}
-                Other regime<br>
-            {% endif %}
-            <br>
-            <strong>What were the goods or services?</strong> {{ breach.what_were_the_goods }}<br>
-        </div>
-
-        <h2 class="govuk-heading-m">People and businesses involved</h2>
-        <h3 class="govuk-heading-s">Supplier</h3>
-        <div class="govuk-panel__body"><strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
-            <br>
-            {{ supplier_address | linebreaksbr }}</div>
-
-        <div class="govuk-panel__body">
-            {% for end_user in end_users %}
-                <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
-                <strong>Name:</strong> {{ end_user.name }}<br>
-                <strong>Business:</strong> {{ end_user.name_of_business }}<br>
-                <strong>Address:</strong> {{ end_user.get_readable_address }}
-                <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}
-            {% endfor %}
-            <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
-            <strong>Names and addresses:</strong> {{ breach.other_addresses_in_the_supply_chain }}
-        </div>
-
-        <h2 class="govuk-heading-m">Sanctions breach details</h2>
-        <div class="govuk-panel__body">
-            <strong>Upload supporting documents:</strong>
-            {% if not breach.documents.all %}
-                None uploaded
-            {% else %}
-                {% for document in breach.documents.all %}
-                    <a href="{{ document.url }}" download>{{ document.file_name }}</a><br>
-                {% endfor %}
-            {% endif %}
-            <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
-        </div>
-
-        <h2 class="govuk-heading-m">What happens next</h2>
-        <div class="govuk-panel__body">
-            We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for Business and Trade (DBT).<br>
-
-            OTSI will contact you once they've reviewed your report.
-        </div>
+    <div>
+        <h1 class="govuk-heading-l">Report a suspected breach of trade sanctions: submission complete</h1>
     </div>
+    <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
+
+    <p class="govuk-body-m">
+        We've sent a confirmation email to {{ breach.reporter_email_address }}
+    </p>
+
+    <h2 class="govuk-heading-m">Your details</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Full name:</strong> {{ breach.reporter_full_name }}
+            </dt>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
+            </dt>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Professional relationship with the business or person being reported:</strong> {{ breach.reporter_professional_relationship }}<br>
+            </dt>
+        </div>
+    </dl>
+    <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Registered business number:</strong> {{ breacher.registered_company_number }}<br>
+            </dt></div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Name:</strong> {{ breacher.name_of_business }}<br></dt></div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Website:</strong> {{ breacher.website }}<br></dt></div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Address:</strong> {{ breacher_address }}<br></dt></div>
+
+    </dl>
+    <h2 class="govuk-heading-m">Overview of the breach</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
+                {{ breach.when_did_you_first_suspect }}<br></dt></div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
+                    {{ regime }}
+                    {% if not forloop.last %}
+                        <br><br>
+                    {% endif %}
+                {% endfor %}
+                {% if breach.unknown_sanctions_regime %}
+                    Unknown regime<br>
+                {% endif %}
+                {% if breach.other_sanctions_regime %}
+                    Other regime<br>
+                {% endif %}
+                <br>
+            </dt></div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>What were the goods or services?</strong> {{ breach.what_were_the_goods }}<br>
+            </dt></div>
+    </dl>
+
+    <h2 class="govuk-heading-m">People and businesses involved</h2>
+
+    <h3 class="govuk-heading-s">Supplier</h3>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key"><strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
+                <br>
+                {{ supplier_address | linebreaksbr }}</dt></div>
+
+
+        {% for end_user in end_users %}
+            <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    <strong>Name:</strong> {{ end_user.name }}<br></dt></div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    <strong>Business:</strong> {{ end_user.name_of_business }}<br></dt></div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    <strong>Address:</strong> {{ end_user.get_readable_address }}</dt></div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}</dt></div>
+        {% endfor %}
+        <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Names and addresses:</strong> {{ breach.other_addresses_in_the_supply_chain }}
+            </dt></div>
+    </dl>
+
+    <h2 class="govuk-heading-m">Sanctions breach details</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Upload supporting documents:</strong>
+                {% if not breach.documents.all %}
+                    None uploaded
+                {% else %}
+                    {% for document in breach.documents.all %}
+                        <a href="{{ document.url }}" download>{{ document.file_name }}</a><br>
+                    {% endfor %}
+                {% endif %}</dt></div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
+            </dt></div>
+    </dl>
+
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body-m">
+        We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for Business and Trade (DBT).<br>
+
+        OTSI will contact you once they've reviewed your report.
+    </p>
 {% endblock column_content %}
 {% block footer %}{% endblock footer %}
