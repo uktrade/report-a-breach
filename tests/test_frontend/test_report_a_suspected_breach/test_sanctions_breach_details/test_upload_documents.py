@@ -55,7 +55,7 @@ class TestUploadDocuments(conftest.PlaywrightTestBase):
         self.get_to_document_upload_page()
         self.upload_documents_page(self.page, files=data.MALWARE_FILE_TYPE)
         expect(self.page.get_by_role("heading", name="There is a problem")).to_be_visible()
-        expect(self.page.get_by_role("link", name="The selected file contains a virus")).to_be_visible()
+        expect(self.page.get_by_text("The selected file contains a virus")).to_be_visible()
         self.page.get_by_role("button", name="Continue").click()
         expect(self.page.get_by_text("mock_malware_file.txt")).not_to_be_visible()
         expect(self.page).to_have_url(re.compile(rf".*/{url_paths.UPLOAD_DOCUMENTS}"))
