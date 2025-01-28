@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load static i18n %}
 {% block title %}
     Report a suspected breach of trade sanctions: submission complete
 {% endblock title %}
@@ -9,18 +10,17 @@
     {% block phase_banner %}{% endblock phase_banner %}
     {% block back_button %}{% endblock back_button %}
     {% block extra_css %}
-        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "core/assets/images/favicon.ico" %}" type="image/x-icon">
-        <link rel="mask-icon" href="{% static "core/assets/images/govuk-icon-mask.svg" %}" color="#0b0c0c">
+        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="http://localhost:8000/static/core/assets/images/favicon.ico" type="image/x-icon">
+        <link rel="mask-icon" href="http://localhost:8000/static/core/assets/images/govuk-icon-mask.svg" color="#0b0c0c">
         <link rel="apple-touch-icon" sizes="180x180"
-              href="{% static "core/assets/images/govuk-icon-180.png" %}">
-        <meta property="og:image" content="{% static "core/assets/images/govuk-opengraph-image.png" %}">
+              href="http://localhost:8000/static/core/assets/images/govuk-icon-180.png">
+        <meta property="og:image" content="http://localhost:8000/static/core/assets/images/govuk-opengraph-image.png">
 
 		{# stylesheets #}
-        <link rel="stylesheet" href="{% static 'core/stylesheets/font-awesome-6.5.2.css' %}">
-        <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-5.3.0.min.css" %}">
-        <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
-        <link rel="stylesheet"
-              href="{% static "report_a_suspected_breach/stylesheets/report_a_suspected_breach.css" %}">
+        <link rel="stylesheet" href="http://localhost:8000/static/core/stylesheets/font-awesome-6.5.2.css">
+        <link rel="stylesheet" href="http://localhost:8000/static/core/stylesheets/govuk-frontend-5.3.0.min.css">
+        <link rel="stylesheet" href="http://localhost:8000/static/core/stylesheets/common.css">
+
     {% endblock extra_css %}
     <div>
         <h1 class="govuk-heading-l">Report a suspected breach of trade sanctions: submission complete</h1>
@@ -34,17 +34,17 @@
     <h2 class="govuk-heading-m">Your details</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Full name:</strong> {{ breach.reporter_full_name }}
             </dt>
         </div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
             </dt>
         </div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Professional relationship with the business or person being reported:</strong> {{ breach.reporter_professional_relationship }}<br>
             </dt>
         </div>
@@ -52,28 +52,28 @@
     <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Registered business number:</strong> {{ breacher.registered_company_number }}<br>
             </dt></div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Name:</strong> {{ breacher.name_of_business }}<br></dt></div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Website:</strong> {{ breacher.website }}<br></dt></div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Address:</strong> {{ breacher_address }}<br></dt></div>
 
     </dl>
     <h2 class="govuk-heading-m">Overview of the breach</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
                 {{ breach.when_did_you_first_suspect }}<br></dt></div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
                     {{ regime }}
                     {% if not forloop.last %}
@@ -89,7 +89,7 @@
                 <br>
             </dt></div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>What were the goods or services?</strong> {{ breach.what_were_the_goods }}<br>
             </dt></div>
     </dl>
@@ -99,7 +99,7 @@
     <h3 class="govuk-heading-s">Supplier</h3>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key"><strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular"><strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
                 <br>
                 {{ supplier_address | linebreaksbr }}</dt></div>
 
@@ -107,21 +107,21 @@
         {% for end_user in end_users %}
             <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Name:</strong> {{ end_user.name }}<br></dt></div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Business:</strong> {{ end_user.name_of_business }}<br></dt></div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Address:</strong> {{ end_user.get_readable_address }}</dt></div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}</dt></div>
         {% endfor %}
         <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Names and addresses:</strong> {{ breach.other_addresses_in_the_supply_chain }}
             </dt></div>
     </dl>
@@ -129,7 +129,7 @@
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Upload supporting documents:</strong>
                 {% if not breach.documents.all %}
                     None uploaded
@@ -139,7 +139,7 @@
                     {% endfor %}
                 {% endif %}</dt></div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
+            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
             </dt></div>
     </dl>
