@@ -8,6 +8,20 @@
     {% block skip_link %}{% endblock skip_link %}
     {% block phase_banner %}{% endblock phase_banner %}
     {% block back_button %}{% endblock back_button %}
+    {% block extra_css %}
+        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "core/assets/images/favicon.ico" %}" type="image/x-icon">
+        <link rel="mask-icon" href="{% static "core/assets/images/govuk-icon-mask.svg" %}" color="#0b0c0c">
+        <link rel="apple-touch-icon" sizes="180x180"
+              href="{% static "core/assets/images/govuk-icon-180.png" %}">
+        <meta property="og:image" content="{% static "core/assets/images/govuk-opengraph-image.png" %}">
+
+		{# stylesheets #}
+        <link rel="stylesheet" href="{% static 'core/stylesheets/font-awesome-6.5.2.css' %}">
+        <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-5.3.0.min.css" %}">
+        <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
+        <link rel="stylesheet"
+              href="{% static "report_a_suspected_breach/stylesheets/report_a_suspected_breach.css" %}">
+    {% endblock extra_css %}
     <div>
         <h1 class="govuk-heading-l">Report a suspected breach of trade sanctions: submission complete</h1>
     </div>

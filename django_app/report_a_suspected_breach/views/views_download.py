@@ -28,6 +28,7 @@ class DownloadPDFView(DetailView):
             browser = playwright.chromium.launch(headless=True)
             page = browser.new_page()
             page.set_content(mark_safe(template_string))
+            page.wait_for_function("document.fonts.ready.then(fonts => fonts.status === 'loaded')")
             pdf_data = page.pdf(format="A4")
             browser.close()
 
