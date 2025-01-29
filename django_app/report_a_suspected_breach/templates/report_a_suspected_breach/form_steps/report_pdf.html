@@ -1,10 +1,6 @@
 {% extends "core/base.html" %}
 {% load get_css_rules_as_string %}
 {% block title %}
-{#<!DOCTYPE html>#}
-{#<html lang="en" class="govuk-template">#}
-{#    <title>Report a suspected breach of trade sanctions: submission complete</title>#}
-    Report a suspected breach of trade sanctions: submission complete
 {% endblock title %}
 {% block cookie_banner %}
 {% endblock cookie_banner %}
@@ -26,9 +22,9 @@
         We've sent a confirmation email to {{ breach.reporter_email_address }}
     </p>
 
-    <h2 class="govuk-heading-m">Your details</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
+            <h2 class="govuk-heading-m">Your details</h2>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Full name:</strong> {{ breach.reporter_full_name }}
             </dt>
@@ -44,9 +40,10 @@
             </dt>
         </div>
     </dl>
-    <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
+
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
+            <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Registered business number:</strong> {{ breacher.registered_company_number }}<br>
             </dt></div>
@@ -61,9 +58,10 @@
                 <strong>Address:</strong> {{ breacher_address }}<br></dt></div>
 
     </dl>
-    <h2 class="govuk-heading-m">Overview of the breach</h2>
+
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
+            <h2 class="govuk-heading-m">Overview of the breach</h2>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
                 {{ breach.when_did_you_first_suspect }}<br></dt></div>
@@ -91,9 +89,9 @@
 
     <h2 class="govuk-heading-m">People and businesses involved</h2>
 
-    <h3 class="govuk-heading-s">Supplier</h3>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
+            <h3 class="govuk-heading-s">Supplier</h3>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular"><strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
                 <br>
                 {{ supplier_address | linebreaksbr }}</dt></div>
@@ -114,16 +112,16 @@
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}</dt></div>
         {% endfor %}
-        <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
         <div class="govuk-summary-list__row">
+            <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Names and addresses:</strong> {{ breach.other_addresses_in_the_supply_chain }}
             </dt></div>
     </dl>
 
-    <h2 class="govuk-heading-m">Sanctions breach details</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
+            <h2 class="govuk-heading-m">Sanctions breach details</h2>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                 <strong>Upload supporting documents:</strong>
                 {% if not breach.documents.all %}
@@ -145,6 +143,5 @@
 
         OTSI will contact you once they've reviewed your report.
     </p>
-{#</html>#}
 {% endblock column_content %}
 {% block footer %}{% endblock footer %}
