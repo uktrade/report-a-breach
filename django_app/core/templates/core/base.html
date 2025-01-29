@@ -196,10 +196,12 @@
                     </a>
                 </div>
                 <div class="govuk-header__content">
-                    <a href="/"
-                       class="govuk-header__link govuk-header__service-name">
-                        Report a suspected breach of trade sanctions
-                    </a>
+                    {% block header_content %}
+                        <a href="/"
+                           class="govuk-header__link govuk-header__service-name">
+                            Report a suspected breach of trade sanctions
+                        </a>
+                    {% endblock header_content %}
                 </div>
 
             </div>

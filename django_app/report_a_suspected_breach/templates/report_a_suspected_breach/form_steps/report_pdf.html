@@ -1,9 +1,9 @@
 {% extends "core/base.html" %}
 {% load get_css_rules_as_string %}
-{% block title %}
-{% endblock title %}
 {% block cookie_banner %}
 {% endblock cookie_banner %}
+{% block header_content %}
+{% endblock header_content %}
 {% block column_content %}
     {% block skip_link %}{% endblock skip_link %}
     {% block phase_banner %}{% endblock phase_banner %}
@@ -22,10 +22,10 @@
         We've sent a confirmation email to {{ breach.reporter_email_address }}
     </p>
 
-    <dl class="govuk-summary-list">
+    <h2 class="govuk-heading-m">Your details</h2>
+    <dl class="govuk-summary-list govuk-summary-list--no-border">
         <div class="govuk-summary-list__row">
-            <h2 class="govuk-heading-m">Your details</h2>
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+            <dt class="govuk-summary-list__key">
                 <strong>Full name:</strong> {{ breach.reporter_full_name }}
             </dt>
         </div>
@@ -36,7 +36,7 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Professional relationship with the business or person being reported:</strong> {{ breach.reporter_professional_relationship }}<br>
+                <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}<br>
             </dt>
         </div>
     </dl>
@@ -45,7 +45,7 @@
         <div class="govuk-summary-list__row">
             <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Registered business number:</strong> {{ breacher.registered_company_number }}<br>
+                <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}
             </dt></div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
@@ -70,7 +70,8 @@
                 <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
                     {{ regime }}
                     {% if not forloop.last %}
-                        <br><br>
+                        ,
+                        <br>
                     {% endif %}
                 {% endfor %}
                 {% if breach.unknown_sanctions_regime %}
@@ -115,7 +116,7 @@
         <div class="govuk-summary-list__row">
             <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
             <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Names and addresses:</strong> {{ breach.other_addresses_in_the_supply_chain }}
+                <strong>Names and addresses:</strong> {% if breach.other_addresses_in_the_supply_chain %}{{ breach.other_addresses_in_the_supply_chain }}{% else %}Not provided{% endif %}
             </dt></div>
     </dl>
 
