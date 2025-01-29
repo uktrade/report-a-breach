@@ -3,13 +3,12 @@ from report_a_suspected_breach.views import (
     generic,
     views_business,
     views_documents_and_details,
+    views_download,
     views_end,
     views_sanctions_and_goods,
     views_start,
     views_supply_chain,
 )
-
-from django_app.report_a_suspected_breach.views.views_download import DownloadPDFView
 
 app_name = "report_a_suspected_breach"
 
@@ -125,7 +124,7 @@ views_end_urls = [
     path("check-your-answers", views_end.CheckYourAnswersView.as_view(), name="check_your_answers"),
     path("declaration", views_end.DeclarationView.as_view(), name="declaration"),
     path("submission-complete", views_end.CompleteView.as_view(), name="complete"),
-    path("download_report/", DownloadPDFView.as_view(), name="download_report"),
+    path("download_report/", views_download.DownloadPDFView.as_view(), name="download_report"),
 ]
 
 urlpatterns = (

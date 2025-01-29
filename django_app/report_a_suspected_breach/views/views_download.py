@@ -7,8 +7,7 @@ from django.utils.safestring import mark_safe
 from django.views.generic import DetailView
 from playwright.sync_api import sync_playwright
 from report_a_suspected_breach.models import Breach
-
-from django_app.utils import breach_report
+from utils import breach_report
 
 
 class DownloadPDFView(DetailView):
