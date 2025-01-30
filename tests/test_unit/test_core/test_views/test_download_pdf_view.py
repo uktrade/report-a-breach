@@ -17,7 +17,7 @@ def patched_playwright(monkeypatch):
     mock_page.pdf.return_value = None
     mock_browser.close.return_value = None
 
-    monkeypatch.setattr("core.views.sync_playwright", mock_sync_playwright)
+    monkeypatch.setattr("core.base_views.sync_playwright", mock_sync_playwright)
 
     return mock_sync_playwright, mock_browser, mock_page
 
