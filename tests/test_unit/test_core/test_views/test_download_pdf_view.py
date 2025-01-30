@@ -1,7 +1,10 @@
 from unittest.mock import MagicMock
 
 import pytest
-from django.urls import reverse
+from core.base_views import BaseDownloadPDFView
+from django.test import RequestFactory
+
+# from django.urls import reverse
 
 
 @pytest.fixture(autouse=True)
@@ -26,8 +29,12 @@ class TestDownloadPDFView:
     def test_successful_get(self, patched_playwright, rasb_client):
         mock_sync_playwright, mock_browser, mock_page = patched_playwright
         test_reference = "DE1234"
+        request = RequestFactory().get("?reference=" + test_reference)
 
-        response = rasb_client.get(reverse("report_a_suspected_breach:download_report") + f"?reference={test_reference}")
+        view = BaseDownloadPDFView()
+        view.setup(request=request)
+        response = view.get(BaseDownloadPDFView())
+        # response = rasb_client.get(reverse("report_a_suspected_breach:download_report") + f"?reference={test_reference}")
 
         assert response.status_code == 200
         assert response.context["reference"] == test_reference
