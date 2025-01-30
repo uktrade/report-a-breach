@@ -32,8 +32,8 @@ class TestDownloadPDFView:
         request = RequestFactory().get("?reference=" + test_reference)
 
         view = BaseDownloadPDFView()
-        view.setup(request=request)
-        response = view.get(BaseDownloadPDFView())
+        view.setup(request, reference=test_reference)
+        response = view.get(request, reference=test_reference)
         # response = rasb_client.get(reverse("report_a_suspected_breach:download_report") + f"?reference={test_reference}")
 
         assert response.status_code == 200
