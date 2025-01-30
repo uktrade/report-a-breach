@@ -73,6 +73,9 @@ SANCTIONS = [sanction["name"] for sanction in active_regimes]
 FILES = [os.path.join(os.path.dirname(__file__), "test_report_a_suspected_breach/testfiles/testfile.pdf")]
 MISSING_FILE_TYPE = [os.path.join(os.path.dirname(__file__), "test_report_a_suspected_breach/testfiles/missing_filetype")]
 MALWARE_FILE_TYPE = [os.path.join(os.path.dirname(__file__), "test_report_a_suspected_breach/testfiles/mock_malware_file.txt")]
+INCORRECT_EXTENSION_FILE_TYPE = [
+    os.path.join(os.path.dirname(__file__), "test_report_a_suspected_breach/testfiles/incorrect_file_extension.sh")
+]
 
 END_USERS = {
     "end_user1": {

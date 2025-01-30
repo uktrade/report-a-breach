@@ -19,7 +19,6 @@
                 deleteUrl: "{% url 'report_a_suspected_breach:delete_documents' %}"
             });
 
-
             // add an event handler for the file upload inputs that are dynamically generated when an upload error occurs
             $(document).on('change', '.file-upload-error-input', function (e) {
                 e.stopPropagation()
@@ -43,6 +42,7 @@
                     multi_file_upload.feedbackContainer.removeClass('moj-hidden');
                     multi_file_upload.uploadFiles(e.currentTarget.files);
                 }
+
             });
         })
 
