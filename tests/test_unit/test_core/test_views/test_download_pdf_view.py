@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from core.base_views import BaseDownloadPDFView
+from django.http import HttpResponse
 from django.test import RequestFactory
 
 # from django.urls import reverse
@@ -36,8 +37,9 @@ class TestDownloadPDFView:
         response = view.get(request, reference=test_reference)
         # response = rasb_client.get(reverse("report_a_suspected_breach:download_report") + f"?reference={test_reference}")
 
-        assert response.status_code == 200
-        assert response.context["reference"] == test_reference
+        expected_response = HttpResponse(status=200, content_type="application/pdf")
+        assert response.status_code == expected_response.status_code
+        assert response["content-type"] == expected_response["content-type"]
         assert response.headers["Content-Disposition"] == "inline; filename=" + f"report-{test_reference}.pdf"
 
         mock_sync_playwright.chromium.launch.assert_called_once_with(headless=True)
