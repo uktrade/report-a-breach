@@ -127,7 +127,7 @@ class BaseDownloadPDFView(DetailView):
         response["Content-Disposition"] = f"inline; filename={filename}"
         return response
 
-    def get_context_data(self, *args: object, **kwargs: object) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["header"] = self.header
         reference = self.request.GET.get("reference", "")
