@@ -35,7 +35,6 @@ class TestDownloadPDFView:
         view = BaseDownloadPDFView()
         view.setup(request, reference=test_reference)
         response = view.get(request, reference=test_reference)
-        # response = rasb_client.get(reverse("report_a_suspected_breach:download_report") + f"?reference={test_reference}")
 
         expected_response = HttpResponse(status=200, content_type="application/pdf")
         assert response.status_code == expected_response.status_code
