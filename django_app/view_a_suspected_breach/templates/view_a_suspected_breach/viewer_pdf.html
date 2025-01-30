@@ -1,20 +1,7 @@
-{% extends "core/base.html" %}
-{% load get_css_rules_as_string %}
-{% block cookie_banner %}
-{% endblock cookie_banner %}
-{% block header_content %}
-{% endblock header_content %}
+{% extends "core/base_download_pdf.html" %}
 {% block column_content %}
-    {% block skip_link %}{% endblock skip_link %}
-    {% block phase_banner %}{% endblock phase_banner %}
-    {% block back_button %}{% endblock back_button %}
-    <script>
-        {% get_css_rules_as_string 'core/stylesheets/font-awesome-6.5.2.css' %}
-        {% get_css_rules_as_string 'core/stylesheets/govuk-frontend-5.3.0.min.css' %}
-        {% get_css_rules_as_string 'core/stylesheets/common.css' %}
-    </script>
     <div>
-        <h1 class="govuk-heading-l">Report a suspected breach of trade sanctions: report submitted</h1>
+        <h1 class="govuk-heading-l">{{ header }}</h1>
     </div>
     <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
 
@@ -134,4 +121,3 @@
             </dt></div>
     </dl>
 {% endblock column_content %}
-{% block footer %}{% endblock footer %}
