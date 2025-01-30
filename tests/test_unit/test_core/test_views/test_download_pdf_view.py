@@ -27,7 +27,7 @@ class TestDownloadPDFView:
         mock_sync_playwright, mock_browser, mock_page = patched_playwright
         test_reference = "DE1234"
 
-        response = rasb_client.get(reverse("report_a_suspected_breach:download_report" + f"?reference={test_reference}"))
+        response = rasb_client.get(reverse("report_a_suspected_breach:download_report") + f"?reference={test_reference}")
 
         assert response.status_code == 200
         assert response.context["reference"] == test_reference
