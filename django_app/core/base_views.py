@@ -110,10 +110,10 @@ class BaseDownloadPDFView(DetailView):
     header = "Report a suspected breach"
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
-        context_data = self.get_context_data()
-        filename = f"report-{context_data['reference']}.pdf"
+        self.reference = self.request.GET.get("reference", "")
+        filename = f"report-{self.reference}.pdf"
         pdf_data = None
-        template_string = render_to_string(self.template_name, context=context_data)
+        template_string = render_to_string(self.template_name, context=self.get_context_data(**kwargs))
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
@@ -130,6 +130,5 @@ class BaseDownloadPDFView(DetailView):
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["header"] = self.header
-        reference = self.request.GET.get("reference", "")
-        context["reference"] = reference
+        context["reference"] = self.reference
         return context
