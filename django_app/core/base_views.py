@@ -110,7 +110,7 @@ class BaseDownloadPDFView(DetailView):
     header = "Report a suspected breach"
 
     def get(self, request: HttpRequest, **kwargs: object) -> HttpResponse:
-        context_data = self.get_context_data(**kwargs)
+        context_data = self.get_context_data()
         filename = f"report-{context_data['reference']}.pdf"
         pdf_data = None
         template_string = render_to_string(self.template_name, context=context_data)
