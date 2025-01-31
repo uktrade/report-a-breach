@@ -30,6 +30,7 @@ class TestUploadDocumentsForm:
 
     def test_invalid_mimetype(self, request_object):
         bad_file = SimpleUploadedFile("bad.gif", b"GIF8")
+        bad_file.original_name = "bad.gif"
 
         form = UploadDocumentsForm(
             files={
@@ -45,6 +46,7 @@ class TestUploadDocumentsForm:
 
     def test_invalid_extension(self, request_object):
         bad_file = SimpleUploadedFile("bad.gif", b"%PDF-test_pdf")
+        bad_file.original_name = "bad.gif"
 
         form = UploadDocumentsForm(
             files={
@@ -120,6 +122,7 @@ class TestUploadDocumentsForm:
 
     def test_invalid_extension_file_name_escaped(self, request_object):
         bad_file = SimpleUploadedFile("<img src=xonerror=alert(document.domain)>gif.gif", b"GIF8")
+        bad_file.original_name = "<img src=xonerror=alert(document.domain)>gif.gif"
 
         form = UploadDocumentsForm(
             files={
@@ -131,7 +134,9 @@ class TestUploadDocumentsForm:
         )
         assert not form.is_valid()
         assert "document" in form.errors
-        assert form.errors.as_data()["document"][0].message == (
-            "The selected file must be a DOC, DOCX, ODT, FODT, XLS, XLSX, ODS, FODS, PPT, PPTX, ODP, "
-            "FODP, PDF, TXT, CSV, ZIP, HTML, JPEG, JPG or PNG"
+        assert (
+            form.errors.as_data()["document"][0].message
+            == "<img src=xonerror=alert(document.domain)>gif.gif cannot be uploaded.\n\nThe selected file must be a "
+            "DOC, DOCX, ODT, FODT, XLS, XLSX, ODS, FODS, PPT, PPTX, ODP, FODP, PDF, TXT, CSV, "
+            "ZIP, HTML, JPEG, JPG or PNG"
         )
