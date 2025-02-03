@@ -5,8 +5,6 @@ from core.base_views import BaseDownloadPDFView
 from django.http import HttpResponse
 from django.test import RequestFactory
 
-# from django.urls import reverse
-
 
 @pytest.fixture(autouse=True)
 def patched_playwright(monkeypatch):

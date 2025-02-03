@@ -14,8 +14,6 @@ from django_ratelimit.exceptions import Ratelimited
 from .forms import CookiesConsentForm, HideCookiesForm
 from .utils import update_last_activity_session_timestamp
 
-# from report_a_suspected_breach.models import Breach
-
 
 class RedirectBaseDomainView(RedirectView):
     """Redirects base url visits to either report a breach app or view app default view"""
