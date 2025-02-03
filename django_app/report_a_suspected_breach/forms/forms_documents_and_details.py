@@ -102,12 +102,15 @@ class UploadDocumentsForm(BaseForm):
 
             _, file_extension = os.path.splitext(document.name)
             valid_extension = file_extension.lower() in valid_extensions
-            valid_file_type = (
+            valid_file_types = (
                 ", ".join(valid_extensions[:-1]).replace(".", "").upper() + " or " + valid_extensions[-1].replace(".", "").upper()
             )
 
             if not valid_mimetype or not valid_extension:
-                raise forms.ValidationError(f"The selected file must be a {valid_file_type}", code="invalid_file_type")
+                raise forms.ValidationError(
+                    f"{document.original_name} cannot be uploaded.\n\nThe selected file must be a {valid_file_types}",
+                    code="invalid_file_type",
+                )
 
             # has the user already uploaded 10 files?
             if session_files := get_all_session_files(TemporaryDocumentStorage(), self.request.session):
