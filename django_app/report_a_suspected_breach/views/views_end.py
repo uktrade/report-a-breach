@@ -1,9 +1,10 @@
 from typing import Any
 
-from core.base_views import BaseFormView, BaseTemplateView
+from core.base_views import BaseDownloadPDFView, BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
@@ -112,4 +113,17 @@ class CompleteView(BaseTemplateView):
             self.request.session.flush()
 
         context.update(get_breach_context_data(breach_object))
+        return context
+
+
+class DownloadPDFView(BaseDownloadPDFView):
+    template_name = "report_a_suspected_breach/form_steps/report_pdf.html"
+    header = "Report a suspected breach of trade sanctions: submission complete"
+
+    def get_context_data(self, *args: object, **kwargs: object) -> dict[str, Any]:
+        reference = self.request.GET.get("reference")
+        self.object = get_object_or_404(Breach, reference=reference)
+        context = super().get_context_data(**kwargs)
+        breach_context_data = get_breach_context_data(self.object)
+        context.update(breach_context_data)
         return context
