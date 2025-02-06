@@ -57,7 +57,15 @@
 @media print {
     .hide-on-print {
         display: none !important;
-      }
+    }
+
+    .padding-bottom-0 {
+        padding-bottom: 0;
+    }
+
+    .page-margin {
+    margin-left: 75px;
+    }
 }
 
 .govuk-summary-list__key {
