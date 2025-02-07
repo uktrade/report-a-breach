@@ -5,7 +5,7 @@
 {% block title %}View Suspected Breach Report{% endblock title %}
 {% block download_link %}
     <div class="govuk-grid-column-one-half govuk-!-text-align-right govuk-!-margin-top-3 hide-on-print">
-        <a href="{% url 'view_a_suspected_breach:download_viewer_report' %}?reference={{ breach.reference }}" class="govuk-link--muted govuk-body-s" target="_blank">Download and view report (opens in new tab)</a>
+        <a href="{% url 'view_a_suspected_breach:download_viewer_report' %}?reference={{ breach.reference }}" class="govuk-link--muted govuk-body-s" target="_blank">Download report</a>
     </div>
 {% endblock download_link %}
 {% block column_content %}
