@@ -53,7 +53,7 @@ class TestWhichSanctionsRegimeForm:
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "required"
 
     @patch(
-        "report_a_suspected_breach.forms.forms_sanctions_and_goods.active_regimes",
+        "report_a_suspected_breach.forms.forms_sanctions_and_goods.get_active_regimes",
         [
             {"name": "test regime", "is_active": True},
             {"name": "test regime1", "is_active": True},
@@ -72,7 +72,7 @@ class TestWhichSanctionsRegimeForm:
         assert flat_choices[-2] == "Unknown Regime"
 
     @patch(
-        "report_a_suspected_breach.forms.forms_sanctions_and_goods.active_regimes",
+        "report_a_suspected_breach.forms.forms_sanctions_and_goods.get_active_regimes",
         [
             {"name": "test regime", "is_active": True},
         ],
@@ -84,7 +84,7 @@ class TestWhichSanctionsRegimeForm:
         assert form.errors.as_data()["which_sanctions_regime"][0].code == "invalid"
 
     @patch(
-        "report_a_suspected_breach.forms.forms_sanctions_and_goods.active_regimes",
+        "report_a_suspected_breach.forms.forms_sanctions_and_goods.get_active_regimes",
         [
             {"name": "test regime", "is_active": True},
         ],
