@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.test import RequestFactory
+from django.urls import reverse
 from report_a_suspected_breach.models import ReporterEmailVerification
 from report_a_suspected_breach.views.views_end import (
     CheckYourAnswersView,
@@ -44,7 +45,6 @@ class TestDeclarationView:
 
 
 class TestCompleteView:
-
     def test_get_context_data(self, breach_object, rasb_client):
         request_object = RequestFactory().get("/")
         breach_object.save()
@@ -67,3 +67,12 @@ class TestCompleteView:
         assert breach.id == breach_object.id
         assert response.status_code == expected_response.status_code
         assert response["content-type"] == expected_response["content-type"]
+
+    def test_no_breach_id_redirect(self, rasb_client, breach_object):
+        session = rasb_client.session
+        session["breach_id"] = "123"
+        session.save()
+
+        response = rasb_client.get(reverse("report_a_suspected_breach:complete"))
+        assert response.status_code == 302
+        assert response.url == reverse("report_a_suspected_breach:start")
