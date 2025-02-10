@@ -54,13 +54,13 @@ class TestWhichSanctionsRegimeForm:
 
     @patch(
         "report_a_suspected_breach.forms.forms_sanctions_and_goods.get_active_regimes",
-        [
+        return_value=[
             {"name": "test regime", "is_active": True},
             {"name": "test regime1", "is_active": True},
             {"name": "test regime2", "is_active": True},
         ],
     )
-    def test_choices_creation(self):
+    def test_choices_creation(self, mocked_get_active_regimes):
         form = WhichSanctionsRegimeForm()
         assert len(form.fields["which_sanctions_regime"].choices) == 5  # 3 + 2 default choices
         flat_choices = [choice[0] for choice in form.fields["which_sanctions_regime"].choices]
@@ -73,11 +73,11 @@ class TestWhichSanctionsRegimeForm:
 
     @patch(
         "report_a_suspected_breach.forms.forms_sanctions_and_goods.get_active_regimes",
-        [
+        return_value=[
             {"name": "test regime", "is_active": True},
         ],
     )
-    def test_assert_unknown_regime_selected_error(self):
+    def test_assert_unknown_regime_selected_error(self, mocked_get_active_regimes):
         form = WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Unknown Regime", "test regime"]})
         assert not form.is_valid()
         assert "which_sanctions_regime" in form.errors
@@ -85,11 +85,11 @@ class TestWhichSanctionsRegimeForm:
 
     @patch(
         "report_a_suspected_breach.forms.forms_sanctions_and_goods.get_active_regimes",
-        [
+        return_value=[
             {"name": "test regime", "is_active": True},
         ],
     )
-    def test_assert_other_regime_selected_error(self):
+    def test_assert_other_regime_selected_error(self, mocked_get_active_regimes):
         form = WhichSanctionsRegimeForm(data={"which_sanctions_regime": ["Other Regime", "test regime"]})
         assert not form.is_valid()
         assert "which_sanctions_regime" in form.errors
