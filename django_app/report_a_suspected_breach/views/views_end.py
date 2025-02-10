@@ -4,6 +4,7 @@ from core.base_views import BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from report_a_suspected_breach.form_step_conditions import (
     show_check_company_details_page_condition,
@@ -94,6 +95,14 @@ class DeclarationView(BaseFormView):
 
 class CompleteView(BaseTemplateView):
     template_name = "report_a_suspected_breach/form_steps/complete.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # get the breach report here, because if it doesn't exist we want to redirect them to the start page
+        try:
+            Breach.objects.get(pk=self.request.session.get("breach_id"))
+        except Breach.DoesNotExist:
+            return redirect("report_a_suspected_breach:initial_redirect_view")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
