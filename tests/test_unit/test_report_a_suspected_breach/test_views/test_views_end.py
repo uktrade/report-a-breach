@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import patch
 
 from django.contrib.sessions.models import Session
@@ -70,9 +71,9 @@ class TestCompleteView:
 
     def test_no_breach_id_redirect(self, rasb_client, breach_object):
         session = rasb_client.session
-        session["breach_id"] = "123"
+        session["breach_id"] = str(uuid.uuid4())
         session.save()
 
         response = rasb_client.get(reverse("report_a_suspected_breach:complete"))
         assert response.status_code == 302
-        assert response.url == reverse("report_a_suspected_breach:start")
+        assert response.url == reverse("report_a_suspected_breach:initial_redirect_view")
