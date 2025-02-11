@@ -42,3 +42,13 @@ def get_form(request: HttpRequest, step_name: str) -> dict:
         return form
     else:
         return {}
+
+
+def get_active_regimes() -> list[dict[str, str]]:
+    """Get the active sanctions regimes. If submodule is not present, return an empty list."""
+    try:
+        from sanctions_regimes.report_a_breach import active_regimes
+    except ImportError:
+        active_regimes = []
+
+    return active_regimes
