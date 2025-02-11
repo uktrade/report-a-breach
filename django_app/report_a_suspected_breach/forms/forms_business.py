@@ -86,7 +86,7 @@ class DoYouKnowTheRegisteredCompanyNumberForm(BaseModelForm):
                 "do_you_know_the_registered_company_number",
                 ConditionalQuestion(
                     "Yes",
-                    Field.text("registered_company_number", field_width=Fluid.ONE_THIRD, label_size=Size.MEDIUM, label_tag="h2"),
+                    Field.text("registered_company_number", field_width=Fluid.ONE_THIRD, label_tag="h2"),
                 ),
                 "No",
             )
