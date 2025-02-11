@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from feedback.crispy_fields import get_field_with_label_id
 from report_a_suspected_breach.fields import DateInputField
 from report_a_suspected_breach.models import Breach
-from sanctions_regimes.report_a_breach import active_regimes
+from report_a_suspected_breach.utils import get_active_regimes
 
 Field.template = "core/custom_fields/field.html"
 
@@ -91,7 +91,7 @@ class WhichSanctionsRegimeForm(BaseForm):
         super().__init__(*args, **kwargs)
         checkbox_choices = []
 
-        for item in active_regimes:
+        for item in get_active_regimes():
             checkbox_choices.append(Choice(item["name"], item["name"]))
 
         # adding the OR separator to the last option
