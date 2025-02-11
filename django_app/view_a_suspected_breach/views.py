@@ -124,10 +124,10 @@ class DownloadPDFView(LoginRequiredMixin, ActiveUserRequiredMixin, BaseDownloadP
     template_name = "view_a_suspected_breach/viewer_pdf.html"
     header = "Report a suspected breach of trade sanctions: report submitted"
 
-    def get_context_data(self, *args: object, **kwargs: object) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         reference = self.request.GET.get("reference")
-        self.object = get_object_or_404(Breach, reference=reference)
+        breach_object = Breach.objects.get(reference=reference)
         context = super().get_context_data(**kwargs)
-        breach_context_data = get_breach_context_data(self.object)
+        breach_context_data = get_breach_context_data(breach_object)
         context.update(breach_context_data)
         return context
