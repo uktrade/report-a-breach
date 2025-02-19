@@ -13,7 +13,7 @@ if [ -f "./.gitmodules" ]; then
     git config --global credential.UseHttpPath true
 
     sed -i "s|url = git@github.com:uktrade/\(.*\).git|url = $git_clone_base_url/\1.git|g" ./.gitmodules
-
+    git submodule sync
     git submodule update --init --remote --recursive
 
 else
