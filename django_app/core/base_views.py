@@ -114,7 +114,7 @@ class BaseDownloadPDFView(DetailView):
         filename = f"report-{self.reference}.pdf"
         pdf_data = None
         template_string = render_to_string(self.template_name, context=self.get_context_data(**kwargs))
-        margins = {"left": "3.17in", "right": "3.17in"}
+        margins = {"left": "1.25in", "right": "1.25in"}
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
