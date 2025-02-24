@@ -123,6 +123,7 @@ views_end_urls = [
     path("check-your-answers", views_end.CheckYourAnswersView.as_view(), name="check_your_answers"),
     path("declaration", views_end.DeclarationView.as_view(), name="declaration"),
     path("submission-complete", views_end.CompleteView.as_view(), name="complete"),
+    path("download_report/", views_end.DownloadPDFView.as_view(), name="download_report"),
 ]
 
 urlpatterns = (
