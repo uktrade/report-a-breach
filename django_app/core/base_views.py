@@ -114,13 +114,15 @@ class BaseDownloadPDFView(DetailView):
         filename = f"report-{self.reference}.pdf"
         pdf_data = None
         template_string = render_to_string(self.template_name, context=self.get_context_data(**kwargs))
+        margins = {"left": "3.17in", "right": "3.17in"}
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             page = browser.new_page()
             page.set_content(mark_safe(template_string))
             page.wait_for_function("document.fonts.ready.then(fonts => fonts.status === 'loaded')")
-            pdf_data = page.pdf(format="A4")
+            pdf_data = page.pdf(format="A4", tagged=True, margin=margins)
+            response = HttpResponse(pdf_data, content_type="application/pdf")
             browser.close()
 
         response = HttpResponse(pdf_data, content_type="application/pdf")
