@@ -41,5 +41,7 @@ class TestDownloadPDFView:
 
         mock_sync_playwright.chromium.launch.assert_called_once_with(headless=True)
         mock_browser.new_page.assert_called_once()
-        mock_page.pdf.assert_called_once_with(format="A4", tagged=True, margin={"left": "1.25in", "right": "1.25in"})
+        mock_page.pdf.assert_called_once_with(
+            format="A4", tagged=True, margin={"left": "1.25in", "right": "1.25in", "top": "1in", "bottom": "1in"}
+        )
         mock_browser.close.assert_called_once()
