@@ -10,10 +10,10 @@
             We've sent a confirmation email to {{ breach.reporter_email_address }}
         </p>
 
-        <h2 class="govuk-heading-m padding-bottom-0">Your details</h2>
+        <h2 class="govuk-heading-m">Your details</h2>
         <dl class="govuk-summary-list govuk-summary-list--no-border">
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Full name:</strong> {{ breach.reporter_full_name }}
                 </dt>
             </div>
@@ -29,9 +29,9 @@
             </div>
         </dl>
 
-        <dl class="govuk-summary-list">
+        <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
             <div class="govuk-summary-list__row">
-                <h2 class="govuk-heading-m padding-bottom-0">Person or business you’re reporting</h2>
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}
                 </dt></div>
@@ -44,12 +44,11 @@
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Address:</strong> {{ breacher_address }}<br></dt></div>
-
         </dl>
 
-        <dl class="govuk-summary-list">
+        <h2 class="govuk-heading-m">Overview of the breach</h2>
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
             <div class="govuk-summary-list__row">
-                <h2 class="govuk-heading-m padding-bottom-0">Overview of the breach</h2>
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
                     {{ breach.when_did_you_first_suspect }}<br></dt></div>
@@ -78,7 +77,6 @@
         </dl>
 
         <h2 class="govuk-heading-m padding-bottom-0">People and businesses involved</h2>
-
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <h3 class="govuk-heading-s">Supplier</h3>
@@ -109,9 +107,9 @@
                 </dt></div>
         </dl>
 
+        <h2 class="govuk-heading-m padding-bottom-0">Sanctions breach details</h2>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
-                <h2 class="govuk-heading-m padding-bottom-0">Sanctions breach details</h2>
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     <strong>Upload supporting documents:</strong>
                     {% if not breach.documents.all %}
