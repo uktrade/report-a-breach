@@ -13,16 +13,18 @@
 {#        <div class="govuk-summary-list__row">#}
 {#            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">#}
     <p class="govuk-body-m">
-        <strong>Full name:</strong> {{ breach.reporter_full_name }}
+        <strong>Full name:</strong> {{ breach.reporter_full_name }}</p>
 {#            </dt>#}
 {#        </div>#}
 {#        <div class="govuk-summary-list__row">#}
 {#            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">#}
-        <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
+    <p class="govuk-body-m">
+        <strong>Email:</strong> {{ breach.reporter_email_address }}</p>
 {#            </dt>#}
 {#        </div>#}
 {#        <div class="govuk-summary-list__row">#}
 {#            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">#}
+    <p class="govuk-body-m">
         <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}<br>
     </p>
 {#            </dt>#}
