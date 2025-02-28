@@ -14,105 +14,78 @@
         <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
         <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}
     </p>
-{#            </dt>#}
-{#        </div>#}
-{#    </dl>#}
 
     <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
-    <dl class="govuk-summary-list govuk-summary-list--no-border">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}
-            </dt></div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Name:</strong> {{ breacher.name_of_business }}<br></dt></div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Website:</strong> {{ breacher.website }}<br></dt></div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Address:</strong> {{ breacher_address }}<br></dt></div>
-    </dl>
+    <p class="govuk-body-m">
+        <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}
+        <strong>Name:</strong> {{ breacher.name_of_business }}<br>
+
+        <strong>Website:</strong> {{ breacher.website }}<br>
+        <strong>Address:</strong> {{ breacher_address }}
+    </p>
 
     <h2 class="govuk-heading-m">Overview of the breach</h2>
-    <dl class="govuk-summary-list govuk-summary-list--no-border">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
-                {{ breach.when_did_you_first_suspect }}<br></dt></div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
-                    {% if forloop.first %}<br>{% endif %}
-                    {{ regime }}
-                    {% if not forloop.last %}
-                        ,
-                        <br>
-                    {% endif %}
-                {% endfor %}
-                {% if breach.unknown_sanctions_regime %}
-                    Unknown regime<br>
-                {% endif %}
-                {% if breach.other_sanctions_regime %}
-                    Other regime<br>
-                {% endif %}
+    <p class="govuk-body-m">
+        <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
+        {{ breach.when_did_you_first_suspect }}<br>
+        <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
+            {% if forloop.first %}<br>{% endif %}
+            {{ regime }}
+            {% if not forloop.last %}
+                ,
                 <br>
-            </dt></div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>What were the goods or services?</strong> {{ breach.what_were_the_goods }}<br>
-            </dt></div>
-    </dl>
+            {% endif %}
+        {% endfor %}
+        {% if breach.unknown_sanctions_regime %}
+            Unknown regime<br>
+        {% endif %}
+        {% if breach.other_sanctions_regime %}
+            Other regime<br>
+        {% endif %}
+        <br>
+        <strong>What were the goods or services?</strong> {{ breach.what_were_the_goods }}
+    </p>
 
     <h2 class="govuk-heading-m padding-bottom-0">People and businesses involved</h2>
-    <dl class="govuk-summary-list">
-        <h3 class="govuk-heading-s">Supplier</h3>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular"><strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
-                <br>
-                {{ supplier_address | linebreaksbr }}</dt></div>
+    <h3 class="govuk-heading-s">Supplier</h3>
+    <p class="govuk-body-m">
 
+        <strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
+        <br>
+        {{ supplier_address | linebreaksbr }}
+    </p>
 
-        {% for end_user in end_users %}
-            <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    <strong>Name:</strong> {{ end_user.name }}<br></dt></div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    <strong>Business:</strong> {{ end_user.name_of_business }}<br></dt></div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    <strong>Address:</strong> {{ end_user.get_readable_address }}</dt></div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                    <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}</dt></div>
-        {% endfor %}
-        <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Names and addresses:</strong> {% if breach.other_addresses_in_the_supply_chain %}{{ breach.other_addresses_in_the_supply_chain }}{% else %}Not provided{% endif %}
-            </dt></div>
-    </dl>
+    {% for end_user in end_users %}
+        <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
+        <p class="govuk-body-m">
+            <strong>Name:</strong> {{ end_user.name }}<br>
+
+            <strong>Business:</strong> {{ end_user.name_of_business }}<br>
+
+            <strong>Address:</strong> {{ end_user.get_readable_address }}<br>
+
+            <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}
+        </p>
+    {% endfor %}
+    <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
+    <p class="govuk-body-m">
+        <strong>Names and addresses:</strong> {% if breach.other_addresses_in_the_supply_chain %}{{ breach.other_addresses_in_the_supply_chain }}{% else %}Not provided{% endif %}
+    </p>
 
     <h2 class="govuk-heading-m padding-bottom-0">Sanctions breach details</h2>
-    <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Upload supporting documents:</strong>
-                {% if not breach.documents.all %}
-                    None uploaded
-                {% else %}
-                    {% for document in breach.documents.all %}
-                        {{ document.file_name }}<br>
-                    {% endfor %}
-                {% endif %}</dt></div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
-            </dt></div>
-    </dl>
+    <p class="govuk-body-m">
+        <strong>Upload supporting documents:</strong>
+        {% if not breach.documents.all %}
+            None uploaded
+        {% else %}
+            {% for document in breach.documents.all %}
+                {{ document.file_name }}<br>
+            {% endfor %}
+        {% endif %}
+    </p>
+    <p class="govuk-body-m">
+        <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
+    </p>
 
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body-m">
