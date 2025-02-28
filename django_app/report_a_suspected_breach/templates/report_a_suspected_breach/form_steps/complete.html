@@ -20,13 +20,9 @@
     {% else %}
         <p class="govuk-body">We have sent you a confirmation email.</p>
     {% endif %}
-    {% comment %}
-        TODO: remove comment when DST-797 is complete
     <p class="govuk-body">
-        <a href="{% url 'download_report' %}?reference={{ reference }}" class="govuk-link" target="_blank">Download and view report (opens in new tab)</a>
+        <a href="{% url 'report_a_suspected_breach:download_report' %}?reference={{ reference }}" class="govuk-link" target="_blank">Download report</a>
     </p>
-    {% endcomment %}
-    <p class="govuk-body hide-on-js-disabled show-on-js-enabled hide-on-print"><a class="govuk-link" onclick="window.print()" href=#>View and print your report</a></p>
 
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">
