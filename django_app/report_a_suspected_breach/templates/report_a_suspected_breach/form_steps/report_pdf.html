@@ -9,23 +9,25 @@
     </p>
 
     <h2 class="govuk-heading-m">Your details</h2>
-    <dl class="govuk-summary-list govuk-summary-list--no-border">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Full name:</strong> {{ breach.reporter_full_name }}
-            </dt>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
-            </dt>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
-                <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}<br>
-            </dt>
-        </div>
-    </dl>
+{#    <dl class="govuk-summary-list govuk-summary-list--no-border">#}
+{#        <div class="govuk-summary-list__row">#}
+{#            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">#}
+    <p class="govuk-body-m">
+        <strong>Full name:</strong> {{ breach.reporter_full_name }}
+{#            </dt>#}
+{#        </div>#}
+{#        <div class="govuk-summary-list__row">#}
+{#            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">#}
+        <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
+{#            </dt>#}
+{#        </div>#}
+{#        <div class="govuk-summary-list__row">#}
+{#            <dt class="govuk-summary-list__key govuk-!-font-weight-regular">#}
+        <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}<br>
+    </p>
+{#            </dt>#}
+{#        </div>#}
+{#    </dl>#}
 
     <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
     <dl class="govuk-summary-list govuk-summary-list--no-border">
