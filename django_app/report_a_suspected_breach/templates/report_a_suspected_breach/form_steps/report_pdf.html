@@ -51,8 +51,8 @@
         <strong>Address:</strong> {{ breacher_address }}
     </div>
 
-    <h2 class="govuk-heading-m">Overview of the breach</h2>
-    <p style="line-height: 1.5;">
+    <h2 style="font-size: 1rem;">Overview of the breach</h2>
+    <p style="line-height: 1.4;">
         <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
         {{ breach.when_did_you_first_suspect }}<br>
         <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
