@@ -54,22 +54,21 @@
     margin-top: 2rem;
 }
 
-@page {
+@media print {
     .hide-on-print {
         display: none !important;
       }
 
-    .govuk-heading-m {
-        color: #000;
-        font-family: arial;
+    .pdf-spacing {
+        line-height: 1.6;
     }
 
-    .govuk-body {
-        font-family: arial;
-        line-height: 1.4;
+    .pdf-heading-size-2 {
+        font-size: 16px;
     }
-
 }
+
+
 
 dialog {
     border: none;

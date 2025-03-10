@@ -2,7 +2,7 @@
 {% block column_content %}
     <h1 class="govuk-heading-l">{{ header }}</h1>
 
-    <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
+    <h2 class="govuk-heading-m pdf-heading-size-2">Reference number: {{ reference }}</h2>
 
     <p class="govuk-body-m">
         We've sent a confirmation email to {{ breach.reporter_email_address }}
@@ -13,7 +13,7 @@
         <strong>Full name:</strong> {{ breach.reporter_full_name }}</p>
     <p class="govuk-body">
         <strong>Email:</strong> {{ breach.reporter_email_address }}</p>
-    <p class="govuk-body">
+    <p class="govuk-body pdf-spacing">
         <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}
     </p>
 
