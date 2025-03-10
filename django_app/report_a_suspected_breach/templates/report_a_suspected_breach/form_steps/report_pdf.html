@@ -8,10 +8,12 @@
         We've sent a confirmation email to {{ breach.reporter_email_address }}
     </p>
 
-    <h2 class="govuk-heading-m">Your details</h2>
-    <p class="govuk-body-m">
-        <strong>Full name:</strong> {{ breach.reporter_full_name }}<br>
-        <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
+    <h2 class="govuk-heading-m" >Your details</h2>
+    <p class="govuk-body">
+        <strong>Full name:</strong> {{ breach.reporter_full_name }}</p>
+    <p class="govuk-body">
+        <strong>Email:</strong> {{ breach.reporter_email_address }}</p>
+    <p class="govuk-body">
         <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}
     </p>
 

@@ -54,16 +54,22 @@
     margin-top: 2rem;
 }
 
-@media print {
+@page {
     .hide-on-print {
         display: none !important;
       }
-}
 
-.govuk-summary-list__key {
-    width: 50%;
-}
+    .govuk-heading-m {
+        color: #000;
+        font-family: arial;
+    }
 
+    .govuk-body {
+        font-family: arial;
+        line-height: 1.4;
+    }
+
+}
 
 dialog {
     border: none;
