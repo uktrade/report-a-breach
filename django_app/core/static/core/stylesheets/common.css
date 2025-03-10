@@ -63,6 +63,7 @@
 .pdf-body-with-spacing {
     line-height: 1.6;
     font-family: Arial, sans-serif;
+    font-size: 12px;
 }
 
 .pdf-heading-size-2 {
