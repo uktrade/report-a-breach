@@ -29,30 +29,30 @@
 
     <h1 class="govuk-heading-l">{{ header }}</h1>
 
-    <h2 class="pdf-heading-size-2">Reference number: {{ reference }}</h2>
+    <h2 style="font-size: 16px;">Reference number: {{ reference }}</h2>
 
-    <p class="pdf-body-with-spacing" style="line-height: 1.5;">
+    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
         We've sent a confirmation email to {{ breach.reporter_email_address }}
     </p>
 
-    <h2 class="pdf-heading-size-2" >Your details</h2>
-    <p class="pdf-body-with-spacing" style="line-height: 1.5;">
+    <h2 style="font-size: 16px;">Your details</h2>
+    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
         <strong>Full name:</strong> {{ breach.reporter_full_name }}<br>
         <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
         <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}
     </p>
 
-    <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
-    <div class="govuk-body-m" style="line-height: 1.5;">
+    <h2 style="font-size: 16px;">Person or business you’re reporting</h2>
+    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
         <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}
         <strong>Name:</strong> {{ breacher.name_of_business }}<br>
 
         <strong>Website:</strong> {{ breacher.website }}<br>
         <strong>Address:</strong> {{ breacher_address }}
-    </div>
+    </p>
 
-    <h2 style="font-size: 1rem;">Overview of the breach</h2>
-    <p style="line-height: 1.4;">
+    <h2 style="font-size: 16px;">Overview of the breach</h2>
+    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
         <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
         {{ breach.when_did_you_first_suspect }}<br>
         <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
