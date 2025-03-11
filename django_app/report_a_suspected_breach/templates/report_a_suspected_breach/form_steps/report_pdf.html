@@ -2,9 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <script>
-        {% get_css_rules_as_string "core/stylesheets/font-awesome-6.5.2.css" %}
         {% get_css_rules_as_string "core/stylesheets/govuk-frontend-5.3.0.min.css" %}
-        {% get_css_rules_as_string "core/stylesheets/common.css" %}
     </script>
     <header class="govuk-header" role="banner" data-module="govuk-header">
         <div class="govuk-header__container govuk-width-container">
@@ -29,21 +27,21 @@
 
     <h1 class="govuk-heading-l">{{ header }}</h1>
 
-    <h2 style="font-size: 16px;">Reference number: {{ reference }}</h2>
+    <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
 
-    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
+    <p style="line-height: 1.4; font-family: Arial;">
         We've sent a confirmation email to {{ breach.reporter_email_address }}
     </p>
 
-    <h2 style="font-size: 16px;">Your details</h2>
-    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
+    <h2 class="govuk-heading-m">Your details</h2>
+    <p style="line-height: 1.4; font-family: Arial;">
         <strong>Full name:</strong> {{ breach.reporter_full_name }}<br>
         <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
         <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}
     </p>
 
-    <h2 style="font-size: 16px;">Person or business you’re reporting</h2>
-    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
+    <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
+    <p style="line-height: 1.4; font-family: Arial;">
         <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}
         <strong>Name:</strong> {{ breacher.name_of_business }}<br>
 
@@ -51,8 +49,8 @@
         <strong>Address:</strong> {{ breacher_address }}
     </p>
 
-    <h2 style="font-size: 16px;">Overview of the breach</h2>
-    <p style="line-height: 1.4; font-family: Arial, sans-serif;">
+    <h2 class="govuk-heading-m">Overview of the breach</h2>
+    <p style="line-height: 1.4; font-family: Arial;">
         <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
         {{ breach.when_did_you_first_suspect }}<br>
         <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
@@ -73,9 +71,9 @@
         <strong>What were the goods or services?</strong> {{ breach.what_were_the_goods }}
     </p>
 
-    <h2 class="govuk-heading-m padding-bottom-0">People and businesses involved</h2>
+    <h2 class="govuk-heading-m">People and businesses involved</h2>
     <h3 class="govuk-heading-s">Supplier</h3>
-    <p class="govuk-body-m">
+    <p style="line-height: 1.4; font-family: Arial;">
 
         <strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
         <br>
@@ -95,12 +93,12 @@
         </p>
     {% endfor %}
     <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
-    <p class="govuk-body-m">
+    <p style="line-height: 1.4; font-family: Arial;">
         <strong>Names and addresses:</strong> {% if breach.other_addresses_in_the_supply_chain %}{{ breach.other_addresses_in_the_supply_chain }}{% else %}Not provided{% endif %}
     </p>
 
-    <h2 class="govuk-heading-m padding-bottom-0">Sanctions breach details</h2>
-    <p class="govuk-body-m">
+    <h2 class="govuk-heading-m">Sanctions breach details</h2>
+    <p style="line-height: 1.4; font-family: Arial;">
         <strong>Upload supporting documents:</strong>
         {% if not breach.documents.all %}
             None uploaded
@@ -110,12 +108,12 @@
             {% endfor %}
         {% endif %}
     </p>
-    <p class="govuk-body-m">
+    <p style="line-height: 1.4; font-family: Arial;">
         <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
     </p>
 
     <h2 class="govuk-heading-m">What happens next</h2>
-    <p class="govuk-body-m">
+    <p style="line-height: 1.4; font-family: Arial;">
         We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for Business and Trade (DBT).<br>
 
         OTSI will contact you once they've reviewed your report.
