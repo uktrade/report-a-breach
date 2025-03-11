@@ -29,19 +29,19 @@
 
     <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
 
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         We've sent a confirmation email to {{ breach.reporter_email_address }}
     </p>
 
     <h2 class="govuk-heading-m">Your details</h2>
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         <strong>Full name:</strong> {{ breach.reporter_full_name }}<br>
         <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
         <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}
     </p>
 
     <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}
         <strong>Name:</strong> {{ breacher.name_of_business }}<br>
 
@@ -50,14 +50,13 @@
     </p>
 
     <h2 class="govuk-heading-m">Overview of the breach</h2>
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
         {{ breach.when_did_you_first_suspect }}<br>
         <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
             {% if forloop.first %}<br>{% endif %}
-            {{ regime }}
+            {{ regime }},
             {% if not forloop.last %}
-                ,
                 <br>
             {% endif %}
         {% endfor %}
@@ -73,8 +72,7 @@
 
     <h2 class="govuk-heading-m">People and businesses involved</h2>
     <h3 class="govuk-heading-s">Supplier</h3>
-    <p style="line-height: 1.4; font-family: Arial;">
-
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         <strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
         <br>
         {{ supplier_address | linebreaksbr }}
@@ -84,21 +82,18 @@
         <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
         <p class="govuk-body-m">
             <strong>Name:</strong> {{ end_user.name }}<br>
-
             <strong>Business:</strong> {{ end_user.name_of_business }}<br>
-
             <strong>Address:</strong> {{ end_user.get_readable_address }}<br>
-
             <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}
         </p>
     {% endfor %}
     <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         <strong>Names and addresses:</strong> {% if breach.other_addresses_in_the_supply_chain %}{{ breach.other_addresses_in_the_supply_chain }}{% else %}Not provided{% endif %}
     </p>
 
     <h2 class="govuk-heading-m">Sanctions breach details</h2>
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         <strong>Upload supporting documents:</strong>
         {% if not breach.documents.all %}
             None uploaded
@@ -108,12 +103,12 @@
             {% endfor %}
         {% endif %}
     </p>
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
     </p>
 
     <h2 class="govuk-heading-m">What happens next</h2>
-    <p style="line-height: 1.4; font-family: Arial;">
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
         We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for Business and Trade (DBT).<br>
 
         OTSI will contact you once they've reviewed your report.
