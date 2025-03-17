@@ -222,3 +222,12 @@ Will be invoked by calling `invoke frontend-tests`
 
 MyPy is used to sanity check typing but is not currently enforced. \
 To run mypy against the django_app, call `invoke mypy`
+
+### Accessing the viewer portal
+
+The first time accessing the viewer portal you will automatically be logged in as `vyvyan.holland@email.com` through the
+mock Staff SSO server. This user will by default not be able to access the viewer portal as `is_active` is set to False in the DB.
+
+Create a superuser with `pipenv run django_app/manage.py createsuperuser` and log in to the admin panel (`http://view-a-licence:8000/admin`) with the superuser credentials.
+
+In order to access the viewer portal, run the django make_admin_user management command ([details here](https://uktrade.atlassian.net/wiki/spaces/TS1/pages/4664950873/Admin+user+for+viewer+portal)) using `vyvyan.holland@email.com` as the email.
