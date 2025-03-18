@@ -63,6 +63,7 @@ pyinstrument = "*"
 factory-boy = "*"
 mypy = "~=1.9"
 freezegun = "*"
+pytest-rerunfailures = "*"
 
 [requires]
 python_version = "3.11"

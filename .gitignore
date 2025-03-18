@@ -101,3 +101,5 @@ __pycache__/
 /django_app/profiles/
 /test-results/unit-test-results.xml
 nohup.out
+/video-test-results/
+video-test-results/

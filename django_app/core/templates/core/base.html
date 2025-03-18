@@ -14,12 +14,14 @@
                 nonce="{{ request.csp_nonce }}"
             ></script>
             <script nonce="{{ request.csp_nonce }}">
-                Sentry.init({
-                    dsn: "{{ SENTRY_DSN }}",
-                    environment: "{{ SENTRY_ENVIRONMENT }}",
-                    enableTracing: {% if SENTRY_ENABLE_TRACING %}true{% else %}false{% endif %},
-                    tracesSampleRate: {{ SENTRY_TRACES_SAMPLE_RATE }},
-                });
+                window.sentryOnLoad = function() {
+                    Sentry.init({
+                        dsn: "{{ SENTRY_DSN }}",
+                        environment: "{{ SENTRY_ENVIRONMENT }}",
+                        enableTracing: {% if SENTRY_ENABLE_TRACING %}true{% else %}false{% endif %},
+                        tracesSampleRate: {{ SENTRY_TRACES_SAMPLE_RATE }},
+                    });
+                };
             </script>
         {% endif %}
         {% if gtm_enabled %}
