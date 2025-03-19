@@ -1,6 +1,7 @@
 import logging
 from typing import Any
 
+from core.base_views import BaseDownloadPDFView
 from core.sites import require_view_a_breach
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -118,3 +119,17 @@ class ViewFeedbackView(LoginRequiredMixin, ActiveUserRequiredMixin, DetailView):
     model = FeedbackItem
     template_name = "view_a_suspected_breach/view_feedback.html"
     context_object_name = "feedback"
+
+
+@method_decorator(require_view_a_breach(), name="dispatch")
+class DownloadPDFView(LoginRequiredMixin, ActiveUserRequiredMixin, BaseDownloadPDFView):
+    template_name = "view_a_suspected_breach/viewer_pdf.html"
+    header = "Report a suspected breach of trade sanctions: report submitted"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        reference = self.request.GET.get("reference")
+        breach_object = Breach.objects.get(reference=reference)
+        context = super().get_context_data(**kwargs)
+        breach_context_data = get_breach_context_data(breach_object)
+        context.update(breach_context_data)
+        return context

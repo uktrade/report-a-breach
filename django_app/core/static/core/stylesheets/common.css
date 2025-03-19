@@ -60,11 +60,6 @@
       }
 }
 
-.govuk-summary-list__key {
-    width: 50%;
-}
-
-
 dialog {
     border: none;
     padding: 35px;
