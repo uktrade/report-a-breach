@@ -3,7 +3,6 @@ import logging
 from core.views import (
     AccessibilityStatementView,
     CookiesConsentView,
-    DownloadPDFView,
     HelpAndSupportView,
     HideCookiesView,
     PingSessionView,
@@ -27,7 +26,6 @@ public_urls = [
     path("ping_session/", PingSessionView.as_view(), name="ping_session"),
     path("report-deleted/", SessionExpiredView.as_view(), name="session_expired"),
     path("throw_error/", lambda x: 1 / 0),
-    path("download_report/", DownloadPDFView.as_view(), name="download_report"),
     path("accessibility-statement", AccessibilityStatementView.as_view(), name="accessibility_statement"),
     path("help-support", HelpAndSupportView.as_view(), name="help_and_support"),
     path("auth/", include("authbroker_client.urls")),

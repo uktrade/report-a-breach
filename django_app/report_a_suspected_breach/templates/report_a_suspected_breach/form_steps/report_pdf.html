@@ -1,0 +1,118 @@
+{% load get_css_rules_as_string %}
+<!DOCTYPE html>
+<html lang="en">
+    <script>
+        {% get_css_rules_as_string "core/stylesheets/govuk-frontend-5.3.0.min.css" %}
+    </script>
+    <header class="govuk-header" role="banner" data-module="govuk-header">
+        <div class="govuk-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <svg
+                    focusable="false"
+                    role="img"
+                    class="govuk-header__logotype"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 148 30"
+                    height="30"
+                    width="148"
+                    aria-labelledby="govuk-logo-title govuk-logo-desc">
+                    <title id="govuk-logo-title">GOV.UK</title>
+                    <desc id="govuk-logo-desc">The crown logo of GOV.UK</desc>
+                    <path
+                        d="M22.6 10.4c-1 .4-2-.1-2.4-1-.4-.9.1-2 1-2.4.9-.4 2 .1 2.4 1s-.1 2-1 2.4m-5.9 6.7c-.9.4-2-.1-2.4-1-.4-.9.1-2 1-2.4.9-.4 2 .1 2.4 1s-.1 2-1 2.4m10.8-3.7c-1 .4-2-.1-2.4-1-.4-.9.1-2 1-2.4.9-.4 2 .1 2.4 1s0 2-1 2.4m3.3 4.8c-1 .4-2-.1-2.4-1-.4-.9.1-2 1-2.4.9-.4 2 .1 2.4 1s-.1 2-1 2.4M17 4.7l2.3 1.2V2.5l-2.3.7-.2-.2.9-3h-3.4l.9 3-.2.2c-.1.1-2.3-.7-2.3-.7v3.4L15 4.7c.1.1.1.2.2.2l-1.3 4c-.1.2-.1.4-.1.6 0 1.1.8 2 1.9 2.2h.7c1-.2 1.9-1.1 1.9-2.1 0-.2 0-.4-.1-.6l-1.3-4c-.1-.2 0-.2.1-.3m-7.6 5.7c.9.4 2-.1 2.4-1 .4-.9-.1-2-1-2.4-.9-.4-2 .1-2.4 1s0 2 1 2.4m-5 3c.9.4 2-.1 2.4-1 .4-.9-.1-2-1-2.4-.9-.4-2 .1-2.4 1s.1 2 1 2.4m-3.2 4.8c.9.4 2-.1 2.4-1 .4-.9-.1-2-1-2.4-.9-.4-2 .1-2.4 1s0 2 1 2.4m14.8 11c4.4 0 8.6.3 12.3.8 1.1-4.5 2.4-7 3.7-8.8l-2.5-.9c.2 1.3.3 1.9 0 2.7-.4-.4-.8-1.1-1.1-2.3l-1.2 4c.7-.5 1.3-.8 2-.9-1.1 2.5-2.6 3.1-3.5 3-1.1-.2-1.7-1.2-1.5-2.1.3-1.2 1.5-1.5 2.1-.1 1.1-2.3-.8-3-2-2.3 1.9-1.9 2.1-3.5.6-5.6-2.1 1.6-2.1 3.2-1.2 5.5-1.2-1.4-3.2-.6-2.5 1.6.9-1.4 2.1-.5 1.9.8-.2 1.1-1.7 2.1-3.5 1.9-2.7-.2-2.9-2.1-2.9-3.6.7-.1 1.9.5 2.9 1.9l.4-4.3c-1.1 1.1-2.1 1.4-3.2 1.4.4-1.2 2.1-3 2.1-3h-5.4s1.7 1.9 2.1 3c-1.1 0-2.1-.2-3.2-1.4l.4 4.3c1-1.4 2.2-2 2.9-1.9-.1 1.5-.2 3.4-2.9 3.6-1.9.2-3.4-.8-3.5-1.9-.2-1.3 1-2.2 1.9-.8.7-2.3-1.2-3-2.5-1.6.9-2.2.9-3.9-1.2-5.5-1.5 2-1.3 3.7.6 5.6-1.2-.7-3.1 0-2 2.3.6-1.4 1.8-1.1 2.1.1.2.9-.3 1.9-1.5 2.1-.9.2-2.4-.5-3.5-3 .6 0 1.2.3 2 .9l-1.2-4c-.3 1.1-.7 1.9-1.1 2.3-.3-.8-.2-1.4 0-2.7l-2.9.9C1.3 23 2.6 25.5 3.7 30c3.7-.5 7.9-.8 12.3-.8m28.3-11.6c0 .9.1 1.7.3 2.5.2.8.6 1.5 1 2.2.5.6 1 1.1 1.7 1.5.7.4 1.5.6 2.5.6.9 0 1.7-.1 2.3-.4s1.1-.7 1.5-1.1c.4-.4.6-.9.8-1.5.1-.5.2-1 .2-1.5v-.2h-5.3v-3.2h9.4V28H55v-2.5c-.3.4-.6.8-1 1.1-.4.3-.8.6-1.3.9-.5.2-1 .4-1.6.6s-1.2.2-1.8.2c-1.5 0-2.9-.3-4-.8-1.2-.6-2.2-1.3-3-2.3-.8-1-1.4-2.1-1.8-3.4-.3-1.4-.5-2.8-.5-4.3s.2-2.9.7-4.2c.5-1.3 1.1-2.4 2-3.4.9-1 1.9-1.7 3.1-2.3 1.2-.6 2.6-.8 4.1-.8 1 0 1.9.1 2.8.3.9.2 1.7.6 2.4 1s1.4.9 1.9 1.5c.6.6 1 1.3 1.4 2l-3.7 2.1c-.2-.4-.5-.9-.8-1.2-.3-.4-.6-.7-1-1-.4-.3-.8-.5-1.3-.7-.5-.2-1.1-.2-1.7-.2-1 0-1.8.2-2.5.6-.7.4-1.3.9-1.7 1.5-.5.6-.8 1.4-1 2.2-.3.8-.4 1.9-.4 2.7zM71.5 6.8c1.5 0 2.9.3 4.2.8 1.2.6 2.3 1.3 3.1 2.3.9 1 1.5 2.1 2 3.4s.7 2.7.7 4.2-.2 2.9-.7 4.2c-.4 1.3-1.1 2.4-2 3.4-.9 1-1.9 1.7-3.1 2.3-1.2.6-2.6.8-4.2.8s-2.9-.3-4.2-.8c-1.2-.6-2.3-1.3-3.1-2.3-.9-1-1.5-2.1-2-3.4-.4-1.3-.7-2.7-.7-4.2s.2-2.9.7-4.2c.4-1.3 1.1-2.4 2-3.4.9-1 1.9-1.7 3.1-2.3 1.2-.5 2.6-.8 4.2-.8zm0 17.6c.9 0 1.7-.2 2.4-.5s1.3-.8 1.7-1.4c.5-.6.8-1.3 1.1-2.2.2-.8.4-1.7.4-2.7v-.1c0-1-.1-1.9-.4-2.7-.2-.8-.6-1.6-1.1-2.2-.5-.6-1.1-1.1-1.7-1.4-.7-.3-1.5-.5-2.4-.5s-1.7.2-2.4.5-1.3.8-1.7 1.4c-.5.6-.8 1.3-1.1 2.2-.2.8-.4 1.7-.4 2.7v.1c0 1 .1 1.9.4 2.7.2.8.6 1.6 1.1 2.2.5.6 1.1 1.1 1.7 1.4.6.3 1.4.5 2.4.5zM88.9 28 83 7h4.7l4 15.7h.1l4-15.7h4.7l-5.9 21h-5.7zm28.8-3.6c.6 0 1.2-.1 1.7-.3.5-.2 1-.4 1.4-.8.4-.4.7-.8.9-1.4.2-.6.3-1.2.3-2v-13h4.1v13.6c0 1.2-.2 2.2-.6 3.1s-1 1.7-1.8 2.4c-.7.7-1.6 1.2-2.7 1.5-1 .4-2.2.5-3.4.5-1.2 0-2.4-.2-3.4-.5-1-.4-1.9-.9-2.7-1.5-.8-.7-1.3-1.5-1.8-2.4-.4-.9-.6-2-.6-3.1V6.9h4.2v13c0 .8.1 1.4.3 2 .2.6.5 1 .9 1.4.4.4.8.6 1.4.8.6.2 1.1.3 1.8.3zm13-17.4h4.2v9.1l7.4-9.1h5.2l-7.2 8.4L148 28h-4.9l-5.5-9.4-2.7 3V28h-4.2V7zm-27.6 16.1c-1.5 0-2.7 1.2-2.7 2.7s1.2 2.7 2.7 2.7 2.7-1.2 2.7-2.7-1.2-2.7-2.7-2.7z"></path>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+
+    <h1 class="govuk-heading-l">{{ header }}</h1>
+
+    <h2 class="govuk-heading-m">Reference number: {{ reference }}</h2>
+
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        We've sent a confirmation email to {{ breach.reporter_email_address }}
+    </p>
+
+    <h2 class="govuk-heading-m">Your details</h2>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        <strong>Full name:</strong> {{ breach.reporter_full_name }}<br>
+        <strong>Email:</strong> {{ breach.reporter_email_address }}<br>
+        <strong>Professional relationship with the business or person being reported:</strong> {{ breach.get_reporter_professional_relationship_display }}
+    </p>
+
+    <h2 class="govuk-heading-m">Person or business you’re reporting</h2>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        <strong>Registered business number:</strong> {% if breacher.registered_company_number %}{{ breacher.registered_company_number }} {% else %} Not provided<br>{% endif %}<br>
+        <strong>Name:</strong> {{ breacher.name_of_business }}<br>
+
+        <strong>Website:</strong> {{ breacher.website }}<br>
+        <strong>Address:</strong> {{ breacher_address }}
+    </p>
+
+    <h2 class="govuk-heading-m">Overview of the breach</h2>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        <strong>When did you first suspect the breach?</strong> {{ breach.is_the_date_accurate | title}} date <br>
+        {{ breach.when_did_you_first_suspect }}<br>
+        <strong>Sanctions regime breached:</strong> {% for regime in sanctions %}
+            {% if forloop.first %}<br>{% endif %}
+            {{ regime }},
+            {% if not forloop.last %}
+                <br>
+            {% endif %}
+        {% endfor %}
+        {% if breach.unknown_sanctions_regime %}
+            Unknown regime<br>
+        {% endif %}
+        {% if breach.other_sanctions_regime %}
+            Other regime<br>
+        {% endif %}
+        <br>
+        <strong>What were the goods or services?</strong> {{ breach.what_were_the_goods }}
+    </p>
+
+    <h2 class="govuk-heading-m">People and businesses involved</h2>
+    <h3 class="govuk-heading-s">Supplier</h3>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        <strong>Name and address of supplier:</strong> <br>{{ supplier.name }}
+        <br>
+        {{ supplier_address | linebreaksbr }}
+    </p>
+
+    {% for end_user in end_users %}
+        <h3 class="govuk-heading-s">End-user {{ forloop.counter }}</h3>
+        <p class="govuk-body-m">
+            <strong>Name:</strong> {{ end_user.name }}<br>
+            <strong>Business:</strong> {{ end_user.name_of_business }}<br>
+            <strong>Address:</strong> {{ end_user.get_readable_address }}<br>
+            <strong>Additional contact information:</strong> {{ end_user.additional_contact_details }}
+        </p>
+    {% endfor %}
+    <h3 class="govuk-heading-s">Other people or businesses involved in the trade</h3>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        <strong>Names and addresses:</strong> {% if breach.other_addresses_in_the_supply_chain %}{{ breach.other_addresses_in_the_supply_chain }}{% else %}Not provided{% endif %}
+    </p>
+
+    <h2 class="govuk-heading-m">Sanctions breach details</h2>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        <strong>Upload supporting documents:</strong>
+        {% if not breach.documents.all %}
+            None uploaded
+        {% else %}
+            {% for document in breach.documents.all %}
+                {{ document.file_name }}<br>
+            {% endfor %}
+        {% endif %}
+    </p>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        <strong>Summary of the breach:</strong> {{ breach.tell_us_about_the_suspected_breach }}<br>
+    </p>
+
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p style="line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
+        We've sent your report to the Office of Trade Sanctions Implementation (OTSI), part of the Department for Business and Trade (DBT).<br>
+
+        OTSI will contact you once they've reviewed your report.
+    </p>
+
+</html>

@@ -1,6 +1,6 @@
 from typing import Any
 
-from core.base_views import BaseFormView, BaseTemplateView
+from core.base_views import BaseDownloadPDFView, BaseFormView, BaseTemplateView
 from core.document_storage import TemporaryDocumentStorage
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -121,4 +121,17 @@ class CompleteView(BaseTemplateView):
             self.request.session.flush()
 
         context.update(get_breach_context_data(breach_object))
+        return context
+
+
+class DownloadPDFView(BaseDownloadPDFView):
+    template_name = "report_a_suspected_breach/form_steps/report_pdf.html"
+    header = "Report a suspected breach of trade sanctions: submission complete"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, Any]:
+        reference = self.request.GET.get("reference")
+        breach_object = Breach.objects.get(reference=reference)
+        context = super().get_context_data(**kwargs)
+        breach_context_data = get_breach_context_data(breach_object)
+        context.update(breach_context_data)
         return context

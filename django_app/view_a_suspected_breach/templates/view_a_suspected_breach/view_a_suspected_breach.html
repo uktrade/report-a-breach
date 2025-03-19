@@ -9,18 +9,13 @@
             <a class="govuk-back-link govuk-link--no-visited-state"
                href="{% url 'view_a_suspected_breach:summary_reports' %}">{{ back_button_text }}</a>
         </div>
-        {% block download_link %}{% endblock download_link %}
+        {% block download_link %}
+            <div class="govuk-grid-column-one-half govuk-!-text-align-right govuk-!-margin-top-3 hide-on-print">
+                <a href="{% url 'view_a_suspected_breach:download_viewer_report' %}?reference={{ breach.reference }}" class="govuk-link--muted govuk-body-s" target="_blank">Download report</a>
+            </div>
+        {% endblock download_link %}
     </div>
 {% endblock back_button %}
-{% comment %}
-        TODO: remove comment when DST-797 is complete
-{% block download_link %}
-    <div class="govuk-grid-column-one-half govuk-!-text-align-right govuk-!-margin-top-3 hide-on-print">
-        <a href="{% url 'download_report' %}?reference={{ breach.reference }}" class="govuk-link--muted govuk-body-s" target="_blank">Download and view report (opens in new tab)</a>
-    </div>
-{% endblock download_link %}
-
-{% endcomment %}
 {% block column_content %}
     {% include "report_a_suspected_breach/partials/summary_report.html" %}
 {% endblock column_content %}
