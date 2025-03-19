@@ -2792,6 +2792,7 @@
                 "sha256:9a9a40f418ced8ecaf7e3b28d69887ceaa76adad3bcaa6dae0d9e596fec1d680",
                 "sha256:9c9f616819652d109bd889ecd1e15e9a162b9b94d682534c9c2146092945b78f"
             ],
+            "index": "pypi",
             "version": "==3.4.0"
         },
         "python-slugify": {
