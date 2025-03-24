@@ -121,7 +121,7 @@ class BaseDownloadPDFView(DetailView):
             page = browser.new_page()
             page.set_content(mark_safe(template_string))
             page.wait_for_function("document.fonts.ready.then(fonts => fonts.status === 'loaded')")
-            pdf_data = page.pdf(format="A4", tagged=True, margin=margins)
+            pdf_data = page.pdf(display_header_footer=True, format="A4", tagged=True, margin=margins)
             response = HttpResponse(pdf_data, content_type="application/pdf")
             browser.close()
 
