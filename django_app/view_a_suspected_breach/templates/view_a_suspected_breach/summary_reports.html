@@ -69,7 +69,7 @@
                         None uploaded
                     {% else %}
                         {% for document in breach_report.breach.documents.all %}
-                            <a class="govuk-link"href="{{ document.url }}" download>{{ document.file_name }}</a><br>
+                            <a class="govuk-link" href="{{ document.url }}" download>{{ document.file_name }}</a><br>
                         {% endfor %}
                     {% endif %}
                 </dd>
