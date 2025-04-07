@@ -71,6 +71,22 @@ class TestDocumentUploadView:
         )
 
 
+class TestSessionFilesInUploadDocuments:
+    @patch("report_a_suspected_breach.views.views_documents_and_details.get_all_session_files")
+    def test_session_files_are_uploaded(self, mock_get_files, rasb_client):
+        mock_get_files.return_value = {"key1": {"file_name": "test.png"}}
+        response = rasb_client.get(reverse("report_a_suspected_breach:upload_documents"))
+        assert response.status_code == 200
+        assert mock_get_files.called
+
+        for context_dict in response.context:
+            if "session_files" in context_dict:
+                assert context_dict["session_files"] == {"key1": {"file_name": "test.png"}}
+                return
+
+        assert False
+
+
 @patch("report_a_suspected_breach.views.views_documents_and_details.TemporaryDocumentStorage.delete")
 class TestDeleteDocumentsView:
     def test_successful_post(self, mocked_temporary_document_storage, rasb_client):

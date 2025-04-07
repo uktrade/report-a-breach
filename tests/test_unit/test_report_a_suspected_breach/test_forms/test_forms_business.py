@@ -3,7 +3,9 @@ from unittest.mock import patch
 from report_a_suspected_breach import choices
 from report_a_suspected_breach.forms.forms_business import (
     AreYouReportingABusinessOnCompaniesHouseForm,
+    BusinessOrPersonDetailsForm,
     DoYouKnowTheRegisteredCompanyNumberForm,
+    ManualCompaniesHouseInputForm,
 )
 
 
@@ -17,6 +19,10 @@ class TestAreYouReportingABusinessOnCompaniesHouseForm:
     def test_optional_choice_removed(self):
         form = AreYouReportingABusinessOnCompaniesHouseForm()
         assert len(form.fields["business_registered_on_companies_house"].choices) == len(choices.YesNoDoNotKnowChoices.choices)
+
+    def test_init_method_removes_first_choice(self):
+        form = AreYouReportingABusinessOnCompaniesHouseForm()
+        assert "" not in form.fields["business_registered_on_companies_house"].choices
 
 
 class TestDoYouKnowTheRegisteredCompanyNumberForm:
@@ -105,3 +111,15 @@ class TestDoYouKnowTheRegisteredCompanyNumberForm:
             request=request_object,
         )
         assert not form.is_bound
+
+
+class TestManualCompaniesHouseInputForm:
+    def test_form_layout(self):
+        form = ManualCompaniesHouseInputForm()
+        assert hasattr(form.helper, "layout")
+
+
+class TestBusinessOrPersonDetailsForm:
+    def test_form_layout(self):
+        form = BusinessOrPersonDetailsForm()
+        assert hasattr(form.helper, "layout")

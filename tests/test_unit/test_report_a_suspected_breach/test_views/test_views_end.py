@@ -44,6 +44,39 @@ class TestDeclarationView:
         assert response.status_code == 302
         assert response.url == "/report/submission-complete"
 
+    @patch("report_a_suspected_breach.views.views_end.get_all_session_files")
+    def test_session_files_are_uploaded(self, mock_get_files, rasb_client):
+        mock_get_files.return_value = {"key1": {"file_name": "test.png"}}
+        response = rasb_client.get(reverse("report_a_suspected_breach:check_your_answers"))
+        assert response.status_code == 200
+        assert mock_get_files.called
+
+        assert "form_data" in response.context
+        assert "session_files" in response.context["form_data"]
+        assert response.context["form_data"]["session_files"] == {"key1": {"file_name": "test.png"}}
+
+    @patch("report_a_suspected_breach.views.views_end.get_all_cleaned_data")
+    def test_end_users_in_session(self, mocked_get_all_cleaned_data, request_object, rasb_client):
+        mocked_get_all_cleaned_data.return_value = data.cleaned_data
+        request_object.session = rasb_client.session
+        request_object.session["end_users"] = ["User 1", "User 2"]
+        request_object.session.save()
+
+        view = CheckYourAnswersView()
+        view.setup(request_object)
+        context_data = view.get_context_data()
+
+        assert "end_users" in context_data["form_data"]
+        assert context_data["form_data"]["end_users"] == ["User 1", "User 2"]
+
+    @patch("report_a_suspected_breach.views.views_end.get_cleaned_data_for_step")
+    def test_same_address_is_true(self, mocked_get_cleaned_data_for_step, request_object, rasb_client):
+        return None
+
+    @patch("report_a_suspected_breach.views.views_end.get_cleaned_data_for_step")
+    def test_same_address_is_false(self, mocked_get_cleaned_data_for_step, request_object):
+        return None
+
 
 class TestCompleteView:
     def test_get_context_data(self, breach_object, rasb_client):
