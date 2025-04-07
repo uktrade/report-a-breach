@@ -132,6 +132,21 @@ class TestEmailVerifyCodeView:
         assert mocked_verify_email.called_once
         assert mocked_verify_email.called_with("test@example.com")
 
+    def test_success_url_(self, rasb_client):
+        session = rasb_client.session
+        session["reporter_email_address"] = "test@example.com"
+        session.save()
+
+        verification = ReporterEmailVerification.objects.create(
+            reporter_session=rasb_client.session._get_session_from_db(), email_verification_code="123456"
+        )
+        verification.save()
+
+        response = rasb_client.post(reverse("report_a_suspected_breach:verify_email"), data={"email_verification_code": "123456"})
+
+        assert response.status_code == 302
+        assert response.url == reverse("report_a_suspected_breach:name")
+
 
 class TestRequestVerifyCodeView:
 
