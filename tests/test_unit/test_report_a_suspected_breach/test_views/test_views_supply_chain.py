@@ -2,7 +2,13 @@ from django.http import HttpResponseRedirect
 from django.test import RequestFactory
 from django.urls import reverse, reverse_lazy
 
-from django_app.report_a_suspected_breach.views.views_supply_chain import (
+# from report_a_suspected_breach.forms.forms_supply_chain import EndUserAddedForm
+from report_a_suspected_breach.views.views_supply_chain import (
+    AboutTheSupplierView,
+    WhereWereTheGoodsMadeAvailableToView,
+)
+
+from django_app.report_a_suspected_breach.views.views_supply_chain import (  # EndUserAddedView,
     AboutTheEndUserView,
 )
 
@@ -195,3 +201,117 @@ class TestAboutTheEndUserView:
         response = view.get_form_kwargs()
         assert response["form_h1_header"] == "End-user 4 details"
         assert response["data"] is None
+
+    # def test_form_valid(self, request_object, rasb_client):
+    #     request_object.session = rasb_client.session
+    #     request_object.session["end_users"] = {}
+    #     request_object.save()
+    #     view = AboutTheEndUserView()
+
+
+class TestWhereWereTheGoodsMadeAvailableToView:
+    def test_redirect_after_post(self, rasb_client):
+        session = rasb_client.session
+        session["company_details"] = {
+            "do_you_know_the_registered_company_number": "yes",
+            "registered_office_address": "123 Fake Street, London, E1 4UD",
+        }
+        session.save()
+
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:where_were_the_goods_supplied_from")
+            + "?redirect_to_url=report_a_suspected_breach:check_your_answers",
+            data={"where_were_the_goods_supplied_from": "i_do_not_know"},
+        )
+
+        assert response.url == reverse("report_a_suspected_breach:check_your_answers")
+
+        response = rasb_client.post(
+            reverse("report_a_suspected_breach:where_were_the_goods_supplied_from")
+            + "?redirect_to_url=report_a_suspected_breach:check_your_answers",
+            data={"where_were_the_goods_supplied_from": "different_uk_address"},
+        )
+        assert not response.url == reverse("report_a_suspected_breach:check_your_answers")
+
+    def test_get_form_kwargs_with_and_without_end_user(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session.save()
+        view = WhereWereTheGoodsMadeAvailableToView()
+        view.setup(request_object)
+        response = view.get_form_kwargs()
+        assert "data" not in response
+        assert "end_user_uuid" not in response
+
+        request_object.session["end_users_location"] = {"end_user_uuid": {"dirty_data": {"field1": "value1"}}}
+        request_object.session.save()
+        view.setup(request_object, end_user_uuid="end_user_uuid")
+        response = view.get_form_kwargs()
+        assert "data" in response
+        assert response["data"] == {"field1": "value1"}
+        assert response["end_user_uuid"] == "end_user_uuid"
+
+    def test_get_form_kwargs_no_end_user_data(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session["end_users_location"] = {"end_user_uuid": "123456"}
+        request_object.session.save()
+        view = WhereWereTheGoodsMadeAvailableToView()
+        view.setup(request_object, end_user_uuid="123456")
+        response = view.get_form_kwargs()
+        assert "data" not in response
+        assert response["end_user_uuid"] == "123456"
+
+    def test_get_form_kwargs_no_get_method(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session.save()
+        request_object.method = "POST"
+        request_object.FILES = {}
+        request_object.POST = {}
+
+        view = WhereWereTheGoodsMadeAvailableToView()
+        view.setup(request_object, end_user_uuid="123456")
+        response = view.get_form_kwargs()
+        assert response["data"] == {}
+        assert "end_user_uuid" not in response
+
+
+class TestAboutTheSupplierView:
+    def test_get_form_kwargs_uk_address(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session.save()
+        view = AboutTheSupplierView()
+        view.setup(request_object, is_uk_address="True")
+        response = view.get_form_kwargs()
+        assert response["is_uk_address"] is True
+
+    def test_get_form_kwargs_non_uk_address(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session.save()
+        view = AboutTheSupplierView()
+        view.setup(request_object, is_uk_address=False)
+        response = view.get_form_kwargs()
+        assert response["is_uk_address"] is False
+
+    def test_get_success_url(self, request_object, rasb_client):
+        request_object.session = rasb_client.session
+        request_object.session.save()
+
+        view = AboutTheSupplierView()
+        view.request = request_object
+
+        success_url = view.get_success_url()
+        assert success_url == reverse("report_a_suspected_breach:where_were_the_goods_supplied_to")
+
+        request_object.session["made_available_journey"] = True
+        request_object.session.save()
+        success_url = view.get_success_url()
+        assert success_url == reverse("report_a_suspected_breach:where_were_the_goods_made_available_to")
+
+
+# class TestEndUserAddedView:
+#     # def test_get_context_data(self, request_object, mock_get_all):
+#
+#     def test_get_success_url(self, request_object, rasb_client):
+#         request_object.session = rasb_client.session
+#         request_object.session.save()
+#         view = EndUserAddedView()
+#         view.request =
