@@ -6,6 +6,10 @@ from django.shortcuts import render
 from django.views.generic import View
 from healthcheck.checks import db_check, s3_check
 
+print("......debug.....")
+print(db_check)
+print(type(db_check))
+
 
 class HealthCheckView(View):
     """Checks the status of the Report a Breach service itself, and all other backing services.
