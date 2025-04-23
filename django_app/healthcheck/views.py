@@ -13,8 +13,7 @@ class HealthCheckView(View):
     Returns an XML file containing the response time and the results of these checks, used by Pingdom to monitor
     the health of the service."""
 
-    @staticmethod
-    async def get(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    async def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         # we want to disable the healthcheck if we're building on DBT Platform
         if isinstance(env, DBTPlatformSettings) and env.in_build_step:
             return HttpResponse(status=200)
