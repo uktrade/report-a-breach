@@ -2,7 +2,7 @@ from asgiref.sync import sync_to_async
 from django.db import DatabaseError, connection
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def db_check() -> bool:
     """
     Performs a basic check on the database
