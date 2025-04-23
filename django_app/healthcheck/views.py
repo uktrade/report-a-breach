@@ -27,7 +27,7 @@ class HealthCheckView(View):
             Performs a basic check on the database
             """
             try:
-                await sync_to_async(connection.ensure_connection(), thread_sensitive=False)()
+                await sync_to_async(connection.ensure_connection, thread_sensitive=False)()
                 return True
             except DatabaseError:
                 return False
