@@ -12,6 +12,3 @@ def db_check() -> bool:
         return True
     except DatabaseError:
         return False
-
-
-async_function = sync_to_async(db_check)
