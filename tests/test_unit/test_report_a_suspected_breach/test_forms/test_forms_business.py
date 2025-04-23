@@ -21,8 +21,11 @@ class TestAreYouReportingABusinessOnCompaniesHouseForm:
         assert len(form.fields["business_registered_on_companies_house"].choices) == len(choices.YesNoDoNotKnowChoices.choices)
 
     def test_init_method_removes_first_choice(self):
+        original_form_choices = choices.YesNoDoNotKnowChoices.choices.copy()
         form = AreYouReportingABusinessOnCompaniesHouseForm()
-        assert "" not in form.fields["business_registered_on_companies_house"].choices
+        form.fields["business_registered_on_companies_house"].choices = [("", "Select one")] + list(original_form_choices)
+        form.__init__()
+        assert ("", "Select one") not in form.fields["business_registered_on_companies_house"].choices
 
 
 class TestDoYouKnowTheRegisteredCompanyNumberForm:
