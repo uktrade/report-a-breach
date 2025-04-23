@@ -3,7 +3,7 @@ from django.db import DatabaseError, connection
 
 
 @sync_to_async(thread_sensitive=False)
-def db_check() -> bool:
+def testdb_check() -> bool:
     """
     Performs a basic check on the database
     """
