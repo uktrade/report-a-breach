@@ -1,6 +1,5 @@
 import asyncio
 
-# from asgiref.sync import sync_to_async
 from django.db import DatabaseError, connection
 
 
