@@ -1,12 +1,19 @@
+import asyncio
+
 from django.db import DatabaseError, connection
 
 
-def db_check() -> bool:
+async def db_check() -> bool:
     """
     Performs a basic check on the database
     """
-    try:
-        connection.ensure_connection()
-        return True
-    except DatabaseError:
-        return False
+    loop = asyncio.get_event_loop()
+
+    def _check():
+        try:
+            connection.ensure_connection()
+            return True
+        except DatabaseError:
+            return False
+
+    return await loop.run_in_executor(None, _check)
