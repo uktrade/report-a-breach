@@ -1,12 +1,10 @@
 import time
 
-from asgiref.sync import sync_to_async
 from config.env import DBTPlatformSettings, env
-from django.db import DatabaseError, connection
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
-from healthcheck.checks import s3_check
+from healthcheck.checks import db_check, s3_check
 
 
 class HealthCheckView(View):
@@ -15,24 +13,13 @@ class HealthCheckView(View):
     Returns an XML file containing the response time and the results of these checks, used by Pingdom to monitor
     the health of the service."""
 
-    async def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         # we want to disable the healthcheck if we're building on DBT Platform
         if isinstance(env, DBTPlatformSettings) and env.in_build_step:
             return HttpResponse(status=200)
 
         start = time.time()
-
-        async def db_check() -> bool:
-            """
-            Performs a basic check on the database
-            """
-            try:
-                await sync_to_async(connection.ensure_connection, thread_sensitive=False)()
-                return True
-            except DatabaseError:
-                return False
-
-        is_db_good = await db_check()
+        is_db_good = db_check()
         is_s3_good = s3_check()
         all_good = is_db_good and is_s3_good
 
