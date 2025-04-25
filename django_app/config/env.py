@@ -58,6 +58,8 @@ class BaseSettings(PydanticBaseSettings):
     view_a_suspected_breach_domain: str = "view-a-suspected-breach"
     report_a_suspected_breach_extra_domain: str = ""
     view_a_suspected_breach_extra_domain: str = ""
+    report_a_suspected_breach_service_domain: str = ""
+    view_a_suspected_breach_service_domain: str = ""
 
     # SSO
     authbroker_url: str = ""
