@@ -7,7 +7,6 @@ async def db_check() -> bool:
     """
     Performs a basic check on the database
     """
-    loop = asyncio.get_event_loop()
 
     def _check():
         try:
@@ -16,4 +15,4 @@ async def db_check() -> bool:
         except DatabaseError:
             return False
 
-    return await loop.run_in_executor(None, _check)
+    return await asyncio.get_running_loop().run_in_executor(None, _check)
