@@ -54,6 +54,8 @@ class SummaryReportsView(LoginRequiredMixin, ActiveUserRequiredMixin, ListView):
         context["selected_sort"] = self.request.session.pop("sort", "newest")
         return context
 
+    paginate_by = 10
+
 
 @method_decorator(require_view_a_breach(), name="dispatch")
 class ManageUsersView(LoginRequiredMixin, StaffUserOnlyMixin, TemplateView):
