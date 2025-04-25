@@ -5,7 +5,6 @@ from django.db import migrations
 def insert_sites(apps, schema_editor):
     """Populate the sites model"""
     Site = apps.get_model("sites", "Site")
-    Site.objects.all().delete()
 
     if settings.ENVIRONMENT == "production":
         # Register SITE_ID = 5
