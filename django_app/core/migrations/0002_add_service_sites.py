@@ -23,5 +23,5 @@ def remove_sites(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("sites", "0001_insert_sites")]
+    dependencies = [("core", "0001_insert_sites")]
     operations = [migrations.RunPython(insert_sites, reverse_code=remove_sites)]
