@@ -1,6 +1,7 @@
 import uuid
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+import pytest
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.test import RequestFactory
@@ -10,6 +11,7 @@ from report_a_suspected_breach.views.views_end import (
     CheckYourAnswersView,
     CompleteView,
     DeclarationView,
+    DownloadPDFView,
 )
 
 from django_app.report_a_suspected_breach.forms.forms_end import DeclarationForm
@@ -26,6 +28,44 @@ class TestCheckYourAnswersView:
         context_data = view.get_context_data()
         assert context_data["form_data"] == data.cleaned_data
         assert not context_data["is_third_party_relationship"]
+
+    @patch("report_a_suspected_breach.views.views_end.get_all_cleaned_data")
+    @patch("report_a_suspected_breach.views.views_end.get_cleaned_data_for_step")
+    @patch("report_a_suspected_breach.views.views_end.show_check_company_details_page_condition")
+    def test_get_context_data_with_supplier_same_address(
+        self, mock_show_company_details, mock_get_cleaned_data_for_step, mock_get_all_cleaned_data, request_object
+    ):
+        test_data = {
+            "do_you_know_the_registered_company_number": {
+                "registered_company_name": "Test Company",
+                "readable_address": "1 Test Road",
+                "country": "UK",
+            },
+            "business_or_person_details": {
+                "name": "Business Person",
+                "readable_address": "456 Business Ave",
+                "country": "Business Country",
+            },
+        }
+
+        mock_get_all_cleaned_data.return_value = test_data
+        mock_get_cleaned_data_for_step.return_value = {"where_were_the_goods_supplied_from": "same_address"}
+        mock_show_company_details.return_value = True
+
+        view = CheckYourAnswersView()
+        view.setup(request_object)
+        context_data = view.get_context_data()
+
+        assert context_data["form_data"] == test_data
+        assert context_data["form_data"]["about_the_supplier"]["name"] == "Test Company"
+
+        mock_show_company_details.return_value = False
+
+        view = CheckYourAnswersView()
+        view.setup(request_object)
+        context_data = view.get_context_data()
+
+        assert context_data["form_data"]["about_the_supplier"]["name"] == "Business Person"
 
 
 class TestDeclarationView:
@@ -69,14 +109,6 @@ class TestDeclarationView:
         assert "end_users" in context_data["form_data"]
         assert context_data["form_data"]["end_users"] == ["User 1", "User 2"]
 
-    @patch("report_a_suspected_breach.views.views_end.get_cleaned_data_for_step")
-    def test_same_address_is_true(self, mocked_get_cleaned_data_for_step, request_object, rasb_client):
-        return None
-
-    @patch("report_a_suspected_breach.views.views_end.get_cleaned_data_for_step")
-    def test_same_address_is_false(self, mocked_get_cleaned_data_for_step, request_object):
-        return None
-
 
 class TestCompleteView:
     def test_get_context_data(self, breach_object, rasb_client):
@@ -110,3 +142,51 @@ class TestCompleteView:
         response = rasb_client.get(reverse("report_a_suspected_breach:complete"))
         assert response.status_code == 302
         assert response.url == reverse("report_a_suspected_breach:initial_redirect_view")
+
+
+@pytest.fixture(autouse=True)
+def patched_playwright(monkeypatch):
+    mock_sync_playwright = MagicMock()
+    mock_browser = MagicMock()
+    mock_page = MagicMock()
+
+    mock_sync_playwright.return_value.__enter__.return_value = mock_sync_playwright
+    mock_sync_playwright.chromium.launch.return_value = mock_browser
+    mock_browser.new_page.return_value = mock_page
+
+    mock_page.pdf.return_value = None
+    mock_browser.close.return_value = None
+
+    monkeypatch.setattr("core.base_views.sync_playwright", mock_sync_playwright)
+
+    return mock_sync_playwright, mock_browser, mock_page
+
+
+class TestDownloadPDFView:
+    @patch("report_a_suspected_breach.views.views_end.get_breach_context_data")
+    @patch("report_a_suspected_breach.models.Breach.objects.get")
+    def test_successful_get(self, mocked_breach_get, mock_get_breach_context_data, patched_playwright, breach_object):
+        mock_sync_playwright, mock_browser, mock_page = patched_playwright
+        test_reference = "DE1234"
+
+        mocked_breach_get.return_value = breach_object
+        mock_get_breach_context_data.return_value = {"test_key": "test_value"}
+
+        request = RequestFactory().get("?reference=" + test_reference)
+        request.user = MagicMock()
+
+        view = DownloadPDFView()
+        view.setup(request)
+        response = view.get(request)
+
+        expected_response = HttpResponse(status=200, content_type="application/pdf")
+        assert response.status_code == expected_response.status_code
+        assert response["content-type"] == expected_response["content-type"]
+        assert response.headers["Content-Disposition"] == "inline; filename=" + f"report-{test_reference}.pdf"
+
+        mock_sync_playwright.chromium.launch.assert_called_once_with(headless=True)
+        mock_browser.new_page.assert_called_once()
+        mock_page.pdf.assert_called_once_with(
+            format="A4", tagged=True, margin={"left": "1.25in", "right": "1.25in", "top": "1in", "bottom": "1in"}
+        )
+        mock_browser.close.assert_called_once()
