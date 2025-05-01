@@ -40,6 +40,7 @@ cryptography = "~=44.0.2"
 django-permissions-policy = "*"
 playwright = "~=1.47.0"
 PyJWT = "~=2.10"
+uvicorn = ">=0.23.2"
 
 [dev-packages]
 black = "~=24.3"
