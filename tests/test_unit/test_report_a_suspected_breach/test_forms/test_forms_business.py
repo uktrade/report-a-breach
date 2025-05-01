@@ -118,11 +118,15 @@ class TestDoYouKnowTheRegisteredCompanyNumberForm:
 
 class TestManualCompaniesHouseInputForm:
     def test_form_layout(self):
-        form = ManualCompaniesHouseInputForm()
-        assert hasattr(form.helper, "layout")
+        form = ManualCompaniesHouseInputForm(data={"manual_companies_house_input": None})
+        assert not form.is_valid()
+        assert "manual_companies_house_input" in form.errors
+        expected_error = "Select if the address of the business suspected of breaching sanctions is in the UK, or outside the UK"
+        assert form.errors["manual_companies_house_input"][0] == expected_error
 
 
 class TestBusinessOrPersonDetailsForm:
     def test_form_layout(self):
         form = BusinessOrPersonDetailsForm()
-        assert hasattr(form.helper, "layout")
+        assert hasattr(form, "form_h1_header")
+        assert form.form_h1_header == "Business or person details"

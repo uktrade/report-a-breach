@@ -77,7 +77,7 @@ class TestSessionFilesInUploadDocuments:
         mock_get_files.return_value = {"key1": {"file_name": "test.png"}}
         response = rasb_client.get(reverse("report_a_suspected_breach:upload_documents"))
         assert response.status_code == 200
-        assert mock_get_files.called
+        mock_get_files.assert_called_once()
 
         for context_dict in response.context:
             if "session_files" in context_dict:

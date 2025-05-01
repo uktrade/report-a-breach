@@ -89,7 +89,7 @@ class TestDeclarationView:
         mock_get_files.return_value = {"key1": {"file_name": "test.png"}}
         response = rasb_client.get(reverse("report_a_suspected_breach:check_your_answers"))
         assert response.status_code == 200
-        assert mock_get_files.called
+        mock_get_files.assert_called_once()
 
         assert "form_data" in response.context
         assert "session_files" in response.context["form_data"]
