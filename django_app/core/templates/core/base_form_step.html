@@ -6,6 +6,9 @@
 {% endblock extra_css %}
 
 {% block title %}
+    {%  if form.errors %}
+        Error:
+    {% endif %}
     {% if form.form_h1_header %}
         {{ form.form_h1_header }}
     {% else %}
