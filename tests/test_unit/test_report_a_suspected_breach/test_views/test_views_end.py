@@ -67,23 +67,6 @@ class TestCheckYourAnswersView:
 
         assert context_data["form_data"]["about_the_supplier"]["name"] == "Business Person"
 
-
-class TestDeclarationView:
-    @patch("report_a_suspected_breach.models.get_all_cleaned_data")
-    def test_form_valid(self, mocked_get_all_cleaned_data, request_object, rasb_client):
-        mocked_get_all_cleaned_data.return_value = data.cleaned_data
-        request_object.session = rasb_client.session
-        request_session = Session.objects.get(session_key=request_object.session.session_key)
-        reporter_object = ReporterEmailVerification.objects.create(
-            reporter_session=request_session, email_verification_code="012345", verified=True
-        )
-        reporter_object.save()
-        view = DeclarationView()
-        view.setup(request_object)
-        response = view.form_valid(DeclarationForm(data={}))
-        assert response.status_code == 302
-        assert response.url == "/report/submission-complete"
-
     @patch("report_a_suspected_breach.views.views_end.get_all_session_files")
     def test_session_files_are_uploaded(self, mock_get_files, rasb_client):
         mock_get_files.return_value = {"key1": {"file_name": "test.png"}}
@@ -108,6 +91,23 @@ class TestDeclarationView:
 
         assert "end_users" in context_data["form_data"]
         assert context_data["form_data"]["end_users"] == ["User 1", "User 2"]
+
+
+class TestDeclarationView:
+    @patch("report_a_suspected_breach.models.get_all_cleaned_data")
+    def test_form_valid(self, mocked_get_all_cleaned_data, request_object, rasb_client):
+        mocked_get_all_cleaned_data.return_value = data.cleaned_data
+        request_object.session = rasb_client.session
+        request_session = Session.objects.get(session_key=request_object.session.session_key)
+        reporter_object = ReporterEmailVerification.objects.create(
+            reporter_session=request_session, email_verification_code="012345", verified=True
+        )
+        reporter_object.save()
+        view = DeclarationView()
+        view.setup(request_object)
+        response = view.form_valid(DeclarationForm(data={}))
+        assert response.status_code == 302
+        assert response.url == "/report/submission-complete"
 
 
 class TestCompleteView:
