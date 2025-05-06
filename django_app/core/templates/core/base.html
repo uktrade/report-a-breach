@@ -135,8 +135,9 @@
         <meta property="og:image" content="{% static "core/assets/images/govuk-opengraph-image.png" %}">
 
 		{# stylesheets #}
+
         <link rel="stylesheet" href="{% static 'core/stylesheets/font-awesome-6.5.2.css' %}">
-        <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend-5.3.0.min.css" %}">
+        <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend.min.css" %}">
         <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
         <link rel="stylesheet"
               href="{% static "report_a_suspected_breach/stylesheets/report_a_suspected_breach.css" %}">
@@ -145,6 +146,8 @@
     </head>
 
     <body class="govuk-template__body js-disabled govuk-frontend-supported">
+        <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+
         {% if gtm_enabled %}
 			<!-- Google Tag Manager (noscript) -->
             <noscript>
@@ -208,6 +211,61 @@
 
         </div>
     </header>
+
+    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+        <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+                <h2 class="govuk-accordion__section-heading">
+                    <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
+                        Writing well for the web
+                    </span>
+                </h2>
+            </div>
+            <div id="accordion-default-content-1" class="govuk-accordion__section-content">
+                <p class="govuk-body">This is the content for Writing well for the web.</p>
+            </div>
+        </div>
+        <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+                <h2 class="govuk-accordion__section-heading">
+                    <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
+                        Writing well for specialists
+                    </span>
+                </h2>
+            </div>
+            <div id="accordion-default-content-2" class="govuk-accordion__section-content">
+                <p class="govuk-body">This is the content for Writing well for specialists.</p>
+            </div>
+        </div>
+        <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+                <h2 class="govuk-accordion__section-heading">
+                    <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
+                        Know your audience
+                    </span>
+                </h2>
+            </div>
+            <div id="accordion-default-content-3" class="govuk-accordion__section-content">
+                <p class="govuk-body">This is the content for Know your audience.</p>
+            </div>
+        </div>
+        <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+                <h2 class="govuk-accordion__section-heading">
+                    <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
+                        How people read
+                    </span>
+                </h2>
+            </div>
+            <div id="accordion-default-content-4" class="govuk-accordion__section-content">
+                <p class="govuk-body">This is the content for How people read.</p>
+            </div>
+        </div>
+    </div>
+
+
+
+
     {% block phase_banner %}
         <div class="govuk-width-container">
             <div class="govuk-phase-banner hide-on-print">
@@ -324,12 +382,17 @@
             </div>
         </div>
         <script src="{% static 'core/javascript/jquery-3.7.1.js' %}" nonce="{{ request.csp_nonce }}"></script>
-        <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script type="module" src="{% static "core/javascript/govuk-frontend.min.js" %}" nonce="{{ request.csp_nonce }}"></script>
         <script type="module" nonce="{{ request.csp_nonce }}">
-            import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"
-
+            import { initAll } from "{% static "core/javascript/govuk-frontend.min.js" %}"
             initAll()
         </script>
+{#        <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}" nonce="{{ request.csp_nonce }}"></script>#}
+{#        <script type="module" nonce="{{ request.csp_nonce }}">#}
+{#            import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"#}
+{##}
+{#            initAll()#}
+{#        </script>#}
         {% block extra_js %}{% endblock %}
     </footer>
 {% endblock footer %}

@@ -1,0 +1,25 @@
+{
+  "name": "report-a-breach",
+  "version": "1.0.0",
+  "description": "* [Setup](#setup)     + [1. Setting up your virtual environment](#1-setting-up-your-virtual-environment)     + [2. Installing pre-commit](#2-installing-pre-commit)     + [3. Setup your local environment variables](#3-setup-your-local-environment-variables)     + [4. Setup AWS localstack](#4-setup-aws-localstack)     + [5. Run the backing services](#5-run-the-backing-services)     + [6. Setup local custom domains](#6-setup-local-custom-domains)     + [7. Run the web server](#7-run-the-web-server)   * [Useful commands](#useful-commands)     + [Django](#django)     + [Dependencies](#dependencies)     + [Localstack](#localstack)     + [Testing](#testing)       - [End-to-End tests](#end-to-end-tests)     + [Single Sign On (SSO)](#single-sign-on--sso-)   * [Standards](#standards)     + [Linting and Formatting](#linting-and-formatting)     + [Branches](#branches)     + [Commits](#commits)     + [Pull Requests](#pull-requests)     + [Local development tools](#local-development-tools)",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uktrade/report-a-breach.git"
+  },
+  "author": "@uktrade/service-sanctions",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uktrade/report-a-breach/issues"
+  },
+  "homepage": "https://github.com/uktrade/report-a-breach#readme",
+  "dependencies": {
+    "govuk-frontend": "^5.10.0"
+  }
+}
