@@ -2,6 +2,7 @@
 
 {% if field.is_hidden %}
     {{ field }}
+
 {% else %}
     {% if max_characters or max_words %}
         <div class="govuk-character-count" data-module="govuk-character-count"{% if max_characters %}
@@ -16,6 +17,11 @@
 
     {% if field|is_radios %}
         {% include 'gds/layout/radios.html' %}
+        {% if field.name == "do_you_know_the_registered_company_number" %}
+            <div id="conditional_do_you_know_the_registered_company_number_2" class="govuk-radios__conditional govuk-radios__conditional--hidden">
+                {{ form.registered_company_number }}
+            </div>
+        {% endif %}
     {% endif %}
 
     {% if field|is_multivalue %}

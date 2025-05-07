@@ -4,3 +4,5 @@
 set -e
 
 # Add commands below to run as part of the build phase
+npm ci
+npm run build

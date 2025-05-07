@@ -128,16 +128,16 @@
 
         <title>{% block title %}{% endblock title %} - Report a suspected breach of trade sanctions - GOV.UK</title>
 
-        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "core/assets/images/favicon.ico" %}" type="image/x-icon">
-        <link rel="mask-icon" href="{% static "core/assets/images/govuk-icon-mask.svg" %}" color="#0b0c0c">
+        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static "core/govuk/images/favicon.ico" %}" type="image/x-icon">
+        <link rel="mask-icon" href="{% static "core/govuk/images/govuk-icon-mask.svg" %}" color="#0b0c0c">
         <link rel="apple-touch-icon" sizes="180x180"
-              href="{% static "core/assets/images/govuk-icon-180.png" %}">
+              href="{% static "core/govuk/images/govuk-icon-180.png" %}">
         <meta property="og:image" content="{% static "core/assets/images/govuk-opengraph-image.png" %}">
 
 		{# stylesheets #}
 
         <link rel="stylesheet" href="{% static 'core/stylesheets/font-awesome-6.5.2.css' %}">
-        <link rel="stylesheet" href="{% static "core/stylesheets/govuk-frontend.min.css" %}">
+        <link rel="stylesheet" href="{% static "govuk/govuk.css" %}">
         <link rel="stylesheet" href="{% static "core/stylesheets/common.css" %}">
         <link rel="stylesheet"
               href="{% static "report_a_suspected_breach/stylesheets/report_a_suspected_breach.css" %}">
@@ -146,7 +146,6 @@
     </head>
 
     <body class="govuk-template__body js-disabled govuk-frontend-supported">
-        <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
 
         {% if gtm_enabled %}
 			<!-- Google Tag Manager (noscript) -->
@@ -159,7 +158,7 @@
 
         <script type="text/javascript" nonce="{{ request.csp_nonce }}">
             document.body.classList.remove("js-disabled");
-            document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
+            document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');
         </script>
 
         {% block skip_link %}
@@ -211,60 +210,6 @@
 
         </div>
     </header>
-
-    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-        <div class="govuk-accordion__section">
-            <div class="govuk-accordion__section-header">
-                <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
-                        Writing well for the web
-                    </span>
-                </h2>
-            </div>
-            <div id="accordion-default-content-1" class="govuk-accordion__section-content">
-                <p class="govuk-body">This is the content for Writing well for the web.</p>
-            </div>
-        </div>
-        <div class="govuk-accordion__section">
-            <div class="govuk-accordion__section-header">
-                <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-                        Writing well for specialists
-                    </span>
-                </h2>
-            </div>
-            <div id="accordion-default-content-2" class="govuk-accordion__section-content">
-                <p class="govuk-body">This is the content for Writing well for specialists.</p>
-            </div>
-        </div>
-        <div class="govuk-accordion__section">
-            <div class="govuk-accordion__section-header">
-                <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
-                        Know your audience
-                    </span>
-                </h2>
-            </div>
-            <div id="accordion-default-content-3" class="govuk-accordion__section-content">
-                <p class="govuk-body">This is the content for Know your audience.</p>
-            </div>
-        </div>
-        <div class="govuk-accordion__section">
-            <div class="govuk-accordion__section-header">
-                <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-                        How people read
-                    </span>
-                </h2>
-            </div>
-            <div id="accordion-default-content-4" class="govuk-accordion__section-content">
-                <p class="govuk-body">This is the content for How people read.</p>
-            </div>
-        </div>
-    </div>
-
-
-
 
     {% block phase_banner %}
         <div class="govuk-width-container">
@@ -382,17 +327,7 @@
             </div>
         </div>
         <script src="{% static 'core/javascript/jquery-3.7.1.js' %}" nonce="{{ request.csp_nonce }}"></script>
-        <script type="module" src="{% static "core/javascript/govuk-frontend.min.js" %}" nonce="{{ request.csp_nonce }}"></script>
-        <script type="module" nonce="{{ request.csp_nonce }}">
-            import { initAll } from "{% static "core/javascript/govuk-frontend.min.js" %}"
-            initAll()
-        </script>
-{#        <script type="module" src="{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}" nonce="{{ request.csp_nonce }}"></script>#}
-{#        <script type="module" nonce="{{ request.csp_nonce }}">#}
-{#            import {initAll} from "{% static "core/javascript/govuk-frontend-5.3.0.min.js" %}"#}
-{##}
-{#            initAll()#}
-{#        </script>#}
+        <script src="{% static "govuk/govuk.js" %}" nonce="{{ request.csp_nonce }}"></script>
         {% block extra_js %}{% endblock %}
     </footer>
 {% endblock footer %}
