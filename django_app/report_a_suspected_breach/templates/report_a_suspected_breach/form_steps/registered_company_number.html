@@ -1,0 +1,43 @@
+{% extends "core/base_form_step.html" %}
+{% load crispy_forms_tags crispy_forms_gds %}
+
+{% block row_content %}
+    <div class="govuk-grid-column-three-quarters">
+        {% block column_content %}
+            <form action="{{ request.get_full_path }}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <fieldset class="govuk-fieldset" aria-describedby="{{ form.do_you_know_the_registered_company_number.id_for_label }}-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h1 class="govuk-heading-l">{{ form.do_you_know_the_registered_company_number.label }}</h1>
+                    </legend>
+                    {% error_summary form %}
+                    <div class="govuk-radios" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="do_you_know_the_registered_company_number"
+                                   data-aria-controls="conditional-do_you_know_the_registered_company_number"
+                                   name="do_you_know_the_registered_company_number" type="radio" value="Yes"
+                                   {% if "yes" in form.do_you_know_the_registered_company_number.value %}checked{% endif %}>
+                            <label class="govuk-label govuk-radios__label" for="do_you_know_the_registered_company_number_yes">
+                                Yes</label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-do_you_know_the_registered_company_number">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="registered_company_number">
+                                    Enter the registered company number
+                                </label>
+                                <input class="govuk-input" id="registered_company_number" name="registered_company_number" type="text"
+                                       value="{{ form.registered_company_number.value|default_if_none:'' }}"></div>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="do_you_know_the_registered_company_number_no" name="do_you_know_the_registered_company_number"
+                                   type="radio" value="No" {% if "No" in form.do_you_know_the_registered_company_number.value %}checked{% endif %}>
+                            <label class="govuk-label govuk-radios__label" for="do_you_know_the_registered_company_number_no">
+                                No</label>
+                        </div>
+                    </div>
+                </fieldset>
+                <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
+            </form>
+            </div>
+        {% endblock column_content %}
+{% endblock %}

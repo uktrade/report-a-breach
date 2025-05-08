@@ -21,6 +21,7 @@ class AreYouReportingCompaniesHouseBusinessView(BaseFormView):
 
 
 class DoYouKnowTheRegisteredCompanyNumberView(BaseFormView):
+    template_name = "report_a_suspected_breach/form_steps/registered_company_number.html"
     form_class = forms.DoYouKnowTheRegisteredCompanyNumberForm
     redirect_after_post = False
 
