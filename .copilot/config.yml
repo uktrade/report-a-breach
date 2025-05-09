@@ -1,5 +1,6 @@
 repository: report-a-breach
 builder:
-  name: paketo-buildpacks/nodejs
+  name: paketo-buildpacks/npm-install
+  version: 1.8.10
 packs:
   - acodeninja/playwright
