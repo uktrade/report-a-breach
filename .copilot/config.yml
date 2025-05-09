@@ -1,6 +1,6 @@
 repository: report-a-breach
 builder:
-  name: paketo-buildpacks/npm-install
-  version: 1.8.10
+  name: paketobuildpacks/builder-jammy-full
+  version: 0.3.339
 packs:
   - acodeninja/playwright
