@@ -3,7 +3,9 @@ from unittest.mock import patch
 from report_a_suspected_breach import choices
 from report_a_suspected_breach.forms.forms_business import (
     AreYouReportingABusinessOnCompaniesHouseForm,
+    BusinessOrPersonDetailsForm,
     DoYouKnowTheRegisteredCompanyNumberForm,
+    ManualCompaniesHouseInputForm,
 )
 
 
@@ -17,6 +19,13 @@ class TestAreYouReportingABusinessOnCompaniesHouseForm:
     def test_optional_choice_removed(self):
         form = AreYouReportingABusinessOnCompaniesHouseForm()
         assert len(form.fields["business_registered_on_companies_house"].choices) == len(choices.YesNoDoNotKnowChoices.choices)
+
+    def test_init_method_removes_first_choice(self):
+        original_form_choices = choices.YesNoDoNotKnowChoices.choices.copy()
+        form = AreYouReportingABusinessOnCompaniesHouseForm()
+        form.fields["business_registered_on_companies_house"].choices = [("", "Select one")] + list(original_form_choices)
+        form.__init__()
+        assert ("", "Select one") not in form.fields["business_registered_on_companies_house"].choices
 
 
 class TestDoYouKnowTheRegisteredCompanyNumberForm:
@@ -105,3 +114,19 @@ class TestDoYouKnowTheRegisteredCompanyNumberForm:
             request=request_object,
         )
         assert not form.is_bound
+
+
+class TestManualCompaniesHouseInputForm:
+    def test_form_layout(self):
+        form = ManualCompaniesHouseInputForm(data={"manual_companies_house_input": None})
+        assert not form.is_valid()
+        assert "manual_companies_house_input" in form.errors
+        expected_error = "Select if the address of the business suspected of breaching sanctions is in the UK, or outside the UK"
+        assert form.errors["manual_companies_house_input"][0] == expected_error
+
+
+class TestBusinessOrPersonDetailsForm:
+    def test_form_layout(self):
+        form = BusinessOrPersonDetailsForm()
+        assert hasattr(form, "form_h1_header")
+        assert form.form_h1_header == "Business or person details"

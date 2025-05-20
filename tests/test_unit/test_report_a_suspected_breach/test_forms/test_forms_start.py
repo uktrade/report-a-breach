@@ -31,6 +31,10 @@ class TestStartForm:
         form = StartForm()
         assert isinstance(form.fields["reporter_professional_relationship"].widget, django_forms.RadioSelect)
 
+    def test_init_method_removes_first_choice(self):
+        form = StartForm()
+        assert "" not in form.fields["reporter_professional_relationship"].choices
+
 
 class TestEmailForm:
     def test_required(self):

@@ -1,5 +1,6 @@
 from report_a_suspected_breach.forms.forms_supply_chain import (
     AboutTheEndUserForm,
+    WhereWereTheGoodsSuppliedFromForm,
     ZeroEndUsersForm,
 )
 
@@ -45,3 +46,15 @@ class TestZeroEndUsersForm:
         assert not form.is_valid()
         assert "do_you_want_to_add_an_end_user" in form.errors
         assert form.errors.as_data()["do_you_want_to_add_an_end_user"][0].code == "required"
+
+
+class TestWhereWereTheGoodsSuppliedFromForm:
+    def test_init_address_string(self):
+        form = WhereWereTheGoodsSuppliedFromForm(address_string="")
+        choices = form.fields["where_were_the_goods_supplied_from"].choices
+        assert "same_address" not in choices[0]
+
+        # with address
+        form2 = WhereWereTheGoodsSuppliedFromForm(address_string="1 Test Street")
+        choices = form2.fields["where_were_the_goods_supplied_from"].choices
+        assert "same_address" in [choice[0] for choice in choices]
