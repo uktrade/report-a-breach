@@ -27,6 +27,7 @@ class DoYouKnowTheRegisteredCompanyNumberView(BaseFormView):
     def form_valid(self, form: forms.DoYouKnowTheRegisteredCompanyNumberForm) -> HttpResponse:
         self.form = form
         self.request.session["company_details"] = self.form.cleaned_data
+        self.request.session.modified = True
         return super().form_valid(form)
 
     def get_success_url(self) -> str:
@@ -54,7 +55,7 @@ class CheckCompanyDetailsView(BaseFormView):
 
     def get_context_data(self, **kwargs: object) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["company_details"] = self.request.session["company_details"]
+        context["company_details"] = self.request.session.get("company_details", {})
         return context
 
 
