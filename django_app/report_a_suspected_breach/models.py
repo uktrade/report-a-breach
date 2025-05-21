@@ -264,6 +264,7 @@ class UploadedDocument(BaseModel):
             )
 
 
+# TODO
 class ReporterEmailVerification(BaseModel):
     reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     email_verification_code = models.CharField(max_length=6)
