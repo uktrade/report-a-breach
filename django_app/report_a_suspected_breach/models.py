@@ -201,6 +201,8 @@ class PersonOrCompany(BaseModel):
             registered_company_number=person_or_company.get("registered_company_number"),
         )
 
+    breach = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=True, null=True)
+    whistleblower_report = models.ForeignKey("WhistleblowerReport", on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField()
     name_of_business = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -213,7 +215,6 @@ class PersonOrCompany(BaseModel):
     country = CountryField(blank_label="Select country")
     county = models.TextField(null=True, blank=True)
     postal_code = models.TextField()
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
     additional_contact_details = models.TextField(null=True, blank=True)
     type_of_relationship = models.CharField(choices=choices.TypeOfRelationshipChoices.choices, max_length=9)
     do_you_know_the_registered_company_number = models.CharField(
@@ -264,9 +265,40 @@ class UploadedDocument(BaseModel):
             )
 
 
-# TODO
 class ReporterEmailVerification(BaseModel):
     reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     email_verification_code = models.CharField(max_length=6)
     date_created = models.DateTimeField(auto_now_add=True)
     verified = models.BooleanField(default=False)
+
+
+class Whistleblower(BaseModel):
+    name = models.TextField(blank=True)
+    email = models.EmailField(blank=True)
+    email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.CASCADE, blank=True)
+
+
+class WhistleblowerReport(BaseModel):
+    whistleblower = models.ForeignKey("Whistleblower", on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+    business_name = models.CharField(max_length=300, verbose_name="Business you work for")
+    when_did_you_first_suspect = models.DateField()
+    is_the_date_accurate = models.CharField(choices=choices.IsTheDateAccurateChoices.choices, max_length=11)
+    unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
+    where_were_the_goods_supplied_from = models.TextField()
+    sanctions_regimes_breached = ArrayField(base_field=models.CharField(max_length=255), blank=True, default=list)
+    other_sanctions_regime = models.BooleanField(blank=True, default=False)
+    what_were_the_goods = models.TextField(blank=False)
+    business_registered_on_companies_house = models.CharField(
+        choices=choices.YesNoDoNotKnowChoices.choices,
+        max_length=11,
+        blank=False,
+    )
+    were_there_other_addresses_in_the_supply_chain = models.CharField(
+        choices=choices.YesNoDoNotKnowChoices.choices,
+        max_length=11,
+        blank=False,
+    )
+    other_addresses_in_the_supply_chain = models.TextField(blank=True)
+    tell_us_about_the_suspected_breach = models.TextField(blank=False)
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
