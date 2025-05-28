@@ -17,6 +17,7 @@ from tests.factories import (
     BreachWith2SanctionsFactory,
     BreachWithCompaniesHouseFactory,
     UploadedDocumentFactory,
+    WhistleblowerReportFactory,
 )
 from tests.helpers import get_test_client
 
@@ -70,6 +71,12 @@ def vasb_client_logged_in(vasb_client, staff_user) -> Client:
 def breach_object(db):
     """Fixture to create a breach object."""
     return BreachFactory()
+
+
+@pytest.fixture()
+def whistleblower_report_object(db):
+    """Fixture to create a breach object."""
+    return WhistleblowerReportFactory()
 
 
 @pytest.fixture()

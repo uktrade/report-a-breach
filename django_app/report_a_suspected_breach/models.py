@@ -4,6 +4,7 @@ from core.document_storage import PermanentDocumentStorage, TemporaryDocumentSto
 from core.models import BaseModel
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.sessions.models import Session
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.forms import model_to_dict
 from django.http import HttpRequest
@@ -154,31 +155,131 @@ class Breach(BaseModel):
             PersonOrCompany.save_person_or_company(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
 
             # Save documents to permanent bucket and database
-            UploadedDocument.save_documents(new_breach, request)
+            UploadedDocument.save_documents(request, breach=new_breach)
             # Save supplier details to database
             if show_about_the_supplier_page(request):
                 supplier_details = cleaned_data["about_the_supplier"]
-                PersonOrCompany.save_person_or_company(new_breach, supplier_details, TypeOfRelationshipChoices.supplier)
+                PersonOrCompany.save_person_or_company(
+                    type_of_report=new_breach, person_or_company=supplier_details, relationship=TypeOfRelationshipChoices.supplier
+                )
 
             # Save recipient(s) details to database
             if end_users := request.session.get("end_users", None):
                 for end_user in end_users:
                     end_user_details = end_users[end_user]["cleaned_data"]
                     end_user_details["name"] = end_user_details.get("name_of_person", "")
-                    PersonOrCompany.save_person_or_company(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
+                    PersonOrCompany.save_person_or_company(
+                        type_of_report=new_breach,
+                        person_or_company=end_user_details,
+                        relationship=TypeOfRelationshipChoices.recipient,
+                    )
 
         new_breach.assign_reference()
         new_breach.save()
         return new_breach
 
 
+class UploadedDocument(BaseModel):
+    file = models.FileField(
+        max_length=340,
+        null=True,
+        blank=True,
+        # if we're storing the document in the DB, we can assume it's in the permanent bucket
+        storage=PermanentDocumentStorage(),
+        validators=[
+            validate_virus_check_result,
+        ],
+    )
+    breach = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=True, related_name="documents", null=True)
+    whistleblower_report = models.ForeignKey("WhistleblowerReport", on_delete=models.CASCADE, blank=True, null=True)
+
+    def file_name(self) -> str:
+        return self.file.name.split("/")[-1]
+
+    def url(self) -> str:
+        return self.file.url
+
+    @classmethod
+    def save_documents(cls, request, breach=None, whistleblower_report=None) -> None:
+        # Save documents
+        if breach is None and whistleblower_report is None:
+            raise ValidationError("Breach or Whistleblower report must be specified")
+        documents = get_all_session_files(TemporaryDocumentStorage(), request.session)
+        for key, _ in documents.items():
+            if breach is not None:
+                new_key = store_document_in_permanent_bucket(object_key=key, breach_pk=breach.pk)
+                UploadedDocument.objects.create(
+                    breach=breach,
+                    file=new_key,
+                )
+            elif whistleblower_report is not None:
+                new_key = store_document_in_permanent_bucket(object_key=key, whistleblower_pk=whistleblower_report.pk)
+                UploadedDocument.objects.create(
+                    whistleblower_report=whistleblower_report,
+                    file=new_key,
+                )
+
+
+class ReporterEmailVerification(BaseModel):
+    reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
+    email_verification_code = models.CharField(max_length=6)
+    date_created = models.DateTimeField(auto_now_add=True)
+    verified = models.BooleanField(default=False)
+
+
+class Whistleblower(BaseModel):
+    name = models.TextField(blank=True)
+    email = models.EmailField(blank=True)
+    email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.SET_NULL, blank=True, null=True)
+
+
+class WhistleblowerReport(BaseModel):
+    whistleblower = models.ForeignKey("Whistleblower", on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+    business_name = models.CharField(max_length=300, verbose_name="Business you work for")
+    when_did_you_first_suspect = models.DateField()
+    is_the_date_accurate = models.CharField(choices=choices.IsTheDateAccurateChoices.choices, max_length=11)
+    unknown_sanctions_regime = models.BooleanField(blank=True, default=False)
+    where_were_the_goods_supplied_from = models.TextField()
+    sanctions_regimes_breached = ArrayField(base_field=models.CharField(max_length=255), blank=True, default=list)
+    other_sanctions_regime = models.BooleanField(blank=True, default=False)
+    what_were_the_goods = models.TextField(blank=False)
+    business_registered_on_companies_house = models.CharField(
+        choices=choices.YesNoDoNotKnowChoices.choices,
+        max_length=11,
+        blank=False,
+    )
+    were_there_other_addresses_in_the_supply_chain = models.CharField(
+        choices=choices.YesNoDoNotKnowChoices.choices,
+        max_length=11,
+        blank=False,
+    )
+    other_addresses_in_the_supply_chain = models.TextField(blank=True)
+    tell_us_about_the_suspected_breach = models.TextField(blank=False)
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
+
+
 class PersonOrCompany(BaseModel):
     @classmethod
     def save_person_or_company(
-        cls, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
+        cls,
+        type_of_report: Breach | WhistleblowerReport,
+        person_or_company: dict[str, str],
+        relationship: TypeOfRelationshipChoices,
     ) -> "PersonOrCompany":
         """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
-        return cls.objects.create(
+
+        breach_report = None
+        whistleblower_report = None
+
+        if type_of_report.__class__.__name__ == "Breach":
+            breach_report = type_of_report
+        elif type_of_report.__class__.__name__ == "WhistleblowerReport":
+            whistleblower_report = type_of_report
+        else:
+            raise ValidationError(f"Unrecognized report type: {type_of_report.__class__.__name__}")
+
+        new_person_or_company = cls.objects.create(
             name=person_or_company.get("name", ""),
             name_of_business=(
                 person_or_company["registered_company_name"]
@@ -196,11 +297,22 @@ class PersonOrCompany(BaseModel):
             county=person_or_company.get("county"),
             postal_code=person_or_company.get("postal_code", ""),
             additional_contact_details=person_or_company.get("additional_contact_details"),
-            breach=breach,
             type_of_relationship=relationship,
             registered_company_number=person_or_company.get("registered_company_number"),
         )
 
+        if breach_report is not None:
+            new_person_or_company.breach_report = breach_report
+
+        elif whistleblower_report is not None:
+            new_person_or_company.whistleblower_report = whistleblower_report
+
+        new_person_or_company.save()
+
+        return new_person_or_company
+
+    breach_report = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=True, null=True)
+    whistleblower_report = models.ForeignKey("WhistleblowerReport", on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField()
     name_of_business = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -213,7 +325,6 @@ class PersonOrCompany(BaseModel):
     country = CountryField(blank_label="Select country")
     county = models.TextField(null=True, blank=True)
     postal_code = models.TextField()
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE)
     additional_contact_details = models.TextField(null=True, blank=True)
     type_of_relationship = models.CharField(choices=choices.TypeOfRelationshipChoices.choices, max_length=9)
     do_you_know_the_registered_company_number = models.CharField(
@@ -231,42 +342,3 @@ class PersonOrCompany(BaseModel):
             return self.registered_office_address
         else:
             return get_formatted_address(model_to_dict(self))
-
-
-class UploadedDocument(BaseModel):
-    file = models.FileField(
-        max_length=340,
-        null=True,
-        blank=True,
-        # if we're storing the document in the DB, we can assume it's in the permanent bucket
-        storage=PermanentDocumentStorage(),
-        validators=[
-            validate_virus_check_result,
-        ],
-    )
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=False, related_name="documents")
-
-    def file_name(self) -> str:
-        return self.file.name.split("/")[-1]
-
-    def url(self) -> str:
-        return self.file.url
-
-    @classmethod
-    def save_documents(cls, breach, request) -> None:
-        # Save documents
-        documents = get_all_session_files(TemporaryDocumentStorage(), request.session)
-        for key, _ in documents.items():
-            new_key = store_document_in_permanent_bucket(object_key=key, breach_pk=breach.pk)
-            UploadedDocument.objects.create(
-                breach=breach,
-                file=new_key,
-            )
-
-
-# TODO
-class ReporterEmailVerification(BaseModel):
-    reporter_session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
-    email_verification_code = models.CharField(max_length=6)
-    date_created = models.DateTimeField(auto_now_add=True)
-    verified = models.BooleanField(default=False)

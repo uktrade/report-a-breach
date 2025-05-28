@@ -37,12 +37,14 @@ class TestViewASuspectedBreachView:
         breach_id = breach_with_sanctions_object.id
         response = vasb_client.get(f"/view/view-report/{breach_with_sanctions_object.reference}/")
         breacher = PersonOrCompany.objects.filter(
-            breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
+            breach_report=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
         supplier = PersonOrCompany.objects.filter(
-            breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.supplier
+            breach_report=breach_id, type_of_relationship=TypeOfRelationshipChoices.supplier
         ).first()
-        recipients = PersonOrCompany.objects.filter(breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.recipient)
+        recipients = PersonOrCompany.objects.filter(
+            breach_report=breach_id, type_of_relationship=TypeOfRelationshipChoices.recipient
+        )
         assert response.context["breach"] == breach_with_sanctions_object
         assert response.context["breacher"] == breacher
         assert response.context["supplier"] == supplier
@@ -65,9 +67,11 @@ class TestViewASuspectedBreachView:
         breach_id = breach_with_companies_house_object.id
         response = vasb_client.get(f"/view/view-report/{breach_with_companies_house_object.reference}/")
         breacher = PersonOrCompany.objects.filter(
-            breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
+            breach_report=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
-        recipients = PersonOrCompany.objects.filter(breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.recipient)
+        recipients = PersonOrCompany.objects.filter(
+            breach_report=breach_id, type_of_relationship=TypeOfRelationshipChoices.recipient
+        )
         assert response.context["breach"] == breach_with_companies_house_object
         assert response.context["breacher"] == breacher
         if breach_with_companies_house_object.where_were_the_goods_supplied_from == "same_address":
@@ -94,9 +98,11 @@ class TestViewASuspectedBreachView:
         breach_id = breacher_and_supplier_object.id
         response = vasb_client.get(f"/view/view-report/{breacher_and_supplier_object.reference}/")
         breacher = PersonOrCompany.objects.filter(
-            breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
+            breach_report=breach_id, type_of_relationship=TypeOfRelationshipChoices.breacher
         ).first()
-        recipients = PersonOrCompany.objects.filter(breach=breach_id, type_of_relationship=TypeOfRelationshipChoices.recipient)
+        recipients = PersonOrCompany.objects.filter(
+            breach_report=breach_id, type_of_relationship=TypeOfRelationshipChoices.recipient
+        )
         assert response.context["breach"] == breacher_and_supplier_object
         assert response.context["breacher"] == breacher
         assert response.context["supplier"].name == breacher.name
