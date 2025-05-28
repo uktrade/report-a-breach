@@ -81,14 +81,18 @@ def get_user_uploaded_files(session: SessionBase) -> List[str]:
     return uploaded_files
 
 
-def store_document_in_permanent_bucket(object_key: str, breach_pk: str) -> str:
+def store_document_in_permanent_bucket(object_key: str, breach_pk: str | None = None, whistleblower_pk: str | None = None) -> str:
     """
     Copies a specific document from the temporary storage to permanent storage on s3
     """
     temporary_storage_bucket = TemporaryDocumentStorage()
     permanent_storage_bucket = PermanentDocumentStorage()
 
-    new_key = f"{breach_pk}/{object_key}"
+    if breach_pk is None and whistleblower_pk is None:
+        raise ValueError("Must specify either `breach_pk` or `whistleblower_pk`")
+
+    path = breach_pk if breach_pk is not None else whistleblower_pk
+    new_key = f"{path}/{object_key}"
     permanent_storage_bucket.bucket.meta.client.copy(
         CopySource={
             "Bucket": settings.TEMPORARY_S3_BUCKET_NAME,

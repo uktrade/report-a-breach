@@ -155,18 +155,24 @@ class Breach(BaseModel):
             PersonOrCompany.save_person_or_company(new_breach, breacher_details, TypeOfRelationshipChoices.breacher)
 
             # Save documents to permanent bucket and database
-            UploadedDocument.save_documents(new_breach, request)
+            UploadedDocument.save_documents(request, breach=new_breach)
             # Save supplier details to database
             if show_about_the_supplier_page(request):
                 supplier_details = cleaned_data["about_the_supplier"]
-                PersonOrCompany.save_person_or_company(new_breach, supplier_details, TypeOfRelationshipChoices.supplier)
+                PersonOrCompany.save_person_or_company(
+                    type_of_report=new_breach, person_or_company=supplier_details, relationship=TypeOfRelationshipChoices.supplier
+                )
 
             # Save recipient(s) details to database
             if end_users := request.session.get("end_users", None):
                 for end_user in end_users:
                     end_user_details = end_users[end_user]["cleaned_data"]
                     end_user_details["name"] = end_user_details.get("name_of_person", "")
-                    PersonOrCompany.save_person_or_company(new_breach, end_user_details, TypeOfRelationshipChoices.recipient)
+                    PersonOrCompany.save_person_or_company(
+                        type_of_report=new_breach,
+                        person_or_company=end_user_details,
+                        relationship=TypeOfRelationshipChoices.recipient,
+                    )
 
         new_breach.assign_reference()
         new_breach.save()
@@ -184,7 +190,8 @@ class UploadedDocument(BaseModel):
             validate_virus_check_result,
         ],
     )
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=False, related_name="documents")
+    breach = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=True, related_name="documents", null=True)
+    whistleblower_report = models.ForeignKey("WhistleblowerReport", on_delete=models.CASCADE, blank=True, null=True)
 
     def file_name(self) -> str:
         return self.file.name.split("/")[-1]
@@ -193,15 +200,24 @@ class UploadedDocument(BaseModel):
         return self.file.url
 
     @classmethod
-    def save_documents(cls, breach, request) -> None:
+    def save_documents(cls, request, breach=None, whistleblower_report=None) -> None:
         # Save documents
+        if breach is None and whistleblower_report is None:
+            raise ValidationError("Breach or Whistleblower report must be specified")
         documents = get_all_session_files(TemporaryDocumentStorage(), request.session)
         for key, _ in documents.items():
-            new_key = store_document_in_permanent_bucket(object_key=key, breach_pk=breach.pk)
-            UploadedDocument.objects.create(
-                breach=breach,
-                file=new_key,
-            )
+            if breach is not None:
+                new_key = store_document_in_permanent_bucket(object_key=key, breach_pk=breach.pk)
+                UploadedDocument.objects.create(
+                    breach=breach,
+                    file=new_key,
+                )
+            elif whistleblower_report is not None:
+                new_key = store_document_in_permanent_bucket(object_key=key, whistleblower_pk=whistleblower_report.pk)
+                UploadedDocument.objects.create(
+                    whistleblower_report=whistleblower_report,
+                    file=new_key,
+                )
 
 
 class ReporterEmailVerification(BaseModel):

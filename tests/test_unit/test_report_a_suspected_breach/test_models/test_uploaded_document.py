@@ -33,7 +33,7 @@ def test_save_documents(
 
     perm_document_storage = PermanentDocumentStorage()
     assert len(list(perm_document_storage.bucket.objects.all())) == 0
-    UploadedDocument.save_documents(breach_object, rasb_client)
+    UploadedDocument.save_documents(rasb_client, breach=breach_object)
     assert len(list(perm_document_storage.bucket.objects.all())) == 2
     documents = breach_object.documents.all()
     assert len(documents) == 2
