@@ -125,3 +125,20 @@ class UploadedDocumentFactory(factory.django.DjangoModelFactory):
 
     breach = factory.SubFactory(BreachFactory)
     file = factory.django.FileField(filename="test.txt")
+
+
+class WhistleblowerFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.Whistleblower"
+
+
+class WhistleblowerReportFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "report_a_suspected_breach.WhistleblowerReport"
+
+    whistleblower = factory.SubFactory(WhistleblowerFactory)
+    when_did_you_first_suspect = factory.Faker("date_time", tzinfo=timezone.get_current_timezone())
+    where_were_the_goods_supplied_from = factory.Faker(
+        "random_element",
+        elements=["same_address", "different_uk_address", "outside_the_uk", "they_have_not_been_supplied", "i_do_not_know"],
+    )

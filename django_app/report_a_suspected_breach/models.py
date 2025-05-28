@@ -214,7 +214,7 @@ class ReporterEmailVerification(BaseModel):
 class Whistleblower(BaseModel):
     name = models.TextField(blank=True)
     email = models.EmailField(blank=True)
-    email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.CASCADE, blank=True)
+    email_verification = models.ForeignKey("ReporterEmailVerification", on_delete=models.SET_NULL, blank=True, null=True)
 
 
 class WhistleblowerReport(BaseModel):
