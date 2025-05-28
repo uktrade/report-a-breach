@@ -6,7 +6,7 @@ from tests.factories import BreacherPersonOrCompanyFactory
 def test_save_person_or_company_name_of_business(breach_object):
     #  Test the save_person_or_company method.
     new_object = PersonOrCompany.save_person_or_company(
-        breach=breach_object,
+        type_of_report=breach_object,
         person_or_company={
             "name": "Test Name",
             "website": "https://www.test.com",
@@ -26,7 +26,7 @@ def test_save_person_or_company_name_of_business(breach_object):
     assert new_object.name_of_business == "Test Registered Company Name"
 
     new_object = PersonOrCompany.save_person_or_company(
-        breach=breach_object,
+        type_of_report=breach_object,
         person_or_company={
             "name": "Test Name",
             "website": "https://www.test.com",
@@ -50,11 +50,11 @@ def test_readable_address(breach_object):
         registered_office_address="12 test road, coventry, GL123, United Kingdom",
         address_line_1="DO NOT SHOW",
         address_line_2="DO NOT SHOW",
-        breach=breach_object,
+        breach_report=breach_object,
     )
     assert company.get_readable_address() == "12 test road, coventry, GL123, United Kingdom"
 
     company = BreacherPersonOrCompanyFactory(
-        registered_office_address=None, address_line_1="12 test road", address_line_2="coventry", breach=breach_object
+        registered_office_address=None, address_line_1="12 test road", address_line_2="coventry", breach_report=breach_object
     )
     assert company.get_readable_address() == "12 test road,\n coventry"

@@ -10,7 +10,7 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
 
     # Breacher
     if breacher := PersonOrCompany.objects.filter(
-        breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.breacher
+        breach_report=breach.id, type_of_relationship=TypeOfRelationshipChoices.breacher
     ).first():
         breacher_address = breacher.get_readable_address()
         breach_context["breacher"] = breacher
@@ -18,7 +18,7 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
 
     # Supplier
     if supplier := PersonOrCompany.objects.filter(
-        breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.supplier
+        breach_report=breach.id, type_of_relationship=TypeOfRelationshipChoices.supplier
     ).first():
         supplier_address = supplier.get_readable_address()
         breach_context["supplier"] = supplier
@@ -30,7 +30,7 @@ def get_breach_context_data(breach: Breach) -> dict[str, Any]:
             breach_context["supplier_address"] = breacher_address
 
     # End Users (recipients)
-    recipients = PersonOrCompany.objects.filter(breach_id=breach.id, type_of_relationship=TypeOfRelationshipChoices.recipient)
+    recipients = PersonOrCompany.objects.filter(breach_report=breach.id, type_of_relationship=TypeOfRelationshipChoices.recipient)
     breach_context["recipients"] = recipients
 
     # Sanctions Regimes

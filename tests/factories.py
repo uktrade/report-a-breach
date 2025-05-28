@@ -78,36 +78,36 @@ class RecipientPersonOrCompanyFactory(factory.django.DjangoModelFactory):
 class BreachWith2SanctionsFactory(BreachFactory):
     breacher = factory.RelatedFactory(
         BreacherPersonOrCompanyFactory,
-        factory_related_name="breach",
+        factory_related_name="breach_report",
     )
 
-    supplier = factory.RelatedFactory(SupplierPersonOrCompanyFactory, factory_related_name="breach")
+    supplier = factory.RelatedFactory(SupplierPersonOrCompanyFactory, factory_related_name="breach_report")
 
-    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach_report")
 
-    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach_report")
 
-    recipient3 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+    recipient3 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach_report")
 
 
 class BreachWithCompaniesHouseFactory(BreachFactory):
     breacher = factory.RelatedFactory(
         BreacherCompaniesHouseCompanyFactory,
-        factory_related_name="breach",
+        factory_related_name="breach_report",
     )
-    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach_report")
 
-    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach_report")
 
 
 class BreachBreacherAndSupplierFactory(BreacherandSupplierFactory):
     breacher = factory.RelatedFactory(
         BreacherPersonOrCompanyFactory,
-        factory_related_name="breach",
+        factory_related_name="breach_report",
     )
-    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+    recipient1 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach_report")
 
-    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach")
+    recipient2 = factory.RelatedFactory(RecipientPersonOrCompanyFactory, factory_related_name="breach_report")
 
 
 class FeedbackFactory(factory.django.DjangoModelFactory):

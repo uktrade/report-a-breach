@@ -4,6 +4,7 @@ from core.document_storage import PermanentDocumentStorage, TemporaryDocumentSto
 from core.models import BaseModel
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.sessions.models import Session
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.forms import model_to_dict
 from django.http import HttpRequest
@@ -172,68 +173,6 @@ class Breach(BaseModel):
         return new_breach
 
 
-class PersonOrCompany(BaseModel):
-    @classmethod
-    def save_person_or_company(
-        cls, breach: Breach, person_or_company: dict[str, str], relationship: TypeOfRelationshipChoices
-    ) -> "PersonOrCompany":
-        """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
-        return cls.objects.create(
-            name=person_or_company.get("name", ""),
-            name_of_business=(
-                person_or_company["registered_company_name"]
-                if person_or_company.get("do_you_know_the_registered_company_number", False)
-                else person_or_company.get("name_of_business")
-            ),
-            website=person_or_company.get("website"),
-            email=person_or_company.get("email"),
-            address_line_1=person_or_company.get("address_line_1"),
-            address_line_2=person_or_company.get("address_line_2"),
-            address_line_3=person_or_company.get("address_line_3"),
-            address_line_4=person_or_company.get("address_line_4"),
-            town_or_city=person_or_company.get("town_or_city"),
-            country=person_or_company.get("country"),
-            county=person_or_company.get("county"),
-            postal_code=person_or_company.get("postal_code", ""),
-            additional_contact_details=person_or_company.get("additional_contact_details"),
-            breach=breach,
-            type_of_relationship=relationship,
-            registered_company_number=person_or_company.get("registered_company_number"),
-        )
-
-    breach = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=True, null=True)
-    whistleblower_report = models.ForeignKey("WhistleblowerReport", on_delete=models.CASCADE, blank=True, null=True)
-    name = models.TextField()
-    name_of_business = models.TextField(null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
-    website = models.CharField(null=True, blank=True, max_length=512)
-    address_line_1 = models.TextField()
-    address_line_2 = models.TextField(null=True, blank=True)
-    address_line_3 = models.TextField(null=True, blank=True)
-    address_line_4 = models.TextField(null=True, blank=True)
-    town_or_city = models.TextField()
-    country = CountryField(blank_label="Select country")
-    county = models.TextField(null=True, blank=True)
-    postal_code = models.TextField()
-    additional_contact_details = models.TextField(null=True, blank=True)
-    type_of_relationship = models.CharField(choices=choices.TypeOfRelationshipChoices.choices, max_length=9)
-    do_you_know_the_registered_company_number = models.CharField(
-        choices=choices.YesNoChoices.choices,
-        max_length=3,
-        blank=False,
-    )
-    registered_company_number = models.CharField(max_length=20, null=True, blank=True)
-    registered_office_address = models.CharField(null=True, blank=True)
-
-    def get_readable_address(self) -> str:
-        """Returns a formatted address string for the address fields of this model instance."""
-        if self.registered_office_address:
-            #  If we have registered_office_address, use that instead of the address fields
-            return self.registered_office_address
-        else:
-            return get_formatted_address(model_to_dict(self))
-
-
 class UploadedDocument(BaseModel):
     file = models.FileField(
         max_length=340,
@@ -302,3 +241,88 @@ class WhistleblowerReport(BaseModel):
     other_addresses_in_the_supply_chain = models.TextField(blank=True)
     tell_us_about_the_suspected_breach = models.TextField(blank=False)
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
+
+
+class PersonOrCompany(BaseModel):
+    @classmethod
+    def save_person_or_company(
+        cls,
+        type_of_report: Breach | WhistleblowerReport,
+        person_or_company: dict[str, str],
+        relationship: TypeOfRelationshipChoices,
+    ) -> "PersonOrCompany":
+        """Converts a person or company dictionary into a PersonOrCompany object and saves it to the database."""
+
+        breach_report = None
+        whistleblower_report = None
+
+        if type_of_report.__class__.__name__ == "Breach":
+            breach_report = type_of_report
+        elif type_of_report.__class__.__name__ == "WhistleblowerReport":
+            whistleblower_report = type_of_report
+        else:
+            raise ValidationError(f"Unrecognized report type: {type_of_report.__class__.__name__}")
+
+        new_person_or_company = cls.objects.create(
+            name=person_or_company.get("name", ""),
+            name_of_business=(
+                person_or_company["registered_company_name"]
+                if person_or_company.get("do_you_know_the_registered_company_number", False)
+                else person_or_company.get("name_of_business")
+            ),
+            website=person_or_company.get("website"),
+            email=person_or_company.get("email"),
+            address_line_1=person_or_company.get("address_line_1"),
+            address_line_2=person_or_company.get("address_line_2"),
+            address_line_3=person_or_company.get("address_line_3"),
+            address_line_4=person_or_company.get("address_line_4"),
+            town_or_city=person_or_company.get("town_or_city"),
+            country=person_or_company.get("country"),
+            county=person_or_company.get("county"),
+            postal_code=person_or_company.get("postal_code", ""),
+            additional_contact_details=person_or_company.get("additional_contact_details"),
+            type_of_relationship=relationship,
+            registered_company_number=person_or_company.get("registered_company_number"),
+        )
+
+        if breach_report is not None:
+            new_person_or_company.breach_report = breach_report
+
+        elif whistleblower_report is not None:
+            new_person_or_company.whistleblower_report = whistleblower_report
+
+        new_person_or_company.save()
+
+        return new_person_or_company
+
+    breach_report = models.ForeignKey("Breach", on_delete=models.CASCADE, blank=True, null=True)
+    whistleblower_report = models.ForeignKey("WhistleblowerReport", on_delete=models.CASCADE, blank=True, null=True)
+    name = models.TextField()
+    name_of_business = models.TextField(null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    website = models.CharField(null=True, blank=True, max_length=512)
+    address_line_1 = models.TextField()
+    address_line_2 = models.TextField(null=True, blank=True)
+    address_line_3 = models.TextField(null=True, blank=True)
+    address_line_4 = models.TextField(null=True, blank=True)
+    town_or_city = models.TextField()
+    country = CountryField(blank_label="Select country")
+    county = models.TextField(null=True, blank=True)
+    postal_code = models.TextField()
+    additional_contact_details = models.TextField(null=True, blank=True)
+    type_of_relationship = models.CharField(choices=choices.TypeOfRelationshipChoices.choices, max_length=9)
+    do_you_know_the_registered_company_number = models.CharField(
+        choices=choices.YesNoChoices.choices,
+        max_length=3,
+        blank=False,
+    )
+    registered_company_number = models.CharField(max_length=20, null=True, blank=True)
+    registered_office_address = models.CharField(null=True, blank=True)
+
+    def get_readable_address(self) -> str:
+        """Returns a formatted address string for the address fields of this model instance."""
+        if self.registered_office_address:
+            #  If we have registered_office_address, use that instead of the address fields
+            return self.registered_office_address
+        else:
+            return get_formatted_address(model_to_dict(self))
